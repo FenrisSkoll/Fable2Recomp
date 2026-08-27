@@ -125,3 +125,21 @@ validate both ordinary and fault-walk builds before the next numbered harvest.
 The fault walker itself remains experimental tolerance. A manifest entry is
 also only the correct remedy if TU1 bytes prove that the target is a real,
 missing PPC function boundary.
+
+## Resolution
+
+Resolved on `2026-08-27` with TU1-proven manifest entries:
+
+```toml
+"0x829647F0" = { size = 0x10 }
+"0x82C03B28" = { size = 0x1C }
+"0x829675E0" = { size = 0x10 }
+```
+
+Regeneration produced and registered `sub_829647F0`, `sub_82C03B28`, and
+`sub_829675E0`. A normal, non-fault-walk run reached controllable Bowerstone Old
+Town gameplay without any `[FATAL]` or `[FWT]` line. Evidence:
+
+- Runtime log: `C:\Dev\Fable2Recomp\fable2-run-007.log`
+- Result: `C:\Dev\Fable2Recomp\out\normal-validation-runs\iteration-01\result.json`
+- Exit: user/automation-requested graceful close, `0x00000000`

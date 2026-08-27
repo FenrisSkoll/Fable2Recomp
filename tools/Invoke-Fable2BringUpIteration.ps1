@@ -18,6 +18,8 @@ param(
 
     [switch] $SkipBuild,
 
+    [switch] $ManualInput,
+
     [switch] $GracefulStop
 )
 
@@ -603,37 +605,43 @@ if ($remainingMilliseconds -gt 0) {
     Start-Sleep -Milliseconds $remainingMilliseconds
 }
 
-try {
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #1' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #2' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #3' -InputEvents $result['input_events']
-    # The hero-selection UI was still neutral when Left was sent after 1.5 seconds.
-    # Six seconds was visually validated by the dedicated D-Pad calibration.
-    Start-Sleep -Seconds 6
-    Invoke-InputPress -Process $gameProcess -Key DPadLeft -Name 'Left Arrow (D-Pad Left)' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #4' -InputEvents $result['input_events']
-} catch {
-    $result['classification'] = if (Test-ProcessStopped -Process $gameProcess) {
-        'ProcessExitedDuringInput'
-    } else {
-        'InputAutomationFailure'
+if ($ManualInput) {
+    $result['manual_input'] = $true
+    Write-Output "[$iterationName] Manual input enabled; monitoring for $MonitorSeconds seconds"
+} else {
+    try {
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #1' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #2' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #3' -InputEvents $result['input_events']
+        # The hero-selection UI was still neutral when Left was sent after 1.5 seconds.
+        # Six seconds was visually validated by the dedicated D-Pad calibration.
+        Start-Sleep -Seconds 6
+        Invoke-InputPress -Process $gameProcess -Key DPadLeft -Name 'Left Arrow (D-Pad Left)' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #4' -InputEvents $result['input_events']
+    } catch {
+        $result['classification'] = if (Test-ProcessStopped -Process $gameProcess) {
+            'ProcessExitedDuringInput'
+        } else {
+            'InputAutomationFailure'
+        }
+        $result['input_error'] = $_.Exception.Message
+        $result['exit_code'] = Get-ExitCodeHex -Process $gameProcess
+        $fatalLine = Get-FirstFatalLine
+        if ($null -ne $fatalLine) {
+            $result['fatal_line'] = $fatalLine
+        }
+        Stop-ExactProcess -Process $gameProcess
+        Write-Result -Result $result
+        exit 24
     }
-    $result['input_error'] = $_.Exception.Message
-    $result['exit_code'] = Get-ExitCodeHex -Process $gameProcess
-    $fatalLine = Get-FirstFatalLine
-    if ($null -ne $fatalLine) {
-        $result['fatal_line'] = $fatalLine
-    }
-    Stop-ExactProcess -Process $gameProcess
-    Write-Result -Result $result
-    exit 24
+
+    $result['final_input_at'] = [DateTimeOffset]::Now.ToString('o')
+    Write-Output "[$iterationName] Final Space sent; monitoring for $MonitorSeconds seconds"
 }
 
-$result['final_input_at'] = [DateTimeOffset]::Now.ToString('o')
-Write-Output "[$iterationName] Final Space sent; monitoring for $MonitorSeconds seconds"
 $monitorStopwatch = [Diagnostics.Stopwatch]::StartNew()
 
 while ($monitorStopwatch.Elapsed.TotalSeconds -lt $MonitorSeconds) {

@@ -21,7 +21,9 @@ param(
 
     [switch] $SkipCodegen,
 
-    [switch] $SkipBuild
+    [switch] $SkipBuild,
+
+    [switch] $ManualInput
 )
 
 $ErrorActionPreference = 'Stop'
@@ -49,6 +51,7 @@ try {
         -FaultWalkReportPath $reportPath `
         -SkipCodegen:$SkipCodegen `
         -SkipBuild:$SkipBuild `
+        -ManualInput:$ManualInput `
         -GracefulStop
 
     exit $LASTEXITCODE

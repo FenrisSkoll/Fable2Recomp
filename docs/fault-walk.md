@@ -29,6 +29,19 @@ them for another runtime-only harvesting iteration with:
     -SkipBuild
 ```
 
+For a user-controlled harvest, disable the calibrated input sequence while
+retaining process monitoring, guardrails, reporting, and graceful shutdown:
+
+```powershell
+.\tools\Invoke-Fable2FaultWalk.ps1 `
+    -Iteration 7 `
+    -RunDirectory .\out\fault-walk-runs `
+    -MonitorSeconds 1800 `
+    -SkipCodegen `
+    -SkipBuild `
+    -ManualInput
+```
+
 The helper reuses `Invoke-Fable2BringUpIteration.ps1`, the calibrated keyboard
 input helper, numbered `fable2-run-NNN.log` files, and the existing TU1 guest
 byte capture. Its additional output is:
@@ -43,6 +56,7 @@ Optional parameters expose the runtime guardrails:
 - `-MaxTotalSuppressions` (default `1000000`)
 - `-MaxFunctionSuppressions` (default `250000`)
 - `-MonitorSeconds` (default `120` after calibrated input)
+- `-ManualInput` (do not inject the calibrated input sequence)
 
 The helper first requests a graceful window close so the end-of-run summary can
 be emitted, then force-stops only if the process does not exit within five

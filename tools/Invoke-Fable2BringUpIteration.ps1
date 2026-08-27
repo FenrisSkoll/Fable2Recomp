@@ -5,7 +5,20 @@ param(
     [int] $Iteration,
 
     [Parameter(Mandatory = $true)]
-    [string] $RunDirectory
+    [string] $RunDirectory,
+
+    [string] $BuildPreset = 'win-amd64-release',
+
+    [ValidateRange(1, 3600)]
+    [int] $MonitorSeconds = 60,
+
+    [string] $FaultWalkReportPath = '',
+
+    [switch] $SkipCodegen,
+
+    [switch] $SkipBuild,
+
+    [switch] $GracefulStop
 )
 
 $ErrorActionPreference = 'Stop'
@@ -40,7 +53,7 @@ function Get-Fable2NextRunNumber {
 }
 
 $manifestPath = Join-Path $repositoryRoot 'fable2_manifest.toml'
-$buildDirectory = Join-Path $repositoryRoot 'out\build\win-amd64-release'
+$buildDirectory = Join-Path $repositoryRoot "out\build\$BuildPreset"
 $executablePath = Join-Path $buildDirectory 'fable2.exe'
 $inputHelperPath = Join-Path $repositoryRoot 'out\input-calibration\Send-Fable2Key.ps1'
 $gameDataRoot = Join-Path $repositoryRoot 'assets\runtime'
@@ -454,19 +467,26 @@ function Invoke-InputPress {
 
 $result = @{
     classification = 'Unknown'
+    build_preset = $BuildPreset
     input_events = [Collections.Generic.List[string]]::new()
     run_number = $runText
     started_at = [DateTimeOffset]::Now.ToString('o')
 }
 
-Write-Output "[$iterationName] Normal ReXGlue codegen"
-Push-Location $repositoryRoot
-try {
-    & cmake --build --preset win-amd64-release --target fable2_codegen 2>&1 |
-        Tee-Object -FilePath $codegenLogPath
-    $codegenExitCode = $LASTEXITCODE
-} finally {
-    Pop-Location
+if ($SkipCodegen) {
+    Write-Output "[$iterationName] Reusing existing generated code"
+    $codegenExitCode = 0
+    $result['codegen_skipped'] = $true
+} else {
+    Write-Output "[$iterationName] ReXGlue codegen via $BuildPreset"
+    Push-Location $repositoryRoot
+    try {
+        & cmake --build --preset $BuildPreset --target fable2_codegen 2>&1 |
+            Tee-Object -FilePath $codegenLogPath
+        $codegenExitCode = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
 }
 
 $result['codegen_exit_code'] = $codegenExitCode
@@ -476,13 +496,19 @@ if ($codegenExitCode -ne 0) {
     exit 20
 }
 
-Write-Output "[$iterationName] Build win-amd64-release"
-Push-Location $repositoryRoot
-try {
-    & cmake --build --preset win-amd64-release 2>&1 | Tee-Object -FilePath $buildLogPath
-    $buildExitCode = $LASTEXITCODE
-} finally {
-    Pop-Location
+if ($SkipBuild) {
+    Write-Output "[$iterationName] Reusing existing $BuildPreset executable"
+    $buildExitCode = 0
+    $result['build_skipped'] = $true
+} else {
+    Write-Output "[$iterationName] Build $BuildPreset"
+    Push-Location $repositoryRoot
+    try {
+        & cmake --build --preset $BuildPreset 2>&1 | Tee-Object -FilePath $buildLogPath
+        $buildExitCode = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
 }
 
 $result['build_exit_code'] = $buildExitCode
@@ -512,6 +538,13 @@ $processStartInfo.ArgumentList.Add('debug')
 $processStartInfo.ArgumentList.Add('--mnk_mode')
 $processStartInfo.ArgumentList.Add('--log_file')
 $processStartInfo.ArgumentList.Add($runtimeLogArgument)
+if ($FaultWalkReportPath) {
+    $resolvedFaultWalkReportPath = [IO.Path]::GetFullPath($FaultWalkReportPath)
+    $faultWalkReportDirectory = Split-Path -Parent $resolvedFaultWalkReportPath
+    New-Item -ItemType Directory -Force -Path $faultWalkReportDirectory | Out-Null
+    $processStartInfo.Environment['REXGLUE_FAULT_WALK_REPORT'] = $resolvedFaultWalkReportPath
+    $result['fault_walk_report'] = $resolvedFaultWalkReportPath
+}
 
 $gameProcess = [Diagnostics.Process]::new()
 $gameProcess.StartInfo = $processStartInfo
@@ -600,10 +633,10 @@ try {
 }
 
 $result['final_input_at'] = [DateTimeOffset]::Now.ToString('o')
-Write-Output "[$iterationName] Final Space sent; monitoring for 60 seconds"
+Write-Output "[$iterationName] Final Space sent; monitoring for $MonitorSeconds seconds"
 $monitorStopwatch = [Diagnostics.Stopwatch]::StartNew()
 
-while ($monitorStopwatch.Elapsed.TotalSeconds -lt 60) {
+while ($monitorStopwatch.Elapsed.TotalSeconds -lt $MonitorSeconds) {
     $fatalLine = Get-FirstFatalLine
     if ($null -ne $fatalLine) {
         $result['fatal_line'] = $fatalLine
@@ -630,6 +663,13 @@ while ($monitorStopwatch.Elapsed.TotalSeconds -lt 60) {
 
 if ($result['classification'] -eq 'Unknown') {
     $result['classification'] = 'PostInputTimeout'
+}
+
+if ($GracefulStop -and -not (Test-ProcessStopped -Process $gameProcess)) {
+    $result['graceful_stop_requested'] = $gameProcess.CloseMainWindow()
+    if ($result['graceful_stop_requested']) {
+        $gameProcess.WaitForExit(5000) | Out-Null
+    }
 }
 
 Stop-ExactProcess -Process $gameProcess

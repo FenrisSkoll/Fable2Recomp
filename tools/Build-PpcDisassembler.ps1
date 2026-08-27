@@ -10,12 +10,15 @@ $outputDirectory = Join-Path $repositoryRoot 'out\tools'
 $outputPath = Join-Path $outputDirectory 'ppc-disasm.exe'
 $sdkRoot = 'C:\Dev\rexglue-sdk'
 $disasmInclude = Join-Path $sdkRoot 'thirdparty\disasm'
-$disasmLibrary = Join-Path $sdkRoot 'out\install\win-amd64\lib\disasm.lib'
+$disasmSource = Join-Path $disasmInclude 'disasm.c'
+$ppcDisasmSource = Join-Path $disasmInclude 'ppc-dis.c'
 
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
 
-if (-not (Test-Path -LiteralPath $disasmLibrary -PathType Leaf)) {
-    throw "ReXGlue disassembler library was not found: $disasmLibrary"
+foreach ($requiredSource in @($disasmSource, $ppcDisasmSource)) {
+    if (-not (Test-Path -LiteralPath $requiredSource -PathType Leaf)) {
+        throw "ReXGlue disassembler source was not found: $requiredSource"
+    }
 }
 
 $compiler = Get-Command clang-cl.exe -ErrorAction Stop
@@ -26,9 +29,9 @@ $compilerArguments = @(
     '/O2'
     "/I$disasmInclude"
     $sourcePath
+    $disasmSource
+    $ppcDisasmSource
     "/Fe:$outputPath"
-    '/link'
-    $disasmLibrary
 )
 & $compiler.Source @compilerArguments
 

@@ -6,8 +6,16 @@ cmake_minimum_required(VERSION 3.25)
 project(fable2 LANGUAGES CXX)
 
 option(REXGLUE_ENABLE_FAULT_WALK
-    "Enable experimental diagnostic generated-function fault walking"
+    "Enable experimental FULL generated-function fault walking"
     OFF)
+option(REXGLUE_ENABLE_FAULT_WALK_DISPATCH
+    "Enable lightweight invalid/unregistered-dispatch fault walking"
+    OFF)
+
+if(REXGLUE_ENABLE_FAULT_WALK AND REXGLUE_ENABLE_FAULT_WALK_DISPATCH)
+    message(FATAL_ERROR
+        "Choose only one fault-walk mode: FULL or DISPATCH_ONLY")
+endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -32,4 +40,7 @@ if(REXGLUE_ENABLE_FAULT_WALK)
         message(FATAL_ERROR "REXGLUE_ENABLE_FAULT_WALK v1 requires Windows SEH")
     endif()
     target_compile_definitions(fable2 PRIVATE REXGLUE_ENABLE_FAULT_WALK=1)
+elseif(REXGLUE_ENABLE_FAULT_WALK_DISPATCH)
+    target_compile_definitions(fable2 PRIVATE
+        REXGLUE_ENABLE_FAULT_WALK_DISPATCH=1)
 endif()

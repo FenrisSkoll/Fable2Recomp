@@ -364,12 +364,18 @@ function Write-Result {
     }
 
     $fatalText = if ($Result.ContainsKey('fatal_line')) { $Result['fatal_line'] } else { '' }
+    $guardrailText = if ($Result.ContainsKey('fault_walk_guardrail_line')) {
+        $Result['fault_walk_guardrail_line']
+    } else {
+        ''
+    }
     Add-Content -LiteralPath $summaryPath -Encoding utf8 -Value @(
         "## Iteration $Iteration"
         ''
         "- Classification: $($Result['classification'])"
         "- Runtime log: $runtimeLogPath"
         "- Fatal: $fatalText"
+        "- Fault-walk guardrail: $guardrailText"
         "- Input events: $($Result['input_events'] -join '; ')"
         ''
     )
@@ -378,6 +384,9 @@ function Write-Result {
     Write-Output "CLASSIFICATION=$($Result['classification'])"
     if ($Result.ContainsKey('fatal_line')) {
         Write-Output "FATAL_LINE=$($Result['fatal_line'])"
+    }
+    if ($Result.ContainsKey('fault_walk_guardrail_line')) {
+        Write-Output "FAULT_WALK_GUARDRAIL_LINE=$($Result['fault_walk_guardrail_line'])"
     }
 }
 
@@ -388,6 +397,16 @@ function Get-FirstFatalLine {
 
     return Get-Content -LiteralPath $runtimeLogPath |
         Where-Object { $_ -match '\[FATAL\]' } |
+        Select-Object -First 1
+}
+
+function Get-FirstFaultWalkGuardrailLine {
+    if (-not (Test-Path -LiteralPath $runtimeLogPath -PathType Leaf)) {
+        return $null
+    }
+
+    return Get-Content -LiteralPath $runtimeLogPath |
+        Where-Object { $_ -match '\[FWT\] GUARDRAIL STOP:' } |
         Select-Object -First 1
 }
 
@@ -657,6 +676,13 @@ while ($monitorStopwatch.Elapsed.TotalSeconds -lt $MonitorSeconds) {
         } else {
             $result['classification'] = 'OtherFatal'
         }
+        break
+    }
+
+    $faultWalkGuardrailLine = Get-FirstFaultWalkGuardrailLine
+    if ($null -ne $faultWalkGuardrailLine) {
+        $result['classification'] = 'FaultWalkGuardrail'
+        $result['fault_walk_guardrail_line'] = $faultWalkGuardrailLine
         break
     }
 

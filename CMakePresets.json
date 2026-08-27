@@ -64,11 +64,21 @@
         },
         {
             "name": "win-amd64-fault-walk-release",
-            "displayName": "Windows AMD64 Fault Walk Release",
+            "displayName": "Windows AMD64 Full Fault Walk Release",
             "inherits": "windows-base",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "REXGLUE_ENABLE_FAULT_WALK": "ON"
+            }
+        },
+        {
+            "name": "win-amd64-fault-walk-dispatch-release",
+            "displayName": "Windows AMD64 Dispatch-Only Fault Walk Release",
+            "inherits": "windows-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "REXGLUE_ENABLE_FAULT_WALK": "OFF",
+                "REXGLUE_ENABLE_FAULT_WALK_DISPATCH": "ON"
             }
         },
         {
@@ -138,6 +148,10 @@
         {
             "name": "win-amd64-fault-walk-release",
             "configurePreset": "win-amd64-fault-walk-release"
+        },
+        {
+            "name": "win-amd64-fault-walk-dispatch-release",
+            "configurePreset": "win-amd64-fault-walk-dispatch-release"
         },
         { "name": "win-amd64-relwithdebinfo", "configurePreset": "win-amd64-relwithdebinfo" },
         { "name": "linux-amd64-debug", "configurePreset": "linux-amd64-debug" },

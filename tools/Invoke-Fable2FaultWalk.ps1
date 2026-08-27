@@ -19,6 +19,9 @@ param(
     [ValidateRange(1, [long]::MaxValue)]
     [long] $MaxFunctionSuppressions = 250000,
 
+    [ValidateSet('Dispatch', 'Full')]
+    [string] $Mode = 'Dispatch',
+
     [switch] $SkipCodegen,
 
     [switch] $SkipBuild,
@@ -33,6 +36,11 @@ $resolvedRunDirectory = [IO.Path]::GetFullPath($RunDirectory)
 $iterationName = 'iteration-{0:D2}' -f $Iteration
 $reportPath = Join-Path $resolvedRunDirectory "$iterationName\fault-walk-report.json"
 $bringUpScript = Join-Path $PSScriptRoot 'Invoke-Fable2BringUpIteration.ps1'
+$buildPreset = if ($Mode -eq 'Full') {
+    'win-amd64-fault-walk-release'
+} else {
+    'win-amd64-fault-walk-dispatch-release'
+}
 
 $savedMaxUnique = $env:REXGLUE_FAULT_WALK_MAX_UNIQUE
 $savedMaxTotal = $env:REXGLUE_FAULT_WALK_MAX_TOTAL_SUPPRESSIONS
@@ -46,7 +54,7 @@ try {
     & $bringUpScript `
         -Iteration $Iteration `
         -RunDirectory $resolvedRunDirectory `
-        -BuildPreset 'win-amd64-fault-walk-release' `
+        -BuildPreset $buildPreset `
         -MonitorSeconds $MonitorSeconds `
         -FaultWalkReportPath $reportPath `
         -SkipCodegen:$SkipCodegen `

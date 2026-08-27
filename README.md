@@ -1,54 +1,83 @@
-# Fable 2 Recomp
+# Fable II Recomp
 
-**Fable2Recomp** is a recompilation Project with hopes to port the game Fable 2 to Windows and Linux. It uses a static recompilation approach based on the [ReXGlue](https://github.com/rexglue/rexglue-sdk) project, streamlining the process and fixing various issues that may arise during decompilation and recompilation.
+**Fable2Recomp** is an attempt to bring **Fable II** to PC through static recompilation using [ReXGlue](https://github.com/rexglue/rexglue-sdk).
 
-This Recomp is currently based off [Fable 2](https://en.wikipedia.org/wiki/Fable_II) GOTY TU1
+The project currently targets **Fable II: Game of the Year Edition, TU1**.
 
-## Features
-- User-friendly interface for ease of use.
-- Plans for enhancing the game with high-resolution support up to 1080p, 2K, 4K, and beyond.
-- Plans for improving the frame rate to 60fps and beyond, reaching up to 240fps.
-- Enhanced graphics for a superior gaming experience.
-- Cross architecture and OS - (x86_64, ARM) (Windows, Linux, Mac, Android?)
+The priority for now is simple: get the original game running correctly. Improvements such as higher resolutions, higher frame rates and other PC-specific features can come later once the game is stable.
+
+## Current Status
+
+The recompiled executable now reaches the **Fable II title screen**.
+
+![Fable II title screen](docs/images/fable2-title-screen.jpg)
+
+The game is **not yet considered playable**. Work is ongoing to identify and fix recompilation and runtime issues as they appear.
+
+## Goals
+
+* Recompile Fable II into a native executable.
+* Match the behaviour of the original Xbox 360 release as closely as possible.
+* Get the game fully playable on Windows.
+* Support Linux where practical.
+* Use ReXGlue for Xbox 360 runtime functionality rather than reimplementing existing functionality unnecessarily.
+* Investigate higher resolutions and frame rates once the original game is stable.
 
 ## Building Fable2Recomp
 
-### Installing the ReXGlue SDK
-Download the latest release and extract it to a location of your choice. This will be your `REXSDK` path. Set this as an environment variable using your preferred method.
+### ReXGlue SDK
 
-### Prerequisites (non-Visual Studio users only)
+Download the latest [ReXGlue SDK release](https://github.com/rexglue/rexglue-sdk/releases) and extract it somewhere convenient.
 
-- Clang 20
-- CMake
-- Ninja
-- [vcpkg](https://github.com/microsoft/vcpkg)
-- Latest Release from [Releases](https://github.com/rexglue/rexglue-sdk/releases)
+Set the extracted SDK location as your `REXSDK` environment variable.
 
-#### Building from source
+### Building ReXGlue from source
+
+If you want to build ReXGlue yourself:
 
 ```bash
 git clone --recursive https://github.com/rexglue/rexglue-sdk
-cd rexglue
+cd rexglue-sdk
+
 cmake --preset <platform>
 cmake --build out/build/<platform> --target install
 ```
 
-Where `<platform>` is `win-amd64` or `linux-amd64`. The build step compiles all configurations (Debug, Release, RelWithDebInfo) at once.
+Where `<platform>` is currently:
 
-### Fable 2 Project configuration
+```text
+win-amd64
+linux-amd64
+```
 
-To build Fable 2, run codegen from the root with all assests in the assets folder and build:
+### Building Fable2Recomp
+
+Clone the repository:
 
 ```bash
-git clone --recursive https://github.com/Fable2Recomp/Fable2Recomp.git
+git clone --recursive https://github.com/FenrisSkoll/Fable2Recomp.git
 cd Fable2Recomp
-rexglue codegen Fable-2_config.toml
+```
+
+Place the required Fable II game files in the appropriate `assets` directories.
+
+Generate the recompiled source:
+
+```bash
+rexglue codegen fable2_manifest.toml
+```
+
+Configure and build:
+
+```bash
 cmake --preset <platform>
 cmake --build out/build/<platform>
 ```
 
-## Contributing
-We are looking for help and we are willing to learn coding and help where we can, we are also open to others joining the project and teaching us if possible. If you have experience or are willing to learn and help out, your support would be greatly appreciated. We're eager to enhance the game with high-resolution support, improved frame rates, and enhanced graphics.
+For example on Windows:
 
-We welcome contributions to Fable2Recomp! If you're interested in enhancing Fable 2 and have the skills or willingness to learn, please join us. Feel free to open a PR if you want to contribute.
-Join the Discord server at https://discord.gg/zVVtGbEsCR
+```bash
+rexglue codegen fable2_manifest.toml
+cmake --preset win-amd64
+cmake --build out/build/win-amd64
+```

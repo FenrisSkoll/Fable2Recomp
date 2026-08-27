@@ -407,3 +407,9 @@ generated/*
 Fable-2
 
 Fable2
+
+# ReXGlue bootstrap - generated code remains ignored
+!generated/rexglue.cmake
+
+# Local copyrighted game data / junction
+/assets/

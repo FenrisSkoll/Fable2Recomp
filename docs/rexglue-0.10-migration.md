@@ -683,7 +683,7 @@ Other classified differences:
 | FULL executable | 107,328,000 | 109,618,688 | +2.134% | Comparable mode |
 | Generated source bytes | 313,737,070 | 318,051,458 | +1.375% | 152 v0.9 files versus 592 v0.10 source/config files |
 | Final incremental codegen | n/a | 0.266 s | n/a | Module up to date |
-| Fault-walk disabled build overhead | n/a | none measurable | n/a | Normal and dispatch executables have identical length; hashes differ by configuration |
+| Fault-walk disabled runtime overhead | n/a | not independently measured | n/a | OFF compile commands contain neither fault-walk define; normal and dispatch executables have identical length, but that is not a runtime benchmark |
 
 Cached shader initialization was comparable but not treated as a benchmark:
 v0.9 translated 176 shaders in 11 ms and created 403 pipelines in 65 ms;

@@ -40,6 +40,10 @@ if(REXGLUE_ENABLE_FAULT_WALK)
         message(FATAL_ERROR "REXGLUE_ENABLE_FAULT_WALK v1 requires Windows SEH")
     endif()
     target_compile_definitions(fable2 PRIVATE REXGLUE_ENABLE_FAULT_WALK=1)
+    if(TARGET fable2_recomp)
+        target_compile_definitions(fable2_recomp PRIVATE
+            REXGLUE_ENABLE_FAULT_WALK=1)
+    endif()
 elseif(REXGLUE_ENABLE_FAULT_WALK_DISPATCH)
     target_compile_definitions(fable2 PRIVATE
         REXGLUE_ENABLE_FAULT_WALK_DISPATCH=1)

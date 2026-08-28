@@ -82,6 +82,31 @@
             }
         },
         {
+            "name": "win-amd64-rexglue-0.10-release",
+            "displayName": "Windows AMD64 ReXGlue 0.10 Release",
+            "inherits": "windows-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+        {
+            "name": "win-amd64-rexglue-0.10-fault-walk-release",
+            "displayName": "Windows AMD64 ReXGlue 0.10 Full Fault Walk Release",
+            "inherits": "windows-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "REXGLUE_ENABLE_FAULT_WALK": "ON"
+            }
+        },
+        {
+            "name": "win-amd64-rexglue-0.10-fault-walk-dispatch-release",
+            "displayName": "Windows AMD64 ReXGlue 0.10 Dispatch-Only Fault Walk Release",
+            "inherits": "windows-base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "REXGLUE_ENABLE_FAULT_WALK": "OFF",
+                "REXGLUE_ENABLE_FAULT_WALK_DISPATCH": "ON"
+            }
+        },
+        {
             "name": "linux-amd64-debug",
             "displayName": "Linux AMD64 Debug",
             "inherits": "linux-base",
@@ -152,6 +177,18 @@
         {
             "name": "win-amd64-fault-walk-dispatch-release",
             "configurePreset": "win-amd64-fault-walk-dispatch-release"
+        },
+        {
+            "name": "win-amd64-rexglue-0.10-release",
+            "configurePreset": "win-amd64-rexglue-0.10-release"
+        },
+        {
+            "name": "win-amd64-rexglue-0.10-fault-walk-release",
+            "configurePreset": "win-amd64-rexglue-0.10-fault-walk-release"
+        },
+        {
+            "name": "win-amd64-rexglue-0.10-fault-walk-dispatch-release",
+            "configurePreset": "win-amd64-rexglue-0.10-fault-walk-dispatch-release"
         },
         { "name": "win-amd64-relwithdebinfo", "configurePreset": "win-amd64-relwithdebinfo" },
         { "name": "linux-amd64-debug", "configurePreset": "linux-amd64-debug" },

@@ -22,6 +22,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(generated/rexglue.cmake)
 
+set(FABLE2_REXGLUE_VERSION_STRING "0.10.0.5-dev.g8f853c3")
+if(NOT REXGLUE_VERSION_STRING STREQUAL FABLE2_REXGLUE_VERSION_STRING)
+    message(FATAL_ERROR
+        "Fable II requires audited ReXGlue ${FABLE2_REXGLUE_VERSION_STRING}; "
+        "found ${REXGLUE_VERSION_STRING}")
+endif()
+
 # Sources
 set(FABLE2_SOURCES
     src/main.cpp

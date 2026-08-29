@@ -67,6 +67,9 @@ public class ExportFable2FunctionMap extends GhidraScript {
             long extentEnd) {
     }
 
+    private record ImageBaseEvidence(long value, String source) {
+    }
+
     @Override
     protected void run() throws Exception {
         if (currentProgram == null) {
@@ -88,6 +91,8 @@ public class ExportFable2FunctionMap extends GhidraScript {
         for (MemoryBlock block : blocks) {
             blockMaps.add(exportMemoryBlock(block));
         }
+
+        ImageBaseEvidence imageBase = determineImageBase(blocks, arguments);
 
         Map<String, Object> fingerprint = computeExecutableFingerprint(blocks);
         Map<Long, List<String>> pdataRecords = collectPdataRecords(blocks);
@@ -138,7 +143,8 @@ public class ExportFable2FunctionMap extends GhidraScript {
             "compiler_spec", currentProgram.getCompilerSpec()
                 .getCompilerSpecID().getIdAsString()));
         root.put("program", orderedMap(
-            "image_base", hex(currentProgram.getImageBase()),
+            "image_base", hex(imageBase.value()),
+            "image_base_source", imageBase.source(),
             "executable_format", currentProgram.getExecutableFormat(),
             "executable_sha256", emptyToNull(currentProgram.getExecutableSHA256()),
             "memory_block_count", (long) blockMaps.size(),
@@ -151,7 +157,8 @@ public class ExportFable2FunctionMap extends GhidraScript {
             "executable_memory_fingerprint_algorithm", FINGERPRINT_ALGORITHM,
             "executable_memory_fingerprint", fingerprint.get("sha256"),
             "executable_memory_fingerprint_status", fingerprint.get("status"),
-            "image_base", hex(currentProgram.getImageBase()),
+            "image_base", hex(imageBase.value()),
+            "image_base_source", imageBase.source(),
             "memory_blocks", blockMaps));
         root.put("functions", functionMaps);
         root.put("overlaps", overlapMaps);
@@ -223,6 +230,35 @@ public class ExportFable2FunctionMap extends GhidraScript {
         if (!currentProgram.getLanguage().isBigEndian()) {
             throw new IllegalStateException("Fable II export requires a big-endian Ghidra program");
         }
+    }
+
+    private ImageBaseEvidence determineImageBase(
+            List<MemoryBlock> blocks, Map<String, String> arguments) {
+        String supplied = arguments.get("image-base");
+        if (supplied != null && !supplied.isBlank()) {
+            try {
+                String digits = supplied.startsWith("0x") || supplied.startsWith("0X")
+                    ? supplied.substring(2) : supplied;
+                return new ImageBaseEvidence(
+                    Long.parseUnsignedLong(digits, 16), "export_argument");
+            }
+            catch (NumberFormatException error) {
+                throw new IllegalArgumentException(
+                    "--image-base must be an unsigned hexadecimal address", error);
+            }
+        }
+        long programBase = unsignedOffset(currentProgram.getImageBase());
+        if (programBase != 0) {
+            return new ImageBaseEvidence(programBase, "ghidra_program_image_base");
+        }
+        for (MemoryBlock block : blocks) {
+            if (block.isLoaded() && !block.isOverlay()) {
+                long inferred = unsignedOffset(block.getStart()) & ~0xffffL;
+                return new ImageBaseEvidence(
+                    inferred, "inferred_64k_aligned_first_loaded_block");
+            }
+        }
+        return new ImageBaseEvidence(0, "ghidra_program_image_base");
     }
 
     private List<FunctionRecord> collectFunctions() {

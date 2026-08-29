@@ -46,6 +46,7 @@ param(
     [string]$ClaimedEdition = "Fable II Game of the Year Edition",
     [string]$ClaimedRegion,
     [string]$ClaimedTitleUpdate = "TU1",
+    [string]$ImageBase,
     [string]$BaseXexSha256,
     [string]$TitleUpdateSha256,
     [string]$PatchedImageSha256,
@@ -273,6 +274,9 @@ if ($operationMode -eq "RawXex") {
     if ($actualBaseHash -eq $expectedBaseXexSha256 -and
             $actualTitleUpdateHash -eq $expectedTitleUpdateSha256) {
         $PatchedImageSha256 = $expectedPatchedImageSha256
+        if (-not $ImageBase) {
+            $ImageBase = "0x82000000"
+        }
     }
     else {
         $PatchedImageSha256 = $null
@@ -333,6 +337,7 @@ $headlessArguments.Add("--source-version=$SourceVersion")
 $headlessArguments.Add("--claimed-edition=$ClaimedEdition")
 $headlessArguments.Add("--claimed-region=$ClaimedRegion")
 $headlessArguments.Add("--claimed-title-update=$ClaimedTitleUpdate")
+$headlessArguments.Add("--image-base=$ImageBase")
 $headlessArguments.Add("--base-xex-sha256=$BaseXexSha256")
 $headlessArguments.Add("--title-update-sha256=$TitleUpdateSha256")
 $headlessArguments.Add("--patched-image-sha256=$PatchedImageSha256")

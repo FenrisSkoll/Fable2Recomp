@@ -46,6 +46,13 @@ The next report-only evidence stage is documented in
 schema-2 executable-memory fingerprint and imports Ghidra/XEXLoader maps
 without treating Ghidra names or boundaries as authoritative.
 
+The implemented pre-boundary consumer is documented in
+[`03-jump-table-recovery.md`](03-jump-table-recovery.md). It upgrades the
+closure to schema 3/analyser 2.0.0, treats recovered switch targets as owned
+blocks rather than function entries, and preserves schemas 1 and 2 as readable
+historical inputs. The schema-1 counts later in this document remain the
+baseline for this stage, not the current TU1 totals.
+
 ## Canonical repositories and commits
 
 Fable2Recomp:

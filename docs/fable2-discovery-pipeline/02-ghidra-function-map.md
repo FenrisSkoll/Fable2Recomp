@@ -12,6 +12,13 @@ The implementation deliberately excludes jump-table recovery, Xenia tracing,
 and runtime bulk import. Projects, databases, private executable bytes and
 generated reports remain outside the source tree or ignored under `out/`.
 
+Jump-table recovery was subsequently implemented in
+[`03-jump-table-recovery.md`](03-jump-table-recovery.md). The importer now
+accepts shared contract/closure schemas 1-3 and consumes schema-3 exact case
+ownership: a Ghidra entry that is only a recovered case, without independent
+callable evidence, is quarantined as `ghidra_false_positive_suspected`. The
+schema-2 counts below remain the reproducible Ghidra-stage baseline.
+
 Durable implementation commits:
 
 - ReXGlue SDK `fe1ae38`: versioned executable-memory identity and
@@ -349,9 +356,10 @@ Final regression results on `2026-08-29`:
   repo and export metadata only; do not upload or redistribute without licence
   and byte-content audits.
 
-The precise next consumer should read `function-map-diff.json` as shared
-evidence schema 2 and select a narrow exact-identity boundary-validation queue,
-starting where Ghidra and ReXGlue disagree but `.pdata` and surrounding trusted
-boundaries exist. Validate TU1 bytes/control flow before any manifest edit and
-preserve manual/fault-walker evidence. Do not begin jump-table recovery, Xenia
-tracing, or runtime bulk import in this stage.
+The completed next consumer reads `function-map-diff.json` with shared
+contract schemas 1-3 and subtracts recovered switch cases before selecting a
+narrow exact-identity boundary-validation queue. See
+[`03-jump-table-recovery.md`](03-jump-table-recovery.md) for the current schema,
+exact private-TU1 results, remaining unresolved indirect sites and the next
+integration point. Preserve manual/fault-walker evidence and validate TU1
+bytes/control flow before any manifest edit.

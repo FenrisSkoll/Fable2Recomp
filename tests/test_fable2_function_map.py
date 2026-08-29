@@ -104,7 +104,7 @@ def function(
 
 def contract() -> dict:
     return {
-        "schema_version": 2,
+        "schema_version": 3,
         "expected_image_identity": {
             "base_xex_sha256": BASE,
             "title_update_sha256": UPDATE,
@@ -280,6 +280,15 @@ class IdentityTests(unittest.TestCase):
 
 
 class ValidationTests(unittest.TestCase):
+    def test_shared_evidence_contract_upgrades_remain_readable(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "evidence.json"
+            for schema_version in (1, 2, 3):
+                value = contract()
+                value["schema_version"] = schema_version
+                path.write_text(json.dumps(value), encoding="utf-8")
+                self.assertEqual(fm.load_contract(path)["schema_version"], schema_version)
+
     def test_contiguous_and_fragmented_bodies(self) -> None:
         document = map_document(
             [
@@ -417,6 +426,37 @@ class DiffTests(unittest.TestCase):
         first = json.dumps(self.build(), indent=2, sort_keys=True)
         second = json.dumps(self.build(), indent=2, sort_keys=True)
         self.assertEqual(first, second)
+
+    def test_recovered_case_quarantines_a_ghidra_function_without_callable_evidence(self) -> None:
+        metadata = {
+            "schema_version": 3,
+            "analyzer_version": "2.0.0",
+            "jump_table_schema_version": 1,
+            "jump_table_cases": {
+                0x1600: [
+                    {
+                        "dispatch": "0x000015F0",
+                        "owner_address": "0x00001500",
+                        "table_kind": "absolute_pointer",
+                        "table_address": "0x00002000",
+                        "origin": "automatic",
+                        "independently_callable": False,
+                    }
+                ]
+            },
+        }
+        report = self.build()
+        identity = report["identity_assessment"]
+        document = map_document([function(0x1600, pdata=False, inbound=False)])
+        result = fm.build_diff(
+            document, identity, {}, {}, {}, metadata, contract(), "exact"
+        )
+        difference = next(
+            item for item in result["differences"] if item["address"] == "0x00001600"
+        )
+        self.assertIn("ghidra_false_positive_suspected", difference["classifications"])
+        self.assertIn("jump_table_recovery", difference["sources"])
+        self.assertFalse(difference["automatic_action_safe"])
 
     def test_diff_command_does_not_mutate_manifest(self) -> None:
         document = map_document()

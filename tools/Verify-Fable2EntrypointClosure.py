@@ -78,8 +78,8 @@ def main() -> int:
     errors: list[str] = []
     schema_version = report.get("schema_version")
     analyzer_version = report.get("analyzer_version")
-    require(schema_version in {1, 2}, f"unsupported schema_version {schema_version}", errors)
-    expected_analyzer = {1: "1.0.0", 2: "1.1.0"}.get(schema_version)
+    require(schema_version in {1, 2, 3}, f"unsupported schema_version {schema_version}", errors)
+    expected_analyzer = {1: "1.0.0", 2: "1.1.0", 3: "2.0.0"}.get(schema_version)
     require(
         analyzer_version == expected_analyzer,
         f"schema {schema_version} requires analyzer {expected_analyzer}, got {analyzer_version}",
@@ -99,7 +99,7 @@ def main() -> int:
         )
         actual = actual_identity.get(report_key)
         require(actual == expected, f"identity {key}: expected {expected}, got {actual}", errors)
-    if schema_version == 2:
+    if schema_version in {2, 3}:
         expected_sections = expected_identity.get("executable_sections", [])
         actual_sections = [
             {
@@ -122,6 +122,39 @@ def main() -> int:
         require(
             actual_sections == expected_sections,
             "identity executable_sections differ from the versioned evidence contract",
+            errors,
+        )
+
+    if schema_version == 3:
+        jump = report.get("jump_table_recovery", {})
+        require(jump.get("schema_version") == 1, "jump-table schema is not version 1", errors)
+        sites = jump.get("indirect_sites", [])
+        site_keys = [
+            (address_value(site["site"]), address_value(site["owner_address"]))
+            for site in sites
+        ]
+        require(site_keys == sorted(site_keys), "jump-table sites are not sorted", errors)
+        unresolved = [
+            site
+            for site in sites
+            if site.get("uses_ctr")
+            and not site.get("link")
+            and site.get("selected_table") is None
+        ]
+        require(
+            all(site.get("failures") for site in unresolved),
+            "an unresolved relevant CTR site has no explicit failure reason",
+            errors,
+        )
+        stats = jump.get("stats", {})
+        require(
+            stats.get("indirect_sites") == len(sites),
+            "jump-table indirect-site count does not match the array",
+            errors,
+        )
+        require(
+            stats.get("unresolved_relevant_ctr_sites") == len(unresolved),
+            "jump-table unresolved count does not match the array",
             errors,
         )
 

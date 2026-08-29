@@ -402,7 +402,7 @@ def assess_identity(document: dict[str, Any], contract: dict[str, Any]) -> dict[
 
 def load_contract(path: Path) -> dict[str, Any]:
     contract = read_json(path)
-    if contract.get("schema_version") not in {1, 2}:
+    if contract.get("schema_version") not in {1, 2, 3}:
         raise MapValidationError(
             f"unsupported shared evidence contract schema {contract.get('schema_version')!r}"
         )
@@ -502,11 +502,37 @@ def compact_closure(path: Path) -> tuple[dict[int, dict[str, Any]], dict[int, di
             "conflicts": item.get("conflicts", []),
             "rejection_reasons": item.get("rejection_reasons", []),
         }
+    jump_cases: dict[int, list[dict[str, Any]]] = {}
+    callable_cases = {
+        parse_address(address, "jump_table_recovery.independently_callable_cases")
+        for effect in document.get("jump_table_recovery", {}).get("boundary_effects", [])
+        for address in effect.get("independently_callable_cases", [])
+    }
+    for site in document.get("jump_table_recovery", {}).get("indirect_sites", []):
+        table = site.get("selected_table")
+        if not table:
+            continue
+        for target in table.get("targets", []):
+            address = parse_address(target, "jump_table_recovery.targets")
+            jump_cases.setdefault(address, []).append(
+                {
+                    "dispatch": site["site"],
+                    "owner_address": site["owner_address"],
+                    "table_kind": table.get("kind"),
+                    "table_address": table.get("table_address"),
+                    "origin": table.get("origin"),
+                    "independently_callable": address in callable_cases,
+                }
+            )
     metadata = {
         "schema_version": document.get("schema_version"),
         "analyzer_version": document.get("analyzer_version"),
         "image_identity": document.get("image_identity"),
         "safety": document.get("safety"),
+        "jump_table_schema_version": document.get("jump_table_recovery", {}).get(
+            "schema_version"
+        ),
+        "jump_table_cases": jump_cases,
     }
     del document
     gc.collect()
@@ -625,6 +651,7 @@ def build_diff(
                     "compatibility_source": "function_association_from_map_without_pdata_functions",
                 }
     closure_starts = sorted(closure_ranges)
+    jump_cases = closure_metadata.get("jump_table_cases", {})
     differences: list[dict[str, Any]] = []
     if identity["state"] == "related_build_or_title_update":
         differences.append(
@@ -661,6 +688,7 @@ def build_diff(
         candidate = closure_candidates.get(entry)
         manual_item = manual.get(entry)
         pdata_item = pdata.get(entry)
+        jump_case = jump_cases.get(entry)
         classes: list[str] = []
         conflicts: list[str] = []
         sources: dict[str, Any] = {}
@@ -678,6 +706,8 @@ def build_diff(
             sources["manual_and_fault_walker"] = manual_item
         if pdata_item:
             sources["pdata"] = pdata_item
+        if jump_case:
+            sources["jump_table_recovery"] = jump_case
 
         if gfun and rfun:
             gbody = exact_body(gfun)
@@ -727,6 +757,17 @@ def build_diff(
                 and default_ghidra_name(name_info.get("name", ""), entry)
             ):
                 classes.append("ghidra_false_positive_suspected")
+        if gfun and jump_case:
+            if any(item["independently_callable"] for item in jump_case):
+                classes.append("callable_internal_entry")
+                conflicts.append(
+                    "jump-table case also has independent callable-entry evidence"
+                )
+            else:
+                classes.append("ghidra_false_positive_suspected")
+                conflicts.append(
+                    "Ghidra function entry is an automatically recovered owned switch case"
+                )
         if mfun and not gfun:
             classes.append("manifest_missing_from_ghidra")
             if manual_item:
@@ -758,6 +799,7 @@ def build_diff(
                 and not gfun.get("thunk")
                 and not conflicts
                 and not gfun.get("overlapping_function_entries")
+                and not jump_case
             )
             recommendation = (
                 "Boundary-only TU1 disassembly validation; compare exact body membership, .pdata, and callers."
@@ -842,6 +884,10 @@ def build_diff(
             "map_schema": map_document["schema"],
             "closure_schema_version": closure_metadata.get("schema_version"),
             "closure_analyzer_version": closure_metadata.get("analyzer_version"),
+            "jump_table_schema_version": closure_metadata.get(
+                "jump_table_schema_version"
+            ),
+            "jump_table_case_count": len(jump_cases),
             "manifest_function_count": len(manifest),
             "ghidra_function_count": len(ghidra),
             "rexglue_function_range_count": len(closure_ranges),

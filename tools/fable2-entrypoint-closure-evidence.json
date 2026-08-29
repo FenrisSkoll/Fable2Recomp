@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "expected_image_identity": {
     "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
     "title_update_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
@@ -29,6 +29,45 @@
         "sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146"
       }
     ]
+  },
+  "jump_table_recovery": {
+    "report_schema_version": 1,
+    "report_file": "jump-table-recovery.json",
+    "pipeline_stage": "before_final_function_ownership_and_boundaries",
+    "classifications": [
+      "switch_bctr",
+      "computed_tail_bctr",
+      "virtual_or_callback_bctrl",
+      "indirect_tail_bctrl_or_bctr",
+      "ordinary_blr_return",
+      "nonstandard_bclr",
+      "opaque_indirect_transfer"
+    ],
+    "failure_reasons": [
+      "missing_bound",
+      "ambiguous_bound",
+      "unknown_table_base",
+      "unknown_index",
+      "ambiguous_reaching_definition",
+      "unsupported_relative_form",
+      "invalid_element_width",
+      "target_out_of_range",
+      "target_unaligned",
+      "mixed_validity_targets",
+      "analysis_limit",
+      "non_switch_indirect"
+    ],
+    "manual_comparisons": [
+      "exact_equivalent",
+      "automatic_superset",
+      "automatic_subset",
+      "conflicting_targets",
+      "conflicting_bounds",
+      "unsupported_manual_form",
+      "new_automatic_table"
+    ],
+    "manual_annotations_authoritative": true,
+    "case_targets_are_functions_by_default": false
   },
   "manual_evidence": [
     {

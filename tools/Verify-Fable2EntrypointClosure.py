@@ -87,18 +87,38 @@ def main() -> int:
     )
 
     actual_identity = report.get("image_identity", {})
-    identity_keys = [
-        key
-        for key in expected_identity
-        if key != "executable_sections" and (schema_version == 2 or not key.startswith("executable_memory_"))
-    ]
+    identity_keys = [key for key in expected_identity if key != "executable_sections"]
     for key in identity_keys:
+        if schema_version == 1 and key.startswith("executable_memory_"):
+            continue
         expected = expected_identity[key]
-        actual = actual_identity.get(key)
+        report_key = (
+            "executable_memory_fingerprint"
+            if key == "executable_memory_sha256"
+            else key
+        )
+        actual = actual_identity.get(report_key)
         require(actual == expected, f"identity {key}: expected {expected}, got {actual}", errors)
     if schema_version == 2:
         expected_sections = expected_identity.get("executable_sections", [])
-        actual_sections = actual_identity.get("executable_sections", [])
+        actual_sections = [
+            {
+                "name": section["name"],
+                "start": section["range"]["start"],
+                "end": section["range"]["end"],
+                "size": section["range"]["size"],
+                "permissions": "".join(
+                    (
+                        "r" if section.get("readable") else "-",
+                        "w" if section.get("writable") else "-",
+                        "x" if section.get("executable") else "-",
+                    )
+                ),
+                "sha256": section["sha256"],
+            }
+            for section in report.get("sections", [])
+            if section.get("executable")
+        ]
         require(
             actual_sections == expected_sections,
             "identity executable_sections differ from the versioned evidence contract",

@@ -41,6 +41,11 @@ HYPOTHESIS:
 No manifest entry was added, removed, resized, or stubbed. No
 `RETURN_R3_ZERO` implementation was generated or proposed.
 
+The next report-only evidence stage is documented in
+[`02-ghidra-function-map.md`](02-ghidra-function-map.md). It adds the shared
+schema-2 executable-memory fingerprint and imports Ghidra/XEXLoader maps
+without treating Ghidra names or boundaries as authoritative.
+
 ## Canonical repositories and commits
 
 Fable2Recomp:

@@ -55,6 +55,8 @@ DIFF_CLASSES = {
     "conflicting_boundaries",
     "related_build_candidate",
     "unresolved_identity",
+    "pdata_missing_from_ghidra",
+    "ghidra_missing_from_pdata",
 }
 
 
@@ -265,6 +267,29 @@ def validate_map(document: dict[str, Any]) -> dict[str, Any]:
                 if thunk.get(key) is not None:
                     parse_address(thunk[key], f"{location}.thunk.{key}")
 
+    pdata_functions = document.get("pdata_functions", [])
+    pdata_functions = require_list(pdata_functions, "pdata_functions")
+    previous_pdata_entry = -1
+    for index, pdata_value in enumerate(pdata_functions):
+        pdata = require_object(pdata_value, f"pdata_functions[{index}]")
+        pdata_entry = parse_address(pdata.get("entry"), f"pdata_functions[{index}].entry")
+        if pdata_entry <= previous_pdata_entry:
+            raise MapValidationError("pdata_functions entries are duplicated or unsorted")
+        previous_pdata_entry = pdata_entry
+        addresses = require_list(
+            pdata.get("record_addresses"), f"pdata_functions[{index}].record_addresses"
+        )
+        if not addresses:
+            raise MapValidationError(f"pdata_functions[{index}] has no record addresses")
+        parsed_addresses = [
+            parse_address(address, f"pdata_functions[{index}].record_addresses[{address_index}]")
+            for address_index, address in enumerate(addresses)
+        ]
+        if parsed_addresses != sorted(set(parsed_addresses)):
+            raise MapValidationError(
+                f"pdata_functions[{index}].record_addresses are duplicated or unsorted"
+            )
+
     overlaps = require_list(document.get("overlaps"), "overlaps")
     for index, overlap_value in enumerate(overlaps):
         overlap = require_object(overlap_value, f"overlaps[{index}]")
@@ -414,6 +439,7 @@ def imported_evidence(document: dict[str, Any], identity: dict[str, Any]) -> dic
         "source_artifact": source,
         "toolchain": document["toolchain"],
         "functions": functions,
+        "pdata_functions": document.get("pdata_functions", []),
         "overlaps": document["overlaps"],
     }
 
@@ -585,6 +611,19 @@ def build_diff(
         parse_address(item["address"], "manual_evidence.address"): item
         for item in contract.get("manual_evidence", [])
     }
+    pdata: dict[int, dict[str, Any]] = {
+        parse_address(item["entry"], "pdata_functions.entry"): item
+        for item in map_document.get("pdata_functions", [])
+    }
+    if not pdata:
+        for function in map_document["functions"]:
+            if function.get("pdata_records"):
+                entry = parse_address(function["entry"], "functions.entry")
+                pdata[entry] = {
+                    "entry": function["entry"],
+                    "record_addresses": function["pdata_records"],
+                    "compatibility_source": "function_association_from_map_without_pdata_functions",
+                }
     closure_starts = sorted(closure_ranges)
     differences: list[dict[str, Any]] = []
     if identity["state"] == "related_build_or_title_update":
@@ -612,13 +651,16 @@ def build_diff(
             )
         )
 
-    all_entries = sorted(set(ghidra) | set(manifest) | set(closure_ranges) | set(manual))
+    all_entries = sorted(
+        set(ghidra) | set(manifest) | set(closure_ranges) | set(manual) | set(pdata)
+    )
     for entry in all_entries:
         gfun = ghidra.get(entry)
         mfun = manifest.get(entry)
         rfun = closure_ranges.get(entry)
         candidate = closure_candidates.get(entry)
         manual_item = manual.get(entry)
+        pdata_item = pdata.get(entry)
         classes: list[str] = []
         conflicts: list[str] = []
         sources: dict[str, Any] = {}
@@ -634,6 +676,8 @@ def build_diff(
             sources["entrypoint_closure"] = candidate
         if manual_item:
             sources["manual_and_fault_walker"] = manual_item
+        if pdata_item:
+            sources["pdata"] = pdata_item
 
         if gfun and rfun:
             gbody = exact_body(gfun)
@@ -687,6 +731,10 @@ def build_diff(
             classes.append("manifest_missing_from_ghidra")
             if manual_item:
                 classes.append("manifest_manual_only")
+        if pdata_item and not gfun:
+            classes.append("pdata_missing_from_ghidra")
+        if gfun and not pdata_item:
+            classes.append("ghidra_missing_from_pdata")
         if gfun and (
             gfun.get("overlapping_function_entries")
             or gfun.get("other_function_entries_in_body")
@@ -706,7 +754,7 @@ def build_diff(
                 and not mfun
                 and not rfun
                 and gfun.get("contiguous_body")
-                and gfun.get("pdata_records")
+                and pdata_item
                 and not gfun.get("thunk")
                 and not conflicts
                 and not gfun.get("overlapping_function_entries")
@@ -797,6 +845,7 @@ def build_diff(
             "manifest_function_count": len(manifest),
             "ghidra_function_count": len(ghidra),
             "rexglue_function_range_count": len(closure_ranges),
+            "pdata_function_count": len(pdata),
         },
         "counts": {
             "differences": len(differences),
@@ -877,6 +926,7 @@ def write_markdown_report(path: Path, report: dict[str, Any]) -> None:
         f"- Identity: `{identity['state']}`",
         f"- Source artifact: `{report['source_artifact']['id']}`",
         f"- Ghidra functions: {report['inputs']['ghidra_function_count']}",
+        f"- `.pdata` function entries: {report['inputs']['pdata_function_count']}",
         f"- ReXGlue ranges: {report['inputs']['rexglue_function_range_count']}",
         f"- Manifest overrides: {report['inputs']['manifest_function_count']}",
         f"- Difference records: {report['counts']['differences']}",
@@ -999,6 +1049,10 @@ def validate_catalog(document: dict[str, Any]) -> list[dict[str, Any]]:
             raise MapValidationError(f"artifacts[{index}].url must be a string")
         if artifact.get("sha256") is not None:
             validate_hash(artifact["sha256"], f"artifacts[{index}].sha256")
+            if not isinstance(artifact.get("size"), int) or artifact["size"] <= 0:
+                raise MapValidationError(
+                    f"artifacts[{index}].size must accompany a downloadable hash"
+                )
     return artifacts
 
 
@@ -1021,6 +1075,12 @@ def catalog_command(args: argparse.Namespace) -> int:
                 print(f"Downloading {artifact['id']} -> {output}")
                 urllib.request.urlretrieve(download_url, output)
             actual_hash = sha256_file(output)
+            actual_size = output.stat().st_size
+            if actual_size != artifact["size"]:
+                raise MapValidationError(
+                    f"catalog artifact {artifact['id']} size mismatch: "
+                    f"expected {artifact['size']}, got {actual_size}"
+                )
             if actual_hash != expected_hash:
                 raise MapValidationError(
                     f"catalog artifact {artifact['id']} hash mismatch: expected {expected_hash}, got {actual_hash}"

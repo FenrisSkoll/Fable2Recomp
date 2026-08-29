@@ -46,7 +46,7 @@ import ghidra.util.exception.CancelledException;
 public class ExportFable2FunctionMap extends GhidraScript {
     private static final String SCHEMA_NAME = "fable2-ghidra-function-map";
     private static final long SCHEMA_VERSION = 1;
-    private static final String EXPORTER_VERSION = "1.0.0";
+    private static final String EXPORTER_VERSION = "1.1.0";
     private static final String FINGERPRINT_ALGORITHM =
         "fable2-executable-memory-sha256-v1";
     private static final byte[] FINGERPRINT_MAGIC =
@@ -160,6 +160,7 @@ public class ExportFable2FunctionMap extends GhidraScript {
             "image_base", hex(imageBase.value()),
             "image_base_source", imageBase.source(),
             "memory_blocks", blockMaps));
+        root.put("pdata_functions", exportPdataFunctions(pdataRecords));
         root.put("functions", functionMaps);
         root.put("overlaps", overlapMaps);
 
@@ -374,6 +375,19 @@ public class ExportFable2FunctionMap extends GhidraScript {
         }
         for (List<String> records : result.values()) {
             records.sort(String::compareTo);
+        }
+        return result;
+    }
+
+    private List<Map<String, Object>> exportPdataFunctions(
+            Map<Long, List<String>> pdataRecords) {
+        List<Long> entries = new ArrayList<>(pdataRecords.keySet());
+        entries.sort(Long::compareUnsigned);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Long entry : entries) {
+            result.add(orderedMap(
+                "entry", hex(entry),
+                "record_addresses", new ArrayList<>(pdataRecords.get(entry))));
         }
         return result;
     }

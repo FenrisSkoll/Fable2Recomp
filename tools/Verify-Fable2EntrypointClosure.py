@@ -76,17 +76,34 @@ def main() -> int:
         return 1
 
     errors: list[str] = []
-    require(report.get("schema_version") == 1, "schema_version is not 1", errors)
+    schema_version = report.get("schema_version")
+    analyzer_version = report.get("analyzer_version")
+    require(schema_version in {1, 2}, f"unsupported schema_version {schema_version}", errors)
+    expected_analyzer = {1: "1.0.0", 2: "1.1.0"}.get(schema_version)
     require(
-        report.get("analyzer_version") == "1.0.0",
-        "analyzer_version is not 1.0.0",
+        analyzer_version == expected_analyzer,
+        f"schema {schema_version} requires analyzer {expected_analyzer}, got {analyzer_version}",
         errors,
     )
 
     actual_identity = report.get("image_identity", {})
-    for key, expected in expected_identity.items():
+    identity_keys = [
+        key
+        for key in expected_identity
+        if key != "executable_sections" and (schema_version == 2 or not key.startswith("executable_memory_"))
+    ]
+    for key in identity_keys:
+        expected = expected_identity[key]
         actual = actual_identity.get(key)
         require(actual == expected, f"identity {key}: expected {expected}, got {actual}", errors)
+    if schema_version == 2:
+        expected_sections = expected_identity.get("executable_sections", [])
+        actual_sections = actual_identity.get("executable_sections", [])
+        require(
+            actual_sections == expected_sections,
+            "identity executable_sections differ from the versioned evidence contract",
+            errors,
+        )
 
     safety = report.get("safety", {})
     require(safety.get("mode") == "report_only", "report mode is not report_only", errors)
@@ -213,7 +230,7 @@ def main() -> int:
         return 1
 
     print(
-        "PASS: schema=1 analyzer=1.0.0 "
+        f"PASS: schema={schema_version} analyzer={analyzer_version} "
         f"image={patched_sha256} candidates={counts.get('candidates')} "
         f"strong={counts.get('strong_new_functions')} "
         f"probable={counts.get('probable_new_functions')} fixtures={len(expected_fixtures)}"

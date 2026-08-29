@@ -1,14 +1,34 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "expected_image_identity": {
     "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
     "title_update_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
     "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+    "executable_memory_sha256": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
     "image_base": "0x82000000",
     "image_size": "0x01620000",
     "title_id": "0x4D5307F1",
     "media_id": "0x716F0A0D",
-    "version": "0.0.1.26"
+    "version": "0.0.1.26",
+    "executable_sections": [
+      {
+        "name": ".text",
+        "start": "0x82170000",
+        "end": "0x832BABBC",
+        "size": "0x0114ABBC",
+        "permissions": "r-x",
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724"
+      },
+      {
+        "name": "BINK",
+        "start": "0x832BAC00",
+        "end": "0x832CA03C",
+        "size": "0x0000F43C",
+        "permissions": "r-x",
+        "sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146"
+      }
+    ]
   },
   "manual_evidence": [
     {

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "expected_image_identity": {
+    "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+    "title_update_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+    "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "image_base": "0x82000000",
+    "image_size": "0x01620000",
+    "title_id": "0x4D5307F1",
+    "media_id": "0x716F0A0D",
+    "version": "0.0.1.26"
+  },
+  "manual_evidence": [
+    {
+      "address": "0x829647F0",
+      "size": "0x10",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified virtual-dispatch leaf thunk; static rediscovery remains independently required"
+    },
+    {
+      "address": "0x82C03B28",
+      "size": "0x1C",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified conditional callback leaf; static rediscovery remains independently required"
+    },
+    {
+      "address": "0x829675E0",
+      "size": "0x10",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified virtual-dispatch leaf thunk; static rediscovery remains independently required"
+    }
+  ],
+  "acceptance_fixtures": [
+    {
+      "address": "0x829647F0",
+      "size": "0x10",
+      "verified_classification": "virtual-dispatch leaf thunk"
+    },
+    {
+      "address": "0x82C03B28",
+      "size": "0x1C",
+      "verified_classification": "conditional callback leaf reached through callback-table bctrl"
+    },
+    {
+      "address": "0x829675E0",
+      "size": "0x10",
+      "verified_classification": "virtual-dispatch leaf thunk"
+    }
+  ]
+}

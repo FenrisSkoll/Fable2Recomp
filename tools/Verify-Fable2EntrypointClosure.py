@@ -141,6 +141,27 @@ def main() -> int:
             errors,
         )
 
+    review_classes = {
+        "strong_new_function",
+        "probable_new_function",
+        "ambiguous_code_pointer",
+    }
+    review_ranges = [
+        (
+            address_value(candidate["proposed_range"]["start"]),
+            address_value(candidate["proposed_range"]["end"]),
+        )
+        for candidate in candidates
+        if candidate.get("classification") in review_classes
+        and candidate.get("proposed_range") is not None
+    ]
+    overlap_pairs = 0
+    active_ranges: list[tuple[int, int]] = []
+    for start, end in review_ranges:
+        active_ranges = [active for active in active_ranges if active[1] > start]
+        overlap_pairs += sum(1 for active in active_ranges if active[0] < end)
+        active_ranges.append((start, end))
+
     actual_fixtures = {
         fixture["expected"]["address"]: fixture
         for fixture in report.get("fixture_results", [])
@@ -178,6 +199,11 @@ def main() -> int:
     require(
         counts.get("candidates") == len(candidates),
         "candidate count does not match candidate array length",
+        errors,
+    )
+    require(
+        counts.get("candidate_overlap_pairs") == overlap_pairs,
+        "candidate overlap count does not match proposed ranges",
         errors,
     )
 

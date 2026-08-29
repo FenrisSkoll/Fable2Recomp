@@ -14,6 +14,10 @@ The recompiled executable now reaches the **Fable II title screen**.
 
 The game is **not yet considered playable**. Work is ongoing to identify and fix recompilation and runtime issues as they appear.
 
+The current static function-discovery architecture and verified TU1 evidence
+are documented in
+[`docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md`](docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md).
+
 ## Goals
 
 * Recompile Fable II into a native executable.

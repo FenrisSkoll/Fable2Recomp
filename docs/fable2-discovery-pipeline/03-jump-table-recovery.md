@@ -2,14 +2,15 @@
 
 ## Status and scope
 
-> **Regression-closure update (2026-08-30):** The original `0x8223FD7C`
+> **Regression-closure update (2026-08-31):** The original `0x8223FD7C`
 > result below is superseded by
 > [`03a-jump-table-regression-closure.md`](03a-jump-table-regression-closure.md).
-> Coherent A/B runs prove it is a Phase 3-unrecovered switch case, and generic
-> recovery plus performance corrections now select 726 tables and 6,359 unique
-> cases. Final runtime validation exposed the next old-heuristic state-machine
-> switch at `0x82CB6154 -> 0x82CB6158`, so the overall closure remains
-> incomplete. No manifest function was added.
+> Coherent A/B and generated-output comparisons prove the missing targets were
+> Phase 3-unrecovered switch cases. Final generic recovery selects 877 tables
+> and 9,000 unique cases; the whole-image census leaves 712 explicitly
+> classified non-switch or insufficient-evidence transfers and no credible
+> switch miss. Runs 040-044 are clean, with Run 044 reaching controllable
+> Bowerstone Old Town. Phase 3 is closed; no manifest function was added.
 
 This is the durable checkpoint for the third Fable II function-discovery
 stage. As of 2026-08-29, generic jump-table recovery is part of the canonical

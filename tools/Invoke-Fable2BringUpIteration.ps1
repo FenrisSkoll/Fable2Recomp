@@ -5,7 +5,22 @@ param(
     [int] $Iteration,
 
     [Parameter(Mandatory = $true)]
-    [string] $RunDirectory
+    [string] $RunDirectory,
+
+    [string] $BuildPreset = 'win-amd64-release',
+
+    [ValidateRange(1, 3600)]
+    [int] $MonitorSeconds = 60,
+
+    [string] $FaultWalkReportPath = '',
+
+    [switch] $SkipCodegen,
+
+    [switch] $SkipBuild,
+
+    [switch] $ManualInput,
+
+    [switch] $GracefulStop
 )
 
 $ErrorActionPreference = 'Stop'
@@ -40,7 +55,7 @@ function Get-Fable2NextRunNumber {
 }
 
 $manifestPath = Join-Path $repositoryRoot 'fable2_manifest.toml'
-$buildDirectory = Join-Path $repositoryRoot 'out\build\win-amd64-release'
+$buildDirectory = Join-Path $repositoryRoot "out\build\$BuildPreset"
 $executablePath = Join-Path $buildDirectory 'fable2.exe'
 $inputHelperPath = Join-Path $repositoryRoot 'out\input-calibration\Send-Fable2Key.ps1'
 $gameDataRoot = Join-Path $repositoryRoot 'assets\runtime'
@@ -349,12 +364,18 @@ function Write-Result {
     }
 
     $fatalText = if ($Result.ContainsKey('fatal_line')) { $Result['fatal_line'] } else { '' }
+    $guardrailText = if ($Result.ContainsKey('fault_walk_guardrail_line')) {
+        $Result['fault_walk_guardrail_line']
+    } else {
+        ''
+    }
     Add-Content -LiteralPath $summaryPath -Encoding utf8 -Value @(
         "## Iteration $Iteration"
         ''
         "- Classification: $($Result['classification'])"
         "- Runtime log: $runtimeLogPath"
         "- Fatal: $fatalText"
+        "- Fault-walk guardrail: $guardrailText"
         "- Input events: $($Result['input_events'] -join '; ')"
         ''
     )
@@ -363,6 +384,9 @@ function Write-Result {
     Write-Output "CLASSIFICATION=$($Result['classification'])"
     if ($Result.ContainsKey('fatal_line')) {
         Write-Output "FATAL_LINE=$($Result['fatal_line'])"
+    }
+    if ($Result.ContainsKey('fault_walk_guardrail_line')) {
+        Write-Output "FAULT_WALK_GUARDRAIL_LINE=$($Result['fault_walk_guardrail_line'])"
     }
 }
 
@@ -373,6 +397,16 @@ function Get-FirstFatalLine {
 
     return Get-Content -LiteralPath $runtimeLogPath |
         Where-Object { $_ -match '\[FATAL\]' } |
+        Select-Object -First 1
+}
+
+function Get-FirstFaultWalkGuardrailLine {
+    if (-not (Test-Path -LiteralPath $runtimeLogPath -PathType Leaf)) {
+        return $null
+    }
+
+    return Get-Content -LiteralPath $runtimeLogPath |
+        Where-Object { $_ -match '\[FWT\] GUARDRAIL STOP:' } |
         Select-Object -First 1
 }
 
@@ -416,6 +450,57 @@ function Get-ExitCodeHex {
     return '0x{0:X8}' -f $unsignedExitCode
 }
 
+function Get-LoadedModuleEvidence {
+    param(
+        [Parameter(Mandatory = $true)]
+        [Diagnostics.Process] $Process
+    )
+
+    $requestedNames = @(
+        'fable2.exe'
+        'rexruntime.dll'
+        'rexgpu-xenos.dll'
+        'TracyClient.dll'
+    )
+    $requestedSet = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase)
+    foreach ($name in $requestedNames) {
+        $requestedSet.Add($name) | Out-Null
+    }
+
+    $Process.Refresh()
+    $modules = [Collections.Generic.List[object]]::new()
+    foreach ($module in $Process.Modules) {
+        if (-not $requestedSet.Contains($module.ModuleName)) {
+            continue
+        }
+
+        $resolvedPath = [IO.Path]::GetFullPath($module.FileName)
+        $file = Get-Item -LiteralPath $resolvedPath
+        $modules.Add([ordered]@{
+            module_name = $module.ModuleName
+            path = $resolvedPath
+            sha256 = (Get-FileHash -LiteralPath $resolvedPath -Algorithm SHA256).Hash
+            file_length = $file.Length
+            base_address = '0x{0:X16}' -f $module.BaseAddress.ToInt64()
+            module_memory_size = $module.ModuleMemorySize
+        })
+    }
+
+    $orderedModules = @($modules | Sort-Object { $_['module_name'] })
+    $loadedNames = @($orderedModules | ForEach-Object { $_['module_name'] })
+    $missingNames = @(
+        $requestedNames |
+            Where-Object { $_ -notin $loadedNames }
+    )
+    return [ordered]@{
+        captured_at = [DateTimeOffset]::Now.ToString('o')
+        requested_modules = $requestedNames
+        modules = $orderedModules
+        missing_modules = $missingNames
+    }
+}
+
 function Invoke-InputPress {
     param(
         [Parameter(Mandatory = $true)]
@@ -454,19 +539,26 @@ function Invoke-InputPress {
 
 $result = @{
     classification = 'Unknown'
+    build_preset = $BuildPreset
     input_events = [Collections.Generic.List[string]]::new()
     run_number = $runText
     started_at = [DateTimeOffset]::Now.ToString('o')
 }
 
-Write-Output "[$iterationName] Normal ReXGlue codegen"
-Push-Location $repositoryRoot
-try {
-    & cmake --build --preset win-amd64-release --target fable2_codegen 2>&1 |
-        Tee-Object -FilePath $codegenLogPath
-    $codegenExitCode = $LASTEXITCODE
-} finally {
-    Pop-Location
+if ($SkipCodegen) {
+    Write-Output "[$iterationName] Reusing existing generated code"
+    $codegenExitCode = 0
+    $result['codegen_skipped'] = $true
+} else {
+    Write-Output "[$iterationName] ReXGlue codegen via $BuildPreset"
+    Push-Location $repositoryRoot
+    try {
+        & cmake --build --preset $BuildPreset --target fable2_codegen 2>&1 |
+            Tee-Object -FilePath $codegenLogPath
+        $codegenExitCode = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
 }
 
 $result['codegen_exit_code'] = $codegenExitCode
@@ -476,13 +568,19 @@ if ($codegenExitCode -ne 0) {
     exit 20
 }
 
-Write-Output "[$iterationName] Build win-amd64-release"
-Push-Location $repositoryRoot
-try {
-    & cmake --build --preset win-amd64-release 2>&1 | Tee-Object -FilePath $buildLogPath
-    $buildExitCode = $LASTEXITCODE
-} finally {
-    Pop-Location
+if ($SkipBuild) {
+    Write-Output "[$iterationName] Reusing existing $BuildPreset executable"
+    $buildExitCode = 0
+    $result['build_skipped'] = $true
+} else {
+    Write-Output "[$iterationName] Build $BuildPreset"
+    Push-Location $repositoryRoot
+    try {
+        & cmake --build --preset $BuildPreset 2>&1 | Tee-Object -FilePath $buildLogPath
+        $buildExitCode = $LASTEXITCODE
+    } finally {
+        Pop-Location
+    }
 }
 
 $result['build_exit_code'] = $buildExitCode
@@ -512,6 +610,13 @@ $processStartInfo.ArgumentList.Add('debug')
 $processStartInfo.ArgumentList.Add('--mnk_mode')
 $processStartInfo.ArgumentList.Add('--log_file')
 $processStartInfo.ArgumentList.Add($runtimeLogArgument)
+if ($FaultWalkReportPath) {
+    $resolvedFaultWalkReportPath = [IO.Path]::GetFullPath($FaultWalkReportPath)
+    $faultWalkReportDirectory = Split-Path -Parent $resolvedFaultWalkReportPath
+    New-Item -ItemType Directory -Force -Path $faultWalkReportDirectory | Out-Null
+    $processStartInfo.Environment['REXGLUE_FAULT_WALK_REPORT'] = $resolvedFaultWalkReportPath
+    $result['fault_walk_report'] = $resolvedFaultWalkReportPath
+}
 
 $gameProcess = [Diagnostics.Process]::new()
 $gameProcess.StartInfo = $processStartInfo
@@ -570,40 +675,46 @@ if ($remainingMilliseconds -gt 0) {
     Start-Sleep -Milliseconds $remainingMilliseconds
 }
 
-try {
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #1' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #2' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #3' -InputEvents $result['input_events']
-    # The hero-selection UI was still neutral when Left was sent after 1.5 seconds.
-    # Six seconds was visually validated by the dedicated D-Pad calibration.
-    Start-Sleep -Seconds 6
-    Invoke-InputPress -Process $gameProcess -Key DPadLeft -Name 'Left Arrow (D-Pad Left)' -InputEvents $result['input_events']
-    Start-Sleep -Milliseconds 1500
-    Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #4' -InputEvents $result['input_events']
-} catch {
-    $result['classification'] = if (Test-ProcessStopped -Process $gameProcess) {
-        'ProcessExitedDuringInput'
-    } else {
-        'InputAutomationFailure'
+if ($ManualInput) {
+    $result['manual_input'] = $true
+    Write-Output "[$iterationName] Manual input enabled; monitoring for $MonitorSeconds seconds"
+} else {
+    try {
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #1' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #2' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #3' -InputEvents $result['input_events']
+        # The hero-selection UI was still neutral when Left was sent after 1.5 seconds.
+        # Six seconds was visually validated by the dedicated D-Pad calibration.
+        Start-Sleep -Seconds 6
+        Invoke-InputPress -Process $gameProcess -Key DPadLeft -Name 'Left Arrow (D-Pad Left)' -InputEvents $result['input_events']
+        Start-Sleep -Milliseconds 1500
+        Invoke-InputPress -Process $gameProcess -Key A -Name 'Space (Xbox A) #4' -InputEvents $result['input_events']
+    } catch {
+        $result['classification'] = if (Test-ProcessStopped -Process $gameProcess) {
+            'ProcessExitedDuringInput'
+        } else {
+            'InputAutomationFailure'
+        }
+        $result['input_error'] = $_.Exception.Message
+        $result['exit_code'] = Get-ExitCodeHex -Process $gameProcess
+        $fatalLine = Get-FirstFatalLine
+        if ($null -ne $fatalLine) {
+            $result['fatal_line'] = $fatalLine
+        }
+        Stop-ExactProcess -Process $gameProcess
+        Write-Result -Result $result
+        exit 24
     }
-    $result['input_error'] = $_.Exception.Message
-    $result['exit_code'] = Get-ExitCodeHex -Process $gameProcess
-    $fatalLine = Get-FirstFatalLine
-    if ($null -ne $fatalLine) {
-        $result['fatal_line'] = $fatalLine
-    }
-    Stop-ExactProcess -Process $gameProcess
-    Write-Result -Result $result
-    exit 24
+
+    $result['final_input_at'] = [DateTimeOffset]::Now.ToString('o')
+    Write-Output "[$iterationName] Final Space sent; monitoring for $MonitorSeconds seconds"
 }
 
-$result['final_input_at'] = [DateTimeOffset]::Now.ToString('o')
-Write-Output "[$iterationName] Final Space sent; monitoring for 60 seconds"
 $monitorStopwatch = [Diagnostics.Stopwatch]::StartNew()
 
-while ($monitorStopwatch.Elapsed.TotalSeconds -lt 60) {
+while ($monitorStopwatch.Elapsed.TotalSeconds -lt $MonitorSeconds) {
     $fatalLine = Get-FirstFatalLine
     if ($null -ne $fatalLine) {
         $result['fatal_line'] = $fatalLine
@@ -619,6 +730,13 @@ while ($monitorStopwatch.Elapsed.TotalSeconds -lt 60) {
         break
     }
 
+    $faultWalkGuardrailLine = Get-FirstFaultWalkGuardrailLine
+    if ($null -ne $faultWalkGuardrailLine) {
+        $result['classification'] = 'FaultWalkGuardrail'
+        $result['fault_walk_guardrail_line'] = $faultWalkGuardrailLine
+        break
+    }
+
     if (Test-ProcessStopped -Process $gameProcess) {
         $result['classification'] = 'ProcessExited'
         $result['exit_code'] = Get-ExitCodeHex -Process $gameProcess
@@ -630,6 +748,21 @@ while ($monitorStopwatch.Elapsed.TotalSeconds -lt 60) {
 
 if ($result['classification'] -eq 'Unknown') {
     $result['classification'] = 'PostInputTimeout'
+}
+
+if (-not (Test-ProcessStopped -Process $gameProcess)) {
+    try {
+        $result['loaded_module_evidence'] = Get-LoadedModuleEvidence -Process $gameProcess
+    } catch {
+        $result['loaded_module_evidence_error'] = $_.Exception.Message
+    }
+}
+
+if ($GracefulStop -and -not (Test-ProcessStopped -Process $gameProcess)) {
+    $result['graceful_stop_requested'] = $gameProcess.CloseMainWindow()
+    if ($result['graceful_stop_requested']) {
+        $gameProcess.WaitForExit(5000) | Out-Null
+    }
 }
 
 Stop-ExactProcess -Process $gameProcess

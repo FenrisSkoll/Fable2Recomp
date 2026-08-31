@@ -1,0 +1,118 @@
+{
+  "schema_version": 3,
+  "expected_image_identity": {
+    "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+    "title_update_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+    "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+    "executable_memory_sha256": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
+    "image_base": "0x82000000",
+    "image_size": "0x01620000",
+    "title_id": "0x4D5307F1",
+    "media_id": "0x716F0A0D",
+    "version": "0.0.1.26",
+    "executable_sections": [
+      {
+        "name": ".text",
+        "start": "0x82170000",
+        "end": "0x832BABBC",
+        "size": "0x0114ABBC",
+        "permissions": "r-x",
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724"
+      },
+      {
+        "name": "BINK",
+        "start": "0x832BAC00",
+        "end": "0x832CA03C",
+        "size": "0x0000F43C",
+        "permissions": "r-x",
+        "sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146"
+      }
+    ]
+  },
+  "jump_table_recovery": {
+    "report_schema_version": 1,
+    "report_file": "jump-table-recovery.json",
+    "pipeline_stage": "before_final_function_ownership_and_boundaries",
+    "classifications": [
+      "switch_bctr",
+      "computed_tail_bctr",
+      "virtual_or_callback_bctrl",
+      "indirect_tail_bctrl_or_bctr",
+      "ordinary_blr_return",
+      "nonstandard_bclr",
+      "opaque_indirect_transfer"
+    ],
+    "failure_reasons": [
+      "missing_bound",
+      "ambiguous_bound",
+      "unknown_table_base",
+      "unknown_index",
+      "ambiguous_reaching_definition",
+      "unsupported_relative_form",
+      "invalid_element_width",
+      "target_out_of_range",
+      "target_unaligned",
+      "mixed_validity_targets",
+      "analysis_limit",
+      "non_switch_indirect"
+    ],
+    "manual_comparisons": [
+      "exact_equivalent",
+      "automatic_superset",
+      "automatic_subset",
+      "conflicting_targets",
+      "conflicting_bounds",
+      "unsupported_manual_form",
+      "new_automatic_table"
+    ],
+    "manual_annotations_authoritative": true,
+    "case_targets_are_functions_by_default": false
+  },
+  "manual_evidence": [
+    {
+      "address": "0x829647F0",
+      "size": "0x10",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified virtual-dispatch leaf thunk; static rediscovery remains independently required"
+    },
+    {
+      "address": "0x82C03B28",
+      "size": "0x1C",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified conditional callback leaf; static rediscovery remains independently required"
+    },
+    {
+      "address": "0x829675E0",
+      "size": "0x10",
+      "evidence": [
+        "manual_verified",
+        "fault_walker_verified"
+      ],
+      "provenance": "Fable II GOTY TU1 verified virtual-dispatch leaf thunk; static rediscovery remains independently required"
+    }
+  ],
+  "acceptance_fixtures": [
+    {
+      "address": "0x829647F0",
+      "size": "0x10",
+      "verified_classification": "virtual-dispatch leaf thunk"
+    },
+    {
+      "address": "0x82C03B28",
+      "size": "0x1C",
+      "verified_classification": "conditional callback leaf reached through callback-table bctrl"
+    },
+    {
+      "address": "0x829675E0",
+      "size": "0x10",
+      "verified_classification": "virtual-dispatch leaf thunk"
+    }
+  ]
+}

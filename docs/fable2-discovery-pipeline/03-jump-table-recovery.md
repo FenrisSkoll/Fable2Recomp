@@ -2,6 +2,20 @@
 
 ## Status and scope
 
+> **Post-closure correction (2026-08-31):** Two later, unrelated linked-call
+> paths reached internal target `0x82174734`. Static and retained generated
+> output prove that dispatch `0x821746BC` is one additional Phase 3 regression:
+> the pre-Phase-3 generator emitted its 29-entry absolute switch, while the
+> Phase 3 output fell back to indirect function dispatch. ReXGlue
+> `16d7915550676121667a5155a96216e9e42bbad8` restores the case edges
+> generically. The commit-exact TU1 result is 878 tables, 9,002 unique cases,
+> and 711 unresolved non-link CTR sites, with no existing table removed or
+> changed. See
+> [`04-runtime-indirect-target-seed.md`](04-runtime-indirect-target-seed.md).
+> Static/build validation is complete; person-controlled validation of the two
+> paths is pending, so the narrow post-closure regression is not yet declared
+> runtime-closed.
+>
 > **Regression-closure update (2026-08-31):** The original `0x8223FD7C`
 > result below is superseded by
 > [`03a-jump-table-regression-closure.md`](03a-jump-table-regression-closure.md).

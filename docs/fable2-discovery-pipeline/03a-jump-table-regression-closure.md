@@ -1,5 +1,20 @@
 # Phase 3 jump-table regression closure
 
+> **Post-closure correction (2026-08-31):** Later user gameplay exposed one
+> additional Phase 3 miss at `0x821746BC -> 0x82174734`. It is an internal case
+> edge, not a function. Retained pre-Phase-3 output contains the exact switch;
+> the Phase 3 output replaced it with `REX_CALL_INDIRECT_FUNC` because two of
+> six finite-domain callers were reachable only after their own independently
+> validated case expansion. ReXGlue
+> `16d7915550676121667a5155a96216e9e42bbad8` fixes that generic caller-domain
+> omission. The commit-exact report delta is exactly one added table and two
+> added case targets, with no removed or semantically changed table. Full
+> details and the pending person-controlled runtime gates are in
+> [`04-runtime-indirect-target-seed.md`](04-runtime-indirect-target-seed.md).
+> The historical Runs 040-044 below remain valid for the paths they exercised,
+> but the later regression is not considered runtime-closed until both new
+> paths pass with the documented final build.
+
 ## Outcome
 
 Phase 3 is **CONFIRMED closed as of 2026-08-31**. Coherent generated-output

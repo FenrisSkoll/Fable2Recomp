@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import importlib.util
 import unittest
 from pathlib import Path
@@ -93,6 +94,68 @@ def schema_two_report() -> dict:
     }
 
 
+def entry_callsite(call_address: str, caller_address: str, value: int) -> dict:
+    definition = f"0x{int(call_address, 0) - 4:08X}"
+    return {
+        "caller_address": caller_address,
+        "call_address": call_address,
+        "target_address": "0x00001000",
+        "compare_address": None,
+        "guard_address": None,
+        "register": 3,
+        "definition_addresses": [definition],
+        "finite_values": [value],
+        "proof_kind": "dominating_immediate_constant",
+        "rejections": [],
+        "exhausted_budget": None,
+        "budget_limit": 0,
+        "budget_observed": 0,
+        "complete": True,
+        "limit_hit": False,
+    }
+
+
+def schema_three_report() -> dict:
+    report = copy.deepcopy(schema_two_report())
+    report["schema_version"] = 3
+    report["analyzer_version"] = "3.0.0"
+    for indirect_site in report["indirect_sites"]:
+        indirect_site["dataflow"]["entry_register_domains"] = []
+
+    resolved = report["indirect_sites"][0]
+    first_call = entry_callsite("0x00002004", "0x00002000", 0)
+    second_call = entry_callsite("0x00003004", "0x00003000", 1)
+    resolved["dataflow"].update(
+        {
+            "merge_shape": "interprocedural_entry_domain",
+            "bound_candidates": [
+                {
+                    "interprocedural_entry_domain": True,
+                    "index_register": 3,
+                    "finite_values": [0, 1],
+                    "value": 1,
+                    "case_count": 2,
+                }
+            ],
+            "entry_register_domains": [
+                {
+                    "entry_address": "0x00001000",
+                    "register": 3,
+                    "finite_values": [0, 1],
+                    "direct_call_sites": ["0x00002004", "0x00003004"],
+                    "rejected_reference_sites": [],
+                    "reference_rejections": [],
+                    "callsites": [first_call, second_call],
+                    "all_references_direct_calls": True,
+                    "finite_dense_domain": True,
+                    "rejection": None,
+                }
+            ],
+        }
+    )
+    return report
+
+
 class JumpTableSchemaValidationTests(unittest.TestCase):
     def validate(self, report: dict) -> list[str]:
         errors: list[str] = []
@@ -101,6 +164,37 @@ class JumpTableSchemaValidationTests(unittest.TestCase):
 
     def test_schema_two_cluster_census_is_accepted(self) -> None:
         self.assertEqual(self.validate(schema_two_report()), [])
+
+    def test_schema_three_complete_entry_domain_is_accepted(self) -> None:
+        self.assertEqual(self.validate(schema_three_report()), [])
+
+    def test_schema_three_entry_domain_cannot_mask_an_incomplete_callsite(self) -> None:
+        report = schema_three_report()
+        callsite = report["indirect_sites"][0]["dataflow"]["entry_register_domains"][0][
+            "callsites"
+        ][1]
+        callsite.update(
+            {
+                "finite_values": [],
+                "proof_kind": None,
+                "rejections": ["callsite_bound_analysis_limit"],
+                "complete": False,
+                "limit_hit": True,
+            }
+        )
+        errors = self.validate(report)
+        self.assertTrue(any("includes an incomplete callsite" in error for error in errors))
+        self.assertTrue(any("union differs from its callsites" in error for error in errors))
+
+    def test_schema_three_entry_domain_call_must_target_the_exact_owner(self) -> None:
+        report = schema_three_report()
+        callsite = report["indirect_sites"][0]["dataflow"]["entry_register_domains"][0][
+            "callsites"
+        ][0]
+        callsite["target_address"] = "0x00001010"
+        self.assertTrue(
+            any("call targets a different entry" in error for error in self.validate(report))
+        )
 
     def test_complete_valid_unresolved_probe_is_rejected(self) -> None:
         report = schema_two_report()

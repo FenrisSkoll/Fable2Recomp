@@ -450,6 +450,57 @@ function Get-ExitCodeHex {
     return '0x{0:X8}' -f $unsignedExitCode
 }
 
+function Get-LoadedModuleEvidence {
+    param(
+        [Parameter(Mandatory = $true)]
+        [Diagnostics.Process] $Process
+    )
+
+    $requestedNames = @(
+        'fable2.exe'
+        'rexruntime.dll'
+        'rexgpu-xenos.dll'
+        'TracyClient.dll'
+    )
+    $requestedSet = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::OrdinalIgnoreCase)
+    foreach ($name in $requestedNames) {
+        $requestedSet.Add($name) | Out-Null
+    }
+
+    $Process.Refresh()
+    $modules = [Collections.Generic.List[object]]::new()
+    foreach ($module in $Process.Modules) {
+        if (-not $requestedSet.Contains($module.ModuleName)) {
+            continue
+        }
+
+        $resolvedPath = [IO.Path]::GetFullPath($module.FileName)
+        $file = Get-Item -LiteralPath $resolvedPath
+        $modules.Add([ordered]@{
+            module_name = $module.ModuleName
+            path = $resolvedPath
+            sha256 = (Get-FileHash -LiteralPath $resolvedPath -Algorithm SHA256).Hash
+            file_length = $file.Length
+            base_address = '0x{0:X16}' -f $module.BaseAddress.ToInt64()
+            module_memory_size = $module.ModuleMemorySize
+        })
+    }
+
+    $orderedModules = @($modules | Sort-Object { $_['module_name'] })
+    $loadedNames = @($orderedModules | ForEach-Object { $_['module_name'] })
+    $missingNames = @(
+        $requestedNames |
+            Where-Object { $_ -notin $loadedNames }
+    )
+    return [ordered]@{
+        captured_at = [DateTimeOffset]::Now.ToString('o')
+        requested_modules = $requestedNames
+        modules = $orderedModules
+        missing_modules = $missingNames
+    }
+}
+
 function Invoke-InputPress {
     param(
         [Parameter(Mandatory = $true)]
@@ -697,6 +748,14 @@ while ($monitorStopwatch.Elapsed.TotalSeconds -lt $MonitorSeconds) {
 
 if ($result['classification'] -eq 'Unknown') {
     $result['classification'] = 'PostInputTimeout'
+}
+
+if (-not (Test-ProcessStopped -Process $gameProcess)) {
+    try {
+        $result['loaded_module_evidence'] = Get-LoadedModuleEvidence -Process $gameProcess
+    } catch {
+        $result['loaded_module_evidence_error'] = $_.Exception.Message
+    }
 }
 
 if ($GracefulStop -and -not (Test-ProcessStopped -Process $gameProcess)) {

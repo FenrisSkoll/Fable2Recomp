@@ -36,14 +36,280 @@ def require(condition: bool, message: str, errors: list[str]) -> None:
         errors.append(message)
 
 
+def sorted_unique(values: list[Any]) -> bool:
+    return values == sorted(set(values))
+
+
+def validate_entry_register_domains(
+    site: dict[str, Any], dataflow: dict[str, Any], errors: list[str]
+) -> None:
+    site_address = site["site"]
+    domains = dataflow.get("entry_register_domains")
+    require(
+        isinstance(domains, list),
+        f"schema-3 site {site_address} has no entry-register-domain array",
+        errors,
+    )
+    if not isinstance(domains, list):
+        return
+
+    domain_keys = [
+        (address_value(domain["entry_address"]), domain.get("register"))
+        for domain in domains
+    ]
+    require(
+        domain_keys == sorted(domain_keys),
+        f"entry-register domains are not sorted at {site_address}",
+        errors,
+    )
+    require(
+        len(domain_keys) == len(set(domain_keys)),
+        f"entry-register domains are not unique at {site_address}",
+        errors,
+    )
+
+    for domain in domains:
+        entry_address = domain.get("entry_address")
+        register = domain.get("register")
+        domain_name = f"{site_address}/{entry_address}/r{register}"
+        require(
+            entry_address == site.get("owner_address"),
+            f"entry-domain owner differs from its site at {domain_name}",
+            errors,
+        )
+        require(
+            isinstance(register, int) and 0 <= register < 32,
+            f"entry-domain register is invalid at {domain_name}",
+            errors,
+        )
+
+        finite_values = domain.get("finite_values")
+        direct_calls = domain.get("direct_call_sites")
+        rejected_references = domain.get("rejected_reference_sites")
+        reference_rejections = domain.get("reference_rejections")
+        callsites = domain.get("callsites")
+        for name, values in (
+            ("finite values", finite_values),
+            ("direct calls", direct_calls),
+            ("rejected references", rejected_references),
+            ("reference rejections", reference_rejections),
+            ("callsites", callsites),
+        ):
+            require(isinstance(values, list), f"entry-domain {name} missing at {domain_name}", errors)
+        if not all(
+            isinstance(values, list)
+            for values in (
+                finite_values,
+                direct_calls,
+                rejected_references,
+                reference_rejections,
+                callsites,
+            )
+        ):
+            continue
+
+        require(
+            sorted_unique(finite_values),
+            f"entry-domain finite values are not sorted and unique at {domain_name}",
+            errors,
+        )
+        require(
+            direct_calls == sorted(set(direct_calls), key=address_value),
+            f"entry-domain direct calls are not sorted and unique at {domain_name}",
+            errors,
+        )
+        require(
+            rejected_references == sorted(set(rejected_references), key=address_value),
+            f"entry-domain rejected references are not sorted and unique at {domain_name}",
+            errors,
+        )
+        require(
+            len(rejected_references) == len(reference_rejections),
+            f"entry-domain rejected-reference reasons differ in count at {domain_name}",
+            errors,
+        )
+
+        callsite_keys = [
+            (address_value(callsite["caller_address"]), address_value(callsite["call_address"]))
+            for callsite in callsites
+        ]
+        require(
+            callsite_keys == sorted(callsite_keys),
+            f"entry-domain callsites are not sorted at {domain_name}",
+            errors,
+        )
+        require(
+            len(callsite_keys) == len(set(callsite_keys)),
+            f"entry-domain callsites are not unique at {domain_name}",
+            errors,
+        )
+
+        for callsite in callsites:
+            call_address = callsite.get("call_address")
+            call_name = f"{domain_name}/{call_address}"
+            require(
+                callsite.get("target_address") == entry_address,
+                f"entry-domain call targets a different entry at {call_name}",
+                errors,
+            )
+            require(
+                callsite.get("register") == register,
+                f"entry-domain call uses a different register at {call_name}",
+                errors,
+            )
+            call_values = callsite.get("finite_values")
+            definitions = callsite.get("definition_addresses")
+            rejections = callsite.get("rejections")
+            require(
+                isinstance(call_values, list) and sorted_unique(call_values),
+                f"callsite finite values are not sorted and unique at {call_name}",
+                errors,
+            )
+            require(
+                isinstance(definitions, list)
+                and definitions == sorted(set(definitions), key=address_value),
+                f"callsite definitions are not sorted and unique at {call_name}",
+                errors,
+            )
+            require(
+                isinstance(rejections, list),
+                f"callsite rejections are missing at {call_name}",
+                errors,
+            )
+            if callsite.get("complete") is True:
+                require(bool(call_values), f"complete callsite has no finite values at {call_name}", errors)
+                require(
+                    isinstance(callsite.get("proof_kind"), str)
+                    and bool(callsite["proof_kind"]),
+                    f"complete callsite has no proof kind at {call_name}",
+                    errors,
+                )
+                require(not rejections, f"complete callsite has rejections at {call_name}", errors)
+                require(
+                    callsite.get("limit_hit") is False,
+                    f"complete callsite still records a limit at {call_name}",
+                    errors,
+                )
+            else:
+                require(bool(rejections), f"incomplete callsite has no rejection at {call_name}", errors)
+
+            exhausted_budget = callsite.get("exhausted_budget")
+            if exhausted_budget is not None:
+                budget_limit = callsite.get("budget_limit")
+                budget_observed = callsite.get("budget_observed")
+                require(
+                    callsite.get("limit_hit") is True,
+                    f"callsite budget exhaustion lacks limit status at {call_name}",
+                    errors,
+                )
+                require(
+                    isinstance(budget_limit, int)
+                    and budget_limit > 0
+                    and isinstance(budget_observed, int)
+                    and budget_observed >= budget_limit,
+                    f"callsite budget evidence is invalid at {call_name}",
+                    errors,
+                )
+
+        all_direct = domain.get("all_references_direct_calls") is True
+        if all_direct:
+            require(
+                not rejected_references and not reference_rejections,
+                f"all-direct entry domain retains rejected references at {domain_name}",
+                errors,
+            )
+
+        finite_dense = domain.get("finite_dense_domain") is True
+        if finite_dense:
+            call_values = sorted(
+                {
+                    value
+                    for callsite in callsites
+                    for value in callsite.get("finite_values", [])
+                }
+            )
+            require(all_direct, f"finite entry domain is not all-direct at {domain_name}", errors)
+            require(bool(callsites), f"finite entry domain has no callsites at {domain_name}", errors)
+            require(
+                all(callsite.get("complete") is True for callsite in callsites),
+                f"finite entry domain includes an incomplete callsite at {domain_name}",
+                errors,
+            )
+            require(
+                set(direct_calls) == {callsite.get("call_address") for callsite in callsites},
+                f"finite entry domain does not account for every direct call at {domain_name}",
+                errors,
+            )
+            require(
+                finite_values == call_values,
+                f"finite entry-domain union differs from its callsites at {domain_name}",
+                errors,
+            )
+            require(
+                bool(finite_values) and finite_values == list(range(finite_values[-1] + 1)),
+                f"finite entry domain is not dense from zero at {domain_name}",
+                errors,
+            )
+            require(
+                domain.get("rejection") is None,
+                f"finite entry domain retains a rejection at {domain_name}",
+                errors,
+            )
+        else:
+            require(
+                isinstance(domain.get("rejection"), str) and bool(domain["rejection"]),
+                f"incomplete entry domain has no rejection at {domain_name}",
+                errors,
+            )
+
+    entry_bounds = [
+        bound
+        for bound in dataflow.get("bound_candidates", [])
+        if bound.get("interprocedural_entry_domain") is True
+    ]
+    if dataflow.get("merge_shape") == "interprocedural_entry_domain":
+        require(
+            bool(entry_bounds),
+            f"interprocedural site {site_address} has no entry-domain bound",
+            errors,
+        )
+    for bound in entry_bounds:
+        matching = [
+            domain
+            for domain in domains
+            if domain.get("entry_address") == site.get("owner_address")
+            and domain.get("register") == bound.get("index_register")
+            and domain.get("finite_dense_domain") is True
+            and domain.get("finite_values") == bound.get("finite_values")
+        ]
+        require(
+            len(matching) == 1,
+            f"entry-domain bound lacks one exact complete domain at {site_address}",
+            errors,
+        )
+        require(
+            site.get("selected_table") is not None,
+            f"validated entry-domain bound remains unresolved at {site_address}",
+            errors,
+        )
+        finite_values = bound.get("finite_values", [])
+        require(
+            bool(finite_values)
+            and bound.get("value") == finite_values[-1]
+            and bound.get("case_count") == len(finite_values),
+            f"entry-domain bound metadata differs from its finite values at {site_address}",
+            errors,
+        )
+
+
 def validate_jump_table_recovery(jump: dict[str, Any], errors: list[str]) -> None:
     jump_schema = jump.get("schema_version")
     require(
-        jump_schema in {1, 2},
+        jump_schema in {1, 2, 3},
         f"unsupported jump-table schema {jump_schema}",
         errors,
     )
-    expected_analyzer = {1: "1.0.0", 2: "2.0.0"}.get(jump_schema)
+    expected_analyzer = {1: "1.0.0", 2: "2.0.0", 3: "3.0.0"}.get(jump_schema)
     require(
         jump.get("analyzer_version") == expected_analyzer,
         (
@@ -85,7 +351,7 @@ def validate_jump_table_recovery(jump: dict[str, Any], errors: list[str]) -> Non
         errors,
     )
 
-    if jump_schema != 2:
+    if jump_schema not in {2, 3}:
         return
 
     limits = jump.get("limits", {})
@@ -121,6 +387,8 @@ def validate_jump_table_recovery(jump: dict[str, Any], errors: list[str]) -> Non
         )
         if not isinstance(dataflow, dict):
             continue
+        if jump_schema == 3:
+            validate_entry_register_domains(site, dataflow, errors)
         cluster_id = dataflow.get("cluster_id")
         likelihood = dataflow.get("switch_likelihood")
         require(

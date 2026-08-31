@@ -2,9 +2,12 @@
 
 ## Outcome
 
-Static investigation and implementation are complete. Runtime closure is
-**pending the two person-controlled checks described at the end of this
-handoff**.
+Static investigation, implementation, and targeted runtime closure are
+**complete**. User-owned Run 047 exercised both formerly failing paths with
+the exact coherent `.42` Release build. Pressing Start passed
+`0x82403720 -> 0x82174734`; the post-dog/first-warrant path passed
+`0x823DCAD8 -> 0x82174734`. The same run continued to Bowerstone Market and
+was intentionally ended there without a runtime-blocking fault.
 
 `0x82174734` is **CONFIRMED to be an internal switch case/basic block**, not a
 function, callable internal entry, thunk, callback, virtual method, exception
@@ -35,6 +38,21 @@ No Fable address is special-cased. No manifest entry, manual table,
 validation was added. The manifest remains byte-identical. The final generated
 owner contains explicit case edges; neither case is declared or registered as
 a function.
+
+The complete rotated Run 047 log stream contains no invalid/unregistered
+dispatch, FWT/fault-walker activity, fatal or critical diagnostic, assertion,
+host exception/access violation, or suppression loop. The log records an
+intentional window close and title termination but no harness exit code, so no
+exit code is claimed. Saving was not tested because the existing save slots
+are full and the user chose not to risk save corruption; this is untested, not
+failed.
+
+Two externally retained screenshots confirm a separate rendering defect: the
+dog and the player character's skin/head render black, while the environment,
+UI, lighting, and at least some clothing materials render normally. This is
+tracked as a GPU/skinned-character material or texture-path investigation. It
+is not evidence against the CPU function-discovery correction and does not
+reopen Phase 3.
 
 This address is a Phase 4 golden **classification/negative-import** case: a
 future Xenia collector/importer should preserve the runtime observation,
@@ -591,25 +609,93 @@ All three DLL hashes match their exact files under
 `CMAKE_BUILD_TYPE=Release`; `REXGLUE_ENABLE_FAULT_WALK=OFF` and
 `REXGLUE_ENABLE_FAULT_WALK_DISPATCH=OFF`.
 
-## Runtime gates and next action
+## User-owned runtime validation: Run 047
 
-No autonomous gameplay or gameplay automation was attempted. Static analysis,
-tests, codegen, and the coherent Release build are complete. Runtime status is:
+No autonomous gameplay or gameplay automation was attempted. The user tested
+the exact coherent `.42` Release build documented above in one continuous run.
 
-| Gate | Exact path | Status |
+| Gate | Exact path | Result |
 | --- | --- | --- |
-| 1 | Press Start during the intro; prior failure `0x82403720 -> 0x82174734` | pending user validation |
-| 2 | Progress beyond the dog-protection fight and walk toward the first missing warrant; prior failure `0x823DCAD8 -> 0x82174734` | not yet requested; run only after Gate 1 is understood |
+| 1 | Press Start during the intro; prior failure `0x82403720 -> 0x82174734` | **PASS**: the old failure point was passed. |
+| 2 | Progress beyond the dog-protection fight and walk toward the first missing warrant; prior failure `0x823DCAD8 -> 0x82174734` | **PASS**: the old failure point was passed. |
 
-The next action is for the user to run Gate 1 with the coherent build above and
-return the numbered log or the exact failure diagnostic. Passing means only
-that the exercised Start path passed its previous failure point without an
-invalid/unregistered target, FWT intervention, fatal, assertion, host
-exception, or suppression loop. Gate 2 requires a separate explicit result.
+The user further exercised and observed:
 
-If either path reaches a new unrelated blocker, preserve it verbatim for a
-subsequent task. Do not convert that unrelated address into another target in
-this task unless evidence proves the same generic caller-domain root cause.
+```text
+petting and healing the dog
+changing and equipping inventory items
+using potions and food
+collecting gold
+buying and upgrading abilities
+melee, ranged, and magic combat
+killing the first bandit boss
+gaining weight by eating jerky
+opening chests
+digging up treasure with the dog
+completing quests
+reaching Bowerstone Market and the sequence where Theresa asks the player to
+wait five minutes
+```
+
+No runtime-blocking fault was observed. The user intentionally ended the run
+in Bowerstone Market. The normal log does not record successful individual
+guest edges, so the two path results above are user-observed runtime evidence;
+they are not inferred from an absent address string.
+
+Run 047 rotated once and must be treated as the chronological concatenation of
+`.1.log` followed by `.log`. The boundary is continuous from
+`23:10:08.353` to `23:10:08.357`:
+
+| Segment | Size | Time covered | SHA-256 |
+| --- | ---: | --- | --- |
+| `fable2-run-047.1.log` | 5,242,848 B | starts `2026-08-31 22:25:33.832`; ends `23:10:08.353` | `BDE01B61B5E8C04298BE17C3702BD3B1FA4ED122A47991BA99A0052C12FBA0C5` |
+| `fable2-run-047.log` | 3,276,167 B | starts `23:10:08.357`; ends `23:32:35.366` | `A32254435C900A6688EC8ECA3583FA364A2F377F5AAB9CB5A455CA3562E7E8FF` |
+| chronological byte concatenation | 8,519,015 B | `01:07:01.534` total logged interval | `D16D9877BE1A78C7DE99A0912769EE0D732005DDD19E8C2C0B9C64AF57CBFE19` |
+
+The stream starts with the expected runtime/update roots, records successful
+TU1 patching to `0.0.1.26`, and loads GPU plugin `xenos`. Its final records are:
+
+```text
+[2026-08-31 23:32:35.165] [info] [core] [t16520] Window closing, shutting down...
+[2026-08-31 23:32:35.165] [debug] [sys] [t16520] KernelState::TerminateTitle
+[2026-08-31 23:32:35.366] [info] [core] [t16520] Title terminated; hard-exiting process.
+```
+
+An exact case-insensitive audit of both segments returned no match for:
+
+```text
+invalid or unregistered / call to invalid
+FWT / fault-walker
+[FATAL] / [critical] / REX_FATAL
+assertion / assert failed
+host exception / unhandled exception / access violation
+suppression loop / suppression-loop
+```
+
+No harness exit code was captured and none is claimed. Saving was not tested:
+the existing saves are full, and the user intentionally avoided risking save
+corruption. This is an untested path, not a failed one.
+
+The original logs and screenshots remain untracked at their source locations
+and are duplicated outside Git under:
+
+```text
+C:\Dev\Fable2Phase4Seed\runtime-run-047
+```
+
+Screenshot evidence:
+
+| External artifact | Size | SHA-256 | Confirmed visible evidence |
+| --- | ---: | --- | --- |
+| `fable2_2026_08_31_23_04_46_860.png` | 3,520,996 B | `6378410C35E8DE09BA8492DBB83ED310A0AF88293AB2C07500BBC8249183D015` | Black dog and black exposed character skin/head; scene, lighting, and clothing render with detail. |
+| `fable2_2026_08_31_23_05_20_600.png` | 3,990,161 B | `E99F15C2466CD2F10B4EF97C328C8A326030F31058C2AE09132F30DE3FA0AEEB` | Same localized defect from a second view; UI and environment render. |
+
+**CONFIRMED:** the localized visual symptom is reproducible in the supplied
+Run 047 screenshots. **HYPOTHESISED:** its cause lies in the GPU
+skinned-character material or texture path. No GPU root cause was investigated
+in this CPU discovery task. The exact next action is a separate GPU-focused
+investigation using these frozen screenshots and the exact `.42` build; it is
+not further Phase 3 or runtime-target harvesting.
 
 ## Commits, worktree policy, and retained limitations
 
@@ -619,6 +705,14 @@ Local commits created so far:
 ec277f6bb51705cbe3da618acd9516e387acd265  Recover entry domains through validated caller cases
 16d7915550676121667a5155a96216e9e42bbad8  Limit caller case expansion to unreachable callsites
 f6bfb534cd872265e1b0311b5acb36be6fcc1605  Pin ReXGlue indirect case recovery
+a1cb43be73d4188f4d275dc7e27a53a88f64bb17  Document runtime indirect case recovery
+```
+
+The runtime-validation documentation commit is obtained without a
+self-referential hash using:
+
+```powershell
+git log -1 --format=%H -- docs/fable2-discovery-pipeline/04-runtime-indirect-target-seed.md
 ```
 
 The SDK worktree retains only the pre-existing materialized
@@ -628,7 +722,10 @@ data, and other private-adjacent artifacts remain ignored or external.
 
 Known limitations:
 
-- Runtime closure remains pending both user-owned gameplay gates.
+- Saving remains untested because existing save slots were full; no saving
+  failure was observed or claimed.
+- The black dog and black player skin/head rendering defect remains open as a
+  separate GPU/skinned-character material or texture-path investigation.
 - The development codegen cache fingerprint is not SDK-commit-sensitive; the
   exact stamp must be invalidated after analyzer-only development changes until
   a separate generic cache-identity fix is designed.

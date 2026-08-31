@@ -12,9 +12,10 @@
 > and 711 unresolved non-link CTR sites, with no existing table removed or
 > changed. See
 > [`04-runtime-indirect-target-seed.md`](04-runtime-indirect-target-seed.md).
-> Static/build validation is complete; person-controlled validation of the two
-> paths is pending, so the narrow post-closure regression is not yet declared
-> runtime-closed.
+> User-owned Run 047 passed both formerly failing paths with the exact `.42`
+> Release build and continued to Bowerstone Market. Its complete rotated log
+> stream contains no invalid dispatch, FWT, fatal, assertion, host exception,
+> or suppression loop. The narrow post-closure regression is runtime-closed.
 >
 > **Regression-closure update (2026-08-31):** The original `0x8223FD7C`
 > result below is superseded by

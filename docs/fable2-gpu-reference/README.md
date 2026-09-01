@@ -1,9 +1,9 @@
 # Fable II GPU reference corpus
 
-This is the permanent G1.5A/G1.5B source reference for the ReXGlue and pinned
-Xenia Canary Xenos GPU architectures. Each implementation is documented first
-on its own terms. The corpus is not a renderer proposal and contains no
-capture or runtime changes.
+This is the permanent G1.5A/G1.5B/G1.5C source reference for the ReXGlue and
+pinned Xenia Canary Xenos GPU architectures. Each implementation is documented
+first on its own terms, then compared through source and primary history. The
+corpus is not a renderer proposal and contains no capture or runtime changes.
 
 The source baseline is ReXGlue
 `956c6a8b5da4c54b9899a2593e9c67c26de30194`. The active Release artifact is
@@ -38,6 +38,10 @@ The independent Canary baseline is
 19. [Canary resources, memory and synchronization](xenia-canary/07-resources-memory-and-synchronization.md)
 20. [Canary presentation, errors and configuration](xenia-canary/08-presentation-errors-and-configuration.md)
 21. [G1.5B completion and handoff](g1.5b-completion.md)
+22. [ReXGlue and Canary divergence](03-rexglue-canary-divergence.md)
+23. [Divergence history and rationale](04-divergence-history-and-rationale.md)
+24. [Accuracy, performance and architecture classification](05-accuracy-performance-architecture-classification.md)
+25. [G1.5C completion and handoff](g1.5c-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and
@@ -50,6 +54,15 @@ The Canary indexes are
 [the Canary subsystem map](evidence/canary-subsystem-map.json), validated by
 [Canary source-inventory v1](../../tools/schemas/fable2-gpu-canary-source-inventory-v1.schema.json)
 and [Canary subsystem-map v1](../../tools/schemas/fable2-gpu-canary-subsystem-map-v1.schema.json).
+
+The G1.5C comparison is represented by
+[the divergence matrix](evidence/divergence-matrix.json) and
+[the primary-history index](evidence/divergence-history.json), validated by
+[divergence-matrix v1](../../tools/schemas/fable2-gpu-divergence-matrix-v1.schema.json)
+and [divergence-history v1](../../tools/schemas/fable2-gpu-divergence-history-v1.schema.json).
+The matrix is authoritative for classifications, counts, preliminary Fable
+relevance, renderer implications, and open questions; the Markdown chapters
+are review views.
 
 Validate the corpus from the repository root with:
 

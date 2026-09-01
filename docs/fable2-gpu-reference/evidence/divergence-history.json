@@ -1,0 +1,929 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-divergence-history-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5C",
+  "generated_on": "2026-09-01",
+  "repository_pins": {
+    "rexglue": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+    "canary": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9"
+  },
+  "history_records": [
+    {
+      "history_id": "CAN-0c843efb",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "0c843efb3279341eefe9dcec2a60885fd14937e1",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/0c843efb3279341eefe9dcec2a60885fd14937e1",
+      "commit": "0c843efb3279341eefe9dcec2a60885fd14937e1",
+      "parent": "ec664e0f0c26a001b2287d2dc7123c976ce37373",
+      "author_date": "2026-08-25T21:32:46-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Round normalized unsigned fixed fetches",
+      "affected_record_ids": [
+        "TEX-004"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+          "symbols": [
+            "Round normalized results to 16 fractional bits"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit says two identified titles compare filtered unsigned-fixed samples to Q16 and therefore adds rounding, leaving signed and integer fetches unchanged.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The cited titles are not Fable II."
+      ]
+    },
+    {
+      "history_id": "CAN-22708301",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+      "commit": "22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+      "parent": "0c843efb3279341eefe9dcec2a60885fd14937e1",
+      "author_date": "2026-08-26T22:43:55Z",
+      "author": "goldislead",
+      "subject": "[Memory/GPU/Kernel] Initial XPS support",
+      "affected_record_ids": [
+        "VTX-003"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/memory.cc",
+          "symbols": [
+            "0x7F000000"
+          ]
+        },
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+          "symbols": [
+            "0x1FFFFFFC"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit makes 0x7F000000 a physical heap and wraps L2 addresses in vertex fetch, index and translator paths.",
+      "ancestry_relationship": "Direct parent of the pinned Canary commit.",
+      "limitations": [
+        "The commit describes initial support and does not prove Fable II uses XPS."
+      ]
+    },
+    {
+      "history_id": "CAN-3a44f20c",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "parent": "22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+      "author_date": "2026-08-28T20:19:01-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Replace AC6 ground hack with scalar approximation rounding",
+      "affected_record_ids": [
+        "SHD-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator_alu.cc",
+          "symbols": [
+            "ReduceFloatPrecision"
+          ]
+        },
+        {
+          "path": "src/xenia/gpu/shader_interpreter.cc",
+          "symbols": [
+            "ReduceFloatPrecision"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The pinned commit replaces a title-specific workaround with 21-mantissa-bit rounding for a scalar ALU family and explicitly says exact precision and halfway behavior remain unconfirmed.",
+      "ancestry_relationship": "Pinned Canary commit.",
+      "limitations": [
+        "The hardware model is deliberately not labelled confirmed accuracy.",
+        "The affected title examples are not Fable II."
+      ]
+    },
+    {
+      "history_id": "CAN-3eab2b8b",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "3eab2b8b39442e32537610c955fbb8db0c2a6561",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/3eab2b8b39442e32537610c955fbb8db0c2a6561",
+      "commit": "3eab2b8b39442e32537610c955fbb8db0c2a6561",
+      "parent": "77597d62ae285fbc5b14a234d24b93aaa5cfd13f",
+      "author_date": "2026-08-08T09:43:00-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Handle tessellated triangle strip and fan draws",
+      "affected_record_ids": [
+        "VTX-001"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/primitive_processor.cc",
+          "symbols": [
+            "kTriangleStrip",
+            "kTriangleFan"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit normalizes strips and fans to triangle lists and creates a runtime conversion buffer when the backend did not bake one.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "No Fable II topology evidence accompanies the change."
+      ]
+    },
+    {
+      "history_id": "CAN-3ff230d2",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "3ff230d23be454b39a9a2904ad0d8a5156e3aa10",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/3ff230d23be454b39a9a2904ad0d8a5156e3aa10",
+      "commit": "3ff230d23be454b39a9a2904ad0d8a5156e3aa10",
+      "parent": "2b071d9b09195a68464401d333ea6ab4d5bf3e62",
+      "author_date": "2026-08-02T10:46:00-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Emulate extended-range float16 in render target pack/unpack",
+      "affected_record_ids": [
+        "RT-005"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/spirv_shader_translator_rb.cc",
+          "symbols": [
+            "PackFloat16x2ExtendedRange",
+            "UnpackFloat16x2ExtendedRange"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit states that guest exponent 31 is finite up to 131008 and corrects the previous 65504 clamp and Inf unpack behavior.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": []
+    },
+    {
+      "history_id": "CAN-437a7280",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "437a7280cf95310d518a2f68087aab61403956ac",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/437a7280cf95310d518a2f68087aab61403956ac",
+      "commit": "437a7280cf95310d518a2f68087aab61403956ac",
+      "parent": "6bef1fbed17734b0c2d2039d20a15241e026045d",
+      "author_date": "2026-08-07T03:46:04Z",
+      "author": "goldislead",
+      "subject": "[GPU] Use EDRAM layout with a single sample addressing scheme",
+      "affected_record_ids": [
+        "RT-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/shaders/edram.xesli",
+          "symbols": [
+            "XeEdramOffsetBytes"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit supplies canonical 1x/2x/4x addressing equations and explains why all resolves, clears, transfers, dumps and interlock paths changed together.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The commit provides no Fable II pass evidence."
+      ]
+    },
+    {
+      "history_id": "CAN-4a863a0e",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "4a863a0e1a69c88591b46564e637b9a817c70a9a",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/4a863a0e1a69c88591b46564e637b9a817c70a9a",
+      "commit": "4a863a0e1a69c88591b46564e637b9a817c70a9a",
+      "parent": "6b5c3233d5cc97583ae6971d6a0afab3a3ffc9a6",
+      "author_date": "2026-08-22T18:21:08-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Fix base map selection with a separate mip page",
+      "affected_record_ids": [
+        "TEX-005"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/texture_util.cc",
+          "symbols": [
+            "base_page == mip_page"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit explains that mip_min_level is sampler state, preserves separate base allocation, clamps its sampler to level zero and identifies a non-Fable regression.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The cited regression title is not Fable II."
+      ]
+    },
+    {
+      "history_id": "CAN-4cc584f4",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "4cc584f47d310c95d3686d8f4c9ffb052ee38fcc",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/4cc584f47d310c95d3686d8f4c9ffb052ee38fcc",
+      "commit": "4cc584f47d310c95d3686d8f4c9ffb052ee38fcc",
+      "parent": "7cd47947b07de30b649fb4224418a659890eab73",
+      "author_date": "2026-08-15T10:32:54+03:00",
+      "author": "Clippy95",
+      "subject": "[D3D12] Fix constant-alpha blending in the RTV path",
+      "affected_record_ids": [
+        "PIP-003"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+          "symbols": [
+            "IsAlphaBlendFactorSupported"
+          ]
+        }
+      ],
+      "rationale_confidence": "INFERRED RATIONALE",
+      "rationale_summary": "The subject identifies the corrected behavior; capability fallback details are established by the source diff, but the commit has no explanatory body.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "No issue, PR discussion or title evidence was found in the local history."
+      ]
+    },
+    {
+      "history_id": "CAN-7cd47947",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "7cd47947b07de30b649fb4224418a659890eab73",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/7cd47947b07de30b649fb4224418a659890eab73",
+      "commit": "7cd47947b07de30b649fb4224418a659890eab73",
+      "parent": "95545f8e76035d8b904e120a0bf379cbc300d86d",
+      "author_date": "2026-08-13T20:40:16-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Select promoted tfetch1D layouts at runtime",
+      "affected_record_ids": [
+        "TEX-006"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+          "symbols": [
+            "instr.dimension",
+            "k1D"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit says runtime selection preserves one title's 2D case while fixing another title's wide 1D bindings.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The cited titles are not Fable II."
+      ]
+    },
+    {
+      "history_id": "CAN-9781a75a",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "9781a75a22ba789124d7f34c6bdb4a85c78b2532",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/9781a75a22ba789124d7f34c6bdb4a85c78b2532",
+      "commit": "9781a75a22ba789124d7f34c6bdb4a85c78b2532",
+      "parent": "a421f8da524ef5d099f21d0222d8c12b9a922142",
+      "author_date": "2026-06-29T08:41:47+01:00",
+      "author": "Michael Oliver",
+      "subject": "[GPU] Avoid stale texture state after invalidation",
+      "affected_record_ids": [
+        "TEX-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/texture_cache.cc",
+          "symbols": [
+            "TextureCache::Texture::MakeUpToDateAndWatch",
+            "IsRangeValid"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit requires backing validity before marking a texture current and installing watches, leaving invalid data outdated for later reload.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": []
+    },
+    {
+      "history_id": "CAN-9e9d3cdd",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "9e9d3cdd3f59ec61afb1115bdd95e3a67e20559e",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/9e9d3cdd3f59ec61afb1115bdd95e3a67e20559e",
+      "commit": "9e9d3cdd3f59ec61afb1115bdd95e3a67e20559e",
+      "parent": "e6bdb0fdf7e745955a74379935d85d6584bb7192",
+      "author_date": "2026-08-07T18:29:00-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Clamp out-of-bounds vertex fetch words to 0",
+      "affected_record_ids": [
+        "VTX-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+          "symbols": [
+            "Words at or past the end of the fetch buffer"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit states that real hardware returns zero at or beyond the fetch-constant size.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": []
+    },
+    {
+      "history_id": "CAN-a635ac64",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "a635ac64f5ca37c0b789e8b4166b53dc673b213f",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/a635ac64f5ca37c0b789e8b4166b53dc673b213f",
+      "commit": "a635ac64f5ca37c0b789e8b4166b53dc673b213f",
+      "parent": "23b79f2a9740ad8aa796f1facb957546cb9878a1",
+      "author_date": "2026-07-06T20:12:52-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Scaled resolve readback through downscale CS",
+      "affected_record_ids": [
+        "RT-003"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+          "symbols": [
+            "IssueCopy_ReadbackResolvePath"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit describes scaled block unpacking, written-extent binding, ResolveInfo authority, alignment/containment checks and tail truncation for D3D12 and Vulkan.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "It credits an Edge approach but the audited evidence here is the Canary commit and current source only."
+      ]
+    },
+    {
+      "history_id": "CAN-aed81ca9",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "aed81ca93a1f3e8dd043107babd33438379f379d",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/aed81ca93a1f3e8dd043107babd33438379f379d",
+      "commit": "aed81ca93a1f3e8dd043107babd33438379f379d",
+      "parent": "59c08cd46231708b7c13050650192136047a72cb",
+      "author_date": "2026-08-01T14:30:00-07:00",
+      "author": "goldislead",
+      "subject": "[Memory] Rework guest access resolution and unwatched invalidation",
+      "affected_record_ids": [
+        "MEM-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/memory.cc",
+          "symbols": [
+            "Memory::TriggerPhysicalMemoryCallbacks",
+            "PhysicalHeap::Protect"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit explicitly covers system-page permissive access, unwatched write-fault validation and invalidation on unwatched decommit/release/protect-to-writable.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The commit says it combines three Edge commits; those upstream Edge identifiers were not present in the local primary history."
+      ]
+    },
+    {
+      "history_id": "CAN-d1195052",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "d119505289d540f61ae3d4ba6168f1145625277a",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/d119505289d540f61ae3d4ba6168f1145625277a",
+      "commit": "d119505289d540f61ae3d4ba6168f1145625277a",
+      "parent": "573cce0fe2724cbdcab38a22153009275c26672e",
+      "author_date": "2026-06-30T20:40:19-07:00",
+      "author": "goldislead",
+      "subject": "[GPU] Texture integer scaling fetches; 8_8_8_8_GAMMA resolve",
+      "affected_record_ids": [
+        "TEX-003",
+        "RT-004"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/dxbc_shader_translator.h",
+          "symbols": [
+            "texture_integer_scale_bits"
+          ]
+        },
+        {
+          "path": "src/xenia/gpu/draw_util.cc",
+          "symbols": [
+            "decode_pwl_gamma",
+            "copy_dest_number"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit calls CPU-derived integer scales authoritative, places their translator operation precisely, and separately documents PWL gamma resolve and copy_dest_number packing.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "Broad title-fix claims in the commit do not establish Fable II relevance."
+      ]
+    },
+    {
+      "history_id": "CAN-e20f2696",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "e20f26963fbebd57209b8356ec6da0f27343e333",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/e20f26963fbebd57209b8356ec6da0f27343e333",
+      "commit": "e20f26963fbebd57209b8356ec6da0f27343e333",
+      "parent": "bad346717a64972f54025af26806d105c3c73369",
+      "author_date": "2026-07-11T05:50:13-04:00",
+      "author": "SaveEditors",
+      "subject": "[GPU] Initialize GPU registers to hardware reset defaults",
+      "affected_record_ids": [
+        "REG-001"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/register_file.cc",
+          "symbols": [
+            "VGT_MAX_VTX_INDX",
+            "PA_SC_AA_MASK"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The author records retail-console reset reads corroborated by AMD and Mesa defaults and explains why tessellation factors were intentionally omitted.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "Fable's read-before-write behavior is not established."
+      ]
+    },
+    {
+      "history_id": "CAN-ec5e0f40",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "ec5e0f40e750ff1e8c8634bc9fef2951747648c5",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/ec5e0f40e750ff1e8c8634bc9fef2951747648c5",
+      "commit": "ec5e0f40e750ff1e8c8634bc9fef2951747648c5",
+      "parent": "9d08d64b5deb1167cfdbc383bdd3dc9945c655dc",
+      "author_date": "2026-08-27T22:26:07Z",
+      "author": "goldislead",
+      "subject": "[GPU] Don’t drop swizzles from dummy texture headers",
+      "affected_record_ids": [
+        "TEX-007"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/texture_cache.cc",
+          "symbols": [
+            "swizzle"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit retains declared dimensions when a header requests only literal zero and one swizzles.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": []
+    },
+    {
+      "history_id": "CAN-fbd620c2",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "fbd620c22b44638b66a70bba80d6f30d55a10924",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/fbd620c22b44638b66a70bba80d6f30d55a10924",
+      "commit": "fbd620c22b44638b66a70bba80d6f30d55a10924",
+      "parent": "29311ddcdd79c0de0817cb74c31e4f80565bbc24",
+      "author_date": "2026-05-01T21:09:16Z",
+      "author": "bomabomabomaboma",
+      "subject": "[GPU] Implement ZPD occlusion queries",
+      "affected_record_ids": [
+        "DRW-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/command_processor.cc",
+          "symbols": [
+            "CommandProcessor::BeginZPDReport",
+            "CommandProcessor::OnZPDQueryResolved"
+          ]
+        },
+        {
+          "path": "src/xenia/gpu/d3d12/d3d12_zpd_query_pool.cc",
+          "symbols": [
+            "D3D12ZPDQueryPool"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit fully describes shared logical reports, cross-submission segments, same-slot reuse, backend query/counter mechanisms, asynchronous retirement and fast/strict/fake modes.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit; follow-up cvar and fast-cache commits are also direct ancestors but are not separate matrix behaviors.",
+      "limitations": [
+        "QueryBatch remains fake-only for a configured range."
+      ]
+    },
+    {
+      "history_id": "CAN-fc48d37c",
+      "repository": "canary",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "fc48d37cdc76c21f20b3dbd8b2e15b035139868d",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/commit/fc48d37cdc76c21f20b3dbd8b2e15b035139868d",
+      "commit": "fc48d37cdc76c21f20b3dbd8b2e15b035139868d",
+      "parent": "8c98ef028087847492f276435c879bdf1fc8afe2",
+      "author_date": "2026-08-10T18:14:02Z",
+      "author": "bomabomabomaboma",
+      "subject": "[GPU] Remove num_format/decode cvars and dead shader code",
+      "affected_record_ids": [
+        "RT-004"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/draw_util.cc",
+          "symbols": [
+            "decode_pwl_gamma = 1"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit removes the num_format/decode switches after describing them as sufficiently exercised and leaves PWL decode enabled for full 8_8_8_8_GAMMA resolves.",
+      "ancestry_relationship": "Direct ancestor of the pinned Canary commit.",
+      "limitations": [
+        "The commit's safety/correctness assessment is stated as probable, not demonstrated for Fable II."
+      ]
+    },
+    {
+      "history_id": "CAN-source-async",
+      "repository": "canary",
+      "provenance_kind": "PINNED SOURCE COMMENT",
+      "immutable_identifier": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9:src/xenia/gpu/d3d12/pipeline_cache.cc:PipelineCache::EndSubmission",
+      "primary_url": "https://github.com/xenia-canary/xenia-canary/blob/3a44f20c7bc66db1da583e8a6f0ab740e31908e9/src/xenia/gpu/d3d12/pipeline_cache.cc",
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "parent": "22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+      "author_date": "2026-08-28T20:19:01-07:00",
+      "author": "goldislead",
+      "subject": "Pinned source comment for asynchronous pipeline completion policy",
+      "affected_record_ids": [
+        "PIP-002"
+      ],
+      "locators": [
+        {
+          "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+          "symbols": [
+            "Draws will be skipped until pipelines are ready",
+            "This avoids frame-time spikes"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The pinned source explicitly says it does not wait at submission end so background threads can continue and frame-time spikes are avoided.",
+      "ancestry_relationship": "Content is immutable at the pin; the exact origin commit is not identifiable within the 200-commit shallow clone.",
+      "limitations": [
+        "This is primary checked-in source rationale, not an identified origin commit."
+      ]
+    },
+    {
+      "history_id": "REX-25f2501b",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "25f2501b8da9dd2c57dbd93e2c92d9393ab96e19",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/25f2501b8da9dd2c57dbd93e2c92d9393ab96e19",
+      "commit": "25f2501b8da9dd2c57dbd93e2c92d9393ab96e19",
+      "parent": "3bce420689ff3e87b49f029fba44b4b4a17828ab",
+      "author_date": "2026-03-01T16:33:09-05:00",
+      "author": "Tom",
+      "subject": "fix(d3d12): double EndQuery causing device removal on occlusion query disable",
+      "affected_record_ids": [
+        "DRW-002",
+        "DIA-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/d3d12/command_processor.cpp",
+          "symbols": [
+            "DisableHostOcclusionQueries"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The body identifies two EndQuery calls for one BeginQuery causing DXGI_ERROR_INVALID_CALL and documents the state-clear ordering fix.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "This is a ReXGlue local robustness fix, not evidence that its full ZPD model matches hardware."
+      ]
+    },
+    {
+      "history_id": "REX-506eee89",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "506eee89145340412ce2896aa6092b7f8bff81e6",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/506eee89145340412ce2896aa6092b7f8bff81e6",
+      "commit": "506eee89145340412ce2896aa6092b7f8bff81e6",
+      "parent": "6ca0cf8d28c1ed92d2925004e4d74e206b041cec",
+      "author_date": "2026-04-19T16:08:36-04:00",
+      "author": "Tom",
+      "subject": "feat(graphics): split GraphicsSystem::Setup into presentation and guest-GPU phases",
+      "affected_record_ids": [
+        "BND-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/graphics_system.cpp",
+          "symbols": [
+            "GraphicsSystem::SetupPresentation",
+            "GraphicsSystem::SetupGuestGpu"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject explicitly records the phase split; it does not claim a guest-visible correction.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": []
+    },
+    {
+      "history_id": "REX-55a836fb",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "55a836fb9a1dc94a0f6b71aeacd6e2c72b3e86f7",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/55a836fb9a1dc94a0f6b71aeacd6e2c72b3e86f7",
+      "commit": "55a836fb9a1dc94a0f6b71aeacd6e2c72b3e86f7",
+      "parent": "7495132c124c5728e7e70a7135b85e460d89d863",
+      "author_date": "2026-06-12T15:38:42-04:00",
+      "author": "Tom",
+      "subject": "feat(system): route kernel and app GPU access through IGraphicsSystem",
+      "affected_record_ids": [
+        "BND-001",
+        "BND-002"
+      ],
+      "locators": [
+        {
+          "path": "src/system/gpu_plugin_loader.cpp",
+          "symbols": [
+            "LoadGpuPlugin"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject and diff directly establish the IGraphicsSystem routing change.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "No explanatory body or guest-visible claim is present."
+      ]
+    },
+    {
+      "history_id": "REX-5f5d7f6f",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "5f5d7f6fe9ff62c57f1b7d225379b54e485fec2c",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/5f5d7f6fe9ff62c57f1b7d225379b54e485fec2c",
+      "commit": "5f5d7f6fe9ff62c57f1b7d225379b54e485fec2c",
+      "parent": "fdc94c3da60b81525a8fd410cb08e40ff0290839",
+      "author_date": "2026-08-14T18:36:24-07:00",
+      "author": "Rien G",
+      "subject": "feat(gpu): Vulkan-Xenos implementation to run with MoltenVK",
+      "affected_record_ids": [
+        "BCK-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/vulkan/graphics_system.cpp",
+          "symbols": [
+            "VulkanGraphicsSystem::CreateCommandProcessor"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The commit records MoltenVK-specific shader, culling, texture fallback and runtime packaging work.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "Vulkan is excluded from the exact Fable GPU DLL."
+      ]
+    },
+    {
+      "history_id": "REX-6124b362",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "6124b3629d13a8c5b59c43d1515a19dcb505b9c9",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/6124b3629d13a8c5b59c43d1515a19dcb505b9c9",
+      "commit": "6124b3629d13a8c5b59c43d1515a19dcb505b9c9",
+      "parent": "25fbf5f41a710354fdf4b777f7a0caf4393193cf",
+      "author_date": "2026-08-13T22:23:43-04:00",
+      "author": "Tom",
+      "subject": "fix(gpu): drop the double-buffered page valid flags so frame-end refresh is coherent",
+      "affected_record_ids": [
+        "MEM-001",
+        "CFG-001"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/shared_memory.cpp",
+          "symbols": [
+            "SharedMemory::RequestRange"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject explicitly ties removal of the double buffer to coherent frame-end refresh and references ReXGlue issue 341.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "Issue 341 was not required to interpret the explicit commit rationale."
+      ]
+    },
+    {
+      "history_id": "REX-71782a3b",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "71782a3bc15cd1994381757fae7d616242f22e6a",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/71782a3bc15cd1994381757fae7d616242f22e6a",
+      "commit": "71782a3bc15cd1994381757fae7d616242f22e6a",
+      "parent": "8078ea7e88d58f8d11997d5a6a533200067da8e5",
+      "author_date": "2026-08-04T18:15:15-04:00",
+      "author": "Tom",
+      "subject": "refactor(gpu): remove snappy and the GPU trace capture system",
+      "affected_record_ids": [
+        "DIA-001"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/CMakeLists.txt",
+          "symbols": [
+            "graphics"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The body says the trace system was only partially intact, had no working viewers and directs this capture use to Xenia.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "This is diagnostic capability, not guest semantics."
+      ]
+    },
+    {
+      "history_id": "REX-75e339bd",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "75e339bd338a762a1942fff1593258232ca6dc8f",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/75e339bd338a762a1942fff1593258232ca6dc8f",
+      "commit": "75e339bd338a762a1942fff1593258232ca6dc8f",
+      "parent": "987593c0fc6612850a2e1b247b2b03aa5281e663",
+      "author_date": "2026-04-02T08:07:19+02:00",
+      "author": "Mystixor",
+      "subject": "fix(gpu): correct pacing for guest vblank counter",
+      "affected_record_ids": [
+        "PRE-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/graphics_system.cpp",
+          "symbols": [
+            "last_frame_time +="
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject and diff establish catch-up pacing for the guest vblank counter.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "The broader divergence from Canary's limiter ancestry is not established."
+      ]
+    },
+    {
+      "history_id": "REX-8e6baaec",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "8e6baaecf3298de193f29b3c30cdcfcb80838511",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/8e6baaecf3298de193f29b3c30cdcfcb80838511",
+      "commit": "8e6baaecf3298de193f29b3c30cdcfcb80838511",
+      "parent": "acb88c3e514a2b531a76645f9c73de8656ccc3be",
+      "author_date": "2026-08-02T13:31:33-07:00",
+      "author": "bomabomabomaboma",
+      "subject": "fix(gpu): Update outdated ZPD sentinel pairwise assumption",
+      "affected_record_ids": [
+        "DRW-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/d3d12/command_processor.cpp",
+          "symbols": [
+            "ExecutePacketType3_EVENT_WRITE_ZPD"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject and diff directly change the outdated pairwise sentinel test.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "No broader query-lifecycle rationale is supplied."
+      ]
+    },
+    {
+      "history_id": "REX-bb4a536c",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "bb4a536c78130175a55ae74e86f4a952071099ae",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/bb4a536c78130175a55ae74e86f4a952071099ae",
+      "commit": "bb4a536c78130175a55ae74e86f4a952071099ae",
+      "parent": "43c5f03b06acf5446af28245e89f328e79a302ac",
+      "author_date": "2026-04-03T20:43:20-04:00",
+      "author": "Tom",
+      "subject": "refactor(gpu): add cvar to gate premasking scaled resolve L2 blocks",
+      "affected_record_ids": [
+        "RT-003",
+        "CFG-001"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/pipeline/texture/cache.cpp",
+          "symbols": [
+            "pre_mask_resolve_l2_block"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The body says the CVar addresses an Armored Core For Answer USA issue.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "The cited title is not Fable II and the CVar does not explain Canary's later scaled-readback design."
+      ]
+    },
+    {
+      "history_id": "REX-c22a33e2",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "c22a33e2e000128b3f71a1c3148f572a76b48fd4",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/c22a33e2e000128b3f71a1c3148f572a76b48fd4",
+      "commit": "c22a33e2e000128b3f71a1c3148f572a76b48fd4",
+      "parent": "2260bb0d90b5a3950de581e317f8c9a0cda39050",
+      "author_date": "2026-06-12T16:01:38-04:00",
+      "author": "Tom",
+      "subject": "feat(gpu)!: extract Xenos GPU emulation into runtime loaded rexgpu-xenos plugin",
+      "affected_record_ids": [
+        "BND-001",
+        "BCK-001"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/plugin_main.cpp",
+          "symbols": [
+            "rex_gpu_create"
+          ]
+        }
+      ],
+      "rationale_confidence": "CONFIRMED RATIONALE",
+      "rationale_summary": "The subject and diff directly establish plugin extraction and runtime loading.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "No guest-semantic claim is present."
+      ]
+    },
+    {
+      "history_id": "REX-e6407f3a",
+      "repository": "rexglue",
+      "provenance_kind": "COMMIT",
+      "immutable_identifier": "e6407f3a63e532365629ffb3176f863773d885ac",
+      "primary_url": "https://github.com/rexglue/rexglue-sdk/commit/e6407f3a63e532365629ffb3176f863773d885ac",
+      "commit": "e6407f3a63e532365629ffb3176f863773d885ac",
+      "parent": "0bd352168b9fc9a4b2ca3cf59623c7af29eb71ab",
+      "author_date": "2026-03-01T15:02:21+11:00",
+      "author": "Ryan Fisher",
+      "subject": "graphics/d3d12: port backend pipeline and command runtime updates",
+      "affected_record_ids": [
+        "DRW-002"
+      ],
+      "locators": [
+        {
+          "path": "src/graphics/d3d12/command_processor.cpp",
+          "symbols": [
+            "active_occlusion_query_"
+          ]
+        }
+      ],
+      "rationale_confidence": "RATIONALE UNKNOWN",
+      "rationale_summary": "The subject establishes that backend updates were ported, but does not identify the source revision or explain the query design intent.",
+      "ancestry_relationship": "Direct ancestor of the pinned ReXGlue commit.",
+      "limitations": [
+        "Port origin and exact ancestry are not identified by this commit."
+      ]
+    }
+  ],
+  "counts": {
+    "records": 30,
+    "by_repository": {
+      "canary": 19,
+      "rexglue": 11
+    },
+    "by_provenance_kind": {
+      "COMMIT": 29,
+      "PINNED SOURCE COMMENT": 1
+    },
+    "by_rationale_confidence": {
+      "CONFIRMED RATIONALE": 28,
+      "INFERRED RATIONALE": 1,
+      "RATIONALE UNKNOWN": 1
+    }
+  }
+}

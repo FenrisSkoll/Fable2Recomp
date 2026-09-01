@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-divergence-history-v1.schema.json",
+  "title": "Fable II G1.5C divergence history and rationale evidence",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "repository_pins",
+    "history_records",
+    "counts"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.5C" },
+    "generated_on": { "type": "string", "format": "date" },
+    "repository_pins": {
+      "type": "object",
+      "required": ["rexglue", "canary"],
+      "properties": {
+        "rexglue": { "pattern": "^[0-9a-f]{40}$" },
+        "canary": { "pattern": "^[0-9a-f]{40}$" }
+      }
+    },
+    "history_records": {
+      "type": "array",
+      "minItems": 15,
+      "items": { "$ref": "#/$defs/history_record" }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["records", "by_repository", "by_provenance_kind", "by_rationale_confidence"]
+    }
+  },
+  "$defs": {
+    "locator": {
+      "type": "object",
+      "required": ["path", "symbols"],
+      "properties": {
+        "path": { "type": "string" },
+        "symbols": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "history_record": {
+      "type": "object",
+      "required": [
+        "history_id",
+        "repository",
+        "provenance_kind",
+        "immutable_identifier",
+        "primary_url",
+        "commit",
+        "parent",
+        "author_date",
+        "author",
+        "subject",
+        "affected_record_ids",
+        "locators",
+        "rationale_confidence",
+        "rationale_summary",
+        "ancestry_relationship",
+        "limitations"
+      ],
+      "properties": {
+        "history_id": { "pattern": "^(CAN|REX)-[A-Za-z0-9-]+$" },
+        "repository": { "enum": ["rexglue", "canary"] },
+        "provenance_kind": { "enum": ["COMMIT", "PINNED SOURCE COMMENT"] },
+        "immutable_identifier": { "type": "string" },
+        "primary_url": { "pattern": "^https://github\\.com/" },
+        "commit": { "pattern": "^[0-9a-f]{40}$" },
+        "parent": { "pattern": "^[0-9a-f]{40}$" },
+        "author_date": { "type": "string" },
+        "author": { "type": "string" },
+        "subject": { "type": "string" },
+        "affected_record_ids": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "pattern": "^[A-Z]{2,3}-[0-9]{3}$" }
+        },
+        "locators": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/locator" }
+        },
+        "rationale_confidence": {
+          "enum": [
+            "CONFIRMED RATIONALE",
+            "INFERRED RATIONALE",
+            "RATIONALE UNKNOWN"
+          ]
+        },
+        "rationale_summary": { "type": "string" },
+        "ancestry_relationship": { "type": "string" },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

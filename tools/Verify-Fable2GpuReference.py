@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only validator for the Fable II G1.5A/G1.5B GPU reference corpus."""
+"""Read-only validator for the Fable II G1.5A/G1.5B/G1.5C GPU corpus."""
 
 from __future__ import annotations
 
@@ -29,6 +29,14 @@ CANARY_INVENTORY_SCHEMA_PATH = (
     SCHEMA_ROOT / "fable2-gpu-canary-source-inventory-v1.schema.json"
 )
 CANARY_MAP_SCHEMA_PATH = SCHEMA_ROOT / "fable2-gpu-canary-subsystem-map-v1.schema.json"
+DIVERGENCE_MATRIX_PATH = EVIDENCE_ROOT / "divergence-matrix.json"
+DIVERGENCE_HISTORY_PATH = EVIDENCE_ROOT / "divergence-history.json"
+DIVERGENCE_MATRIX_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-divergence-matrix-v1.schema.json"
+)
+DIVERGENCE_HISTORY_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-divergence-history-v1.schema.json"
+)
 
 REQUIRED_DOCUMENTS = (
     "README.md",
@@ -57,12 +65,31 @@ REQUIRED_DOCUMENTS = (
     "evidence/canary-source-inventory.json",
     "evidence/canary-subsystem-map.json",
     "g1.5b-completion.md",
+    "03-rexglue-canary-divergence.md",
+    "04-divergence-history-and-rationale.md",
+    "05-accuracy-performance-architecture-classification.md",
+    "evidence/divergence-matrix.json",
+    "evidence/divergence-history.json",
+    "g1.5c-completion.md",
 )
 
 CONFIDENCE = ("CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE")
 MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]+\]\(([^)]+)\)")
 CANARY_SOURCE_LOCATOR_RE = re.compile(
     r"\x60(src/xenia/[^\s\x60:]+)(?::([A-Za-z_][A-Za-z0-9_:]*))?\x60"
+)
+RATIONALE_CONFIDENCE = (
+    "CONFIRMED RATIONALE",
+    "INFERRED RATIONALE",
+    "RATIONALE UNKNOWN",
+    "NOT APPLICABLE",
+)
+FABLE_RELEVANCE = (
+    "CONFIRMED RELEVANT",
+    "PROBABLE RELEVANT",
+    "UNKNOWN FOR FABLE II",
+    "NOT OBSERVED FOR FABLE II",
+    "NOT APPLICABLE TO FABLE II",
 )
 
 
@@ -560,6 +587,273 @@ def validate_canary_repository(
     return {"canary": repo}, {"canary": commit}
 
 
+def counted(values: list[str]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for value in values:
+        result[value] = result.get(value, 0) + 1
+    return dict(sorted(result.items()))
+
+
+def validate_record_locators(
+    implementation: dict[str, Any],
+    roots: dict[str, Path],
+    commits: dict[str, str],
+    label: str,
+    validation: Validation,
+) -> None:
+    repository = implementation.get("repository")
+    repo = roots.get(repository)
+    expected_commit = commits.get(repository)
+    recorded_commit = implementation.get("commit")
+    if repo is None or expected_commit is None:
+        validation.error(f"{label}: unknown repository {repository!r}")
+        return
+    if recorded_commit != expected_commit:
+        validation.error(
+            f"{label}: commit mismatch: recorded {recorded_commit!r}, "
+            f"expected {expected_commit!r}"
+        )
+        return
+    for locator in implementation.get("paths", []):
+        path = locator.get("path")
+        if not isinstance(path, str):
+            validation.error(f"{label}: invalid source path {path!r}")
+            continue
+        source = git_text(repo, "show", f"{expected_commit}:{path}")
+        if source is None:
+            validation.error(f"{label}: missing source {repository}:{path}")
+            continue
+        for symbol in locator.get("symbols", []):
+            if symbol not in source:
+                validation.error(
+                    f"{label}: missing symbol {symbol!r} in {repository}:{path}"
+                )
+
+
+def validate_divergence_evidence(
+    matrix: dict[str, Any],
+    history: dict[str, Any],
+    roots: dict[str, Path],
+    commits: dict[str, str],
+    validation: Validation,
+) -> None:
+    records = matrix.get("records", [])
+    if not isinstance(records, list):
+        validation.error("divergence matrix records is not an array")
+        return
+    record_ids = [record.get("record_id") for record in records]
+    if record_ids != sorted(record_ids):
+        validation.error("divergence matrix records are not sorted by record_id")
+    if len(record_ids) != len(set(record_ids)):
+        validation.error("divergence matrix contains duplicate record_id values")
+    record_id_set = set(record_ids)
+
+    pin_names = {
+        "fable_repository": "fable2",
+        "rexglue_repository": "rexglue",
+        "canary_repository": "canary",
+    }
+    for pin_key, repository in pin_names.items():
+        pin = matrix.get("pins", {}).get(pin_key, {})
+        repo = roots.get(repository)
+        baseline_commit = commits.get(repository)
+        recorded_commit = pin.get("commit") if isinstance(pin, dict) else None
+        expected_commit = (
+            recorded_commit if repository == "fable2" else baseline_commit
+        )
+        if (
+            not isinstance(pin, dict)
+            or repo is None
+            or not isinstance(expected_commit, str)
+        ):
+            validation.error(f"invalid divergence pin {pin_key}")
+            continue
+        if repository != "fable2" and recorded_commit != expected_commit:
+            validation.error(
+                f"divergence pin mismatch {pin_key}: recorded {recorded_commit!r}, "
+                f"expected {expected_commit!r}"
+            )
+        if run_git(repo, "cat-file", "-e", f"{expected_commit}^{{commit}}").returncode != 0:
+            validation.error(f"divergence pin {pin_key} is unavailable: {expected_commit}")
+            continue
+        actual_tree = git_text(repo, "rev-parse", f"{expected_commit}^{{tree}}")
+        if pin.get("tree") != actual_tree:
+            validation.error(
+                f"divergence tree mismatch {pin_key}: recorded {pin.get('tree')!r}, "
+                f"actual {actual_tree!r}"
+            )
+
+    for record in records:
+        record_id = record.get("record_id")
+        label = f"divergence record {record_id}"
+        validate_record_locators(record.get("rexglue", {}), roots, commits, label, validation)
+        validate_record_locators(record.get("canary", {}), roots, commits, label, validation)
+        direction = record.get("direction")
+        divergences = record.get("material_divergences", [])
+        if direction == "SAME BEHAVIOUR, DIFFERENT STRUCTURE" and divergences:
+            validation.error(f"{label}: equivalence record has material divergences")
+        if direction != "SAME BEHAVIOUR, DIFFERENT STRUCTURE" and not divergences:
+            validation.error(f"{label}: non-equivalence record lacks a material divergence")
+        if record.get("rationale_confidence") not in RATIONALE_CONFIDENCE:
+            validation.error(f"{label}: invalid rationale confidence")
+        preliminary_fable = record.get("preliminary_fable", {})
+        if preliminary_fable.get("relevance") not in FABLE_RELEVANCE:
+            validation.error(f"{label}: invalid preliminary Fable relevance")
+
+    expected_matrix_counts = {
+        "records": len(records),
+        "by_direction": counted([str(record.get("direction")) for record in records]),
+        "by_primary_classification": counted(
+            [str(record.get("classification", {}).get("primary")) for record in records]
+        ),
+        "by_source_confidence": counted(
+            [str(record.get("source_confidence")) for record in records]
+        ),
+        "by_rationale_confidence": counted(
+            [str(record.get("rationale_confidence")) for record in records]
+        ),
+        "by_fable_relevance": counted(
+            [str(record.get("preliminary_fable", {}).get("relevance")) for record in records]
+        ),
+    }
+    if matrix.get("counts") != expected_matrix_counts:
+        validation.error(
+            "divergence matrix counts mismatch: "
+            f"recorded {matrix.get('counts')!r}, expected {expected_matrix_counts!r}"
+        )
+
+    history_records = history.get("history_records", [])
+    if not isinstance(history_records, list):
+        validation.error("divergence history records is not an array")
+        return
+    history_ids = [entry.get("history_id") for entry in history_records]
+    if history_ids != sorted(history_ids):
+        validation.error("divergence history records are not sorted by history_id")
+    if len(history_ids) != len(set(history_ids)):
+        validation.error("divergence history contains duplicate history_id values")
+    history_by_id = {entry.get("history_id"): entry for entry in history_records}
+
+    for record in records:
+        record_id = record.get("record_id")
+        for history_id in record.get("historical_provenance", {}).get("history_ids", []):
+            history_entry = history_by_id.get(history_id)
+            if history_entry is None:
+                validation.error(
+                    f"divergence record {record_id}: unknown history_id {history_id!r}"
+                )
+            elif record_id not in history_entry.get("affected_record_ids", []):
+                validation.error(
+                    f"divergence record {record_id}: history {history_id} lacks reciprocal link"
+                )
+
+    for entry in history_records:
+        history_id = entry.get("history_id")
+        repository = entry.get("repository")
+        repo = roots.get(repository)
+        pinned_commit = commits.get(repository)
+        commit = entry.get("commit")
+        if repo is None or pinned_commit is None or not isinstance(commit, str):
+            validation.error(f"history {history_id}: invalid repository or commit")
+            continue
+        if run_git(repo, "cat-file", "-e", f"{commit}^{{commit}}").returncode != 0:
+            validation.error(f"history {history_id}: unavailable commit {commit}")
+            continue
+        if run_git(repo, "merge-base", "--is-ancestor", commit, pinned_commit).returncode != 0:
+            validation.error(f"history {history_id}: commit is not an ancestor of the pin")
+        actual_parent = git_text(repo, "rev-parse", f"{commit}^")
+        if entry.get("parent") != actual_parent:
+            validation.error(
+                f"history {history_id}: parent mismatch: recorded {entry.get('parent')!r}, "
+                f"actual {actual_parent!r}"
+            )
+        if entry.get("provenance_kind") == "COMMIT":
+            metadata_checks = (
+                ("author_date", git_text(repo, "show", "-s", "--format=%aI", commit)),
+                ("author", git_text(repo, "show", "-s", "--format=%an", commit)),
+                ("subject", git_text(repo, "show", "-s", "--format=%s", commit)),
+            )
+            for field, actual in metadata_checks:
+                if entry.get(field) != actual:
+                    validation.error(
+                        f"history {history_id}: {field} mismatch: "
+                        f"recorded {entry.get(field)!r}, actual {actual!r}"
+                    )
+        primary_url = entry.get("primary_url")
+        if not isinstance(primary_url, str) or commit not in primary_url:
+            validation.error(f"history {history_id}: primary URL is not commit-pinned")
+        implementation = {
+            "repository": repository,
+            "commit": pinned_commit,
+            "paths": entry.get("locators", []),
+        }
+        validate_record_locators(implementation, roots, commits, f"history {history_id}", validation)
+        for record_id in entry.get("affected_record_ids", []):
+            if record_id not in record_id_set:
+                validation.error(
+                    f"history {history_id}: unknown affected record {record_id!r}"
+                )
+
+    expected_history_counts = {
+        "records": len(history_records),
+        "by_repository": counted(
+            [str(entry.get("repository")) for entry in history_records]
+        ),
+        "by_provenance_kind": counted(
+            [str(entry.get("provenance_kind")) for entry in history_records]
+        ),
+        "by_rationale_confidence": counted(
+            [str(entry.get("rationale_confidence")) for entry in history_records]
+        ),
+    }
+    if history.get("counts") != expected_history_counts:
+        validation.error(
+            "divergence history counts mismatch: "
+            f"recorded {history.get('counts')!r}, expected {expected_history_counts!r}"
+        )
+
+    prose = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (
+            DOC_ROOT / "03-rexglue-canary-divergence.md",
+            DOC_ROOT / "05-accuracy-performance-architecture-classification.md",
+        )
+        if path.is_file()
+    )
+    for record_id in record_ids:
+        if isinstance(record_id, str) and record_id not in prose:
+            validation.error(f"divergence record {record_id} is absent from G1.5C prose")
+    record_prefixes = sorted(
+        {
+            str(record_id).split("-", 1)[0]
+            for record_id in record_ids
+            if isinstance(record_id, str) and "-" in record_id
+        }
+    )
+    prose_record_ids = set(
+        re.findall(
+            rf"\b(?:{'|'.join(re.escape(prefix) for prefix in record_prefixes)})-[0-9]{{3}}\b",
+            prose,
+        )
+    )
+    for record_id in sorted(prose_record_ids - record_id_set):
+        validation.error(f"G1.5C prose references unknown divergence record {record_id}")
+
+    history_prose_path = DOC_ROOT / "04-divergence-history-and-rationale.md"
+    history_prose = (
+        history_prose_path.read_text(encoding="utf-8")
+        if history_prose_path.is_file()
+        else ""
+    )
+    for history_id in history_ids:
+        if isinstance(history_id, str) and history_id not in history_prose:
+            validation.error(f"history record {history_id} is absent from G1.5C prose")
+    prose_history_ids = set(
+        re.findall(r"\b(?:CAN|REX)-(?:[0-9a-f]{8}|source-[a-z0-9-]+)\b", history_prose)
+    )
+    for history_id in sorted(prose_history_ids - set(history_ids)):
+        validation.error(f"G1.5C prose references unknown history record {history_id}")
+
+
 def validate_markdown_links(validation: Validation) -> None:
     for markdown in sorted(DOC_ROOT.rglob("*.md")):
         text = markdown.read_text(encoding="utf-8")
@@ -581,6 +875,10 @@ def validate_canary_markdown_locators(
     markdown_paths = [
         DOC_ROOT / "02-xenia-canary-overview.md",
         DOC_ROOT / "g1.5b-completion.md",
+        DOC_ROOT / "03-rexglue-canary-divergence.md",
+        DOC_ROOT / "04-divergence-history-and-rationale.md",
+        DOC_ROOT / "05-accuracy-performance-architecture-classification.md",
+        DOC_ROOT / "g1.5c-completion.md",
     ]
     markdown_paths.extend(sorted((DOC_ROOT / "xenia-canary").glob("*.md")))
     for markdown in markdown_paths:
@@ -654,6 +952,10 @@ def main() -> int:
     canary_map = load_json(CANARY_MAP_PATH, validation)
     canary_inventory_schema = load_json(CANARY_INVENTORY_SCHEMA_PATH, validation)
     canary_map_schema = load_json(CANARY_MAP_SCHEMA_PATH, validation)
+    divergence_matrix = load_json(DIVERGENCE_MATRIX_PATH, validation)
+    divergence_history = load_json(DIVERGENCE_HISTORY_PATH, validation)
+    divergence_matrix_schema = load_json(DIVERGENCE_MATRIX_SCHEMA_PATH, validation)
+    divergence_history_schema = load_json(DIVERGENCE_HISTORY_SCHEMA_PATH, validation)
     if inventory and inventory_schema:
         validate_with_schema(inventory, inventory_schema, "source inventory", validation)
     if subsystem_map and map_schema:
@@ -667,6 +969,20 @@ def main() -> int:
         )
     if canary_map and canary_map_schema:
         validate_with_schema(canary_map, canary_map_schema, "canary subsystem map", validation)
+    if divergence_matrix and divergence_matrix_schema:
+        validate_with_schema(
+            divergence_matrix,
+            divergence_matrix_schema,
+            "divergence matrix",
+            validation,
+        )
+    if divergence_history and divergence_history_schema:
+        validate_with_schema(
+            divergence_history,
+            divergence_history_schema,
+            "divergence history",
+            validation,
+        )
 
     if inventory:
         roots, commits = repository_roots(inventory, args.sdk_root, validation)
@@ -698,6 +1014,18 @@ def main() -> int:
             validate_canary_markdown_locators(
                 canary_roots["canary"], canary_commits["canary"], validation
             )
+            if divergence_matrix and divergence_history and inventory:
+                combined_roots = dict(roots)
+                combined_roots.update(canary_roots)
+                combined_commits = dict(commits)
+                combined_commits.update(canary_commits)
+                validate_divergence_evidence(
+                    divergence_matrix,
+                    divergence_history,
+                    combined_roots,
+                    combined_commits,
+                    validation,
+                )
 
     validate_markdown_links(validation)
 
@@ -709,7 +1037,7 @@ def main() -> int:
         print(f"FAIL: {len(validation.errors)} error(s), {len(validation.warnings)} warning(s)")
         return 1
     print(
-        f"PASS: G1.5A/G1.5B GPU reference validated "
+        f"PASS: G1.5A/G1.5B/G1.5C GPU reference validated "
         f"({len(validation.warnings)} warning(s))"
     )
     return 0

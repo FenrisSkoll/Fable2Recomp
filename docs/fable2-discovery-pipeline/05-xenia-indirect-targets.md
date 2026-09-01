@@ -1,380 +1,380 @@
 # Xenia indirect-target collection and reviewed bulk manifest import
 
-## Outcome and validation boundary
+## Current outcome
 
-Phase 4 implementation is complete. A pinned Xenia Canary build records actual
-resolved guest indirect transfers, and Fable2Recomp now turns one or more raw
-traces into deterministic summaries and a dry-run evidence import plan. The
-canonical manifest is changed only by a separate, explicit, reviewed, guarded
-apply command.
+Phase 4 is implemented, and the September 2026 aggregation/footer repair is
+complete in source, schemas, automated tests and synthetic Xenia execution.
+The repaired collector:
 
-The implementation has five distinct validation levels:
+- aggregates repeated indirect transfers in fixed per-guest-thread dirty maps;
+- persists only deltas changed since the previous durable batch;
+- uses time, dirty-pair, capacity, thread-exit, explicit-flush and shutdown
+  triggers instead of a tiny hit-count trigger;
+- explicitly finalizes from Xenia's window-close lifecycle before
+  `std::quick_exit`;
+- emits raw schema 2 with checkpoint-committed delta semantics;
+- retains parser compatibility with schema 1 and usable footerless captures;
+- keeps runtime dispatch sites distinct from retained historical/manual
+  corroboration;
+- leaves manifest planning dry-run-only by default.
 
-| Level | Status |
-| --- | --- |
-| Collector and tools implemented and unit-tested | complete |
-| Collector exercised by minimal PPC under Xenia's real JIT | complete |
-| Collector exercised by two bounded legacy loose-XEX boots with TU1 applied | complete, collector evidence only |
-| Corrected complete-media ISO workflow preflight | complete; launch pending user gameplay |
-| Collector exercised through interactive private-TU1 gameplay coverage | pending user gameplay |
+No post-repair manual gameplay capture was performed during this repair. The
+user will perform that final validation. The collector has been exercised
+through actual minimal PPC under Xenia's x64 JIT, high-volume concurrent
+synthetic workloads, explicit and concurrent shutdown, periodic persistence,
+failure injection and the full Xenia CPU test suite.
 
-The two private-title runs are **not** described as gameplay. They booted the
-loose base XEX with Xenia reporting title-update application from `0.0.0.26`
-to `0.0.1.26`, then were deliberately terminated after bounded non-interactive
-collection. They remain valid collector/identity evidence, but they do not
-validate complete disc-media mounting. Both raw streams therefore have a
-usable final checkpoint but no footer and are correctly classified as
-`abnormal_or_unknown_no_footer`. The corrected ISO workflow has been
-preflighted without launching Xenia and awaits the next user gameplay run.
-
-The merged automated evidence contains 6,358 stable source/target/branch pairs,
-279,936 hits and 6,039 distinct non-return targets. All 6,039 targets are
-explained by current function, internal-entry, switch-case or import evidence.
-There are zero proposed ranges, zero automatically applicable candidates, zero
-ambiguous targets and zero conflicts. The manifest remained byte-identical at
-SHA-256
-`E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0`.
-
-The required golden addresses were not reached during these bounded boots.
-They are instead exercised by a committed address-only raw fixture through the
-same production closure, Ghidra, generated-registration and manifest inputs.
-That distinction prevents synthetic evidence from being presented as gameplay
-observation.
-
-## Starting audit and exact identities
-
-Before source changes, every applicable `AGENTS.md` was read in the two
-canonical repositories and the external Xenia checkout. Every Markdown file
-under `C:\Dev\Fable2Recomp\docs` was enumerated and read, including all Phase
-1-3 discovery documents, the fault-walker baseline and the Run 047 handoff.
-The referenced schemas, analyzers, generated registration tables, manifest
-parser, fixtures, tests and wrappers were then inspected directly.
-
-The fixed Fable2Recomp starting point was verified exactly:
-
-| Property | Value |
-| --- | --- |
-| repository | `C:\Dev\Fable2Recomp` |
-| origin | `https://github.com/FenrisSkoll/Fable2Recomp.git` |
-| starting branch | `main` |
-| starting commit | `efd625d0b9635119df85d61d005d754714c2205e` |
-| starting tree | `2363af6698bbc2e1ade01bfe19e49ca37814e73a` |
-| first parent | `564c2adb3e281f15ee03593e966355c8138a15a7` |
-| second parent | `ed16e1ec208b27e9f4af6832eb8d732b7d688f1f` |
-| Phase 4 branch | `fable2-phase4-indirect-targets` |
-| Phase 4 implementation commit | `f14cec668e94dbf6014a2c829b5ec1b0cc9c4a0f` |
-| implementation tree | `bdb754aee4b95421612a7b51419b351566eac6b4` |
-
-`git diff efd625d0^2 efd625d0` was empty, as required. The Phase 4 branch was
-created from that exact merge; `main` was not changed.
-
-The ReXGlue starting and final integration identities are:
-
-| Property | Value |
-| --- | --- |
-| repository | `C:\Dev\rexglue-sdk-v0.10` |
-| origin | `https://github.com/FenrisSkoll/rexglue-sdk.git` |
-| branch | `fable2-v0.10-migration` |
-| starting commit | `16d7915550676121667a5155a96216e9e42bbad8` |
-| starting identity | `0.10.0.42-dev.g16d7915` |
-| Phase 4 commit | `956c6a8b5da4c54b9899a2593e9c67c26de30194` |
-| Phase 4 tree | `b78b06b8ac650467372236a3a262864e069a9382` |
-| installed identity | `0.10.0.43-dev.g956c6a8` |
-| isolated install | `C:\Dev\Fable2Phase4Xenia\rexglue-install-956c6a8` |
-| installed CLI SHA-256 | `4AD185FA7642BB39CD8F3E0C529BC5A155224A869E09B83FE81A1F659EB43E5D` |
-
-The SDK change is deliberately generic and limited to accepting shared
-entrypoint-evidence contract schema 4. It changes one source file and does not
-add a Fable-specific runtime facility. The locally materialised, unstaged
-`thirdparty/libmspack` state was never cleaned, reset, staged or committed.
-
-The exact private title identity remains:
-
-| Property | Value |
-| --- | --- |
-| complete-game launch media | `D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso` |
-| analysis base XEX | `D:\Fable2-Recomp\tu1\default.xex` |
-| base XEX SHA-256 | `88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662` |
-| extracted XEXP SHA-256 | `046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C` |
-| STFS container file | `TU_16L61VH_0000038000000.000000000008Q` |
-| STFS container SHA-256 | `B36EB38CE1DB9E1195DEA494C8E75D5AB4BE737DCEF10565EF16A415DE27524C` |
-| contiguous loaded post-patch image SHA-256 | `BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00` |
-| executable-memory fingerprint | `5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357` |
-| Xenia loaded-module fingerprint algorithm | `sha1_contiguous_loaded_executable_memory` |
-| pinned Xenia loaded-module fingerprint | `341151E9932EC14CB4F520AA9DE35BCF7169BFE1` |
-| image base / size / entry | `0x82000000` / `0x01620000` / `0x82CC21C0` |
-| title / media / version | `0x4D5307F1` / `0x716F0A0D` / `0.0.1.26` |
-
-The launch-media and analysis-image identities are separate layers. The ISO is
-complete game media and is passed only as Xenia's final positional argument;
-preflight deliberately does not calculate or substitute its SHA-256. The
-analysis base XEX and adjacent XEXP establish the inputs for the canonical
-post-patch image SHA-256. The loaded-module SHA-1 is likewise not relabelled as
-that SHA-256. The trace header retains the configured canonical post-patch
-SHA-256, and post-run validation independently requires the repeatable observed
-Xenia module fingerprint, title metadata and executable ranges.
-
-The validated pre-Phase-4 native host executable remains:
+The earlier private run `fable2-tu1-manual-001` remains accepted evidence. The
+user confirmed that gameplay reached Bowerstone Market. Its stored label
+remains verbatim:
 
 ```text
-B8822AA5051FA64DE8EF008808E86F93B219C2AAC3A4839D4043F3CAD7C2A9F0
+Fable II GOTY TU1 manual gameplay through first successful save
 ```
 
-The newly linked Phase 4 Release executable is the same size, 105,042,944
-bytes, but has SHA-256:
+The old artifact is not rewritten to claim different metadata. Its compact
+summary and import plan remain usable, but the old collector generated about
+90.9 GiB of raw JSONL and Xenia's normal window close produced no footer.
+Those two defects are the reason for this repair.
 
-```text
-EEACEAA8DB38E728B79F4F78B0298B7036E13EB4903518C503199697FA64AE6F
-```
+The canonical `fable2_manifest.toml` was not changed. The repaired dry-run plan
+contains 15,576 observed non-return targets, no range proposals, no ambiguous
+or conflicting targets and no automatically applicable candidates.
 
-This is recorded as a new build identity, not relabelled as the prior validated
-binary. The full fault-walk and dispatch-only binaries are respectively:
+## Repair baseline and repository state
 
-```text
-C0734DB44DB26813FC981EDB15B8548995F69FD5D03FB3E4F98AE5E6594CE442
-02F14F87BCFD047FAD14A132DE862FBE6A93258164B2D33C374B5D62D5148B6C
-```
+The repair began in the canonical worktree `C:\Dev\Fable2Recomp`, not the
+stale `C:\Dev\Fable2Phase4Capture` worktree.
 
-`Get-Command caveman -ErrorAction SilentlyContinue` found the installed
-PowerShell function. The requested literal `caveman --help` was not a help
-mode for that function and failed by trying to resolve `--help` as a path.
-Caveman was not used, so no exact evidence or source was compressed.
-
-## Analysis baseline consumed by Phase 4
-
-The production planner consumes the existing shared evidence contract rather
-than maintaining a disconnected Phase 4 database. The verified current inputs
-are:
-
-| Input | Exact result |
-| --- | --- |
-| entrypoint-closure schema/analyzer | schema 3 / `2.0.0` |
-| entrypoint candidates | 35,626 |
-| strong / probable candidates | 55 / 180 |
-| closure JSON SHA-256 | `665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397` |
-| Phase 3 jump-table schema/analyzer | schema 3 / `3.0.0` |
-| recovered switch sites / distinct case targets | 878 / 9,002 |
-| unresolved relevant non-link CTR sites | 711 |
-| jump-table JSON SHA-256 | `B1FE26FB9119DAF7E7E0196CBDBA8CCA087BE190BF156FE0B12DF116379ED89A` |
-| Ghidra catalog / exact functions | 9 records / 42,462 functions |
-| exact Ghidra map SHA-256 | `03516B3A1F33433E493739418C9939D4FF1AEB0989F4ACEF2FD4D8204A077F58` |
-| migration ledger | 32 entries |
-| exact generated recomp registrations | 60,425 |
-
-The 342-table / 3,170-case result in the original Phase 3 report was verified,
-but it is a historical stage result rather than the final current input. The
-durable Phase 3 document explicitly supersedes it first with 877 / 9,000 and
-then, after the generic Run 047 correction, with 878 / 9,002. Phase 4 uses the
-current corrected report and preserves the 711 remaining non-link CTR sites as
-unresolved static coverage rather than silently claiming closure.
-
-Shared evidence schema 4 adds only Phase 4 provenance: STFS identity, the
-pinned Xenia module fingerprint and the Run 047 source/target ownership record.
-Closure reports remain schema 3. Both the Python verifier and ReXGlue CLI ignore
-container-only fields when checking a schema 1-3 report, so the old report
-contract is not retroactively changed.
-
-## Xenia selection, source and licences
-
-Current primary repositories were inspected rather than assuming a historic
-URL:
-
-- Xenia master: `https://github.com/xenia-project/xenia`
-- Xenia Canary: `https://github.com/xenia-canary/xenia-canary`
-
-Canary was selected because it is the maintained behavioural-reference fork
-used for this title and its current title-update path was needed for the
-private TU1 validation. It was checked out separately; no Xenia source was
-vendored into Fable2Recomp.
-
-| Property | Value |
-| --- | --- |
-| checkout | `C:\Dev\Fable2Phase4Xenia\xenia-canary` |
-| origin | `https://github.com/xenia-canary/xenia-canary.git` |
-| pinned upstream base | `3a44f20c7bc66db1da583e8a6f0ab740e31908e9` |
-| local collector branch | `fable2-phase4-indirect-targets` |
-| production collector commit | `59cfa2b2d8748e1144a4090fcdbc1227fefdf3ec` |
-| final test/benchmark head | `006830ee34596ce94f5ff9ac5b10ee5569a2c1e2` |
-| final tree | `a60624c54d07b780f2fd4b951a8bc46076d1af79` |
-| licence | BSD 3-Clause, root `LICENSE` |
-| licence SHA-256 | `3D58F25C15634B6EC01D1F133EF798209AE06626AB8D2227B6223D5A9F5113F4` |
-| final Release executable SHA-256 | `25EA275AF5CD8A3EFB781C4AD2142032DCD13A6E71CC1541761E0EA752BFC446` |
-
-The collector commit changes 15 files with 1,575 insertions and 6 deletions.
-It adds the collector, HIR branch flags, x64 and AArch64 backend hooks, module
-fingerprints, thread buffers, configuration, lifecycle integration and 650
-lines of collector/synthetic-PPC tests.
-
-Public build dependencies acquired outside the canonical repositories were:
-
-| Dependency | Pin or artifact | Licence / exact identity |
+| Repository | Repair starting state | Repair implementation state |
 | --- | --- | --- |
-| LunarG Vulkan SDK | `https://vulkan.lunarg.com/sdk/home`, Windows x64 `1.4.357.0` installer | component licences in the official SDK licence registry; installer SHA-256 `81F474711E9042F4CD22B31B2F7A8870DB2E428B21586FB43DD80150BE97310D` |
-| SPIRV-Tools | `https://github.com/KhronosGroup/SPIRV-Tools.git` at `33e02568181e3312f49a3cf33df470bf96ef293a` | Apache-2.0; `LICENSE` SHA-256 `3DDF9BE5C28FE27DAD143A5DC76EEA25222AD1DD68934A047064E56ED2FA40C5` |
-| SPIRV-Headers | `https://github.com/KhronosGroup/SPIRV-Headers.git` at `2a611a970fdbc41ac2e3e328802aed9985352dca` | MIT; `LICENSE` SHA-256 `841A6E68E16BFC98DB8ECA98D7002D4F2B508C56CE865FD6F1726BE30ED489EB` |
-| glslang | `https://github.com/KhronosGroup/glslang.git` at `a57276bf558f5cf94d3a9854ebdf5a2236849a5a` | project licence bundle including BSD-3-Clause; `LICENSE.txt` SHA-256 `7D4C1655BE3A4D99E8A4859335E28C8950F2E7F72DCF3EED3379846120F5BF47` |
-| Cygwin setup | `https://cygwin.com/setup-x86_64.exe`, setup `2.937` | GPL-family setup sources at `https://sourceware.org/cygwin-apps/setup.html`; SHA-256 `2C9F2FB56E1FB687B5D9680AFA8F8B06E6214F0E483096AF0EAE1946431226C5` |
-| GNU binutils source | Xenia-pinned `third_party/binutils/binutils-2.24.tar.gz` | GPLv3+; archive SHA-256 `4930B2886309112C00A279483EAEF2F0F8E1B1B62010E0239C16B22AF7C346D4` |
+| Fable2Recomp | branch `fable2-phase4-xenia-media-correction`, commit `112d16d07d4f6d220a923e34ec4ab9938702b3be` | code/schema/fixture commit `9c46998a993ea2046b1e9a873d7d9521eb2f44ad` |
+| Xenia Canary | branch `fable2-phase4-indirect-targets`, commit `006830ee34596ce94f5ff9ac5b10ee5569a2c1e2` | repair commit `6b6715b029d442ff6ed5a89773f119400b1c19b5`, tree `e79833e62b875e0ce23201a2cc4d31529b4cbaf7` |
+| ReXGlue SDK | `C:\Dev\rexglue-sdk-v0.10`, branch `fable2-v0.10-migration`, commit `956c6a8b5da4c54b9899a2593e9c67c26de30194` | unchanged by this repair; expected unstaged `thirdparty/libmspack` materialisation preserved |
 
-The reproducible source pinning pattern was:
+The Fable documentation/provenance synchronization commit is the commit
+containing this file. Obtain it with:
 
 ```powershell
-git clone https://github.com/xenia-canary/xenia-canary.git `
-    C:\Dev\Fable2Phase4Xenia\xenia-canary
-git -C C:\Dev\Fable2Phase4Xenia\xenia-canary checkout `
-    3a44f20c7bc66db1da583e8a6f0ab740e31908e9
-git -C C:\Dev\Fable2Phase4Xenia\xenia-canary switch -c `
-    fable2-phase4-indirect-targets
+git log -1 --format=%H -- docs/fable2-discovery-pipeline/05-xenia-indirect-targets.md
 ```
 
-The ignored extracted binutils source needed one local current-Cygwin
-compatibility condition in `libiberty/pex-unix.c`:
+Xenia remains a separate checkout. No complete Xenia tree is vendored into
+Fable2Recomp.
 
-```c
-#if defined(HAVE_SPAWNVE) && defined(HAVE_SPAWNVPE)
-```
+Repair components are:
 
-The resulting file SHA-256 is
-`4AC66FAB1D735B3FCCEE85CA0A4BDBEB88A061B570979487E89ECC0E8A4788B7`.
-This build-only external patch is not in either canonical repository or the
-Xenia collector commit.
+- Xenia `indirect_target_collector.{h,cc}` and `cpu_flags.{h,cc}` for dirty
+  aggregation, persistence policy, schema 2 and footer accounting;
+- Xenia `processor.{h,cc}`, `emulator.{h,cc}` and `app/xenia_main.cc` for the
+  explicit normal-shutdown lifecycle;
+- Xenia `indirect_target_collector_test.cc` for real synthetic PPC,
+  concurrency, failure, stress and performance coverage;
+- Fable `Fable2IndirectTargets.py`, raw schema 2, Phase 4 fixtures and tests for
+  committed-batch recovery and deterministic summaries;
+- shared evidence/function-map support for schema 5 provenance separation;
+- the GPU-reference provenance verifier, which pins the immutable G1.6 blob
+  separately from the new current shared-evidence blob.
 
-No private executable, title update, raw trace, save, memory dump or compiled
-artifact was uploaded or added to Git.
+## Identity layers and launch media
 
-## Existing Xenia tracing audit
+The gameplay launch and analysis identity are deliberately different concepts.
 
-At the pinned Canary base, the following facilities were inspected in source
-and configuration:
+| Layer | Exact value and use |
+| --- | --- |
+| complete launch media | `D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso`; final positional Xenia argument; not hashed as the analysis image |
+| analysis base XEX | `D:\Fable2-Recomp\tu1\default.xex` |
+| base XEX SHA-256 | `88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662` |
+| adjacent XEXP SHA-256 | `046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C` |
+| patched TU1 analysis-image SHA-256 | `BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00` |
+| TU content directory | `C:\Dev\Fable2Phase4Xenia\content\0000000000000000\4D5307F1\000B0000` |
+| title / media / version | `0x4D5307F1` / `0x716F0A0D` / `0.0.1.26` |
+| image base | `0x82000000` |
+| executable range | `0x82170000`-`0x832D0000` |
+| observed loaded-executable fingerprint | SHA-1 `341151E9932EC14CB4F520AA9DE35BCF7169BFE1` |
+
+The wrapper passes `--content_root=C:\Dev\Fable2Phase4Xenia\content` and
+`--apply_title_update=true`, and passes the GOTY ISO last. It never substitutes
+the ISO SHA-256 for the patched executable-image SHA-256. A standalone
+`.xex`/`.elf` is rejected as normal gameplay launch media.
+
+## Xenia source, licence and existing tracing audit
+
+The collector checkout is:
+
+| Property | Value |
+| --- | --- |
+| path | `C:\Dev\Fable2Phase4Xenia\xenia-canary` |
+| origin | `https://github.com/xenia-canary/xenia-canary.git` |
+| upstream base used for Phase 4 | `3a44f20c7bc66db1da583e8a6f0ab740e31908e9` |
+| pre-repair collector/metrics head | `006830ee34596ce94f5ff9ac5b10ee5569a2c1e2` |
+| repaired collector head | `6b6715b029d442ff6ed5a89773f119400b1c19b5` |
+| repaired tree | `e79833e62b875e0ce23201a2cc4d31529b4cbaf7` |
+| licence | BSD 3-Clause, root `LICENSE` |
+| licence SHA-256 / bytes | `3D58F25C15634B6EC01D1F133EF798209AE06626AB8D2227B6223D5A9F5113F4` / 1,505 |
+| repaired Release executable | 17,271,808 bytes; SHA-256 `A8107146A41CE9020C790F208937D247372989DB88337E8D313B03B8C94DB0C4` |
+
+The original Phase 4 audit inspected `trace_functions`,
+`trace_function_coverage`, `trace_function_references` and
+`trace_function_data_path` in current Canary source. Those facilities do not
+provide the complete runtime tuple required here: resolved guest source and
+target, branch form and link state, source/target module, stable guest thread,
+run identity, ordinary-return filtering, durable aggregate counts, ordering
+and drop/error state. The custom collector remains necessary.
+
+PPC `bcctrx` and `bclrx` lower through common HIR. Existing Phase 4 hooks in the
+x64 and AArch64 backends call the collector only after the guest target is
+resolved and before the transfer. The repair does not alter those HIR/backend
+hooks, guest registers, condition state, memory or target selection.
+
+Public dependencies and their prior Phase 4 pins remain as recorded:
+
+| Dependency | Pin / identity | Licence |
+| --- | --- | --- |
+| Xenia Canary | `https://github.com/xenia-canary/xenia-canary.git`, base `3a44f20c7bc66db1da583e8a6f0ab740e31908e9` | BSD-3-Clause |
+| SPIRV-Tools | `33e02568181e3312f49a3cf33df470bf96ef293a` | Apache-2.0 |
+| SPIRV-Headers | `2a611a970fdbc41ac2e3e328802aed9985352dca` | MIT |
+| glslang | `a57276bf558f5cf94d3a9854ebdf5a2236849a5a` | project licence bundle including BSD-3-Clause |
+| LunarG Vulkan SDK | Windows x64 1.4.357.0 | component licences in the SDK |
+| GNU binutils | Xenia-pinned 2.24 archive | GPLv3+ |
+
+No additional public dependency was downloaded for this repair.
+
+## Confirmed root causes
+
+### Raw amplification
+
+Schema-1 buffers were flushed and cleared every 4,096 indirect hits. A hot game
+loop reached that threshold continuously. Every flush serialized every pair in
+that small interval and emitted a checkpoint, even when the same pair was the
+only thing that changed. The completed capture therefore contained:
+
+| Metric | Old capture |
+| --- | ---: |
+| indirect hits | 24,555,201,598 |
+| unique summary pairs | 26,632 |
+| unique pair/thread observations in the compact summary | 31,448 |
+| raw pair records | 253,054,385 |
+| checkpoints | 6,142,998 |
+| raw size | about 90.9 GiB |
+| dropped hits / I/O errors / count overflows | 0 / 0 / 0 |
+
+This was not one record per hit. It was repeated delta serialization driven by
+a hit threshold that was far too small for a branch-dense title.
+
+### Missing clean footer
+
+Xenia's window close calls
+`EmulatorApp::ShutdownEmulatorThreadFromUIThread` and then
+`std::quick_exit`. Before the repair that function did not finalize the
+collector. The only collector shutdown was reached from
+`Processor::~Processor`, but `quick_exit` bypasses ordinary destructor
+ordering. The user's normal close therefore left a complete checkpointed tail
+with no footer:
 
 ```text
-trace_functions
-trace_function_coverage
-trace_function_references
-trace_function_data
-trace_function_data_path
+flush_status:          abnormal_or_unknown_no_footer
+corrupt_tail:          false
+missing_final_newline: false
+integrity_warnings:    []
 ```
 
-They provide function statistics, coverage, references or function data, but
-not the required runtime tuple. In particular, no existing output preserves
-all of resolved guest source PC, resolved guest target PC, `bctr` / `bctrl` /
-non-standard `bclr`, link state, source and target module, stable guest thread,
-run provenance, return filtering, aggregate ordering, drop/error state and a
-crash-tolerant checkpoint. Existing tracing was therefore insufficient.
+The repair hooks explicit collector finalization into the window-close path.
+The destructor remains an emergency/idempotent fallback; normal correctness no
+longer depends on it.
 
-Current Xenia has no separate production PPC interpreter backend to patch.
-PPC control instructions lower through common HIR into x64 or AArch64 JIT
-backends. Phase 4 adds branch-kind flags at PPC lowering and equivalent hooks
-in both backends at the point where the resolved guest target is available and
-before control is transferred. The hook does not change guest registers,
-condition state, memory or target selection.
+### Jump-table fixture provenance
 
-## Collector architecture
+The old acceptance fixture treated Run 047's retained historical/manual source
+sites as if every new Xenia capture had to observe them as live dispatch
+instructions. The new capture correctly saw the local switch instruction
+`0x821746BC -> 0x82174734`. Run 047's `0x823DCAD8` and `0x82403720` are
+corroborating historical path/source evidence, not required live source PCs in
+every trace.
+
+Shared evidence schema 5 and runtime-indirect evidence schema 2 now encode
+those provenance categories separately.
+
+## Repaired aggregation architecture
 
 ```text
-PPC bcctrx / bclrx lowering
-  -> HIR indirect-call flags (CTR/LR, link, ordinary-return)
-  -> x64 or AArch64 resolved-target hook
-  -> guest-thread-local fixed-capacity aggregate table
-  -> bounded flush under the output lock
-  -> append-safe JSONL pair records + checkpoint
-  -> final footer on orderly Processor shutdown
+resolved indirect transfer in generated code
+  -> disabled fast rejection, or guest-thread fixed dirty map
+  -> cache-local atomic gate (no per-hit global file lock)
+  -> dirty-pair / capacity / timer / explicit / thread-exit trigger
+  -> sorted delta pair batch under the writer lock
+  -> matching checkpoint + fflush
+  -> offline deterministic cross-batch/run aggregation
 ```
 
-Collection is disabled by default. An empty
-`--indirect_target_trace_path` means the Processor creates no collector,
-ThreadState allocates no collector buffer, and generated JIT code contains no
-collector callback. Enabling must happen before title code is compiled.
+Collection remains disabled by default. With an empty
+`--indirect_target_trace_path` the Processor creates no collector, ThreadState
+allocates no buffer, generated JIT code contains no collector callback and no
+file is created.
 
-The hot path uses one fixed-size open-addressed table per guest thread. It does
-not allocate, perform filesystem I/O or take a contended global lock per
-transfer. The default capacity is 256 unique pairs per guest thread and the
-default flush interval is 4,096 hits; both are bounded by validation. A flush
-aggregates/writes under one output lock. Guest thread keys use Xenia's guest
-ThreadState ID, for example `guest:00001234`.
+When enabled, one preallocated open-addressed map belongs to each live guest
+ThreadState. The recording path:
 
-Default capture includes actual resolved:
+- performs no JSON formatting, console output, filesystem access or allocation;
+- never takes the registry or global writer mutex for an ordinary hit;
+- takes only the buffer's cache-local atomic gate;
+- aggregates by guest thread, source PC, target PC and branch flags;
+- preserves a 64-bit delta hit count plus exact first/last per-thread sequence;
+- saturates only at `UINT64_MAX` and increments `count_overflows` explicitly;
+- excludes ordinary `blr` by default;
+- retains `bctr`, `bctrl` and relevant non-standard `bclr`;
+- keeps cross-module targets and validity instead of treating them as Fable
+  manifest candidates.
 
-- non-linking `bctr`;
-- linked `bctrl`;
-- relevant linked or non-standard `bclr` forms.
+Production defaults are:
 
-Ordinary `blr` is omitted by default and can be included only with
-`--indirect_target_trace_include_returns=true`. Default module filtering keeps
-title-module source sites while still retaining cross-module target identity.
-`--indirect_target_trace_all_modules=true` enables diagnostic source capture
-outside the title.
+| Setting | Default | Bound / meaning |
+| --- | ---: | --- |
+| `indirect_target_trace_buffer_pairs` | 4,096 | per-thread fixed dirty-map capacity; clamped 16-65,536 |
+| `indirect_target_trace_dirty_pairs` | 3,072 | persist before the table is full |
+| `indirect_target_trace_flush_interval_ms` | 300,000 | five-minute durability timer; zero disables timer; clamped to 24 hours |
+| `indirect_target_trace_max_unique_aggregates` | 1,000,000 | bound for footer-only unique pair/thread accounting |
 
-Each aggregate retains source and target guest PCs, branch kind, link state,
-ordinary-return status, module names, guest thread, hit count, first/last
-per-thread sequence and target validity. Counter addition saturates at
-`UINT64_MAX` and increments an overflow counter. Buffer exhaustion, dropped
-hits, I/O errors and count overflows are surfaced in checkpoints and the final
-footer.
+A production-size 4,096-entry buffer measured 196,680 bytes. The four-thread
+stress allocation was 786,720 bytes. The separate footer unique-key set is
+bounded at one million entries. Reaching that bound does not discard pair
+evidence; it sets `unique_aggregate_count_complete=false` and increments
+`aggregate_limit_exceeded`.
 
-The collector refuses to overwrite an existing raw path. A header is flushed
-before execution; module records are appended after module discovery and after
-title-update application; every completed batch is followed by a checkpoint;
-and normal shutdown appends a footer. The parser accepts a missing footer and
-an incomplete final JSON line, but rejects corruption in the middle of a
-stream. Thus an abnormal process stop loses at most the unflushed in-memory
-batch and incomplete final line, with dropped/error status preserved through
-the last complete checkpoint.
+Flush reasons are explicit:
 
-## Versioned schemas and deterministic reports
+```text
+buffer_capacity
+dirty_pair_high_water
+periodic_time
+explicit_flush
+thread_exit
+shutdown_drain
+```
 
-Committed schemas are:
+The timer emits nothing for a clean buffer. A checkpoint is written only after
+a non-empty delta batch. Thus repeated hot hits consume a counter update but do
+not create repeated raw records until a durability boundary is reached.
+High-water/capacity flushes protect bounded memory when many genuinely new
+pairs appear.
+
+Lock ordering is always:
+
+```text
+buffer registry -> buffer local gate -> writer
+```
+
+Thread-buffer destruction, periodic draining and shutdown follow the same
+order. Tests exercise concurrent recording/shutdown without deadlock or
+use-after-free.
+
+## Clean shutdown and footer guarantees
+
+The explicit normal path is:
+
+```text
+window OnDestroy
+  -> ShutdownEmulatorThreadFromUIThread
+  -> Emulator::ShutdownIndirectTargetCollector
+  -> Processor::ShutdownIndirectTargetCollector("window_close")
+  -> active=false
+  -> stop/join periodic flusher
+  -> hold registry and drain every live buffer
+  -> write final footer
+  -> fflush + fclose
+  -> existing std::quick_exit
+```
+
+The setup/shutdown mutex also protects an early UI close while the Processor is
+being created. Shutdown is atomic and idempotent, so duplicate lifecycle calls
+write exactly one footer. Setting `active=false` before acquiring buffer gates
+closes the race with recorders: a recorder rechecks active after taking its
+gate and cannot add data behind the final drain. Holding the registry through
+file close prevents a thread-exit flush after the footer.
+
+The schema-2 footer contains:
+
+- run ID, raw schema and collector version;
+- `shutdown_status=normal` and the external flush reason;
+- batch/checkpoint sequence and checkpoint record count;
+- final total hits and pair/delta record count;
+- final unique pair/thread aggregate count and completeness flag;
+- maximum per-thread final sequence;
+- dropped-hit, I/O-error, overflow and aggregate-limit counters;
+- explicit `delta_since_previous_persistence` semantics.
+
+A write failure sets the collector failed state, reports the I/O error, counts
+the affected batch as dropped and does not forge a clean footer. Collector
+failure never changes guest CPU state.
+
+## Raw schema 2 and compatibility
+
+Committed raw schemas are:
 
 ```text
 tools/schemas/xenia-indirect-targets-raw-v1.schema.json
-tools/schemas/fable2-indirect-target-summary-v1.schema.json
-tools/schemas/fable2-indirect-target-import-plan-v1.schema.json
+tools/schemas/xenia-indirect-targets-raw-v2.schema.json
 ```
 
-The raw JSONL record schema is `xenia_indirect_targets_raw` version 1. Record
-kinds are `header`, `module`, `pair`, `checkpoint` and `footer`. The summary
-and import plan are independently named and versioned at 1.
-
-`tools/Fable2IndirectTargets.py` streams raw input line by line. Stable summary
-content is sorted by source module, source PC, target module, target PC, branch
-kind and link state. Run IDs, raw SHA-256 values and per-run hit counts remain
-attached to every pair. Volatile wall-clock metadata is not added during
-summary or plan generation.
-
-Multi-run merge rejects duplicate run IDs, duplicate raw hashes and different
-expected image identities. A raw run whose configured SHA-256, title metadata,
-module ranges or pinned loaded-module fingerprint disagrees is quarantined and
-does not contribute pairs. Equivalent forward and reverse merges are
-byte-identical.
-
-The standard files are:
+Schema 2 keeps append-safe JSONL records:
 
 ```text
-xenia-indirect-targets.raw.jsonl
-xenia-indirect-targets.summary.json
-xenia-indirect-targets.summary.csv
-fable2-indirect-targets.import-plan.json
+header
+module (zero or more, including refreshed post-update identity)
+pair delta(s) for batch N
+checkpoint committing batch N
+...
+footer
 ```
 
-JSON and CSV writes use a same-directory temporary file, `fsync` and atomic
-replace. Raw data and per-run reports live under ignored `out\indirect-targets`.
+Every schema-2 pair says:
 
-## Planner, classifications and size policy
+```json
+"count_semantics": "delta_since_previous_persistence"
+```
 
-The planner compares every non-return runtime target with:
+The header repeats that semantic and records buffer/dirty/timer/unique bounds.
+A pair batch is not considered durable by the offline parser until its matching
+consecutive checkpoint is read. Checkpoints reconcile batch record count,
+cumulative total pair records and cumulative total hits. Footer batch,
+checkpoint and collector-version fields are also reconciled.
 
-- the canonical manifest and current generated registration table;
-- exact trusted function ranges and `.pdata`/exception entries;
-- Phase 1 candidates and boundary provenance;
-- exact-image and related-build Ghidra records;
-- Phase 3 dispatch/case ownership;
-- callable internal labels and known range interiors;
-- shared manual, fault-walker and Run 047 provenance;
-- executable, import, kernel and module ranges.
+Recovery behavior is deliberate:
 
-Every conclusion retains its contributing evidence, source PCs, branch kinds,
-run IDs, counts, conflicts and rejection reasons. It uses exactly these public
-classifications:
+| Tail state | Result |
+| --- | --- |
+| normal footer, counters reconcile, final newline present | `normal` |
+| complete checkpointed tail, no footer | usable; `abnormal_or_unknown_no_footer` |
+| complete uncheckpointed schema-2 pair batch | batch discarded with an integrity warning; prior checkpoints retained |
+| partial final JSON object | prior checkpoints retained; `abnormal_truncated_tail` |
+| complete normal footer without final newline | `invalid_normal_footer` |
+| corrupt JSON in the middle | rejected |
+| unsupported raw version | rejected with the supported version list |
+
+Schema-1 traces remain readable with their legacy delta behavior. Schema-1
+records are never silently reinterpreted as schema-2 committed batches. Old
+compact summary files remain consumable because summary and plan schemas stay
+at version 1.
+
+Stable summary and plan content is deterministically sorted. JSON/CSV writes
+use a same-directory temporary file, flush/fsync and atomic replace. Duplicate
+run IDs and duplicate raw hashes are rejected. Image/module mismatches are
+quarantined and do not contribute evidence.
+
+## Import planning and evidence integration
+
+The planner continues to compare every non-return target with:
+
+- the canonical manifest and exact generated registrations;
+- `.pdata` and exception ownership;
+- Phase 1 entrypoint closure;
+- exact and related-build Ghidra records;
+- Phase 3 jump-table dispatch/case ownership;
+- known functions and callable internal entries;
+- manual, runtime and fault-walker provenance;
+- title executable, import, kernel and cross-module ranges.
+
+Classifications remain:
 
 ```text
 existing_manifest_function
@@ -389,480 +389,416 @@ invalid_or_non_executable_target
 conflicting_range
 ```
 
-An observed target proves execution at that address. It does not prove a
-function boundary or size. A range is proposed only from independent exact-TU1
-boundary evidence: a trusted non-preliminary closure range, exact `.pdata`, an
-exact-image contiguous Ghidra body or agreeing strong sources. Related-build
-Ghidra records are retained but marked unable to authorise TU1 size or
-ownership. Disagreeing exact sources produce `conflicting_range`.
+For backward compatibility, `existing_manifest_function` means an existing
+effective generated registration. That includes far more than the 80 explicit
+canonical manifest overrides. Renaming it would break existing consumers and
+is deferred; the plan evidence says whether the registration came from a
+canonical override.
 
-A target owned by another function remains an internal entry. A recovered
-switch target remains `known_jump_table_case` unless separate callable
-evidence exists. A `bctr`-only target cannot be automatically applied without
-exact `.pdata`; this prevents switch-like dispatch from receiving the policy
-used for virtual/callback `bctrl` evidence. Runtime targets are never sized by
-distance to another runtime target.
+Runtime observation proves an executed entry address, not a function boundary
+or size. Related-build Ghidra data cannot authorize an exact-TU1 edit by
+itself. A `bctr`-only target remains guarded unless independent evidence
+distinguishes a callable computed tail from a switch case. No code path creates
+`RETURN_R3_ZERO`, a placeholder implementation or a fault-walker stub.
 
-## Dry-run and guarded apply
+Dry-run is the default. Explicit apply still requires `--apply` plus reviewed
+candidate IDs, validates the plan and manifest hashes, preserves comments and
+line endings, writes atomically with a recovery backup, rejects overlap/stale
+plans and is idempotent.
 
-`summarize`, `merge`, `plan` and `post-run` never mutate the manifest. The
-canonical workflow is:
+## Repaired mandatory fixtures
 
-```text
-raw traces -> deterministic summaries -> merge -> dry-run plan
-           -> human review/selection -> explicit guarded apply
-```
+The real capture and shared evidence now verify these concepts separately:
 
-Apply requires all of:
-
-- the `apply` subcommand;
-- literal `--apply`;
-- one or more reviewed stable candidate IDs, directly or in a selection file;
-- a plan whose integrity-derived plan ID validates;
-- a candidate whose independent evidence permits guarded application;
-- the exact manifest SHA-256 stored in the plan;
-- no existing duplicate, conflicting entry or overlapping range.
-
-The edit is formatting-preserving for the existing file and adds only a TOML
-function-size line plus the reviewed candidate ID. It writes a
-`fable2_manifest.toml.phase4.bak` recovery copy and atomically replaces the
-manifest. Reapplying an already present identical selection is a no-op. A stale
-manifest, modified plan, unknown candidate, ambiguous candidate or overlap is
-rejected with a non-zero exit. No code path writes C++, a placeholder body,
-`RETURN_R3_ZERO` or any other stub.
-
-Example review/apply syntax, not an instruction to accept any current target:
-
-```powershell
-python .\tools\Fable2IndirectTargets.py apply `
-    --plan .\out\indirect-targets\RUN\review\fable2-indirect-targets.import-plan.json `
-    --manifest .\fable2_manifest.toml `
-    --select P4-REVIEWED-CANDIDATE-ID `
-    --apply
-```
-
-No canonical candidate was applied in Phase 4 because the automated private
-trace produced no proposals.
-
-## Synthetic acceptance and mandatory cases
-
-The Xenia test executes minimal big-endian PPC through the real host JIT. A
-host-supplied `r5` prevents constant propagation from turning the transfer
-direct. The workload records:
-
-```text
-0x80000004 bctr  -> 0x80000020
-0x80000008 bctrl -> 0x80000020
-0x80000008 bclr  -> 0x80000020
-```
-
-All enabled and disabled variants return `r3=42` and preserve
-`r4=0x1122334455667788`. Default collection contains no `blr`; optional-return
-mode records it with `ordinary_return=true`. This directly verifies that
-instrumentation does not alter the workload's register/control-flow result.
-
-The committed address-only fixtures and Xenia tests cover all required cases:
-
-| Requirement | Verification |
-| --- | --- |
-| virtual and callback `bctrl` | synthetic pairs plus the two known leaf fixtures |
-| switch and computed-tail `bctr` | Run 047 fixture remains a case; synthetic computed tail is not auto-applicable |
-| non-standard `bclr` | real synthetic linked PPC plus no-op manifest fixture |
-| ordinary `blr` | absent by default, retained only in diagnostic mode, ignored by planner |
-| cross-module/import | external module and generated `__imp__` registrations classify as import/kernel |
-| repeated pairs and guest threads | deterministic per-run/thread aggregation and hit counts |
-| buffer limits/drop/I/O/overflow | Xenia capacity tests and Python saturating-counter fixtures |
-| normal/abnormal/truncated data | normal footer, missing footer, incomplete tail and corrupt-middle tests |
-| disabled collection | no callback buffer and no output file |
-| duplicate/schema/image guards | duplicate content/run IDs rejected; mismatches quarantined |
-| related-build evidence | retained but cannot authorise exact TU1 edit |
-| deterministic merge | forward/reverse bytes identical |
-| all ten classifications | exact synthetic ownership/range fixtures |
-| size hierarchy/ambiguity/conflict | `.pdata`, exact Ghidra, CFG, disagreement and no-size cases |
-| dry-run/stale/atomic/idempotent apply | temporary CRLF manifests with comment and backup verification |
-| stub prohibition | source assertion and post-apply byte assertion |
-
-The exact mandatory production-fixture result is:
-
-| Runtime evidence | Production classification | Result |
+| Target / range | Live Xenia evidence | Result |
 | --- | --- | --- |
-| `0x829647F0–0x82964800`, size `0x10` | `existing_manifest_function` | no proposal, no change |
-| `0x82C03B28–0x82C03B44`, size `0x1C` | `existing_manifest_function` | no proposal, no change |
-| `0x829675E0–0x829675F0`, size `0x10` | `existing_manifest_function` | no proposal, no change |
-| `0x823DCAD8 -> 0x82174734` | source retained for `known_jump_table_case` | no proposal, no change |
-| `0x82403720 -> 0x82174734` | source retained for `known_jump_table_case` | no proposal, no change |
-| target `0x82174734` | internal switch case owned by `0x821746A8` | manifest entry forbidden absent independent callable evidence |
+| `0x829647F0`-`0x82964800`, size `0x10` | `0x829641C4` `bctrl`, 2,849 hits | `existing_manifest_function`; no proposal/change |
+| `0x82C03B28`-`0x82C03B44`, size `0x1C` | `0x821907A4` `bctrl`, 13 hits | `existing_manifest_function`; no proposal/change |
+| `0x829675E0`-`0x829675F0`, size `0x10` | `0x82966EE4` `bctrl`, 3,257 hits | `existing_manifest_function`; no proposal/change |
+| `0x82174734` | live `0x821746BC` `bctr`, 16,635 hits | `known_jump_table_case` owned by `0x821746A8`; no proposal/change |
 
-Two independent production runs of the canonical fixture produced identical
-bytes:
-
-| Artifact | SHA-256 |
-| --- | --- |
-| summary JSON | `96FF1C62F21EC57BDFC3D797DE06447990C4AC9B9453D34827528F9572F22BAD` |
-| summary CSV | `C399154E89F174490D54EE3A3C993C82025EF4C0C5B282D03CD378C71454E667` |
-| import plan | `E2E1FFA0F842BAA1E5002DE9FE6F88D94D94C6BB5D0125A6C1B2D2E0B73E0CC0` |
-
-The plan contains four targets from five pairs: three
-`existing_manifest_function`, one `known_jump_table_case`, no range proposal
-and no manifest mutation.
-
-## Automated private-TU1 collection
-
-Two ignored local raw streams from the original loose-XEX workflow were
-retained for collector review. They are not evidence that the corrected ISO
-launch path works:
-
-| Run | Raw bytes / SHA-256 | Last complete checkpoint |
-| --- | --- | --- |
-| `phase4-automated-smoke-001` | 6,072,773 / `75C8DE3C1A88DCEA6F023CB329E622C36EE224CFEA5D81EF310A0C1441EA169D` | 157,184 hits; 15,789 pair records; 0 dropped; 0 I/O errors; 0 overflows |
-| `phase4-fingerprint-repeat-002` | 5,341,451 / `E507DF33DDA98D213516B5C30F7DC6FB68AAE2C5AE0428D6D222DEBCFBA0DD5E` | 122,752 hits; 13,836 pair records; 0 dropped; 0 I/O errors; 0 overflows |
-
-Both logs identify build `fable2-phase4-indirect-targets@59cfa2b2d` and contain:
+For `0x82174734` the acceptance report now contains:
 
 ```text
-XEX patch applied successfully: base version: 0.0.0.26, new version: 0.0.1.26
+expected_runtime_dispatch_sites:                  0x821746BC
+observed_runtime_dispatch_sites:                  0x821746BC
+expected_historical_corroborating_source_sites:   0x823DCAD8, 0x82403720
+retained_historical_corroborating_source_sites:   0x823DCAD8, 0x82403720
+owner:                                             0x821746A8
+classification:                                    known_jump_table_case
+manifest_change:                                   false
+passed:                                            true
 ```
 
-Both runs independently observed the pinned module fingerprint
-`341151E9932EC14CB4F520AA9DE35BCF7169BFE1`. Neither run was quarantined.
-Their stable pair set was identical even though hit counts and thread ordering
-differed. These traces exercise production collector commit `59cfa2b2d...`.
-The final Xenia head adds only the periodic-flush benchmark; the production
-collector implementation is byte-identical.
+Controlled fixtures with a wrong runtime source, owner or classification fail.
+Raising the case hit count to 10,000,000,000 still cannot produce a standalone
+function proposal. Historical sites are retained but are no longer falsely
+required to execute in every new capture.
 
-Merged classification is:
+The schema-2 fixture also proves two deltas merge to 4,294,967,307 hits, above
+`UINT32_MAX`, with exact first/last sequences and no overflow.
+
+## Accepted private capture evidence
+
+The accepted run is:
+
+```text
+run ID:      fable2-tu1-manual-001
+directory:   C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001
+review:      C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001\review
+```
+
+The repair did not reread, copy, delete or rehash the approximately 95 GB raw
+file. Its recorded raw SHA-256 remains:
+
+```text
+05E6344E2992089A9F7B7F509D8099D7E8851D130F2769BE9B9A8F72F20E03D0
+```
+
+Compact artifacts used for the repair audit are:
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| summary JSON | 19,725,922 | `F943DA466653278DED408B3AD7CD462392E74E50FC9521BF4F75FE0F95543BA4` |
+| summary CSV | 3,950,518 | `32667F9D5DB00C3362EC5F939BFD03DBE6AF72A1AF737F9450C5F0CF46A053A7` |
+| original retained import plan | 47,504,616 | `8A3BDC97ABBC37AA436A543BF2E552151AD9233C26B82B32695A74CE7617DF9D` |
+| repaired dry-run plan | 47,504,755 | `BB797A09D5B2CD9DCCDE1C0A4D1DA4339BD118809AB3213E9B320511228B3994` |
+
+The repaired plan was regenerated from the compact summary only. It reports:
 
 | Classification | Targets |
 | --- | ---: |
-| `existing_manifest_function` | 5,897 |
-| `existing_function_internal_entry` | 108 |
-| `known_jump_table_case` | 29 |
-| `known_import_or_kernel_target` | 5 |
-| proposed / ambiguous / conflicting | 0 / 0 / 0 |
-| total | 6,039 |
+| existing effective registrations (`existing_manifest_function`) | 12,676 |
+| existing function internal entries | 1,444 |
+| known jump-table cases | 1,447 |
+| known import/kernel targets | 9 |
+| total non-return targets | 15,576 |
+| ambiguous / conflicting | 0 / 0 |
+| range proposals / automatically applicable | 0 / 0 |
 
-The five exact generated import targets were:
+The manifest was byte-identical before and after planning.
 
-| Target / symbol | Hits | Source PCs |
-| --- | ---: | --- |
-| `0x832B9CE4` / `__imp__KeTlsGetValue` | 11 | `0x82CB2CE4`, `0x82CB2E34` |
-| `0x832B9CF4` / `__imp__KeTlsSetValue` | 2 | `0x82CB2D74`, `0x82CB3148` |
-| `0x832B9D84` / `__imp__NtClose` | 14 | `0x82CC27CC` |
-| `0x832B9EF4` / `__imp__NtCreateFile` | 8 | `0x82CC35F0` |
-| `0x832BA114` / `__imp__NtQueryInformationFile` | 2 | `0x82CC7BE4`, `0x82CC7CEC` |
+## Automated validation
 
-Forward and reverse merges have the same hashes:
-
-| Artifact | Bytes / SHA-256 |
-| --- | --- |
-| summary JSON | 6,386,327 / `91C82761E8078C6D861AE88C4388357D594A49DC1037939F56BDD297FD1184C0` |
-| summary CSV | 1,436,586 / `8ACF2505F85CB1BB1677DEE4D96614FA8A57C6DEC7BC0517CA31441A34166FCD` |
-| import plan | 16,598,359 / `154F3BAE45216B5CA9913F16F26E10B54A244EE1CCC0A635EE3196D2819BB9B9` |
-
-The four golden targets above were not present in either bounded boot. Their
-required results come from the canonical committed fixture and Run 047 shared
-evidence, not from these two runs.
-
-## Builds and automated validation
-
-Key commands used were:
+Commands used for this repair include:
 
 ```powershell
-# Fable2Recomp Phase 4 tests
-python -m unittest discover -s tests -p 'test_*.py'
+# Fable parser/schema/planner tests
+python -m unittest tests.test_fable2_indirect_targets
+python -m unittest tests.test_fable2_indirect_targets tests.test_fable2_function_map
+python -m unittest discover -s tests -p "test_*.py"
 python -m compileall -q tools tests
 
-# Existing analysis verification
-.\tools\Invoke-Fable2EntrypointClosure.ps1
-python .\tools\Verify-Fable2EntrypointClosure.py
-python .\tools\Fable2FunctionMap.py validate-catalog
-python .\tools\Fable2FunctionMap.py validate-ledger
-python .\tools\Fable2FunctionMap.py validate-map
-python .\tools\Fable2FunctionMap.py diff
+# Existing compact summary -> repaired dry-run plan
+python .\tools\Fable2IndirectTargets.py plan `
+    --summary .\out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.json `
+    --output .\out\indirect-targets\phase4-repair-validation\fable2-indirect-targets.import-plan.json
 
-# Fable code generation and builds
-fable2-codegen
-fable2-build
-cmake --build --preset win-amd64-fault-walk-release
-cmake --build --preset win-amd64-fault-walk-dispatch-release
-fable2-run
-fable2-log
-
-# ReXGlue
-ctest --test-dir .\out\build\win-amd64 -C Release -j 8 --output-on-failure
-
-# Xenia Canary
-.\xb.ps1 build --config release --build-tests
-.\xb.ps1 build --config release --target xenia_canary.exe
-.\build\bin\Windows\Release\xenia-base-tests.exe
+# Xenia style/build/tests, from its checkout
+python .\xenia-build.py lint
+python .\xenia-build.py build --config=release --build-tests
+.\build\bin\Windows\Release\xenia-cpu-tests.exe '[collector]'
 .\build\bin\Windows\Release\xenia-cpu-tests.exe
-.\build\bin\Windows\Release\xenia-cpu-tests.exe '[collector]~[.benchmark]'
-.\build\bin\Windows\Release\xenia-cpu-tests.exe '[.benchmark][collector]'
+.\build\bin\Windows\Release\xenia-base-tests.exe
 .\build\bin\Windows\Release\xenia-kernel-tests.exe
 .\build\bin\Windows\Release\xenia-vfs-tests.exe
-.\build\bin\Windows\Release\xenia-cpu-ppc-tests.exe
 ```
 
 Exact results:
 
 | Validation | Result |
 | --- | --- |
-| current Fable Python repository suite | 45/45 tests PASS in 2.462 s on the final no-launch preflight regression |
-| Phase 4 indirect-target module | 17/17 tests PASS in 0.273 s, including four launch-media regressions |
-| raw JSON schema | 40/40 committed JSONL records PASS |
-| summary/plan schemas | both production fixture artifacts PASS |
-| closure verifier | schema 3; 35,626 candidates; 55 strong; 180 probable; all mandatory fixtures PASS |
-| Ghidra catalog | 9/9 records PASS |
-| exact Ghidra map | 42,462 functions PASS; 0.727 s; peak working set about 370 MB |
-| Ghidra diff | 52,994 differences; report-only; manifest unchanged; 11.608 s; peak about 1.776 GB |
-| migration ledger / registrations | 32/32 entries; 60,425 exact recomp registrations |
-| Fable codegen | 0 written, 0 unchanged, 0 deleted; 0.2 s |
-| Fable Release build | 301 steps PASS; 113.143 s; subsequent no-op build 0.286 s |
-| fault-walk builds | full and dispatch Release builds PASS |
-| ReXGlue CTest | exit 0; 1,761/1,761 test records PASS in 10.6 s; four intentional BitStream skips |
-| Xenia base | 3,562 assertions / 75 cases PASS |
-| Xenia CPU | 933 assertions / 253 cases PASS |
-| Xenia collector-only | 108 assertions / 7 cases PASS |
+| Phase 4 Python module | 21/21 PASS in 0.269 s |
+| Phase 4 + function-map focused set | 31/31 PASS in 0.341 s |
+| full repository Python suite | 49/49 PASS in 2.818 s (final rerun) |
+| Python compileall | PASS |
+| direct GPU provenance verifier | PASS; 0 warnings |
+| schema-1 and schema-2 committed raw fixtures | PASS |
+| real compact-summary dry-run plan | 15,576 targets; 0 proposals; 0 applicable; manifest false |
+| `fable2-build` | PASS; codegen 0 written; Release linked; 105,042,944 bytes; SHA-256 `18F926D96930B1CC2470F63FA59421FE34BA8A081F7C6BD58EF49CFF13E7E6F4` |
+| Xenia clang-format lint | PASS |
+| Xenia Release configure/build with tests | PASS |
+| Xenia collector + hidden benchmark filter | 20,327 assertions / 13 cases PASS |
+| Xenia full CPU suite | 21,032 assertions / 258 cases PASS |
+| Xenia base | 3,561 assertions / 75 cases PASS |
 | Xenia kernel | 267 assertions / 5 cases PASS |
 | Xenia VFS | 1 assertion / 1 case PASS |
-| Xenia collector benchmark test | 170 assertions / 1 case PASS |
+| PowerShell parser / full help | 0 syntax errors; help loaded PASS |
+| real-input `phase4-repair-preflight-20260902` | PASS without launch; ISO final; schema 2; expected hashes/TU/content/storage verified |
 
-The official Xenia PPC fixture corpus discovered and loaded 568/568 suites.
-Across 141,726 comparisons, 141,725 passed and 28,687 cases were skipped. The
-single failure was the pre-existing `frsp_12_GEN` NaN-payload comparison and
-does not execute the new indirect branch path. Runtime was approximately 9 min
-37 s. This is reported as a failure, not converted into a pass.
+The collector tests cover actual synthetic `bctr`, `bctrl` and linked
+non-standard `bclr` PPC execution, ordinary-return exclusion/inclusion,
+disabled output, exact aggregation, capacity flush, periodic dirty-only
+checkpoints, explicit/idempotent shutdown, pending live buffers, concurrent
+recording/shutdown, injected I/O failure, count saturation and a 2.02-million
+event stress run.
 
-A bounded post-build native Run 048 used `fable2-run`, reached asynchronous
-loading and was deliberately terminated without claiming an exit code. Exact
-log identity:
+No manual game session was launched or claimed during the repair.
 
-```text
-C:\Dev\Fable2Recomp\fable2-run-048.log
-631,212 bytes
-5,311 lines
-SHA-256 893C6143A43598DE0F79D3B9370C70E11182ECE803D8828F27CEE4BBD6A5FD6D
-```
+## Performance and output-size projection
 
-It contains zero matches for invalid/unregistered dispatch, fault-walker
-activity, `REX_FATAL`, fatal/critical diagnostics, assertions, host exceptions,
-access violations or `0xC0000005`. This is a bounded no-input smoke test, not
-Run 047 gameplay revalidation.
+### Collector hot path
 
-## Performance
-
-The Xenia microbenchmark executes the same minimal dynamic PPC transfer through
-the real x64 JIT for seven paired samples of 200,000 transfers. Disabled samples
-compile without the collector callback and produce no raw file. Enabled samples
-use a huge flush interval to measure the aggregate hot path, then time final
-flush separately.
-
-Final measured result:
+The isolated benchmark executes seven paired samples of 200,000 resolved PPC
+transfers through the real x64 JIT.
 
 | Metric | Result |
 | --- | ---: |
-| disabled ns/transfer, min / median / max / mean / population SD | 21.595 / 21.945 / 22.290 / 21.923 / 0.211 |
-| enabled ns/transfer, min / median / max / mean / population SD | 26.062 / 27.301 / 35.962 / 28.168 / 3.252 |
-| median enabled/disabled ratio | 1.244036 |
-| enabled with periodic flush, min / median / max / mean / population SD | 26.840 / 27.052 / 28.712 / 27.405 / 0.628 ns |
-| default periodic flush interval / observed median delta | 4,096 hits / -0.249 ns per transfer, not resolved above sample noise |
-| final flush, median / max | 0.0219 ms / 0.0315 ms |
-| repeated-pair raw size | 1,841 bytes |
-| periodically flushed repeated-pair raw size | 28,555 bytes for 200,000 hits |
-| 10,000 unique-pair throughput / raw size | 917,826.953 events/s / 3,735,707 bytes |
-| per-thread fixed buffer allocation | 12,368 bytes |
-| four-thread aggregate workload | 1,000,000 events at 637,795,777.792 events/s |
+| disabled ns/transfer, min / median / max / mean / population SD | 21.896 / 22.196 / 25.744 / 22.958 / 1.311 |
+| enabled ns/transfer, min / median / max / mean / population SD | 31.839 / 33.312 / 33.955 / 33.095 / 0.781 |
+| enabled/disabled median ratio | 1.500788 |
+| final flush median / max | 0.0178 / 0.0255 ms |
+| one repeated-pair raw file after 200,000 transfers | 2,509 bytes |
+| 10,000 unique events | 766,066.326 events/s; 4,273,708 raw bytes |
+| four-thread repeated-pair lane | 1,000,000 events at 128,748,181.432 events/s |
 
-The four-thread number measures independent thread-local hot paths plus one
-final flush per worker; it is evidence against per-event global lock
-contention, not a gameplay frame-time claim. The measured 24.4% median enabled
-cost applies to this deliberately branch-dense synthetic workload. Real-game
-overhead remains to be measured during user gameplay. The periodic-flush lane
-was slightly faster at the median than the no-periodic-flush lane; its -0.249
-ns difference is smaller than the sample variation and is therefore reported
-as unresolved, not as a speedup. Its output-size effect is measurable.
+The 50.1% enabled ratio is a synthetic worst-shaped microbenchmark in which
+nearly all useful work is an indirect transfer and collector callback.
+Disabled collection still removes the callback, buffer and file entirely.
+This is not a gameplay frame-time claim. A post-repair gameplay overhead
+sample remains pending user execution.
 
-The deterministic merge of both private summaries took 418.0151 ms. Planning
-all 6,039 targets against the closure, generated registrations and exact
-Ghidra map took 5,187.4663 ms. A second forward/reverse run reproduced the
-exact output hashes above.
+### High-volume stress
 
-Guarded apply was benchmarked for 21 measured iterations after three warmups on
-a 201-byte CRLF temporary manifest:
+The deterministic stress test uses four guest threads, 5,000 unique pairs plus
+500,000 repeated hot hits per thread, mixed `bctr`/`bctrl`/`bclr` and
+cross-module/unknown targets.
 
-| Operation | Min / median / max / mean / population SD |
-| --- | --- |
-| first atomic apply | 6.1503 / 6.5947 / 77.9491 / 13.3279 / 20.8700 ms |
-| idempotent reapply | 0.5835 / 0.7016 / 1.3708 / 0.7565 / 0.1878 ms |
+| Metric | Result |
+| --- | ---: |
+| events | 2,020,000 |
+| unique pair/thread aggregates | 20,004 |
+| wall time | 0.027464 s |
+| throughput | 73,550,830.178 events/s |
+| raw bytes | 8,450,646 |
+| raw bytes per unique pair/thread | 422.448 |
+| pair/delta records | 20,004 |
+| checkpoints | 8 |
+| guest threads | 4 |
+| production buffer bytes/thread | 196,680 |
+| bounded four-buffer bytes | 786,720 |
+| drops / I/O errors / count overflows | 0 / 0 / 0 |
+| footer | exactly one, final newline present |
 
-Every iteration verified backup creation, comment/CRLF preservation,
-idempotence and absence of a stub marker. Fable codegen produced no changed
-files because Phase 4 adds analysis tooling rather than manifest entries.
+The test verifies exact hit totals, exact hot-pair first/last sequence
+`5001`/`505000` and footer reconciliation. An abnormal/footerless form remains
+recoverable through its last checkpoint.
 
-## Reproducible collection workflow
+### Offline summary
 
-The checked-in wrapper uses the exact Canary checkout/build, validates the
-private inputs and leaves output under the ignored Fable2Recomp `out` tree.
-`-GamePath` is complete game media and defaults to the GOTY ISO.
-`-AnalysisImagePath` is the base XEX used with its adjacent XEXP to validate
-the expected post-patch analysis identity; it is never appended to Xenia's
-normal gameplay argument list. The former conflated `-TitlePath` parameter was
-removed so an old command fails visibly rather than silently launching a loose
-XEX.
+The actual 8,450,646-byte collector stress output was parsed, aggregated and
+written twice:
 
-Preflight requires a supported complete-media extension, rejects standalone
-`.xex`/`.elf` launch targets, verifies collection is enabled, verifies the raw
-path does not exist, and checks that its parent and Xenia storage are writable.
-It validates the base XEX/XEXP/STFS hashes and requires this exact installed TU
-directory:
+| Iteration | Parse | Aggregate | JSON+CSV write |
+| --- | ---: | ---: | ---: |
+| 1 | 0.805986 s | 1.092709 s | 0.987260 s |
+| 2 | 0.849592 s | 1.192367 s | 0.952874 s |
+
+Both 13,870,596-byte JSON summaries and both 2,914,067-byte CSV summaries were
+byte-identical. Python `tracemalloc` peak was 105,056,358 bytes. The summary
+retained all 2,020,000 hits and 20,004 pairs.
+
+Planning the real 15,576-target compact summary took about 7.9 seconds in the
+recorded validation command and produced the repaired plan above.
+
+### Conservative old-capture projection
+
+The old compact summary contains 31,448 distinct pair/thread observations and
+39 guest-thread keys. Its run duration was approximately 46 minutes 14 seconds.
+A deliberately conservative model assumes every one of those pair/thread
+aggregates becomes dirty in every one of ten five-minute durability windows
+and uses the measured 422.448 bytes per stress record:
 
 ```text
-C:\Dev\Fable2Phase4Xenia\content\0000000000000000\4D5307F1\000B0000
+31,448 aggregates * 10 windows = 314,480 pair records
+314,480 * 422.448 bytes       = 132,851,448 bytes
+                              = about 126.7 MiB
 ```
 
-Its JSON report separately prints launch media, analysis image inputs, content
-root, TU directory/package, storage root, title ID, media ID, version and
-expected patched analysis-image SHA-256.
+Compared with about 90.9 GiB, that model is roughly a 735x reduction and
+comfortably below 1 GiB. It is not an exact full-game prediction: thread
+lifetime, genuinely new pairs, high-water flushes, module records and JSON
+field lengths vary. It nevertheless uses the real run's pair/thread
+cardinality and duration and exceeds the required 100x amplification reduction
+without discarding evidence. Timer-only checkpoints would be bounded near
+dirty live threads per interval rather than the old 6,142,998 checkpoints.
 
-From `C:\Dev\Fable2Recomp`:
+## Future user gameplay workflow
+
+Use a new run ID. Do not reuse or overwrite `fable2-tu1-manual-001`.
+
+### Preflight only
 
 ```powershell
+Set-Location C:\Dev\Fable2Recomp
+
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Preflight `
-    -RunId fable2-tu1-manual-001 `
-    -Label 'Fable II GOTY TU1 manual gameplay coverage' `
+    -RunId fable2-tu1-manual-002 `
+    -Label 'Fable II GOTY TU1 post-repair manual gameplay coverage' `
     -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
     -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
     -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
     -StorageRoot 'C:\Dev\Fable2Phase4Xenia\storage'
 ```
 
-Read the emitted command and identity report. Then launch:
+Preflight must print and verify:
+
+- complete launch-media path/type, with the ISO not hashed as the analysis image;
+- analysis base XEX, adjacent XEXP and expected patched SHA-256;
+- content root and exact installed TU directory;
+- storage/output writability;
+- title `0x4D5307F1`, media `0x716F0A0D` and version `0.0.1.26`;
+- raw schema 2 and the 4,096 / 3,072 / 300,000 ms / 1,000,000 persistence
+  settings;
+- the GOTY ISO as the final quoted argument.
+
+### Launch
 
 ```powershell
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Launch `
-    -RunId fable2-tu1-manual-001 `
-    -Label 'Fable II GOTY TU1 manual gameplay coverage' `
+    -RunId fable2-tu1-manual-002 `
+    -Label 'Fable II GOTY TU1 post-repair manual gameplay coverage' `
     -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
     -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
     -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
     -StorageRoot 'C:\Dev\Fable2Phase4Xenia\storage'
 ```
 
-The emitted Xenia array retains, among the other collector arguments, this
-ordering and identity separation:
+The emitted argument tail must be:
 
 ```text
---indirect_target_trace_image_sha256=BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00
+--indirect_target_trace_buffer_pairs=4096
+--indirect_target_trace_dirty_pairs=3072
+--indirect_target_trace_flush_interval_ms=300000
+--indirect_target_trace_max_unique_aggregates=1000000
 --content_root=C:\Dev\Fable2Phase4Xenia\content
 --apply_title_update=true
 --storage_root=C:\Dev\Fable2Phase4Xenia\storage
+--log_file=...
 D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso
 ```
 
-The ISO is the final positional argument. PowerShell invokes the executable
-with an argument array, and the printed reproducible command single-quotes
-every argument, so spaces in the GOTY filename are preserved.
+The ISO must remain the final positional argument.
 
-The no-launch `phase4-media-correction-preflight` run passed against the real
-local inputs. It reported `sha256_calculated=false` for the ISO, validated the
-base XEX, XEXP and installed STFS hashes, printed title `0x4D5307F1`, media
-`0x716F0A0D`, version `0.0.1.26`, and placed the GOTY ISO last in the generated
-argument array. No raw collector file was created and Xenia was not launched.
+Useful manual coverage is boot/title flow, save load, Bowerstone Market and
+region transitions, dialogue/crowd AI, shops/inventory/equipment, melee/ranged/
+Will combat, quests/scripted scenes/cutscenes and a user-selected safe
+save/reload. This is a subsystem checklist, not control or menu automation.
 
-Committed tests additionally prove that hashing the ISO is an error, the
-collector image argument remains
-`BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00`,
-standalone XEX/ELF launch media is rejected, a missing installed-TU directory
-is rejected, and the spaced ISO path remains one quoted argument.
+Close Xenia through the ordinary window-close path.
 
-After closing Xenia, validate, summarize and dry-run the importer:
+### Confirm the footer before PostRun
+
+```powershell
+$rawPath = 'C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-002\xenia-indirect-targets.raw.jsonl'
+$footer = Get-Content -LiteralPath $rawPath -Tail 1 | ConvertFrom-Json
+
+$footer | Select-Object `
+    record, run_id, raw_schema_version, collector_version, `
+    shutdown_status, flush_reason, total_hits, total_pair_records, `
+    checkpoint_records, final_unique_aggregates, `
+    unique_aggregate_count_complete, dropped_hits, io_errors, `
+    count_overflows, aggregate_limit_exceeded
+```
+
+Expected values include `record=footer`, `run_id=fable2-tu1-manual-002`,
+`raw_schema_version=2`, `collector_version=2`,
+`shutdown_status=normal` and `flush_reason=window_close`. The file must end in
+a newline. If the footer is absent, preserve the raw file and Xenia log; do not
+invent or patch a footer. PostRun will keep usable checkpointed data clearly
+marked incomplete.
+
+### PostRun
 
 ```powershell
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action PostRun `
-    -RunId fable2-tu1-manual-001
+    -RunId fable2-tu1-manual-002
 ```
 
-Post-run never applies a proposal. Review these files:
+PostRun summarizes, validates identity and emits a dry-run plan. It never
+applies a manifest change.
 
-```text
-out\indirect-targets\fable2-tu1-manual-001\xenia-indirect-targets.raw.jsonl
-out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.json
-out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.csv
-out\indirect-targets\fable2-tu1-manual-001\review\fable2-indirect-targets.import-plan.json
-```
+### Safe-before-delete checklist
 
-Before accepting the trace, confirm the adjacent Xenia log contains the exact
-title-update success line and the summary reports
-`module_fingerprint_match=true`, zero quarantine, and acceptable
-drop/I/O/overflow counters.
+Do not delete a future raw trace merely because PostRun created a JSON file.
+First verify all of the following:
 
-Useful manual coverage is:
+1. PostRun exits zero.
+2. The summary run has `flush_status=normal`, no integrity warnings,
+   `corrupt_tail=false` and `missing_final_newline=false`.
+3. `accepted_runs=1`, `quarantined_runs=0` and
+   `module_fingerprint_match=true`.
+4. Dropped hits, I/O errors, count overflows and aggregate-limit errors are
+   acceptable (normally zero), and `unique_aggregate_count_complete=true`.
+5. Summary JSON, summary CSV and import plan all exist and can be reopened.
+6. The summary records the raw trace SHA-256 and exact run ID.
+7. The import plan says `canonical_manifest_modified=false` and has been
+   reviewed.
+8. Hash/copy the compact review artifacts to the user's chosen backup location
+   if the raw evidence will not be retained.
 
-- boot, title flow and an existing save load;
-- childhood and adult-era paths where safely available;
-- Bowerstone Market and region transitions;
-- dialogue, crowd/NPC AI, shops and inventory/equipment;
-- melee, ranged and Will combat;
-- quests, scripted scenes and cutscenes;
-- save and reload only if the user chooses a safe slot.
+Only after those checks should the user decide whether the exact raw file can
+be removed. This repair does not delete it automatically.
 
-This is a subsystem checklist, not input automation. No controls were
-discovered, no menu/gamepad bot was created, and no story progress is claimed.
+## Troubleshooting
 
-## Limitations and next investigation boundary
+- Missing footer with complete newline/checkpoints: treat as
+  `abnormal_or_unknown_no_footer`, retain the Xenia log and check whether the
+  build identifies itself as `6b6715b02`. An older build still has the
+  `quick_exit` lifecycle defect.
+- Missing final newline or partial final object: preserve the file. The parser
+  will retain only complete checkpointed batches and mark the tail abnormal.
+- Millions of checkpoints: inspect the header. Schema 2 must report the
+  five-minute timer and delta semantics; a schema-1/collector-1 binary still
+  uses the obsolete hit policy.
+- `aggregate_limit_exceeded > 0`: pair evidence is still retained, but the
+  footer unique count is a lower bound; do not call the footer aggregate count
+  complete.
+- Identity quarantine: never replace the patched image SHA-256 with an ISO
+  hash. Verify title-update application, title/media/version, module range and
+  loaded-module fingerprint.
+- Loose XEX rejection: use the GOTY ISO for gameplay and reserve
+  `-AnalysisImagePath` for identity preflight only.
 
-- Interactive private-TU1 gameplay collection and gameplay-overhead sampling
+## Remaining limitations and boundary
+
+- A real post-repair private-TU1 gameplay capture and real-game overhead sample
   remain pending user action.
-- The corrected complete-game ISO workflow has passed preflight but has not yet
-  launched Xenia. The earlier automated streams used the loose-XEX workflow
-  and must not be described as complete-media validation.
-- Both automated private boot streams ended without a footer. Their last
-  checkpoints are valid and error-free, but an orderly-shutdown sample is
-  still desirable.
-- The two automated runs observed the same boot pair set; they do not imply
-  whole-game indirect-target coverage.
-- The static Phase 3 report still contains 711 unresolved relevant non-link CTR
-  sites. Runtime evidence should prioritize new gameplay systems and runs,
-  then correlate only newly observed targets rather than treating all 711 as
-  functions.
-- No currently observed target is proposed, ambiguous or conflicting. There is
-  therefore no real candidate on which canonical explicit apply should be
-  demonstrated.
-- The microbenchmark is repeatable and branch-dense but is not a substitute for
-  gameplay frame-time measurement.
-- The black dog and black player skin/head from Run 047 remain a separate
-  GPU/skinned-character material or texture-path defect. Saving remains
-  untested, not failed. Neither was investigated in Phase 4.
+- Synthetic tests prove the explicit lifecycle call and footer ordering, but a
+  future normal GUI close against the private title is the final end-to-end
+  confirmation.
+- The old accepted capture is evidence from real gameplay but used collector
+  schema 1 and cannot validate schema-2 volume or footer behavior.
+- The current real evidence has no proposed, ambiguous or conflicting target,
+  so explicit apply remains verified only on temporary manifests.
+- Phase 3 still contains 711 unresolved relevant non-link CTR sites. Runtime
+  collection should prioritize useful gameplay systems rather than assuming
+  those sites are functions.
+- The classification name `existing_manifest_function` is broader than the 80
+  explicit manifest overrides; changing it is deferred for compatibility.
+- Run 047's black dog and black player skin/head remain a separate
+  GPU/skinned-material or texture issue. Saving in that run remains untested,
+  not failed.
 
-The safest next action is the three-command Preflight / Launch / PostRun manual
-workflow above. Review its dry-run plan before considering any manifest edit.
+The safest next action is Preflight, then the user-run Launch, ordinary window
+close, footer check and PostRun sequence above.
 
-## Commits and worktree policy
+## Commit and publication policy
 
-Local commits created for Phase 4 are:
+Local repair commits:
 
 ```text
-Fable2Recomp  f14cec668e94dbf6014a2c829b5ec1b0cc9c4a0f
-ReXGlue SDK   956c6a8b5da4c54b9899a2593e9c67c26de30194
-Xenia Canary  59cfa2b2d8748e1144a4090fcdbc1227fefdf3ec
-Xenia metrics 006830ee34596ce94f5ff9ac5b10ee5569a2c1e2
+Xenia Canary     6b6715b029d442ff6ed5a89773f119400b1c19b5
+Fable2Recomp     9c46998a993ea2046b1e9a873d7d9521eb2f44ad
+documentation    commit containing this file
 ```
 
-The documentation commit is the commit containing this file; obtain its full
-identity with:
+The ReXGlue SDK was not modified by this repair, and its expected local
+`thirdparty/libmspack` state was preserved.
 
-```powershell
-git log -1 --format=%H -- docs/fable2-discovery-pipeline/05-xenia-indirect-targets.md
-```
-
-At the implementation checkpoint, Fable2Recomp and Xenia had clean tracked
-worktrees. ReXGlue was ahead of its branch by the one Phase 4 commit and had
-only the required unstaged `thirdparty/libmspack` materialisation. External
-Xenia build/dependency outputs and private trace data remain outside Git or in
-ignored output directories.
-
-Nothing was pushed. No remote branch, pull request, tag, release, asset or
-external upload was created. Neither repository's `main` branch was updated.
+No push, merge, history rewrite, tag, pull request, release, asset publication
+or external upload occurred. No private XEX, ISO, XEXP, STFS package, save,
+memory dump, raw gameplay trace or compiled binary was staged or committed.

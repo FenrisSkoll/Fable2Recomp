@@ -1,0 +1,350 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-static-xdk-method-inventory-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.6A",
+  "phase": "G1.6A - Static XDK Method Recovery",
+  "experiment_id": "EXP-STATIC-XDK-001",
+  "generated_on": "2026-09-01",
+  "primary_result": "STATIC SEAM QUALIFIED",
+  "strongest_candidate_id": "SXDK-001",
+  "pins": {
+    "fable_start": { "branch": "fable2-native-renderer-g1.5-reference", "commit": "78c5d66807abf19f67966bd0c3d8301c29990ae4", "tree": "e1881f9de89824feb051b58300374c924747605b", "working_branch": "fable2-native-renderer-g1.6a-static-xdk-recovery" },
+    "g1_accepted_base": { "commit": "c44e8c16f4422f9a828caf30899ac989170b8a8c" },
+    "paused_g2a": { "branch": "fable2-native-renderer-g2a-forwarding-proof", "commit": "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51", "tree": "910e80108c2d9e7d8474866506f1c9e23ede601c", "incorporated": false },
+    "tu1": { "title_id": "0x4D5307F1", "media_id": "0x716F0A0D", "version": "0.0.1.26", "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662", "xexp_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C", "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "loaded_image_base": "0x82000000", "loaded_image_size": "0x01620000", "entry_point": "0x82CC21C0", "executable_fingerprint": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357" },
+    "rexglue": { "path": "C:/Dev/rexglue-sdk-v0.10", "branch": "fable2-v0.10-migration", "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194", "tree": "b78b06b8ac650467372236a3a262864e069a9382", "allowed_preexisting_status": [" m thirdparty/libmspack"] },
+    "canary": { "path": "C:/Dev/Fable2NativeRendererResearch/xenia-canary", "branch": "canary_experimental", "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9", "tree": "c343b0a5796590fadc3b78c993bfada51e7e9148" },
+    "active_gpu_plugin": { "path": "out/build/win-amd64-release/rexgpu-xenos.dll", "sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99", "size": 2770944, "backend": "D3D12_ONLY" }
+  },
+  "analysis_inputs": [
+    { "input_id": "INPUT-G15-CORPUS", "path": "docs/fable2-gpu-reference/", "provenance": "Committed G1.5A-D corpus at required start tree e1881f9de89824feb051b58300374c924747605b.", "status": "COMMITTED", "purpose": "Pins, relevance, ownership, seams, experiment criteria and open questions." },
+    { "input_id": "INPUT-G1", "path": "docs/fable2-native-renderer/candidate-hook-inventory.json", "provenance": "Accepted G1 evidence descended from c44e8c16f4422f9a828caf30899ac989170b8a8c.", "status": "COMMITTED", "purpose": "Seed boundaries and dispositions." },
+    { "input_id": "INPUT-PROVENANCE", "path": "tools/fable2-entrypoint-closure-evidence.json", "provenance": "Size 4768; SHA-256 10F9411631AE08D653FB1CDCA192E364CF499BB56948A6E72F93384632786CC7.", "status": "COMMITTED", "purpose": "Exact XEX/XEXP/loaded-image identity." },
+    { "input_id": "INPUT-CLOSURE", "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json", "provenance": "Size 341019731; SHA-256 665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397.", "status": "IGNORED LOCAL READ-ONLY", "purpose": "Authoritative .pdata ranges, direct edges and address-taken evidence." },
+    { "input_id": "INPUT-GHIDRA", "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/ghidra-function-map.json", "provenance": "Size 96710692; SHA-256 03516B3A1F33433E493739418C9939D4FF1AEB0989F4ACEF2FD4D8204A077F58.", "status": "IGNORED LOCAL READ-ONLY", "purpose": "Independent entries, .pdata records and inbound references." },
+    { "input_id": "INPUT-JUMPS", "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/jump-table-recovery.json", "provenance": "Size 81223154; SHA-256 B1FE26FB9119DAF7E7E0196CBDBA8CCA087BE190BF156FE0B12DF116379ED89A.", "status": "IGNORED LOCAL READ-ONLY", "purpose": "Recovered indirect control flow and negative reachability checks." },
+    { "input_id": "INPUT-GENERATED", "path": "generated/default/fable2_recomp.*.cpp", "provenance": "codegen.d names assets/tu1/default.xex and fable2_manifest.toml; manifest SHA-256 E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0.", "status": "IGNORED LOCAL READ-ONLY", "purpose": "Exact PPC, register, offset, call and import mappings." },
+    { "input_id": "INPUT-REXGLUE", "path": "include/rex/graphics/xenos.h; src/graphics/command_processor.cpp", "provenance": "Read-only source at ReXGlue commit 956c6a8b5da4c54b9899a2593e9c67c26de30194.", "status": "PINNED READ-ONLY REFERENCE", "purpose": "PM4 SET_CONSTANT FETCH and texture-fetch-constant semantics." }
+  ],
+  "classifications": ["QUALIFIED REPRESENTATIVE METHOD", "STRONG STATIC CANDIDATE", "DISCOVERY LEAD ONLY", "REJECTED AS SEMANTIC SEAM", "RECOVERY BLOCKED"],
+  "counts": {
+    "candidates": 6,
+    "by_classification": { "QUALIFIED REPRESENTATIVE METHOD": 1, "STRONG STATIC CANDIDATE": 2, "DISCOVERY LEAD ONLY": 1, "REJECTED AS SEMANTIC SEAM": 2, "RECOVERY BLOCKED": 0 }
+  },
+  "candidates": [
+    {
+      "candidate_id": "SXDK-001",
+      "generated_name": "sub_82BA77D0",
+      "boundary": { "start": "0x82BA77D0", "end": "0x82BA7894", "size": "0xC4", "instruction_count": 49 },
+      "provenance": {
+        "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+        "boundary_authority": "trusted TU1 .pdata function range",
+        "boundary_evidence": ["closure: trusted pdata [0x82BA77D0,0x82BA7894)", "Ghidra: entry 0x82BA77D0, pdata record 0x82137908", "generated: 49 instructions"],
+        "generated_mapping": { "path": "generated/default/fable2_recomp.110.cpp", "sha256": "4168294DC783D211919D0D178732E50A8014CF8E750187BF66491437E7473C10", "size": 1035313, "start_line": 20979, "end_line": 21103, "generated_name": "sub_82BA77D0" }
+      },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": [], "accepted_g1_cluster_relation": "New Xbox D3D method in the G1 static-library region.", "g1_5_divergence_ids": ["TEX-001", "TEX-002", "TEX-003"], "limitation": "No divergence reachability or causality is claimed." },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "device-state pointer", "use": "Reads +0x30/+0x38/+0x31AC; writes +0x30.", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "texture fetch slot", "use": "Multiplied by six for SET_CONSTANT FETCH index.", "confidence": "CONFIRMED" },
+          { "register": "r5", "entry_value": "borrowed six-dword descriptor pointer", "use": "Reads +0x00..+0x14; normalizes address fields in dwords 1 and 5.", "confidence": "CONFIRMED" },
+          { "register": "r6", "entry_value": "unused at entry", "use": "Overwritten.", "confidence": "CONFIRMED" },
+          { "register": "r7", "entry_value": "unused at entry", "use": "Overwritten.", "confidence": "CONFIRMED" },
+          { "register": "r8", "entry_value": "unused at entry", "use": "Overwritten.", "confidence": "CONFIRMED" },
+          { "register": "r9", "entry_value": "unused at entry", "use": "Overwritten.", "confidence": "CONFIRMED" },
+          { "register": "r10", "entry_value": "unused at entry", "use": "Overwritten.", "confidence": "CONFIRMED" }
+        ],
+        "stack_arguments": [],
+        "implicit_inputs": [{ "value": "device[0x31AC]", "role": "packet-header bits", "confidence": "CONFIRMED" }],
+        "return_behavior": { "description": "Void-like; callers ignore incidental final cursor in r3.", "confidence": "CONFIRMED" },
+        "abi_stability": { "description": "Exact bounded r3/r4/r5 ABI; source-level method name unknown.", "confidence": "CONFIRMED" }
+      },
+      "persistent_state_offsets": [
+        { "base": "r3 device", "offset": "0x30", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "PM4 write cursor", "evidence": "Loaded and advanced to final emitted dword.", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x38", "width_bits": 32, "access": "READ", "inferred_role": "PM4 capacity boundary", "evidence": "Unsigned cursor comparison precedes overflow helper.", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x31AC", "width_bits": 32, "access": "READ", "inferred_role": "packet-header mode/predicate bits", "evidence": "ORed with 0xC0062D00.", "confidence": "PROBABLE" }
+      ],
+      "call_relationships": {
+        "direct_callers": [
+          { "address": "0x82BA7B28", "site": "0x82BA81CC", "relationship": "per-slot copy/scale fetch construction", "confidence": "CONFIRMED" },
+          { "address": "0x82BA83C0", "site": "0x82BA85D8", "relationship": "slot-zero parallel copy path", "confidence": "CONFIRMED" }
+        ],
+        "indirect_or_callback_reachability": [{ "path": "sub_82BAA2B8 materializes 0x82BA8928 at 0x82BAA338; sub_82BA8928 -> sub_82BA7B28 -> SXDK-001", "confidence": "CONFIRMED" }],
+        "direct_callees": [{ "address": "0x821E8EC0", "site": "0x82BA77FC", "relationship": "PM4 capacity/advance helper", "confidence": "CONFIRMED" }],
+        "xbox_graphics_imports": []
+      },
+      "resource_ownership_and_lifetime": { "descriptor": "borrowed and synchronously copied", "device": "external owner", "gpu_memory": "external lifetime must extend through asynchronous consumption", "allocation_or_refcount": "none", "confidence": "CONFIRMED" },
+      "thread_queue_ownership": { "execution_model": "Immediate synchronous packet producer on caller thread.", "thread_identity": "Exact thread name UNKNOWN; one upstream path is a registered callback.", "producer_ownership": "Title/XDK caller appends one packet.", "consumer_ownership": "ReXGlue Xenos command processor applies fetch state.", "queue_or_buffer": "device PM4 buffer at +0x30/+0x38", "ordering": "Strict order with surrounding packets.", "synchronization": "No lock/fence; capacity recovery delegates to sub_821E8EC0.", "evidence": ["straight-line body", "ReXGlue SET_CONSTANT type 1 -> WriteFetchRangeFromRing"], "confidence": "CONFIRMED" },
+      "operation": { "family": "texture / sampler / resource binding", "description": "Emits PM4_SET_CONSTANT FETCH at slot*6 with one complete six-dword texture fetch constant.", "behavior": "Updates cursor immediately; GPU-visible fetch state changes on ring consumption.", "confidence": "CONFIRMED" },
+      "state_mutations": ["header = 0xC0062D00 OR device[0x31AC]", "payload selector = 0x00010000 OR ((slot*6)&0x7FF)", "copies six descriptor dwords with exact dword-1/dword-5 normalization", "updates device[0x30]"],
+      "side_effects": ["may advance command buffer", "changes GPU fetch register range on consumption", "no allocation/release/cache field update"],
+      "forwarding_obligations": ["original exactly once until full ownership changes", "preserve header/slot/six dwords/address normalization", "preserve capacity/cursor/order", "preserve deferred resource lifetime", "do not retain r5"],
+      "retained_semantics": ["fetch slot", "format/address/dimensions/mip/sampler fields", "device stream", "ordering"],
+      "lost_semantics": ["Lionhead resource/material", "shader stage/instruction", "draw/pass", "allocation/release owner", "affected-character association"],
+      "coverage": { "estimate": "NARROW BUT REPRESENTATIVE", "covered_paths": ["all calls from sub_82BA7B28 and sub_82BA83C0"], "known_bypasses": ["other SET_CONSTANT/LOAD emitters", "normal binds not using these callers", "vertex/shader/RT/EDRAM/draw/query/present"], "confidence": "CONFIRMED" },
+      "fitness": "BOTH",
+      "classification": { "value": "QUALIFIED REPRESENTATIVE METHOD", "confidence": "CONFIRMED", "evidence": ["exact boundary", "complete bounded ABI", "independent opcode/type/layout agreement", "ownership/mutations/lifetime/forwarding bounded", "honest narrow coverage"], "missing_facts": ["exact XDK name", "thread name", "title-wide frequency", "affected-character relation"], "minimum_evidence_to_change": ["contradict packet/ABI evidence", "for systemic coverage, enumerate every fetch-state producer and caller"] }
+    },
+    {
+      "candidate_id": "SXDK-002",
+      "generated_name": "sub_82BA7B28",
+      "boundary": { "start": "0x82BA7B28", "end": "0x82BA83C0", "size": "0x898", "instruction_count": 550 },
+      "provenance": { "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "boundary_authority": "trusted TU1 .pdata function range", "boundary_evidence": ["closure pdata [0x82BA7B28,0x82BA83C0)", "generated 550 instructions"], "generated_mapping": { "path": "generated/default/fable2_recomp.265.cpp", "sha256": "4928C6367157ACD1B414E0A2709FB2F10FC5F105E1C977641C5D9FC185ADC5B0", "size": 1023903, "start_line": 21165, "end_line": 22453, "generated_name": "sub_82BA7B28" } },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": [], "g1_5_divergence_ids": ["TEX-001", "RT-001", "RT-002", "DRAW-001"], "limitation": "overlap only; no reachability/causality" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "device", "use": "command/cached/resource state", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "source offset/selector", "use": "saved r22; exact type unknown", "confidence": "PROBABLE" },
+          { "register": "r5", "entry_value": "resource/address entry pointer", "use": "saved r27; advanced by four", "confidence": "PROBABLE" },
+          { "register": "r6", "entry_value": "entry count", "use": "bounds fetch loop", "confidence": "CONFIRMED" },
+          { "register": "r7", "entry_value": "dimension-like scalar", "use": "rounded to eight", "confidence": "PROBABLE" },
+          { "register": "r8", "entry_value": "dimension-like scalar", "use": "rounded to eight", "confidence": "PROBABLE" },
+          { "register": "r9", "entry_value": "unbounded", "use": "not preserved", "confidence": "UNKNOWN" },
+          { "register": "r10", "entry_value": "unbounded", "use": "not preserved", "confidence": "UNKNOWN" }
+        ],
+        "stack_arguments": [], "implicit_inputs": [{ "value": "device cached state/PM4 buffer", "confidence": "CONFIRMED" }],
+        "return_behavior": { "description": "No caller-consumed result established.", "confidence": "PROBABLE" },
+        "abi_stability": { "description": "Device/count/dimensions bounded; r4/r5 exact types unresolved.", "confidence": "PROBABLE" }
+      },
+      "persistent_state_offsets": [
+        { "base": "r3 device", "offset": "0x10", "width_bits": 64, "access": "READ_WRITE", "inferred_role": "dirty mask", "evidence": "tested/emitted/cleared", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x20", "width_bits": 64, "access": "READ_WRITE", "inferred_role": "dirty mask", "evidence": "set/restored", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x30", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "PM4 cursor", "evidence": "packet appends", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x38", "width_bits": 32, "access": "READ", "inferred_role": "PM4 boundary", "evidence": "capacity checks", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x29C0", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "cached flags", "evidence": "bit zero save/set/restore", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x3098", "width_bits": 32, "access": "READ", "inferred_role": "resource array", "evidence": "four pointers traversed", "confidence": "PROBABLE" }
+      ],
+      "call_relationships": {
+        "direct_callers": [{ "address": "0x82BA8928", "site": "0x82BA8C78", "relationship": "sole caller", "confidence": "CONFIRMED" }],
+        "indirect_or_callback_reachability": [{ "path": "sub_82BAA2B8 address-taken callback -> sub_82BA8928", "confidence": "CONFIRMED" }],
+        "direct_callees": [
+          { "address": "0x82BA79D0", "site": "0x82BA7F5C", "relationship": "fixed draw-state/draw emitter", "confidence": "CONFIRMED" },
+          { "address": "0x82BA77D0", "site": "0x82BA81CC", "relationship": "texture fetch descriptor emitter", "confidence": "CONFIRMED" },
+          { "address": "0x821E8EC0", "site": "0x82BA7E08", "relationship": "capacity helper", "confidence": "CONFIRMED" },
+          { "address": "0x82BA2748", "site": "0x82BA83AC", "relationship": "submission/order helper", "confidence": "PROBABLE" }
+        ],
+        "complete_direct_callee_addresses": ["0x821F5028", "0x821FC178", "0x82264590", "0x822869A0", "0x822154B0", "0x8221C7D8", "0x821E8EC0", "0x82213AD8", "0x82CA9480", "0x82BA76F8", "0x82BA79D0", "0x82CA99B0", "0x821FB650", "0x82BA77D0", "0x82206888", "0x821FC320", "0x82BA2748"],
+        "xbox_graphics_imports": []
+      },
+      "resource_ownership_and_lifetime": { "description": "Borrows entries, constructs stack descriptors and saves/restores bound state; helper-level retain/release semantics unresolved.", "confidence": "PROBABLE" },
+      "thread_queue_ownership": { "execution_model": "Synchronous packet producer.", "thread_identity": "UNKNOWN callback invocation thread.", "producer_ownership": "method produces internal copy/scale sequence", "consumer_ownership": "ReXGlue consumes packets", "queue_or_buffer": "device PM4 buffer", "ordering": "save/setup/draw/restore ordered", "synchronization": "capacity/submission helpers; exact fences unknown", "evidence": ["sole callback caller", "draw/shader/fetch signatures"], "confidence": "PROBABLE" },
+      "operation": { "family": "render-target/resource copy-scale preparation", "description": "Builds descriptors, emits fixed shader/draw state and restores cached state.", "behavior": "Immediate PM4 production and cached-state update.", "confidence": "PROBABLE" },
+      "state_mutations": ["command cursor", "dirty masks", "temporary bound-resource state", "draw/fetch/shader packets"],
+      "side_effects": ["resource helper touches", "possible submission", "GPU copy/scale work"],
+      "forwarding_obligations": ["state save/restore", "resource lifetime", "descriptor/order/dimensions", "all dirty/cursor effects"],
+      "retained_semantics": ["device", "resource entry list/count", "two dimensions", "copy/draw sequence"],
+      "lost_semantics": ["public XDK name", "surface types/units", "pass/material", "thread"],
+      "coverage": { "estimate": "NARROW INTERNAL COPY/SCALE", "covered_paths": ["sub_82BA8928 route"], "known_bypasses": ["parallel sub_82BA83C0", "normal title draw/bind", "present/resolve/other emitters"], "confidence": "PROBABLE" },
+      "fitness": "BOTH",
+      "classification": { "value": "STRONG STATIC CANDIDATE", "confidence": "PROBABLE", "evidence": ["exact boundary/graph", "explicit fetch/shader/draw packets", "bounded device/count/dimensions"], "missing_facts": ["r4/r5 types", "callback thread", "helper lifetimes", "coverage"], "minimum_evidence_to_change": ["type callback contract and r4/r5 from all sites", "prove helper lifetime and restore behavior"] }
+    },
+    {
+      "candidate_id": "SXDK-003",
+      "generated_name": "sub_82BA8928",
+      "boundary": { "start": "0x82BA8928", "end": "0x82BA8D2C", "size": "0x404", "instruction_count": 257 },
+      "provenance": { "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "boundary_authority": "trusted pdata plus address-taken evidence", "boundary_evidence": ["closure pdata [0x82BA8928,0x82BA8D2C)", "code_materialization_xref 0x82BAA338", "generated 257 instructions"], "generated_mapping": { "path": "generated/default/fable2_recomp.130.cpp", "sha256": "0A6CD19DD979846B81C967F81DE1FD317983968F37E1235F0FA7E1B5DB00A625", "size": 1024438, "start_line": 21039, "end_line": 21616, "generated_name": "sub_82BA8928" } },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": [], "g1_5_divergence_ids": ["TEX-001", "RT-001", "DRAW-001"], "limitation": "potential internal correlation only" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "device", "use": "state and PM4", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "flags", "use": "bit zero reset/early path", "confidence": "CONFIRMED" },
+          { "register": "r5", "entry_value": "input page/address entries", "use": "dereferenced/advanced", "confidence": "PROBABLE" },
+          { "register": "r6", "entry_value": "entry count", "use": "passed to SXDK-002", "confidence": "PROBABLE" },
+          { "register": "r7", "entry_value": "page/byte offset", "use": "added and advanced by 0x1000", "confidence": "PROBABLE" },
+          { "register": "r8", "entry_value": "output buffer", "use": "bounded result copy", "confidence": "CONFIRMED" },
+          { "register": "r9", "entry_value": "output capacity", "use": "clamps copy to 1560", "confidence": "CONFIRMED" },
+          { "register": "r10", "entry_value": "unused at entry", "use": "overwritten", "confidence": "CONFIRMED" }
+        ],
+        "stack_arguments": [], "implicit_inputs": [{ "value": "registered callback context", "confidence": "PROBABLE" }],
+        "return_behavior": { "description": "r3 status 0, 6 or 7; enum names unknown.", "confidence": "CONFIRMED" },
+        "abi_stability": { "description": "register/status bounded; record types/protocol unnamed", "confidence": "PROBABLE" }
+      },
+      "persistent_state_offsets": [
+        { "base": "r3 device", "offset": "0x5420", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "mode flags", "evidence": "high bit clear/restore", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x54B4", "width_bits": 32, "access": "READ", "inferred_role": "first dimension bound", "evidence": "input bound check", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x54B8", "width_bits": 32, "access": "READ", "inferred_role": "second dimension bound", "evidence": "input bound check", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x5528", "width_bits": 12288, "access": "READ_WRITE", "inferred_role": "1536-byte scaler/gamma-like table", "evidence": "compare/copy/program", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x5B30", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "table-present flag", "evidence": "controls table path", "confidence": "PROBABLE" }
+      ],
+      "call_relationships": {
+        "direct_callers": [],
+        "indirect_or_callback_reachability": [{ "path": "sub_82BAA2B8 computes 0x82BA8928 at 0x82BAA338, stores it in a 60-byte record and submits via indirect dispatcher r3=82", "confidence": "CONFIRMED" }],
+        "direct_callees": [
+          { "address": "0x82BAEA88", "site": "0x82BA8AD0", "relationship": "scaler command-buffer setup", "confidence": "PROBABLE" },
+          { "address": "0x82BA7B28", "site": "0x82BA8C78", "relationship": "copy/scale draw producer", "confidence": "PROBABLE" },
+          { "address": "0x821D1508", "site": "0x82BA8D1C", "relationship": "input cleanup", "confidence": "PROBABLE" }
+        ],
+        "complete_direct_callee_addresses": ["0x82CA99B0", "0x82BA47B8", "0x821E8EC0", "0x82CA9480", "0x82BAEA88", "0x82BA45E0", "0x82BA7B28", "0x821D1508"],
+        "xbox_graphics_imports": []
+      },
+      "resource_ownership_and_lifetime": { "description": "Consumes input, uses device table, writes bounded caller output and calls cleanup; transfer semantics unknown.", "confidence": "PROBABLE" },
+      "thread_queue_ownership": { "execution_model": "Address-taken callback; synchronous after invocation.", "thread_identity": "UNKNOWN registrar thread.", "producer_ownership": "callback/SXDK-002 produce commands and output", "consumer_ownership": "ReXGlue consumes PM4; registrant consumes output/status", "queue_or_buffer": "callback record plus device PM4", "ordering": "validate/table/copy then cleanup", "synchronization": "no explicit lock; scheduler unknown", "evidence": ["0x82BAA338 xref", "no direct caller", "SXDK-002 call"], "confidence": "PROBABLE" },
+      "operation": { "family": "resource/target copy-scale callback", "description": "Validates input, updates a cached table, runs copy/scale draw and returns bounded output/status.", "behavior": "Callback-driven cached mutation and GPU work.", "confidence": "PROBABLE" },
+      "state_mutations": ["mode bit", "cached 1536-byte table/flag", "delegated PM4 state"],
+      "side_effects": ["writes min(r9,1560) output", "returns 0/6/7", "may issue GPU work and cleanup input"],
+      "forwarding_obligations": ["status/output bound", "table/mode restoration", "cleanup/order", "no thread-affinity assumption"],
+      "retained_semantics": ["input entries", "dimensions", "flags", "bounded output", "status"],
+      "lost_semantics": ["protocol name", "resource class", "thread", "pass/material"],
+      "coverage": { "estimate": "ONE REGISTERED CALLBACK FAMILY", "covered_paths": ["sub_82BAA2B8 record"], "known_bypasses": ["parallel sub_82BA83C0", "ordinary draw/bind", "non-callback methods"], "confidence": "PROBABLE" },
+      "fitness": "BOTH",
+      "classification": { "value": "STRONG STATIC CANDIDATE", "confidence": "PROBABLE", "evidence": ["exact boundary", "address-taken proof", "bounded ABI/status/output", "reaches fetch/draw"], "missing_facts": ["dispatcher ABI", "thread/scheduling", "record types", "coverage"], "minimum_evidence_to_change": ["recover registrar object and r3=82 contract", "trace all record producers/consumers"] }
+    },
+    {
+      "candidate_id": "SXDK-004",
+      "generated_name": "sub_82AAC208",
+      "boundary": { "start": "0x82AAC208", "end": "0x82AAC54C", "size": "0x344", "instruction_count": 209 },
+      "provenance": { "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "boundary_authority": "trusted TU1 .pdata", "boundary_evidence": ["accepted G1", "closure trusted range", "generated 209 instructions"], "generated_mapping": { "path": "generated/default/fable2_recomp.85.cpp", "sha256": "44D379173BD4C2D525FF55F90BDD9A33E3F3D30FFEAF5A2942EDA82077EC9F3C", "size": 1056093, "start_line": 18657, "end_line": 19135, "generated_name": "sub_82AAC208" } },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": ["0x82AAC208"], "g1_5_divergence_ids": [], "limitation": "ProcessAsyncCommandQueues label remains non-authoritative" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "unused", "use": "overwritten local pointer", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "unused", "use": "overwritten global record", "confidence": "CONFIRMED" },
+          { "register": "r5", "entry_value": "unused", "use": "overwritten timing", "confidence": "CONFIRMED" },
+          { "register": "r6", "entry_value": "unused", "use": "overwritten global base", "confidence": "CONFIRMED" },
+          { "register": "r7", "entry_value": "unused", "use": "overwritten counter address", "confidence": "CONFIRMED" },
+          { "register": "r8", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r9", "entry_value": "unused", "use": "lock state", "confidence": "CONFIRMED" },
+          { "register": "r10", "entry_value": "unused", "use": "atomic update", "confidence": "CONFIRMED" }
+        ],
+        "stack_arguments": [], "implicit_inputs": [{ "value": "fixed globals/records", "confidence": "PROBABLE" }],
+        "return_behavior": { "description": "No meaningful contract.", "confidence": "UNKNOWN" },
+        "abi_stability": { "description": "No explicit arguments; global semantics unresolved.", "confidence": "UNKNOWN" }
+      },
+      "persistent_state_offsets": [],
+      "call_relationships": { "direct_callers": [], "indirect_or_callback_reachability": [], "direct_callees": [
+        { "address": "0x821E3E50", "site": "0x82AAC268", "relationship": "repeated record/timing helper", "confidence": "PROBABLE" },
+        { "address": "0x82AADAA8", "site": "0x82AAC288", "relationship": "repeated work helper", "confidence": "UNKNOWN" },
+        { "address": "0x82214DD8", "site": "0x82AAC530", "relationship": "final bookkeeping", "confidence": "UNKNOWN" }
+      ], "xbox_graphics_imports": [] },
+      "resource_ownership_and_lifetime": { "description": "UNKNOWN; no device/resource retain/release proof.", "confidence": "UNKNOWN" },
+      "thread_queue_ownership": { "execution_model": "Atomic global bookkeeping and repeated fixed-record helpers.", "thread_identity": "UNKNOWN", "producer_ownership": "UNKNOWN", "consumer_ownership": "UNKNOWN", "queue_or_buffer": "queue interpretation unproved; no PM4/device cursor", "ordering": "helpers sequential", "synchronization": "confirmed lwarx/stwcx atomic increment", "evidence": ["no callers/imports", "no direct PM4"], "confidence": "UNKNOWN" },
+      "operation": { "family": "unknown scheduler/bookkeeping lead", "description": "Synchronized global bookkeeping; graphics dispatch unproved.", "behavior": "immediate bookkeeping", "confidence": "UNKNOWN" },
+      "state_mutations": ["global atomic", "possible fixed-record mutations through callees"],
+      "side_effects": ["synchronization; graphics effects unproved"],
+      "forwarding_obligations": ["do not hook/promote before caller/records/queue/thread/recursion/side effects are proved"],
+      "retained_semantics": ["record order", "global synchronization"],
+      "lost_semantics": ["graphics operation", "device/resource", "thread/queue", "coverage"],
+      "coverage": { "estimate": "UNKNOWN", "covered_paths": [], "known_bypasses": ["all confirmed graphics paths"], "confidence": "UNKNOWN" },
+      "fitness": "NEITHER",
+      "classification": { "value": "DISCOVERY LEAD ONLY", "confidence": "CONFIRMED", "evidence": ["no proved graphics ABI/import/PM4/caller"], "missing_facts": ["caller", "records", "producer/consumer", "thread", "recursion", "operation"], "minimum_evidence_to_change": ["recover all callers/records", "prove enqueue/dequeue/thread/recursion/representative operation"] }
+    },
+    {
+      "candidate_id": "SXDK-005",
+      "generated_name": "sub_82BA34D8",
+      "boundary": { "start": "0x82BA34D8", "end": "0x82BA3BFC", "size": "0x724", "instruction_count": 457 },
+      "provenance": { "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "boundary_authority": "trusted TU1 .pdata", "boundary_evidence": ["accepted G1", "closure trusted range/four callers", "generated 457 instructions"], "generated_mapping": { "path": "generated/default/fable2_recomp.22.cpp", "sha256": "4714D7C3B08CBB01F0E9A41D087E2E1033ABECC3C11AA773940AC14F377D38F3", "size": 1023789, "start_line": 21478, "end_line": 22516, "generated_name": "sub_82BA34D8" } },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": ["0x82BA34D8"], "g1_5_divergence_ids": ["PRES-001"], "limitation": "present/forwarding only" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "device", "use": "command/display state", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "surface/front-buffer-like pointer", "use": "52-byte descriptor and 24-byte subrange", "confidence": "PROBABLE" },
+          { "register": "r5", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" },
+          { "register": "r6", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" },
+          { "register": "r7", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" },
+          { "register": "r8", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" },
+          { "register": "r9", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" },
+          { "register": "r10", "entry_value": "unbounded", "use": "overwritten", "confidence": "UNKNOWN" }
+        ],
+        "stack_arguments": [], "implicit_inputs": [{ "value": "process/display state", "confidence": "CONFIRMED" }],
+        "return_behavior": { "description": "No caller-consumed result.", "confidence": "PROBABLE" },
+        "abi_stability": { "description": "r3/r4 bounded for forwarding; prior rendering semantics absent.", "confidence": "CONFIRMED" }
+      },
+      "persistent_state_offsets": [
+        { "base": "r3 device", "offset": "0x30", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "command cursor", "evidence": "capacity/refill", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x38", "width_bits": 32, "access": "READ", "inferred_role": "command boundary", "evidence": "capacity check", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x39FC", "width_bits": 416, "access": "WRITE", "inferred_role": "surface/present descriptor", "evidence": "52-byte copy", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x40B0", "width_bits": 32, "access": "READ_WRITE", "inferred_role": "present counter", "evidence": "entry increment", "confidence": "PROBABLE" }
+      ],
+      "call_relationships": {
+        "direct_callers": [
+          { "address": "0x82B6EA60", "site": "0x82B6EB9C", "relationship": "startup/present", "confidence": "CONFIRMED" },
+          { "address": "0x82B6F1D0", "site": "0x82B6F408", "relationship": "present", "confidence": "CONFIRMED" },
+          { "address": "0x82B6FA48", "site": "0x82B6FB00", "relationship": "title present coordinator", "confidence": "CONFIRMED" },
+          { "address": "0x82BA5D08", "site": "0x82BA5E0C", "relationship": "internal display", "confidence": "CONFIRMED" }
+        ],
+        "indirect_or_callback_reachability": [],
+        "direct_callees": [{ "address": "0x82BAD028", "site": "0x82BA36CC", "relationship": "display/copy helper", "confidence": "PROBABLE" }, { "address": "0x82BA95E0", "site": "0x82BA3A98", "relationship": "display/resource helper", "confidence": "PROBABLE" }],
+        "xbox_graphics_imports": [
+          { "name": "VdGetSystemCommandBuffer", "address": "0x832BA774", "site": "0x82BA36D8" },
+          { "name": "VdSwap", "address": "0x832BA784", "site": "0x82BA373C" },
+          { "name": "VdSetDisplayMode", "address": "0x832BA834", "site": "0x82BA3854" },
+          { "name": "VdGetCurrentDisplayInformation", "address": "0x832BA7D4", "site": "0x82BA385C" },
+          { "name": "VdPersistDisplay", "address": "0x832BA764", "site": "0x82BA3B04" }
+        ]
+      },
+      "resource_ownership_and_lifetime": { "description": "External device/surface owners; branch may free physical memory.", "confidence": "PROBABLE" },
+      "thread_queue_ownership": { "execution_model": "Synchronous present preparation then VdSwap.", "thread_identity": "caller thread, exact name unknown", "producer_ownership": "title/XDK final display packets", "consumer_ownership": "ReXGlue video/Xenos/presenter", "queue_or_buffer": "system command buffer/ring", "ordering": "after contributing rendering semantics", "synchronization": "capacity/runtime services", "evidence": ["VdGetSystemCommandBuffer/VdSwap", "accepted G1"], "confidence": "CONFIRMED" },
+      "operation": { "family": "presentation-state control", "description": "Prepares display/front-buffer state and calls VdSwap.", "behavior": "immediate present preparation", "confidence": "CONFIRMED" },
+      "state_mutations": ["present counter", "surface descriptor", "command/display state"],
+      "side_effects": ["VdSwap/display services", "possible display mode/persist/memory free"],
+      "forwarding_obligations": ["distinct original/exact once", "all display/command/memory/VdSwap effects"],
+      "retained_semantics": ["device", "front-buffer-like descriptor", "swap/display state"],
+      "lost_semantics": ["shader", "texture", "draw/pass", "RT/EDRAM producer", "resource provenance"],
+      "coverage": { "estimate": "PRESENT ONLY", "covered_paths": ["four confirmed callers"], "known_bypasses": ["all contributing render operations"], "confidence": "CONFIRMED" },
+      "fitness": "NEITHER",
+      "classification": { "value": "REJECTED AS SEMANTIC SEAM", "confidence": "CONFIRMED", "evidence": ["present ABI/imports", "render semantics already lost"], "missing_facts": ["frame correlation separate"], "minimum_evidence_to_change": ["none can restore already-lowered semantics; retain for G2A/swap only"] }
+    },
+    {
+      "candidate_id": "SXDK-006",
+      "generated_name": "sub_82BA6990",
+      "boundary": { "start": "0x82BA6990", "end": "0x82BA6C18", "size": "0x288", "instruction_count": 162 },
+      "provenance": { "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00", "boundary_authority": "trusted TU1 .pdata", "boundary_evidence": ["accepted G1", "closure sole caller 0x82B6F928", "generated 162 instructions"], "generated_mapping": { "path": "generated/default/fable2_recomp.161.cpp", "sha256": "61E087C55D11D54F92D83356DD2C8AD8BBE45082846167C57A9F20866CCAD10B", "size": 1024073, "start_line": 21718, "end_line": 22093, "generated_name": "sub_82BA6990" } },
+      "relation_to_prior_evidence": { "accepted_g1_candidates": ["0x82BA6990"], "g1_5_divergence_ids": ["INIT-001"], "limitation": "lifecycle only" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "entry_value": "device", "use": "initialized throughout", "confidence": "CONFIRMED" },
+          { "register": "r4", "entry_value": "0x7C-byte init block pointer", "use": "saved r30/helpers", "confidence": "CONFIRMED" },
+          { "register": "r5", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r6", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r7", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r8", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r9", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" },
+          { "register": "r10", "entry_value": "unused", "use": "overwritten", "confidence": "CONFIRMED" }
+        ],
+        "stack_arguments": [], "implicit_inputs": [{ "value": "process/XConfig/engine state", "confidence": "CONFIRMED" }],
+        "return_behavior": { "description": "Caller-consumed status unknown.", "confidence": "UNKNOWN" },
+        "abi_stability": { "description": "device/init-block bounded; inner fields partly unnamed", "confidence": "PROBABLE" }
+      },
+      "persistent_state_offsets": [
+        { "base": "r3 device", "offset": "0x2ABE", "width_bits": 8, "access": "READ_WRITE", "inferred_role": "engine flags", "evidence": "bit 2 set before VdInitializeEngines", "confidence": "PROBABLE" },
+        { "base": "r3 device", "offset": "0x3A60", "width_bits": 224, "access": "WRITE", "inferred_role": "critical section", "evidence": "RtlInitializeCriticalSection", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x3A7C", "width_bits": 224, "access": "WRITE", "inferred_role": "critical section", "evidence": "RtlInitializeCriticalSection", "confidence": "CONFIRMED" },
+        { "base": "r3 device", "offset": "0x4148", "width_bits": 32, "access": "WRITE", "inferred_role": "initialization state", "evidence": "zeroed before setup", "confidence": "PROBABLE" }
+      ],
+      "call_relationships": {
+        "direct_callers": [{ "address": "0x82B6F6C0", "site": "0x82B6F928", "relationship": "device creation", "confidence": "CONFIRMED" }],
+        "indirect_or_callback_reachability": [],
+        "direct_callees": [
+          { "address": "0x82BA2830", "site": "0x82BA6A84", "relationship": "ring setup", "confidence": "CONFIRMED" },
+          { "address": "0x82BA2080", "site": "0x82BA6A94", "relationship": "default packet/shader setup", "confidence": "PROBABLE" },
+          { "address": "0x82B99018", "site": "0x82BA6AB4", "relationship": "default draw/state setup", "confidence": "PROBABLE" }
+        ],
+        "xbox_graphics_imports": [
+          { "name": "VdInitializeEngines", "address": "0x832BA7F4", "site": "0x82BA69E4" },
+          { "name": "VdSetGraphicsInterruptCallback", "address": "0x832BA814", "site": "0x82BA6A28" },
+          { "name": "VdIsHSIOTrainingSucceeded", "address": "0x832BA824", "site": "0x82BA6BD4" }
+        ]
+      },
+      "resource_ownership_and_lifetime": { "description": "Initializes external device and runtime engine/ring/callback services; shutdown symmetry at sub_82BA6968/sub_82BA6C18.", "confidence": "CONFIRMED" },
+      "thread_queue_ownership": { "execution_model": "one-time synchronous initialization", "thread_identity": "caller thread, exact name unknown", "producer_ownership": "configures title device/ring producer", "consumer_ownership": "ReXGlue engine/ring after init", "queue_or_buffer": "initializes ring; not per-operation seam", "ordering": "before GPU work and paired shutdown", "synchronization": "two critical sections and interrupt callback", "evidence": ["VdInitializeEngines", "VdSetGraphicsInterruptCallback", "sub_82BA2830"], "confidence": "CONFIRMED" },
+      "operation": { "family": "device/engine lifecycle", "description": "Initializes engines, callbacks, command transport and defaults.", "behavior": "lifecycle only", "confidence": "CONFIRMED" },
+      "state_mutations": ["critical sections", "flags", "ring", "callback", "defaults"],
+      "side_effects": ["terminate notifications", "engine/interrupt/EDRAM setup"],
+      "forwarding_obligations": ["lifecycle order/callback/ring/notifications/shutdown symmetry"],
+      "retained_semantics": ["device", "init block", "engine/ring lifecycle"],
+      "lost_semantics": ["per-operation graphics", "frame/pass"],
+      "coverage": { "estimate": "DEVICE INITIALIZATION ONLY", "covered_paths": ["sub_82B6F6C0 create route"], "known_bypasses": ["all per-frame operations"], "confidence": "CONFIRMED" },
+      "fitness": "NEITHER",
+      "classification": { "value": "REJECTED AS SEMANTIC SEAM", "confidence": "CONFIRMED", "evidence": ["lifecycle imports/caller", "no per-operation ABI"], "missing_facts": ["some init fields unnamed"], "minimum_evidence_to_change": ["none would make lifecycle representative; retain as ownership oracle"] }
+    }
+  ],
+  "phase_decision": {
+    "result": "STATIC SEAM QUALIFIED",
+    "basis": "SXDK-001 is an exact title-side Xbox D3D fetch-constant operation with bounded ABI, producer/consumer ownership, state effects, lifetime assumptions, forwarding obligations and narrow coverage.",
+    "preferred_replacement_seam": "Recover individual high-semantic title/XDK operations before any ownership transition. SXDK-001 proves route viability, not implementation authorization or systemic coverage.",
+    "next_phase": "G1.6B - Static Seam Qualification and Coverage",
+    "next_experiment_id": "EXP-STATIC-XDK-002",
+    "next_experiment_scope": "Enumerate all TU1 fetch-state producers and SXDK-001 callers, recover public/callback wrappers and lifetime joins, and quantify normal material/render bypasses. Static only.",
+    "authorization": "STATIC EVIDENCE ONLY; NO HOOK OR IMPLEMENTATION"
+  }
+}

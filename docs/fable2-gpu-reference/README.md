@@ -1,12 +1,13 @@
 # Fable II GPU reference corpus
 
 This is the permanent G1.5A-D source and Fable-evidence reference for the
-ReXGlue and pinned Xenia Canary Xenos GPU architectures. Each implementation is
-documented first on its own terms, compared through source and primary history,
-then reassessed against exact Fable evidence, purpose-specific boundaries and
-renderer ownership. The reference architecture is a hypothesis, not
-implementation authorization. The corpus contains no capture or runtime
-changes.
+ReXGlue and pinned Xenia Canary Xenos GPU architectures, extended by the G1.6A
+static TU1 method-recovery result. Each implementation is documented first on
+its own terms, compared through source and primary history, then reassessed
+against exact Fable evidence, purpose-specific boundaries, renderer ownership
+and one recovered title/XDK texture-fetch operation. The reference architecture
+remains a hypothesis, not implementation authorization. The corpus contains no
+capture or runtime changes.
 
 The source baseline is ReXGlue
 `956c6a8b5da4c54b9899a2593e9c67c26de30194`. The active Release artifact is
@@ -53,6 +54,9 @@ The independent Canary baseline is
 31. [G2A re-entry decision](11-g2a-reentry-decision.md)
 32. [Open questions](open-questions.md)
 33. [G1.5D completion and handoff](g1.5d-completion.md)
+34. [G1.6A static XDK method recovery](12-static-xdk-method-recovery.md)
+35. [G1.6A static method inventory](evidence/static-xdk-method-inventory.json)
+36. [G1.6A completion and handoff](g1.6a-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and
@@ -96,6 +100,21 @@ are review views. Existing local Run 047/048 logs and screenshots remain
 ignored or external; only their paths, sizes, hashes and bounded findings are
 committed.
 
+## G1.6A evidence index
+
+The G1.6A result is represented by the
+[static XDK method inventory](evidence/static-xdk-method-inventory.json),
+validated by
+[static XDK method inventory v1](../../tools/schemas/fable2-gpu-static-xdk-method-inventory-v1.schema.json).
+The inventory is authoritative for candidate boundaries, ABI fields, object
+offsets, call/import relationships, ownership, side effects, coverage,
+classifications and the phase decision. The [G1.6A report](12-static-xdk-method-recovery.md)
+and [completion record](g1.6a-completion.md) are review and handoff views.
+
+`SXDK-001` / `sub_82BA77D0` is a **QUALIFIED REPRESENTATIVE METHOD**
+for one six-dword texture-fetch binding operation. Its coverage is explicitly
+narrow; this result does not authorize interception or renderer work.
+
 Validate the corpus from the repository root with:
 
 ```powershell
@@ -106,9 +125,10 @@ python .\tools\Verify-Fable2GpuReference.py `
 ```
 
 Omit `--verify-artifacts` on a machine without the ignored local build, SDK
-package and cited Run 047/048 evidence. Source, symbol, JSON-schema, history,
-pin, cross-link, count, cleanliness and Markdown-link checks still run. Omit
-`--canary-root` to use the path recorded in the evidence.
+package, cited Run 047/048 evidence and local G1.6A static-analysis reports.
+Source, generated mapping, JSON-schema, history, pin, cross-link, count, phase
+hygiene and Markdown-link checks still run. Omit `--canary-root` to use the path
+recorded in the evidence.
 
 ## Evidence language
 

@@ -1,12 +1,21 @@
-# G1.5D open questions
+# G1.6A open questions
 
-This ledger is generated from the authoritative [Fable relevance matrix](evidence/fable2-relevance-matrix.json) plus the ownership and G2 decisions. An unknown remains unknown until its stated minimum evidence exists.
+This ledger is generated from the authoritative [Fable relevance matrix](evidence/fable2-relevance-matrix.json), ownership and G2 decisions, plus the [G1.6A static XDK method inventory](evidence/static-xdk-method-inventory.json). An unknown remains unknown until its stated minimum evidence exists.
 
 ## Cross-cutting questions
 
 ### `OQ-STATIC-XDK-METHODS`
 
-Can exact TU1 static analysis recover representative draw/resource/shader/render-target methods with stable ABI, threading, ownership and coverage? Gate: `EXP-STATIC-XDK-001`.
+**RESOLVED by `EXP-STATIC-XDK-001`: YES, narrowly.** `SXDK-001` / `sub_82BA77D0` has an exact TU1 boundary, bounded ABI, texture-fetch operation semantics, synchronous producer/asynchronous consumer ownership, state effects, resource-lifetime obligations and honest narrow coverage. See the [G1.6A report](12-static-xdk-method-recovery.md). This does not prove systemic coverage.
+
+### `OQ-STATIC-XDK-COVERAGE`
+
+- Exact missing fact: Which TU1 paths produce texture fetch state, which ordinary material/render paths call or bypass `SXDK-001`, and who owns the callback and resource-retirement joins around `SXDK-002`/`SXDK-003`.
+- Minimum evidence: Exhaustive static producer/caller enumeration for the pinned image, typed callback registration/record flow, lifetime joins, and a bounded covered/bypassed operation inventory.
+- Observation point: `sub_82BA77D0`, direct callers `sub_82BA7B28` and `sub_82BA83C0`, address-taken wrapper `sub_82BA8928`.
+- Static analysis: YES; later tooling: no; user gameplay: no.
+- Decision unlocked: Determines whether the qualified seam is merely an internal copy/scale method or a useful broader diagnosis/replacement surface.
+- Experiment: `EXP-STATIC-XDK-002`.
 
 ### `OQ-LIONHEAD-ASYNC-ABI`
 

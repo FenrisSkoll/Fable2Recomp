@@ -14,6 +14,23 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PROVENANCE = REPO_ROOT / "tools" / "fable2-entrypoint-closure-evidence.json"
 
+# The closure report schemas identify the extracted XEX/XEXP inputs and the
+# loaded post-patch image.  Phase 4 also records the outer STFS container in
+# the shared contract, but that container is not an analyzer input and is not
+# represented by closure report schemas 1-3.
+REPORT_IMAGE_IDENTITY_KEYS = (
+    "base_xex_sha256",
+    "title_update_sha256",
+    "patched_image_sha256",
+    "executable_memory_fingerprint_algorithm",
+    "executable_memory_sha256",
+    "image_base",
+    "image_size",
+    "title_id",
+    "media_id",
+    "version",
+)
+
 
 def load_json(path: Path) -> dict[str, Any]:
     try:
@@ -38,6 +55,15 @@ def require(condition: bool, message: str, errors: list[str]) -> None:
 
 def sorted_unique(values: list[Any]) -> bool:
     return values == sorted(set(values))
+
+
+def report_identity_contract_keys(
+    expected_identity: dict[str, Any], schema_version: int
+) -> list[str]:
+    keys = [key for key in REPORT_IMAGE_IDENTITY_KEYS if key in expected_identity]
+    if schema_version == 1:
+        keys = [key for key in keys if not key.startswith("executable_memory_")]
+    return keys
 
 
 def validate_entry_register_domains(
@@ -575,10 +601,8 @@ def main() -> int:
     )
 
     actual_identity = report.get("image_identity", {})
-    identity_keys = [key for key in expected_identity if key != "executable_sections"]
+    identity_keys = report_identity_contract_keys(expected_identity, schema_version)
     for key in identity_keys:
-        if schema_version == 1 and key.startswith("executable_memory_"):
-            continue
         expected = expected_identity[key]
         report_key = (
             "executable_memory_fingerprint"

@@ -1,0 +1,349 @@
+{
+  "$id": "https://github.com/FenrisSkoll/Fable2Recomp/tools/schemas/xenia-indirect-targets-raw-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Schema for each independent JSON object in an append-safe Xenia indirect-target JSONL stream.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/header"
+    },
+    {
+      "$ref": "#/$defs/module"
+    },
+    {
+      "$ref": "#/$defs/pair"
+    },
+    {
+      "$ref": "#/$defs/checkpoint"
+    },
+    {
+      "$ref": "#/$defs/footer"
+    }
+  ],
+  "title": "Xenia indirect-target raw JSONL record v1",
+  "$defs": {
+    "address": {
+      "pattern": "^0x[0-9A-F]{8}$",
+      "type": "string"
+    },
+    "counter": {
+      "maximum": 18446744073709551615,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "counters": {
+      "properties": {
+        "count_overflows": {
+          "$ref": "#/$defs/counter"
+        },
+        "dropped_hits": {
+          "$ref": "#/$defs/counter"
+        },
+        "io_errors": {
+          "$ref": "#/$defs/counter"
+        },
+        "total_hits": {
+          "$ref": "#/$defs/counter"
+        },
+        "total_pair_records": {
+          "$ref": "#/$defs/counter"
+        }
+      },
+      "required": [
+        "total_hits",
+        "total_pair_records",
+        "dropped_hits",
+        "io_errors",
+        "count_overflows"
+      ],
+      "type": "object"
+    },
+    "footer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/counters"
+        }
+      ],
+      "properties": {
+        "batches": {
+          "$ref": "#/$defs/counter"
+        },
+        "record": {
+          "const": "footer"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "shutdown_status": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "shutdown_status",
+        "batches"
+      ],
+      "type": "object"
+    },
+    "header": {
+      "properties": {
+        "collector_version": {
+          "$ref": "#/$defs/counter"
+        },
+        "identity": {
+          "properties": {
+            "expected_image_sha256": {
+              "description": "Expected patched-image SHA-256 supplied by preflight configuration; this is not an observed Xenia memory hash.",
+              "pattern": "^[0-9A-F]{64}$",
+              "type": "string"
+            },
+            "identity_strength": {
+              "description": "Provenance label for configured header identity; observed module fingerprints are emitted by module records.",
+              "minLength": 1,
+              "type": "string"
+            },
+            "media_id": {
+              "type": "string"
+            },
+            "title_id": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "expected_image_sha256",
+            "identity_strength",
+            "title_id",
+            "media_id",
+            "version"
+          ],
+          "type": "object"
+        },
+        "label": {
+          "type": "string"
+        },
+        "record": {
+          "const": "header"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema": {
+          "const": "xenia_indirect_targets_raw"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "settings": {
+          "properties": {
+            "all_modules": {
+              "type": "boolean"
+            },
+            "buffer_pairs": {
+              "$ref": "#/$defs/counter"
+            },
+            "flush_hits": {
+              "$ref": "#/$defs/counter"
+            },
+            "include_returns": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "include_returns",
+            "all_modules",
+            "buffer_pairs",
+            "flush_hits"
+          ],
+          "type": "object"
+        },
+        "started_unix_ns": {
+          "$ref": "#/$defs/counter"
+        },
+        "xenia_commit": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "schema",
+        "schema_version",
+        "collector_version",
+        "xenia_commit",
+        "run_id",
+        "label",
+        "started_unix_ns",
+        "identity",
+        "settings"
+      ],
+      "type": "object"
+    },
+    "module": {
+      "properties": {
+        "executable": {
+          "type": "boolean"
+        },
+        "executable_end": {
+          "$ref": "#/$defs/address"
+        },
+        "executable_start": {
+          "$ref": "#/$defs/address"
+        },
+        "fingerprint": {
+          "properties": {
+            "algorithm": {
+              "description": "Collector-defined algorithm for an observed module-memory fingerprint, or an empty string when unavailable.",
+              "type": "string"
+            },
+            "value": {
+              "description": "Observed module fingerprint value, or an empty string for an unresolved/pre-patch snapshot.",
+              "type": "string"
+            }
+          },
+          "required": [
+            "algorithm",
+            "value"
+          ],
+          "type": "object"
+        },
+        "image_base": {
+          "$ref": "#/$defs/address"
+        },
+        "name": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "record": {
+          "const": "module"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "title_module": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "name",
+        "image_base",
+        "executable_start",
+        "executable_end",
+        "executable",
+        "title_module",
+        "fingerprint"
+      ],
+      "type": "object"
+    },
+    "pair": {
+      "properties": {
+        "batch_id": {
+          "$ref": "#/$defs/counter"
+        },
+        "branch_kind": {
+          "enum": [
+            "bctr",
+            "bctrl",
+            "bclr",
+            "blr"
+          ]
+        },
+        "first_thread_sequence": {
+          "$ref": "#/$defs/counter"
+        },
+        "hit_count": {
+          "$ref": "#/$defs/counter"
+        },
+        "last_thread_sequence": {
+          "$ref": "#/$defs/counter"
+        },
+        "link": {
+          "type": "boolean"
+        },
+        "ordinary_return": {
+          "type": "boolean"
+        },
+        "record": {
+          "const": "pair"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/address"
+        },
+        "source_module": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/address"
+        },
+        "target_module": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "target_validity": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "thread_key": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "batch_id",
+        "thread_key",
+        "source",
+        "target",
+        "branch_kind",
+        "link",
+        "ordinary_return",
+        "source_module",
+        "target_module",
+        "hit_count",
+        "first_thread_sequence",
+        "last_thread_sequence",
+        "target_validity"
+      ],
+      "type": "object"
+    },
+    "checkpoint": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/counters"
+        }
+      ],
+      "properties": {
+        "batch_id": {
+          "$ref": "#/$defs/counter"
+        },
+        "record": {
+          "const": "checkpoint"
+        },
+        "run_id": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "batch_id"
+      ],
+      "type": "object"
+    }
+  }
+}

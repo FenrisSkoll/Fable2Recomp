@@ -66,6 +66,7 @@ path inventory and local-branch disposition are in the
 38. [G1.6B static seam coverage evidence](evidence/static-xdk-seam-coverage.json)
 39. [G1.6B completion and handoff](g1.6b-completion.md)
 40. [G2A retirement record](g2a-retirement.md)
+41. [Completed G1-G1.6 research milestone](g1-g1.6-research-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and

@@ -1,0 +1,1725 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-boundary-assessment-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5D",
+  "generated_on": "2026-09-01",
+  "pins": {
+    "fable_commit": "3cef954120e062974f3fcdf707ac302aa0e2d44e",
+    "g1_commit": "c44e8c16f4422f9a828caf30899ac989170b8a8c",
+    "paused_g2a_commit": "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51",
+    "rexglue_commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+    "active_dll_sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99"
+  },
+  "purpose_definitions": {
+    "transparent_forwarding_mechanism_proof": "Can an exact call be wrapped and forwarded once without changing guest-visible behaviour?",
+    "presentation_frame_correlation": "Can title swap/frame identity be joined to mailbox and host Present without claiming draw provenance?",
+    "draw_resource_defect_diagnosis": "Does the boundary retain enough draw, register, shader, binding, texture, EDRAM and outcome state to discriminate a defect?",
+    "eventual_renderer_replacement": "Could the boundary express and own renderer operations without recreating the entire GPU ABI or creating dual ownership?"
+  },
+  "boundaries": [
+    {
+      "boundary_id": "G1-HOOK-82AAC208",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82AAC208",
+      "exact_address_or_symbol": "sub_82AAC208 0x82AAC208 [0x82AAC208, 0x82AAC54C) size 0x344",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Object-like r3 and queue-owned state; exact ABI unknown."
+      ],
+      "outputs": [
+        "Consumes or advances one or more async queues; exact result unknown."
+      ],
+      "persistent_state": [
+        "Lionhead queues, synchronization and ownership are unresolved."
+      ],
+      "threading": "Unknown Lionhead worker/queue context; queue thread, producer threads and re-entry are not statically proved.",
+      "semantics_retained": [
+        "Potential Lionhead command grouping and queue timing label."
+      ],
+      "semantics_lost": [
+        "Static Xbox D3D method identities and packet-level outcomes remain unknown."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 209 PPC instructions",
+        "TU1 string reference at 0x82AAC254 to ProcessAsyncCommandQueues timing label",
+        "exact-image Ghidra data reference at 0x82AAA2E8",
+        "Ghidra .pdata record 0x82133E70"
+      ],
+      "side_effects": [
+        "May consume multiple queues, mutate queue ownership, signal synchronization, or recurse into Xbox graphics methods. Hook only after thread/order behaviour is traced."
+      ],
+      "forwarding_feasibility": "conditional",
+      "observation_value": "A proven semantic command ABI could preserve title intent, but no command layouts are known.",
+      "replacement_value": "Potentially valuable only after static ABI, threading and coverage proof.",
+      "evidence_required": "The title-owned diagnostic label identifies queue processing; no evidence yet proves this function is the enqueue boundary or that commands preserve D3D semantics.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "LOW",
+          "rationale": "Queue ABI, ownership, threading, recursion and coverage are unproved."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "The queue has no confirmed one-command-per-frame or present mapping."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "MEDIUM",
+          "rationale": "A proven semantic command ABI could preserve title intent, but no command layouts are known."
+        },
+        "eventual_renderer_replacement": {
+          "value": "UNKNOWN",
+          "rationale": "Potentially valuable only after static ABI, threading and coverage proof."
+        }
+      },
+      "stage_disposition": "STATIC METHOD RECOVERY TARGET",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82B6EA60",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82B6EA60",
+      "exact_address_or_symbol": "sub_82B6EA60 0x82B6EA60 [0x82B6EA60, 0x82B6EBC0) size 0x160",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Title graphics creation inputs and globals."
+      ],
+      "outputs": [
+        "Initialized device path or failure."
+      ],
+      "persistent_state": [
+        "Global title device publication and lifecycle."
+      ],
+      "threading": "Guest initialization context; host GPU command and vblank threads are downstream owners.",
+      "semantics_retained": [
+        "Title creation orchestration."
+      ],
+      "semantics_lost": [
+        "Per-operation rendering semantics."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 88 PPC instructions",
+        "directly calls sub_82B6F6C0",
+        "later invokes the presentation path"
+      ],
+      "side_effects": [
+        "Global device publication, ownership, initial presentation, and failure cleanup must remain byte-for-byte guest behaviour."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "No per-draw/resource state remains.",
+      "replacement_value": "Useful lifecycle context, insufficient rendering operation coverage.",
+      "evidence_required": "It is above Vd/ring setup and coordinates title state, but could be a Fable wrapper rather than the Xbox CreateDevice implementation.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "A lifecycle wrapper is feasible but does not prove draw forwarding."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Creation is not a recurring frame boundary."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "No per-draw/resource state remains."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Useful lifecycle context, insufficient rendering operation coverage."
+        }
+      },
+      "stage_disposition": "REJECT AS PRIMARY SEAM",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82B6F6C0",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82B6F6C0",
+      "exact_address_or_symbol": "sub_82B6F6C0 0x82B6F6C0 [0x82B6F6C0, 0x82B6F9CC) size 0x30C",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Title initialization inputs."
+      ],
+      "outputs": [
+        "0x5E80-byte device-like object and initialization result."
+      ],
+      "persistent_state": [
+        "Allocated object and 0x7C-byte initialization/presentation block."
+      ],
+      "threading": "Guest initialization context; host GPU command and vblank threads are downstream owners.",
+      "semantics_retained": [
+        "Title object allocation and init ordering."
+      ],
+      "semantics_lost": [
+        "Draw/resource operations."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 195 PPC instructions",
+        "allocates 0x5E80 bytes",
+        "passes the object and a 0x7C-byte initialization/presentation block to sub_82BA6990",
+        "Ghidra .pdata record 0x82136A80"
+      ],
+      "side_effects": [
+        "Allocation identity, constructor ordering, virtual/function tables, reference counts, and failure cleanup must be preserved."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "No draw/resource operations are exposed.",
+      "replacement_value": "Object layout evidence may help integration but not rendering replacement.",
+      "evidence_required": "Allocation size, downstream Vd initialization, and title creation flow distinguish it from a small thunk; the exact XDK API name is unconfirmed.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "The allocation/init bridge can be forwarded but validates only lifecycle mechanics."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "Not a frame boundary."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "No draw/resource operations are exposed."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Object layout evidence may help integration but not rendering replacement."
+        }
+      },
+      "stage_disposition": "REJECT AS PRIMARY SEAM",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82B6FA48",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82B6FA48",
+      "exact_address_or_symbol": "sub_82B6FA48 0x82B6FA48 [0x82B6FA48, 0x82B6FBE0) size 0x198",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Global device, referenced front-buffer/surface-like object and related title state."
+      ],
+      "outputs": [
+        "Presentation result and reference/lifetime updates."
+      ],
+      "persistent_state": [
+        "Title object references and presentation coordination."
+      ],
+      "threading": "Guest calling thread; downstream VdSwap publishes work consumed by the host GPU/presenter path.",
+      "semantics_retained": [
+        "Title-level device/front-buffer meaning."
+      ],
+      "semantics_lost": [
+        "Contributing draws, shaders, resources and EDRAM passes."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 102 PPC instructions",
+        "direct call to sub_82BA34D8",
+        "Ghidra .pdata record 0x82136A90"
+      ],
+      "side_effects": [
+        "Reference lifetime, frame pacing, error propagation, and any re-entrant presentation callbacks must remain unchanged."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "It exposes a surface-like object, not contributing draws or resources.",
+      "replacement_value": "Presentation coordination alone is not a renderer seam.",
+      "evidence_required": "It retains title object/reference semantics above the confirmed VdSwap emitter, but G1 does not prove it is the sole engine frame boundary.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Title object/reference semantics make a forwarding test possible after ABI confirmation."
+        },
+        "presentation_frame_correlation": {
+          "value": "HIGH",
+          "rationale": "It is the strongest title-level presentation coordinator hypothesis above sub_82BA34D8."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "LOW",
+          "rationale": "It exposes a surface-like object, not contributing draws or resources."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Presentation coordination alone is not a renderer seam."
+        }
+      },
+      "stage_disposition": "PRESENT CORRELATION LATER",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-SWAP-CORRELATION-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82BA2830",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82BA2830",
+      "exact_address_or_symbol": "sub_82BA2830 0x82BA2830 [0x82BA2830, 0x82BA2CA0) size 0x470",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Device-like object and guest physical allocation services."
+      ],
+      "outputs": [
+        "Configured ring, read-pointer writeback and GPU identifier addresses."
+      ],
+      "persistent_state": [
+        "Guest ring transport and writeback state."
+      ],
+      "threading": "Guest initialization context; host GPU command and vblank threads are downstream owners.",
+      "semantics_retained": [
+        "Exact Xbox transport setup."
+      ],
+      "semantics_lost": [
+        "High-level rendering intent."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 284 PPC instructions",
+        "direct imports VdInitializeRingBuffer, VdEnableRingBufferRPtrWriteBack, and VdSetSystemCommandBufferGpuIdentifierAddress",
+        "Ghidra .pdata record 0x82137788"
+      ],
+      "side_effects": [
+        "Guest physical allocations, MMIO-visible addresses, ring ownership, and writeback setup are renderer-critical and must not be bypassed."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "It carries transport addresses rather than semantic operations.",
+      "replacement_value": "Replacing it would assume ownership of guest ring transport.",
+      "evidence_required": "Named Vd imports prove transport setup rather than a semantic draw/resource API.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Forwarding is feasible but ring setup is highly stateful."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "Setup is not frame-correlated."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "It carries transport addresses rather than semantic operations."
+        },
+        "eventual_renderer_replacement": {
+          "value": "NONE",
+          "rationale": "Replacing it would assume ownership of guest ring transport."
+        }
+      },
+      "stage_disposition": "RETAIN AS ORACLE",
+      "related_divergence_ids": [],
+      "experiment_ids": []
+    },
+    {
+      "boundary_id": "G1-HOOK-82BA34D8",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82BA34D8",
+      "exact_address_or_symbol": "sub_82BA34D8 0x82BA34D8 [0x82BA34D8, 0x82BA3BFC) size 0x724",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "r3 device-like object, r4 front-buffer/surface-like object, r5 flags."
+      ],
+      "outputs": [
+        "System command-buffer writes, VdSwap request and guest-visible return/error state."
+      ],
+      "persistent_state": [
+        "Command buffer, pacing, synchronization and callbacks."
+      ],
+      "threading": "Guest calling thread; downstream VdSwap publishes work consumed by the host GPU/presenter path.",
+      "semantics_retained": [
+        "Device/front-buffer identity, flags and title swap-call correlation."
+      ],
+      "semantics_lost": [
+        "All individual draws, shader identities, texture bindings, register state and EDRAM provenance."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 457 PPC instructions",
+        "direct imports VdGetSystemCommandBuffer and VdSwap",
+        "Ghidra .pdata record 0x821377C0",
+        "exact-image Ghidra call reference at 0x82B6FB00"
+      ],
+      "side_effects": [
+        "Must preserve command-buffer writes, front-buffer metadata, pacing, callbacks, synchronization, return value, and all guest-visible errors."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "All contributing shader, texture, register, draw and EDRAM semantics have already been collapsed.",
+      "replacement_value": "It can coordinate output but cannot express renderer operations.",
+      "evidence_required": "A linked Release production binary exact-once/off/on/recursion proof; draw diagnosis requires a different boundary.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "HIGH",
+          "rationale": "Confirmed stable TU1 body, direct callers and preserved-original G2A wrapper design support exact-once proof."
+        },
+        "presentation_frame_correlation": {
+          "value": "HIGH",
+          "rationale": "It directly reaches VdSwap and retains device/front-buffer-like inputs."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "LOW",
+          "rationale": "All contributing shader, texture, register, draw and EDRAM semantics have already been collapsed."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "It can coordinate output but cannot express renderer operations."
+        }
+      },
+      "stage_disposition": "FORWARDING PROOF ONLY",
+      "related_divergence_ids": [
+        "CMD-001",
+        "PRE-001"
+      ],
+      "experiment_ids": [
+        "EXP-G2A-LINK-001",
+        "EXP-SWAP-CORRELATION-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82BA6968",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82BA6968",
+      "exact_address_or_symbol": "sub_82BA6968 0x82BA6968 [0x82BA6968, 0x82BA6990) size 0x28",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Device/engine shutdown input."
+      ],
+      "outputs": [
+        "Engine shutdown side effects."
+      ],
+      "persistent_state": [
+        "GPU engine lifecycle."
+      ],
+      "threading": "Guest shutdown context with required ordering against host GPU work.",
+      "semantics_retained": [
+        "Shutdown operation identity."
+      ],
+      "semantics_lost": [
+        "All rendering content."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 10 PPC instructions",
+        "direct import VdShutdownEngines",
+        "Ghidra .pdata record 0x821378C0"
+      ],
+      "side_effects": [
+        "May be indirect/function-table invoked. Duplicate shutdown or missing engine teardown would be fatal."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "No draw state.",
+      "replacement_value": "Shutdown contract must eventually be preserved, not used as a primary seam.",
+      "evidence_required": "The VdShutdownEngines import confirms lifecycle semantics; absence of a generated direct caller leaves invocation ownership unresolved.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Small lifecycle forwarding is possible but has no immediate evidence value."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "Shutdown only."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "No draw state."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Shutdown contract must eventually be preserved, not used as a primary seam."
+        }
+      },
+      "stage_disposition": "RETAIN AS ORACLE",
+      "related_divergence_ids": [],
+      "experiment_ids": []
+    },
+    {
+      "boundary_id": "G1-HOOK-82BA6990",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82BA6990",
+      "exact_address_or_symbol": "sub_82BA6990 0x82BA6990 [0x82BA6990, 0x82BA6C18) size 0x288",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "0x5E80-byte device-like allocation and 0x7C-byte init block."
+      ],
+      "outputs": [
+        "Initialized critical sections, interrupt callback and ring/engine state."
+      ],
+      "persistent_state": [
+        "Device offsets 0x3A60 and 0x3A7C, callback, engines and ring."
+      ],
+      "threading": "Guest initialization context; host GPU command and vblank threads are downstream owners.",
+      "semantics_retained": [
+        "Xbox graphics lifecycle parameters."
+      ],
+      "semantics_lost": [
+        "Per-frame operations."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 162 PPC instructions",
+        "direct imports VdInitializeEngines and VdSetGraphicsInterruptCallback",
+        "calls sub_82BA2830",
+        "Ghidra .pdata record 0x821378C8",
+        "exact-image Ghidra call reference at 0x82B6F928"
+      ],
+      "side_effects": [
+        "Critical-section state, interrupt callback, guest ring allocation, and partial-initialization cleanup must stay exact."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "No per-draw semantics.",
+      "replacement_value": "Its services constrain ownership but do not define title rendering.",
+      "evidence_required": "Vd engine/interrupt imports and downstream ring setup prove GPU lifecycle initialization; the public XDK function name remains unknown.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Stable init body but guest ring/interrupt side effects make it a lifecycle oracle."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "Initialization only."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "No per-draw semantics."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Its services constrain ownership but do not define title rendering."
+        }
+      },
+      "stage_disposition": "RETAIN AS ORACLE",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-82BA6C18",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x82BA6C18",
+      "exact_address_or_symbol": "sub_82BA6C18 0x82BA6C18 [0x82BA6C18, 0x82BA6EB8) size 0x2A0",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Device-like object."
+      ],
+      "outputs": [
+        "Callback removal, engine/ring teardown and cleanup."
+      ],
+      "persistent_state": [
+        "Shutdown ordering and object references."
+      ],
+      "threading": "Guest shutdown context with required ordering against host GPU work.",
+      "semantics_retained": [
+        "Full shutdown lifecycle."
+      ],
+      "semantics_lost": [
+        "All rendering content."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 168 PPC instructions",
+        "direct imports VdSetGraphicsInterruptCallback and VdShutdownEngines",
+        "Ghidra .pdata record 0x821378D0"
+      ],
+      "side_effects": [
+        "Ordering against in-flight work, callback removal, ring teardown, guest allocations, and references must be preserved."
+      ],
+      "forwarding_feasibility": "yes",
+      "observation_value": "No draw state.",
+      "replacement_value": "Defines required cleanup obligations only.",
+      "evidence_required": "Named shutdown and callback imports prove the lifecycle role; it is a full cleanup routine rather than a thunk.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Forwardable with strict shutdown ordering, but not decision-unlocking now."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "Shutdown only."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "No draw state."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Defines required cleanup obligations only."
+        }
+      },
+      "stage_disposition": "RETAIN AS ORACLE",
+      "related_divergence_ids": [],
+      "experiment_ids": []
+    },
+    {
+      "boundary_id": "G1-HOOK-8328D6F8",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x8328D6F8",
+      "exact_address_or_symbol": "sub_8328D6F8 0x8328D6F8 [0x8328D6F8, 0x8328D744) size 0x4C",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Unknown registration/construction inputs."
+      ],
+      "outputs": [
+        "Probable type/subsystem registration side effects."
+      ],
+      "persistent_state": [
+        "Unknown title registration tables."
+      ],
+      "threading": "Unknown; no generated direct caller is established.",
+      "semantics_retained": [
+        "A Fable renderer label."
+      ],
+      "semantics_lost": [
+        "Command ABI, draw coverage, resource meaning and threading."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 19 PPC instructions",
+        "TU1 reference at 0x8328D70C to label Outline Renderer",
+        "exact-image Ghidra data reference at 0x832D5504",
+        "Ghidra .pdata record 0x82162C00"
+      ],
+      "side_effects": [
+        "Hooking a registration constructor could corrupt startup/type tables while yielding no frame commands."
+      ],
+      "forwarding_feasibility": "conditional",
+      "observation_value": "The label is a discovery clue, not a render-command method.",
+      "replacement_value": "Could lead to higher methods, but this function itself is not established as a renderer seam.",
+      "evidence_required": "The label proves an engine renderer concept exists, but not that this short function submits rendering work; it may only register a subsystem/type.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "LOW",
+          "rationale": "Likely registration/construction; ABI and invocation are unproved."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No frame relationship."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "LOW",
+          "rationale": "The label is a discovery clue, not a render-command method."
+        },
+        "eventual_renderer_replacement": {
+          "value": "UNKNOWN",
+          "rationale": "Could lead to higher methods, but this function itself is not established as a renderer seam."
+        }
+      },
+      "stage_disposition": "REJECT AS PRIMARY SEAM",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "G1-HOOK-83290138",
+      "origin": "G1_CANDIDATE",
+      "g1_candidate_address": "0x83290138",
+      "exact_address_or_symbol": "sub_83290138 0x83290138 [0x83290138, 0x83290184) size 0x4C",
+      "source_location": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "inputs": [
+        "Unknown registration/construction inputs."
+      ],
+      "outputs": [
+        "Probable type/subsystem registration side effects."
+      ],
+      "persistent_state": [
+        "Unknown title registration tables."
+      ],
+      "threading": "Unknown; no generated direct caller is established.",
+      "semantics_retained": [
+        "A Fable renderer label."
+      ],
+      "semantics_lost": [
+        "Command ABI, draw coverage, resource meaning and threading."
+      ],
+      "existing_fable_evidence": [
+        "exact TU1 generated ReXGlue body: 19 PPC instructions",
+        "TU1 reference at 0x8329014C to label LightingManager Renderer",
+        "exact-image Ghidra data reference at 0x832D57C4",
+        "Ghidra .pdata record 0x82162EE8"
+      ],
+      "side_effects": [
+        "Premature hooking risks registration/type initialization with no semantic capture value."
+      ],
+      "forwarding_feasibility": "conditional",
+      "observation_value": "The label is a discovery clue, not a lighting draw boundary.",
+      "replacement_value": "May lead to semantic methods, but this function itself is not qualified.",
+      "evidence_required": "The label proves a Lionhead renderer identity, not a command/draw method. The function may only register or construct it.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "LOW",
+          "rationale": "Likely registration/construction; ABI and invocation are unproved."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No frame relationship."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "LOW",
+          "rationale": "The label is a discovery clue, not a lighting draw boundary."
+        },
+        "eventual_renderer_replacement": {
+          "value": "UNKNOWN",
+          "rationale": "May lead to semantic methods, but this function itself is not qualified."
+        }
+      },
+      "stage_disposition": "REJECT AS PRIMARY SEAM",
+      "related_divergence_ids": [],
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-VD-SWAP",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "VdSwap_entry",
+      "source_location": "src/kernel/xboxkrnl/xboxkrnl_video.cpp",
+      "inputs": [
+        "Guest VdSwap parameters and system command-buffer context."
+      ],
+      "outputs": [
+        "PM4_XE_SWAP emission."
+      ],
+      "persistent_state": [
+        "Guest ring write state."
+      ],
+      "threading": "Guest title thread; command consumed later by GPU Commands thread.",
+      "semantics_retained": [
+        "Exact swap ABI and command emission."
+      ],
+      "semantics_lost": [
+        "No contributing draw/resource identity."
+      ],
+      "existing_fable_evidence": [
+        "FBL-G1-SWAP-STATIC"
+      ],
+      "side_effects": [
+        "Writes guest command memory and advances ring-visible state."
+      ],
+      "forwarding_feasibility": "Source forwarding is possible only inside the existing runtime import path.",
+      "observation_value": "High for correlating the title swap to XE_SWAP.",
+      "replacement_value": "Not a draw or renderer replacement seam.",
+      "evidence_required": "Monotonic swap ID through mailbox and present.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "MEDIUM",
+          "rationale": "Import forwarding can be tested but adds less than the title wrapper proof."
+        },
+        "presentation_frame_correlation": {
+          "value": "HIGH",
+          "rationale": "Exact next hop below sub_82BA34D8."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "LOW",
+          "rationale": "No draw provenance."
+        },
+        "eventual_renderer_replacement": {
+          "value": "NONE",
+          "rationale": "Raw swap emission is not renderer coverage."
+        }
+      },
+      "stage_disposition": "PRESENT CORRELATION LATER",
+      "related_divergence_ids": [
+        "CMD-001",
+        "PRE-001"
+      ],
+      "experiment_ids": [
+        "EXP-SWAP-CORRELATION-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-EXECUTE-PACKET3",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "CommandProcessor::ExecutePacketType3",
+      "source_location": "src/graphics/command_processor.cpp",
+      "inputs": [
+        "PM4 opcode, body, count and ring sequence."
+      ],
+      "outputs": [
+        "Packet-specific register/memory/control side effects."
+      ],
+      "persistent_state": [
+        "Command processor, register file and submission state."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Exact guest opcode and ordering."
+      ],
+      "semantics_lost": [
+        "Lionhead/XDK intent and original object/resource names."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "May wait, signal, write registers, issue draws/copies/queries or publish swap."
+      ],
+      "forwarding_feasibility": "Observation is feasible; replacing it assumes broad PM4 ownership.",
+      "observation_value": "Medium as a bounded operation router.",
+      "replacement_value": "Low; using it as primary seam trends toward full Xenos emulation.",
+      "evidence_required": "Exact bounded opcode stream for the scene.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "LOW",
+          "rationale": "Not a title forwarding boundary."
+        },
+        "presentation_frame_correlation": {
+          "value": "MEDIUM",
+          "rationale": "Can carry XE_SWAP ordering."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "MEDIUM",
+          "rationale": "Selects draw/copy/query operations but needs deeper records."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Raw PM4 is too low as the primary title renderer seam."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "CMD-001",
+        "CMD-002",
+        "DRW-002"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-ZPD-REPORT-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-WRITE-REGISTER",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12CommandProcessor::WriteRegister",
+      "source_location": "src/graphics/d3d12/command_processor.cpp",
+      "inputs": [
+        "Register index/value and packet sequence."
+      ],
+      "outputs": [
+        "Register-file update and dirty/invalidation flags."
+      ],
+      "persistent_state": [
+        "Xenos register file and backend dirty state."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Exact low-level state mutation."
+      ],
+      "semantics_lost": [
+        "Which title method/material intended the state and read-before-write history unless explicitly tracked."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Invalidates fetch, pipeline, binding or render-target state."
+      ],
+      "forwarding_feasibility": "Observation is feasible; replacement would duplicate register ownership.",
+      "observation_value": "High for REG-001/REG-002 correlation.",
+      "replacement_value": "Low; detailed state is not evidence of a safe replacement seam.",
+      "evidence_required": "Changed-register metadata linked to a draw ID.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a title function."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Only indirect frame ordering."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Provides minimal register provenance."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Must not create a second register owner."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "REG-001",
+        "REG-002"
+      ],
+      "experiment_ids": [
+        "EXP-REGISTER-RESET-001",
+        "EXP-DRAW-DECISION-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-ISSUE-DRAW",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12CommandProcessor::IssueDraw",
+      "source_location": "src/graphics/d3d12/command_processor.cpp",
+      "inputs": [
+        "Draw opcode, current registers, primitive/index inputs and submission state."
+      ],
+      "outputs": [
+        "Rendered/no-effect/zero-extent/pending-pipeline/failure outcome and host commands."
+      ],
+      "persistent_state": [
+        "Pipeline, bindings, render targets, caches and submission."
+      ],
+      "threading": "GPU Commands host thread; may coordinate pipeline worker threads.",
+      "semantics_retained": [
+        "Final low-level draw decision and active guest state."
+      ],
+      "semantics_lost": [
+        "Fable material/object identity unless correlated from a higher seam."
+      ],
+      "existing_fable_evidence": [
+        "FBL-RUN047-IMAGE-001",
+        "FBL-RUN047-IMAGE-002"
+      ],
+      "side_effects": [
+        "Mutates caches, barriers, queries and command lists."
+      ],
+      "forwarding_feasibility": "Observation is high-value; wrapping for replacement risks double rendering and shared state.",
+      "observation_value": "Highest low-level diagnosis value.",
+      "replacement_value": "Low as a primary replacement seam because plugin owns dependent state.",
+      "evidence_required": "One bounded per-draw decision record with hashed identities.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest forwarding boundary."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Draw IDs can roll into frame IDs later."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Directly distinguishes why a draw produced no host work."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "No independent ownership transition exists."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "DRW-001",
+        "PIP-002",
+        "PIP-003",
+        "REG-001"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-PRIMITIVE-PROCESS",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "PrimitiveProcessor::Process",
+      "source_location": "src/graphics/primitive_processor.cpp",
+      "inputs": [
+        "Topology, tessellation, index/fetch bounds and relevant registers."
+      ],
+      "outputs": [
+        "ProcessingResult, converted index choice or rejection."
+      ],
+      "persistent_state": [
+        "Primitive conversion buffers and cached configuration."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Exact topology normalization and bounds decisions."
+      ],
+      "semantics_lost": [
+        "Title mesh/material semantics."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "May allocate or select converted index buffers."
+      ],
+      "forwarding_feasibility": "Observation feasible; not a standalone renderer operation owner.",
+      "observation_value": "High for VTX-001/VTX-002.",
+      "replacement_value": "Low replacement value without draw and resource ownership.",
+      "evidence_required": "Topology/result/out-of-range metadata for affected draws.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Directly tests vertex candidate branches."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Only one stage of draw execution."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "VTX-001",
+        "VTX-002",
+        "VTX-003"
+      ],
+      "experiment_ids": [
+        "EXP-VERTEX-FETCH-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-LOAD-SHADER",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "PipelineCache::LoadShader",
+      "source_location": "src/graphics/d3d12/pipeline_cache.cpp",
+      "inputs": [
+        "Shader type, guest microcode address/length and host pointer."
+      ],
+      "outputs": [
+        "Cached D3D12Shader and stable hashes."
+      ],
+      "persistent_state": [
+        "Shader cache lifetime."
+      ],
+      "threading": "GPU Commands host thread; translation may be delegated.",
+      "semantics_retained": [
+        "Shader identity and stage."
+      ],
+      "semantics_lost": [
+        "Title material name and body privacy if only hashes retained."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Creates/finds shader cache entries."
+      ],
+      "forwarding_feasibility": "Metadata observation feasible; replacement requires translator/backend ownership.",
+      "observation_value": "High for identity, not sufficient alone for a defect.",
+      "replacement_value": "Medium only as a component under a higher semantic seam.",
+      "evidence_required": "Hash/type/length only; never capture microcode body.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Provides privacy-preserving shader identity."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "A future backend needs shader identity but not this cache as its seam."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "SHD-001",
+        "SHD-002"
+      ],
+      "experiment_ids": [
+        "EXP-SHADER-IDENTITY-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-ANALYZE-UCODE",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "Shader::AnalyzeUcode",
+      "source_location": "src/graphics/pipeline/shader/translator.cpp",
+      "inputs": [
+        "Shader ucode already resident inside the oracle."
+      ],
+      "outputs": [
+        "Analysis flags, fetch/export/control-flow metadata and hashes."
+      ],
+      "persistent_state": [
+        "Per-shader analysis result."
+      ],
+      "threading": "Translation context; may run on pipeline worker threads.",
+      "semantics_retained": [
+        "Backend-neutral guest shader structure."
+      ],
+      "semantics_lost": [
+        "Title material meaning; payload must not be captured."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Populates analysis metadata used by translation/binding."
+      ],
+      "forwarding_feasibility": "Observation metadata feasible; wrapping does not provide title operation coverage.",
+      "observation_value": "High for safe operation-class and fetch metadata.",
+      "replacement_value": "Medium as a future translator input, not a primary seam.",
+      "evidence_required": "Hash and analysis bitsets only.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Tests SHD/TEX/VTX applicability without bodies."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "Backend-neutral semantics are useful after ownership is solved."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "SHD-001",
+        "SHD-002",
+        "TEX-003",
+        "TEX-004",
+        "TEX-006",
+        "VTX-002"
+      ],
+      "experiment_ids": [
+        "EXP-SHADER-IDENTITY-001",
+        "EXP-TEXTURE-METADATA-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-CONFIGURE-PIPELINE",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "PipelineCache::ConfigurePipeline",
+      "source_location": "src/graphics/d3d12/pipeline_cache.cpp",
+      "inputs": [
+        "Shader hashes, primitive result, render/blend/depth/raster state and host capabilities."
+      ],
+      "outputs": [
+        "Pipeline handle/hash, root signature and ready/pending/failure status."
+      ],
+      "persistent_state": [
+        "Pipeline cache and asynchronous creation queues."
+      ],
+      "threading": "GPU Commands thread plus pipeline workers.",
+      "semantics_retained": [
+        "Exact host pipeline decision."
+      ],
+      "semantics_lost": [
+        "Fable material name and upstream XDK operation."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "May queue asynchronous creation and determine a skipped draw."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacing it duplicates backend pipeline ownership.",
+      "observation_value": "High for PIP-002/PIP-003.",
+      "replacement_value": "Low as primary seam; D3D12-specific capability choices must be isolated.",
+      "evidence_required": "Pipeline identity/readiness/capability metadata.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Directly distinguishes pending and capability branches."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "D3D12-specific internal boundary."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "PIP-001",
+        "PIP-002",
+        "PIP-003"
+      ],
+      "experiment_ids": [
+        "EXP-CONFIG-CAP-001",
+        "EXP-DRAW-DECISION-001",
+        "EXP-SHADER-IDENTITY-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-UPDATE-BINDINGS",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12CommandProcessor::UpdateBindings",
+      "source_location": "src/graphics/d3d12/command_processor.cpp",
+      "inputs": [
+        "Shader analysis, fetch constants, descriptor layouts and register state."
+      ],
+      "outputs": [
+        "Bound descriptors, samplers, constants and update result."
+      ],
+      "persistent_state": [
+        "Descriptor heaps, binding caches and submission lifetime."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Exact binding decision associated with a draw."
+      ],
+      "semantics_lost": [
+        "Title resource/material names and raw payloads."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Allocates descriptors and transitions resources."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacement would share descriptor/resource ownership unsafely.",
+      "observation_value": "High for draw/resource correlation.",
+      "replacement_value": "Low as standalone replacement seam.",
+      "evidence_required": "Hashed binding layout plus fetch/resource IDs.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Joins shaders, textures and draw state."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Backend-specific descriptor owner."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "PIP-001",
+        "TEX-001",
+        "TEX-005",
+        "TEX-007"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-REQUEST-TEXTURES",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12TextureCache::RequestTextures",
+      "source_location": "src/graphics/d3d12/texture_cache.cpp",
+      "inputs": [
+        "Fetch constants, sampler state, texture keys/ranges and shared-memory state."
+      ],
+      "outputs": [
+        "Texture cache entries, residency/update result and descriptor-ready state."
+      ],
+      "persistent_state": [
+        "Texture cache, watches, validity and upload lifetime."
+      ],
+      "threading": "GPU Commands host thread with GPU copy/barrier work.",
+      "semantics_retained": [
+        "Format, dimensions, pages, layout, validity and binding identity."
+      ],
+      "semantics_lost": [
+        "Texture pixels and title asset/material names."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "May upload, watch, transition and cache guest resources."
+      ],
+      "forwarding_feasibility": "Metadata observation feasible; replacement risks dual cache/resource ownership.",
+      "observation_value": "Highest texture-candidate observation value.",
+      "replacement_value": "Low as primary seam; useful component after a higher operation seam.",
+      "evidence_required": "Only metadata/hashes enumerated by EXP-TEXTURE-METADATA-001.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Directly tests TEX-002 through TEX-007."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "Texture semantics are necessary but ownership remains unresolved."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "TEX-001",
+        "TEX-002",
+        "TEX-003",
+        "TEX-004",
+        "TEX-005",
+        "TEX-006",
+        "TEX-007"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-RT-UPDATE",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12RenderTargetCache::Update",
+      "source_location": "src/graphics/d3d12/render_target_cache.cpp",
+      "inputs": [
+        "Render-target registers, EDRAM bases/pitches, formats, MSAA and aliases."
+      ],
+      "outputs": [
+        "Active host render targets/interlock state and update result."
+      ],
+      "persistent_state": [
+        "EDRAM ownership, aliases and render-target cache."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Pass-level RT/EDRAM configuration."
+      ],
+      "semantics_lost": [
+        "Fable pass/material meaning without correlation."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Transitions/creates targets and mutates alias state."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacement risks dual EDRAM ownership.",
+      "observation_value": "High for identifying affected passes.",
+      "replacement_value": "Low as primary seam; essential oracle below a title method.",
+      "evidence_required": "Minimal pass metadata and alias IDs.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Pass IDs can later correlate to a frame."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Tests pass formats, MSAA and aliases."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "EDRAM semantics are necessary but too low as primary seam."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "RT-001",
+        "RT-002"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-GET-RESOLVE-INFO",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "draw_util::GetResolveInfo",
+      "source_location": "include/rex/graphics/pipeline/render_target/cache.h",
+      "inputs": [
+        "Resolve/copy registers, memory, scale and destination state."
+      ],
+      "outputs": [
+        "ResolveInfo with formats, coordinates, extents and destination interpretation."
+      ],
+      "persistent_state": [
+        "No independent long-lived owner; derived operation description."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Backend-neutral resolve semantics remain unusually rich here."
+      ],
+      "semantics_lost": [
+        "Fable pass/material identity unless correlated."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Reads guest state and validates/derives a resolve."
+      ],
+      "forwarding_feasibility": "Observation is feasible and low-side-effect; replacement still needs EDRAM/resource ownership.",
+      "observation_value": "High for RT-002 through RT-004.",
+      "replacement_value": "Medium as an optional normalized title-IR input after seam proof.",
+      "evidence_required": "ResolveInfo fields only, no surface payload.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Resolve IDs can correlate to frame IDs."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Most discriminating resolve metadata."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "Useful operation semantics, but not an ownership boundary."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "RT-002",
+        "RT-003",
+        "RT-004"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-RT-RESOLVE",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12RenderTargetCache::Resolve",
+      "source_location": "src/graphics/d3d12/render_target_cache.cpp",
+      "inputs": [
+        "ResolveInfo, EDRAM state and destination resource."
+      ],
+      "outputs": [
+        "Host resolve/copy work, clears, destination validity and written ranges."
+      ],
+      "persistent_state": [
+        "EDRAM cache, destination resource state and submission."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Actual resolve path and result."
+      ],
+      "semantics_lost": [
+        "Upstream title pass meaning and private surface contents."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Writes guest-visible resources and mutates EDRAM/cache state."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacing within active plugin would double-own output.",
+      "observation_value": "High for RT-002 through RT-005.",
+      "replacement_value": "Low as primary seam; medium oracle value.",
+      "evidence_required": "Resolve metadata, outcome and consumer identity only.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "LOW",
+          "rationale": "Resolve sequence can correlate to frame."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Direct result and destination path."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Stateful backend operation, unsafe dual ownership."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "RT-002",
+        "RT-003",
+        "RT-004",
+        "RT-005"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-SHARED-REQUEST-RANGES",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "SharedMemory::RequestRanges",
+      "source_location": "src/graphics/shared_memory.cpp",
+      "inputs": [
+        "Guest physical ranges, access intent and submission context."
+      ],
+      "outputs": [
+        "Residency/upload/validity preparation."
+      ],
+      "persistent_state": [
+        "Shared memory pages, watches, uploads and barriers."
+      ],
+      "threading": "GPU Commands host thread.",
+      "semantics_retained": [
+        "Exact ranges requested by GPU consumers."
+      ],
+      "semantics_lost": [
+        "Asset contents and title resource names."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Uploads/transitions pages and arms state."
+      ],
+      "forwarding_feasibility": "Hashed/range observation feasible; replacement would share memory visibility ownership.",
+      "observation_value": "High for texture and lifetime hypotheses.",
+      "replacement_value": "Low as renderer seam; retain as oracle service.",
+      "evidence_required": "Ranges, generation and consumer hashes only.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No direct present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Links resources to validity/lifetime."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Core guest memory service must retain one owner."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "MEM-001",
+        "MEM-002",
+        "TEX-002"
+      ],
+      "experiment_ids": [
+        "EXP-MEM-LIFECYCLE-001",
+        "EXP-TEXTURE-METADATA-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-SHARED-RANGE-WRITTEN",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "SharedMemory::RangeWrittenByGpu",
+      "source_location": "src/graphics/shared_memory.cpp",
+      "inputs": [
+        "GPU-written guest range, submission and validity state."
+      ],
+      "outputs": [
+        "Guest-visible invalidation/writeback bookkeeping."
+      ],
+      "persistent_state": [
+        "Shared-memory validity and download state."
+      ],
+      "threading": "GPU Commands host thread; visibility may complete after GPU work.",
+      "semantics_retained": [
+        "Exact GPU-to-guest range visibility event."
+      ],
+      "semantics_lost": [
+        "Payload and title consumer meaning."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Changes guest-visible memory validity and cache state."
+      ],
+      "forwarding_feasibility": "Metadata observation feasible; must not alter synchronization.",
+      "observation_value": "High for resolve readback and resource lifetime.",
+      "replacement_value": "Low as renderer seam; mandatory service contract.",
+      "evidence_required": "Range, writer/consumer hashes and ordering only.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "NONE",
+          "rationale": "No direct present semantics."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Tests RT-003 and MEM lifecycle."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Memory visibility must not have dual owners."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "MEM-001",
+        "MEM-002",
+        "RT-003"
+      ],
+      "experiment_ids": [
+        "EXP-MEM-LIFECYCLE-001",
+        "EXP-EDRAM-RESOLVE-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-END-SUBMISSION",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12CommandProcessor::EndSubmission",
+      "source_location": "src/graphics/d3d12/command_processor.cpp",
+      "inputs": [
+        "Current command list, pipeline work, queries, caches and fences."
+      ],
+      "outputs": [
+        "Submitted work, waits/retirement and new submission state."
+      ],
+      "persistent_state": [
+        "Submission fence, pipeline workers and query lifetime."
+      ],
+      "threading": "GPU Commands host thread plus coordination with workers/GPU.",
+      "semantics_retained": [
+        "Submission boundary and readiness/query retirement."
+      ],
+      "semantics_lost": [
+        "Title frame boundary; submissions need not equal frames."
+      ],
+      "existing_fable_evidence": [],
+      "side_effects": [
+        "Closes/submits work, may wait and retire resources."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacement would assume command submission ownership.",
+      "observation_value": "High for PIP-002 and DRW-002 ordering.",
+      "replacement_value": "Low as title renderer seam.",
+      "evidence_required": "Submission ID, wait reason, pending pipeline/query counts.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a guest wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "MEDIUM",
+          "rationale": "Useful correlation but not one-to-one with frames."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "HIGH",
+          "rationale": "Distinguishes cross-submission pipeline/query lifetimes."
+        },
+        "eventual_renderer_replacement": {
+          "value": "LOW",
+          "rationale": "Backend-specific submission owner."
+        }
+      },
+      "stage_disposition": "TARGETED OBSERVATION LATER",
+      "related_divergence_ids": [
+        "DRW-002",
+        "PIP-002",
+        "MEM-001"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-ZPD-REPORT-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-PRESENTER-REFRESH",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "Presenter::RefreshGuestOutput",
+      "source_location": "src/ui/presenter.cpp",
+      "inputs": [
+        "Guest output mailbox state and provider output."
+      ],
+      "outputs": [
+        "Refreshed guest image for host composition."
+      ],
+      "persistent_state": [
+        "Guest-output mailbox/generation and presenter resources."
+      ],
+      "threading": "UI/presenter thread with synchronization to graphics provider.",
+      "semantics_retained": [
+        "Mailbox refresh identity and guest-output availability."
+      ],
+      "semantics_lost": [
+        "Draw/resource provenance and title object meaning."
+      ],
+      "existing_fable_evidence": [
+        "FBL-PRESENT-SOURCE"
+      ],
+      "side_effects": [
+        "Consumes/publishes presenter resources and repaint state."
+      ],
+      "forwarding_feasibility": "Observation feasible; renderer replacement requires an explicit mailbox producer contract.",
+      "observation_value": "High for swap-to-mailbox correlation.",
+      "replacement_value": "Medium as presentation contract, none as draw seam.",
+      "evidence_required": "Monotonic mailbox generation correlated with VdSwap.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a title wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "HIGH",
+          "rationale": "Exact mailbox observation point."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "Image is already composed guest output."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "Future renderer must produce equivalent mailbox output."
+        }
+      },
+      "stage_disposition": "PRESENT CORRELATION LATER",
+      "related_divergence_ids": [
+        "PRE-001"
+      ],
+      "experiment_ids": [
+        "EXP-SWAP-CORRELATION-001"
+      ]
+    },
+    {
+      "boundary_id": "REX-D3D12-PAINT-PRESENT",
+      "origin": "REXGLUE_OBSERVATION",
+      "exact_address_or_symbol": "D3D12Presenter::PaintAndPresentImpl",
+      "source_location": "src/ui/d3d12/d3d12_presenter.cpp",
+      "inputs": [
+        "Refreshed guest output, swap-chain/back-buffer state and UIDrawers."
+      ],
+      "outputs": [
+        "Composed back buffer and DXGI Present result."
+      ],
+      "persistent_state": [
+        "Swap chain, back buffers, UI draw state, resize and present scheduling."
+      ],
+      "threading": "UI thread.",
+      "semantics_retained": [
+        "Final guest-output/UI ordering and DXGI Present."
+      ],
+      "semantics_lost": [
+        "All guest draw/resource provenance."
+      ],
+      "existing_fable_evidence": [
+        "FBL-PRESENT-SOURCE",
+        "FBL-RUN047-IMAGE-001",
+        "FBL-RUN047-IMAGE-002"
+      ],
+      "side_effects": [
+        "Draws guest output, host UI, presents, resizes and schedules repaint."
+      ],
+      "forwarding_feasibility": "Observation feasible; replacement must preserve UI and swap-chain single ownership.",
+      "observation_value": "High for final frame correlation and UI contract.",
+      "replacement_value": "Medium as presenter integration; none as renderer operation seam.",
+      "evidence_required": "Present ID/result plus mailbox generation and UIDrawer ordering.",
+      "purposes": {
+        "transparent_forwarding_mechanism_proof": {
+          "value": "NONE",
+          "rationale": "Not a title wrapper."
+        },
+        "presentation_frame_correlation": {
+          "value": "HIGH",
+          "rationale": "Final host presentation point."
+        },
+        "draw_resource_defect_diagnosis": {
+          "value": "NONE",
+          "rationale": "Too late for black-surface cause."
+        },
+        "eventual_renderer_replacement": {
+          "value": "MEDIUM",
+          "rationale": "Defines the presentation contract and single-owner constraint."
+        }
+      },
+      "stage_disposition": "PRESENT CORRELATION LATER",
+      "related_divergence_ids": [
+        "PRE-001",
+        "PRE-002"
+      ],
+      "experiment_ids": [
+        "EXP-SWAP-CORRELATION-001"
+      ]
+    }
+  ],
+  "counts": {
+    "boundaries": 29,
+    "g1_candidate_hooks": 11,
+    "rexglue_observation_surfaces": 18,
+    "by_disposition": {
+      "FORWARDING PROOF ONLY": 1,
+      "PRESENT CORRELATION LATER": 4,
+      "REJECT AS PRIMARY SEAM": 4,
+      "RETAIN AS ORACLE": 4,
+      "STATIC METHOD RECOVERY TARGET": 1,
+      "TARGETED OBSERVATION LATER": 15
+    }
+  }
+}

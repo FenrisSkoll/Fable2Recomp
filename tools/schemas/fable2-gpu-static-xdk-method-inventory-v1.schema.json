@@ -1,0 +1,338 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-static-xdk-method-inventory-v1.schema.json",
+  "title": "Fable II G1.6A static XDK method inventory",
+  "type": "object",
+  "required": [
+    "$schema",
+    "schema_version",
+    "corpus",
+    "phase",
+    "experiment_id",
+    "generated_on",
+    "primary_result",
+    "strongest_candidate_id",
+    "pins",
+    "analysis_inputs",
+    "classifications",
+    "counts",
+    "candidates",
+    "phase_decision"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.6A" },
+    "phase": { "const": "G1.6A - Static XDK Method Recovery" },
+    "experiment_id": { "const": "EXP-STATIC-XDK-001" },
+    "generated_on": { "type": "string", "format": "date" },
+    "primary_result": {
+      "enum": ["STATIC SEAM QUALIFIED", "STATIC RECOVERY BLOCKED", "INCONCLUSIVE"]
+    },
+    "strongest_candidate_id": { "pattern": "^SXDK-[0-9]{3}$" },
+    "pins": {
+      "type": "object",
+      "required": [
+        "fable_start",
+        "g1_accepted_base",
+        "paused_g2a",
+        "tu1",
+        "rexglue",
+        "canary",
+        "active_gpu_plugin"
+      ]
+    },
+    "analysis_inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["input_id", "path", "provenance", "status", "purpose"]
+      }
+    },
+    "classifications": {
+      "type": "array",
+      "minItems": 5,
+      "items": { "$ref": "#/$defs/classification" }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["candidates", "by_classification"]
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/candidate" }
+    },
+    "phase_decision": {
+      "type": "object",
+      "required": [
+        "result",
+        "basis",
+        "preferred_replacement_seam",
+        "next_phase",
+        "next_experiment_id",
+        "next_experiment_scope",
+        "authorization"
+      ],
+      "properties": {
+        "result": {
+          "enum": ["STATIC SEAM QUALIFIED", "STATIC RECOVERY BLOCKED", "INCONCLUSIVE"]
+        },
+        "next_experiment_id": { "pattern": "^EXP-[A-Z0-9-]+$" },
+        "authorization": { "const": "STATIC EVIDENCE ONLY; NO HOOK OR IMPLEMENTATION" }
+      }
+    }
+  },
+  "$defs": {
+    "address": {
+      "type": "string",
+      "pattern": "^0x[0-9A-F]{8}$"
+    },
+    "hexSize": {
+      "type": "string",
+      "pattern": "^0x[0-9A-F]+$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{64}$"
+    },
+    "confidence": {
+      "enum": ["CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE"]
+    },
+    "classification": {
+      "enum": [
+        "QUALIFIED REPRESENTATIVE METHOD",
+        "STRONG STATIC CANDIDATE",
+        "DISCOVERY LEAD ONLY",
+        "REJECTED AS SEMANTIC SEAM",
+        "RECOVERY BLOCKED"
+      ]
+    },
+    "boundary": {
+      "type": "object",
+      "required": ["start", "end", "size", "instruction_count"],
+      "properties": {
+        "start": { "$ref": "#/$defs/address" },
+        "end": { "$ref": "#/$defs/address" },
+        "size": { "$ref": "#/$defs/hexSize" },
+        "instruction_count": { "type": "integer" }
+      }
+    },
+    "generatedMapping": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "size",
+        "start_line",
+        "end_line",
+        "generated_name"
+      ],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "size": { "type": "integer" },
+        "start_line": { "type": "integer" },
+        "end_line": { "type": "integer" },
+        "generated_name": { "pattern": "^sub_[0-9A-F]{8}$" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "loaded_image_sha256",
+        "boundary_authority",
+        "boundary_evidence",
+        "generated_mapping"
+      ],
+      "properties": {
+        "loaded_image_sha256": { "$ref": "#/$defs/sha256" },
+        "boundary_authority": { "type": "string" },
+        "boundary_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" }
+        },
+        "generated_mapping": { "$ref": "#/$defs/generatedMapping" }
+      }
+    },
+    "registerArgument": {
+      "type": "object",
+      "required": ["register", "entry_value", "use", "confidence"],
+      "properties": {
+        "register": { "pattern": "^r(?:3|4|5|6|7|8|9|10)$" },
+        "entry_value": { "type": "string" },
+        "use": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+    "abi": {
+      "type": "object",
+      "required": [
+        "register_arguments",
+        "stack_arguments",
+        "implicit_inputs",
+        "return_behavior",
+        "abi_stability"
+      ],
+      "properties": {
+        "register_arguments": {
+          "type": "array",
+          "minItems": 8,
+          "items": { "$ref": "#/$defs/registerArgument" }
+        },
+        "stack_arguments": { "type": "array", "items": { "type": "object" } },
+        "implicit_inputs": { "type": "array", "items": { "type": "object" } },
+        "return_behavior": {
+          "type": "object",
+          "required": ["description", "confidence"]
+        },
+        "abi_stability": {
+          "type": "object",
+          "required": ["description", "confidence"]
+        }
+      }
+    },
+    "stateOffset": {
+      "type": "object",
+      "required": [
+        "base",
+        "offset",
+        "width_bits",
+        "access",
+        "inferred_role",
+        "evidence",
+        "confidence"
+      ],
+      "properties": {
+        "base": { "type": "string" },
+        "offset": { "$ref": "#/$defs/hexSize" },
+        "width_bits": { "type": "integer" },
+        "access": { "enum": ["READ", "WRITE", "READ_WRITE"] },
+        "inferred_role": { "type": "string" },
+        "evidence": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+    "callEdge": {
+      "type": "object",
+      "required": ["address", "site", "relationship", "confidence"],
+      "properties": {
+        "address": { "$ref": "#/$defs/address" },
+        "site": { "$ref": "#/$defs/address" },
+        "relationship": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/confidence" }
+      }
+    },
+    "callRelationships": {
+      "type": "object",
+      "required": [
+        "direct_callers",
+        "indirect_or_callback_reachability",
+        "direct_callees",
+        "xbox_graphics_imports"
+      ],
+      "properties": {
+        "direct_callers": { "type": "array", "items": { "$ref": "#/$defs/callEdge" } },
+        "indirect_or_callback_reachability": { "type": "array", "items": { "type": "object" } },
+        "direct_callees": { "type": "array", "items": { "$ref": "#/$defs/callEdge" } },
+        "xbox_graphics_imports": { "type": "array", "items": { "type": "object" } }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "required": [
+        "execution_model",
+        "thread_identity",
+        "producer_ownership",
+        "consumer_ownership",
+        "queue_or_buffer",
+        "ordering",
+        "synchronization",
+        "evidence",
+        "confidence"
+      ]
+    },
+    "operation": {
+      "type": "object",
+      "required": ["family", "description", "behavior", "confidence"]
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["estimate", "covered_paths", "known_bypasses", "confidence"]
+    },
+    "candidateClassification": {
+      "type": "object",
+      "required": [
+        "value",
+        "confidence",
+        "evidence",
+        "missing_facts",
+        "minimum_evidence_to_change"
+      ],
+      "properties": {
+        "value": { "$ref": "#/$defs/classification" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "missing_facts": { "type": "array", "items": { "type": "string" } },
+        "minimum_evidence_to_change": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "candidate_id",
+        "generated_name",
+        "boundary",
+        "provenance",
+        "relation_to_prior_evidence",
+        "abi",
+        "persistent_state_offsets",
+        "call_relationships",
+        "resource_ownership_and_lifetime",
+        "thread_queue_ownership",
+        "operation",
+        "state_mutations",
+        "side_effects",
+        "forwarding_obligations",
+        "retained_semantics",
+        "lost_semantics",
+        "coverage",
+        "fitness",
+        "classification"
+      ],
+      "properties": {
+        "candidate_id": { "pattern": "^SXDK-[0-9]{3}$" },
+        "generated_name": { "pattern": "^sub_[0-9A-F]{8}$" },
+        "boundary": { "$ref": "#/$defs/boundary" },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "relation_to_prior_evidence": { "type": "object" },
+        "abi": { "$ref": "#/$defs/abi" },
+        "persistent_state_offsets": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/stateOffset" }
+        },
+        "call_relationships": { "$ref": "#/$defs/callRelationships" },
+        "resource_ownership_and_lifetime": { "type": "object" },
+        "thread_queue_ownership": { "$ref": "#/$defs/ownership" },
+        "operation": { "$ref": "#/$defs/operation" },
+        "state_mutations": { "type": "array", "items": { "type": "string" } },
+        "side_effects": { "type": "array", "items": { "type": "string" } },
+        "forwarding_obligations": { "type": "array", "items": { "type": "string" } },
+        "retained_semantics": { "type": "array", "items": { "type": "string" } },
+        "lost_semantics": { "type": "array", "items": { "type": "string" } },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "fitness": {
+          "enum": [
+            "TARGETED DIAGNOSIS",
+            "EVENTUAL RENDERER REPLACEMENT",
+            "BOTH",
+            "NEITHER"
+          ]
+        },
+        "classification": { "$ref": "#/$defs/candidateClassification" }
+      }
+    }
+  }
+}

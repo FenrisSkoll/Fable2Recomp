@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-replacement-seams-v1.schema.json",
+  "title": "Fable II G1.5D staged renderer ownership and seam decisions",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "pins",
+    "stages",
+    "seam_decisions",
+    "ownership_transition_conclusion"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "corpus": {
+      "const": "Fable II Native Renderer G1.5D"
+    },
+    "generated_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "pins": {
+      "type": "object"
+    },
+    "stages": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/stage"
+      }
+    },
+    "seam_decisions": {
+      "type": "array",
+      "minItems": 5,
+      "items": {
+        "$ref": "#/$defs/seam"
+      }
+    },
+    "ownership_transition_conclusion": {
+      "type": "object",
+      "required": [
+        "classification",
+        "finding",
+        "missing_interface",
+        "decision_gate"
+      ]
+    }
+  },
+  "$defs": {
+    "stage": {
+      "type": "object",
+      "required": [
+        "stage_id",
+        "name",
+        "owners",
+        "rexgpu_xenos_role",
+        "semantic_layer_controlled",
+        "fallback_without_dual_ownership",
+        "entry_gate",
+        "unproven"
+      ],
+      "properties": {
+        "stage_id": {
+          "enum": [
+            "STAGE-A",
+            "STAGE-B",
+            "STAGE-C"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "owners": {
+          "type": "object",
+          "required": [
+            "IGraphicsSystem",
+            "guest_ring_processing",
+            "register_state",
+            "memory_callbacks",
+            "interrupts",
+            "vblank",
+            "command_submission",
+            "presenter",
+            "host_ui",
+            "shutdown"
+          ]
+        },
+        "rexgpu_xenos_role": {
+          "type": "string"
+        },
+        "semantic_layer_controlled": {
+          "type": "string"
+        },
+        "fallback_without_dual_ownership": {
+          "type": "string"
+        },
+        "entry_gate": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unproven": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "seam": {
+      "type": "object",
+      "required": [
+        "seam_id",
+        "name",
+        "decision",
+        "supported_stage",
+        "evidence",
+        "limitations",
+        "fallback",
+        "open_question_ids"
+      ],
+      "properties": {
+        "seam_id": {
+          "pattern": "^SEAM-[A-Z0-9-]+$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "decision": {
+          "enum": [
+            "RETAIN AS ORACLE",
+            "FORWARDING PROOF ONLY",
+            "STATIC METHOD RECOVERY TARGET",
+            "OBSERVATION ONLY",
+            "PRESENTATION CONTRACT",
+            "REJECT AS PRIMARY SEAM",
+            "UNDECIDED"
+          ]
+        },
+        "supported_stage": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "STAGE-A",
+              "STAGE-B",
+              "STAGE-C"
+            ]
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "fallback": {
+          "type": "string"
+        },
+        "open_question_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^OQ-[A-Z0-9-]+$"
+          }
+        }
+      }
+    }
+  }
+}

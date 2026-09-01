@@ -1,0 +1,593 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-static-xdk-seam-coverage-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.6B",
+  "phase": "G1.6B - Static Seam Qualification and Coverage",
+  "experiment_id": "EXP-STATIC-XDK-002",
+  "generated_on": "2026-09-01",
+  "primary_result": "STATIC COVERAGE NARROW",
+  "pins": {
+    "fable_start": {
+      "branch": "fable2-native-renderer-g1.6a-static-xdk-recovery",
+      "commit": "9af33118bcfbf00f8b446f05e90d18de193410c1",
+      "tree": "fd91d6931e81108d4a619d3875c28b4d66e05187"
+    },
+    "g1_5d_base": { "commit": "78c5d66807abf19f67966bd0c3d8301c29990ae4" },
+    "paused_g2a": { "commit": "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51", "incorporated": false },
+    "tu1": {
+      "loaded_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "base": "0x82000000",
+      "size": "0x01620000",
+      "entry_point": "0x82CC21C0"
+    },
+    "rexglue": {
+      "path": "C:/Dev/rexglue-sdk-v0.10",
+      "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+      "tree": "b78b06b8ac650467372236a3a262864e069a9382",
+      "allowed_preexisting_status": [" m thirdparty/libmspack"]
+    },
+    "canary": {
+      "path": "C:/Dev/Fable2NativeRendererResearch/xenia-canary",
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "tree": "c343b0a5796590fadc3b78c993bfada51e7e9148"
+    },
+    "active_gpu_plugin": {
+      "path": "out/build/win-amd64-release/rexgpu-xenos.dll",
+      "sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99",
+      "size": 2770944,
+      "backend": "D3D12_ONLY"
+    }
+  },
+  "starting_state": {
+    "required_branch": "fable2-native-renderer-g1.6a-static-xdk-recovery",
+    "required_commit": "9af33118bcfbf00f8b446f05e90d18de193410c1",
+    "required_tree": "fd91d6931e81108d4a619d3875c28b4d66e05187",
+    "working_branch": "fable2-native-renderer-g1.6b-static-seam-coverage",
+    "paused_g2a_incorporated": false
+  },
+  "analysis_inputs": [
+    {
+      "input_id": "INPUT-G16A-CORPUS",
+      "path": "docs/fable2-gpu-reference/",
+      "provenance": "Committed G1.6A corpus at tree fd91d6931e81108d4a619d3875c28b4d66e05187.",
+      "status": "COMMITTED",
+      "purpose": "Accepted SXDK identities, prior phase conclusions, pins, ownership decisions and experiment constraints."
+    },
+    {
+      "input_id": "INPUT-G1-CANDIDATES",
+      "path": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "provenance": "Accepted G1 evidence descended from c44e8c16f4422f9a828caf30899ac989170b8a8c.",
+      "status": "COMMITTED",
+      "purpose": "Accepted call-cluster boundaries and dispositions."
+    },
+    {
+      "input_id": "INPUT-PROVENANCE",
+      "path": "tools/fable2-entrypoint-closure-evidence.json",
+      "provenance": "Size 4768; SHA-256 10F9411631AE08D653FB1CDCA192E364CF499BB56948A6E72F93384632786CC7.",
+      "status": "COMMITTED",
+      "purpose": "Exact XEX/XEXP/loaded-image identity and generation provenance."
+    },
+    {
+      "input_id": "INPUT-CLOSURE",
+      "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json",
+      "provenance": "Size 341019731; SHA-256 665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397.",
+      "status": "IGNORED LOCAL READ-ONLY",
+      "purpose": "Trusted TU1 ranges, direct edges, indirect sites and address-taken evidence."
+    },
+    {
+      "input_id": "INPUT-GHIDRA",
+      "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/ghidra-function-map.json",
+      "provenance": "Size 96710692; SHA-256 03516B3A1F33433E493739418C9939D4FF1AEB0989F4ACEF2FD4D8204A077F58.",
+      "status": "IGNORED LOCAL READ-ONLY",
+      "purpose": "Independent function entries, pdata records and reference cross-checks."
+    },
+    {
+      "input_id": "INPUT-JUMPS",
+      "path": "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/jump-table-recovery.json",
+      "provenance": "Size 81223154; SHA-256 B1FE26FB9119DAF7E7E0196CBDBA8CCA087BE190BF156FE0B12DF116379ED89A.",
+      "status": "IGNORED LOCAL READ-ONLY",
+      "purpose": "Recovered indirect targets and bounded unresolved-transfer census."
+    },
+    {
+      "input_id": "INPUT-GENERATED",
+      "path": "generated/default/fable2_recomp.*.cpp",
+      "provenance": "293 generated translation units from the exact pinned TU1 inputs; 60,425 generated guest functions and 4,497,828 PPC instructions scanned.",
+      "status": "IGNORED LOCAL READ-ONLY",
+      "purpose": "Whole-generated-corpus packet, constant, call, use-site and address-materialization searches."
+    },
+    {
+      "input_id": "INPUT-REXGLUE",
+      "path": "C:/Dev/rexglue-sdk-v0.10/include/rex/graphics/xenos.h; C:/Dev/rexglue-sdk-v0.10/src/graphics/command_processor.cpp",
+      "provenance": "Pinned read-only ReXGlue commit 956c6a8b5da4c54b9899a2593e9c67c26de30194.",
+      "status": "PINNED READ-ONLY REFERENCE",
+      "purpose": "PM4 opcode, SET_CONSTANT selector and fetch-constant consumer semantics."
+    },
+    {
+      "input_id": "INPUT-CANARY",
+      "path": "C:/Dev/Fable2NativeRendererResearch/xenia-canary/src/xenia/gpu/",
+      "provenance": "Pinned read-only Canary commit 3a44f20c7bc66db1da583e8a6f0ab740e31908e9.",
+      "status": "PINNED READ-ONLY REFERENCE",
+      "purpose": "Independent packet/register semantics only; never used as proof of Fable II reachability."
+    }
+  ],
+  "coverage_boundaries": {
+    "executable_ranges": [
+      { "section": ".text", "start": "0x82170000", "end": "0x832BABBC", "size": "0x0114ABBC" },
+      { "section": "BINK", "start": "0x832BAC00", "end": "0x832CA03C", "size": "0x0000F43C" }
+    ],
+    "generated": {
+      "files": 293,
+      "functions": 60425,
+      "instructions": 4497828,
+      "union_bytes": 17989684,
+      "executable_bytes": 18194424,
+      "coverage_percent": 98.8747101859,
+      "uncovered_bytes": 204740
+    },
+    "entrypoint_closure": {
+      "function_ranges": 60662,
+      "trusted_ranges": 51327,
+      "preliminary_ranges": 9335,
+      "union_bytes": 18069800,
+      "coverage_percent": 99.3150428945,
+      "uncovered_bytes": 124624,
+      "indirect_sites": 4526,
+      "strong_new_functions": 55,
+      "probable_new_functions": 180
+    },
+    "blind_spots": [
+      "124,624 executable bytes are outside the closure range union and 204,740 are outside generated-function union.",
+      "4,526 accepted-closure indirect sites are not globally resolvable by a direct-call search.",
+      "Two recovered PM4 indirect-buffer builders can submit payload content that is not statically decoded by this bounded phase.",
+      "Two metadata-driven LOAD_ALU_CONSTANT helpers choose selector type from runtime resource records, so static code cannot prove whether a given record is texture FETCH type 1.",
+      "Dynamic code/data mutation and runtime packet frequency are outside a static experiment."
+    ]
+  },
+  "search_strategies": [
+    {
+      "strategy_id": "SEARCH-DIRECT-XREF",
+      "scope": "All 60,425 generated functions plus closure and Ghidra references for 0x82BA77D0.",
+      "result": "Exactly two generated direct calls, from 0x82BA7B28 at 0x82BA81CC and 0x82BA83C0 at 0x82BA85D8; no exact-target thunk or data/table reference.",
+      "limitation": "An unresolved computed target that never materializes the exact address cannot be identified as a caller."
+    },
+    {
+      "strategy_id": "SEARCH-PACKET-OPCODES",
+      "scope": "Whole generated corpus for constructed Type 3 PM4_SET_CONSTANT, LOAD_ALU_CONSTANT, SET_CONSTANT2, SET_SHADER_CONSTANTS, LOAD_CONSTANT_CONTEXT and SET_STATE headers.",
+      "result": "One explicit SET_CONSTANT FETCH producer, three dynamic LOAD_ALU helpers, and three SET_STATE record builders; false hits were rejected by header-high and following-store checks.",
+      "limitation": "Prebuilt or runtime-loaded packet payloads are opaque."
+    },
+    {
+      "strategy_id": "SEARCH-TYPE0-FETCH",
+      "scope": "Whole generated corpus for Type 0 headers covering register range 0x4800..0x48FF, then six-word descriptor type decoding.",
+      "result": "Four real header constructors: one texture producer and three vertex-only producers.",
+      "limitation": "A header assembled without a recoverable immediate may evade this syntactic search."
+    },
+    {
+      "strategy_id": "SEARCH-DYNAMIC-SELECTORS",
+      "scope": "All LOAD_ALU_CONSTANT call sites, selector arithmetic and constant argument pairs.",
+      "result": "sub_8227D150 is bounded to ALU type 0 at all ten call sites; sub_82221B90 and sub_8222BFA0 take selector types from runtime metadata and remain texture-capable but unresolved.",
+      "limitation": "Resource metadata values are not embedded in code and payload capture is prohibited."
+    },
+    {
+      "strategy_id": "SEARCH-ADDRESS-TAKEN",
+      "scope": "Closure candidates, Ghidra references, generated lis/addi materializations, recovered pointer runs and jump-table targets.",
+      "result": "No exact address-taken reference to SXDK-001; SXDK-003 is materialized at 0x82BAA338/0x82BAA358 into a callback registration record.",
+      "limitation": "The registrar dispatcher is an unresolved virtual call, so invocation thread and record retention are unknown."
+    },
+    {
+      "strategy_id": "SEARCH-DRAW-BYPASS",
+      "scope": "Callers of common state producer sub_8221B010 and downstream DRAW_INDX packet construction.",
+      "result": "Six accepted-closure state-to-draw segments bypass SXDK-001 and route through metadata-driven sub_8222BFA0.",
+      "limitation": "Static names do not identify character, terrain, particles, UI, video, post-processing or shadow membership."
+    },
+    {
+      "strategy_id": "SEARCH-REFERENCE-SEMANTICS",
+      "scope": "Pinned ReXGlue and Canary command processors and Xenos register definitions.",
+      "result": "Selector type 1 is texture FETCH, type 3 is vertex FETCH; SET_STATE has an enum but no executor/dispatch implementation in either pinned reference.",
+      "limitation": "Reference behavior does not prove Fable II route execution."
+    }
+  ],
+  "sxdk_001_routes": {
+    "target": { "candidate_id": "SXDK-001", "generated_name": "sub_82BA77D0", "start": "0x82BA77D0", "end": "0x82BA7894" },
+    "direct_call_site_count": 2,
+    "unique_direct_caller_count": 2,
+    "indirect_reference_count": 0,
+    "accepted_g1_root_callers": [
+      { "caller": "sub_82B6F1D0", "site": "0x82B6F408", "target": "sub_82BA34D8" },
+      { "caller": "sub_82BA5D08", "site": "0x82BA5E0C", "target": "sub_82BA34D8" },
+      { "caller": "sub_82B6FA48", "site": "0x82B6FB00", "target": "sub_82BA34D8" },
+      { "caller": "sub_82B6EA60", "site": "0x82B6EB9C", "target": "sub_82BA34D8" }
+    ],
+    "routes": [
+      {
+        "route_id": "SXDK001-ROUTE-DIRECT",
+        "path": [
+          "sub_82BA34D8@0x82BA3A98 -> sub_82BA95E0",
+          "sub_82BA95E0@0x82BA9670 -> sub_82BA8EF8",
+          "sub_82BA8EF8@0x82BA95C0 -> sub_82BA83C0",
+          "sub_82BA83C0@0x82BA85D8 -> sub_82BA77D0"
+        ],
+        "reachability_class": "CONDITIONALLY REACHABLE",
+        "path_condition": "The calls are direct after their containing control-flow paths are entered; static evidence does not prove runtime entry or frequency.",
+        "claim_status": "CONFIRMED"
+      },
+      {
+        "route_id": "SXDK001-ROUTE-CALLBACK",
+        "path": [
+          "sub_82BA34D8@0x82BA3BE4 -> sub_82BAAA28",
+          "sub_82BAAA28@0x82BAACC0 -> sub_82BAA2B8",
+          "sub_82BAA2B8 materializes sub_82BA8928 at 0x82BAA338/0x82BAA358 and submits a registration record through global 0x82000910 vtable+0x18 with r3=82",
+          "unresolved callback invocation -> sub_82BA8928@0x82BA8C78 -> sub_82BA7B28",
+          "sub_82BA7B28@0x82BA81CC -> sub_82BA77D0"
+        ],
+        "reachability_class": "ADDRESS-TAKEN CALLER UNRESOLVED",
+        "path_condition": "Registration is statically exposed; later callback selection, invocation, scheduling and runtime execution are unresolved.",
+        "claim_status": "BOUNDED INFERENCE"
+      }
+    ],
+    "negative_findings": [
+      "No third direct call site exists in 4,497,828 scanned PPC instructions.",
+      "No thunk, tail branch, vtable entry, callback-table entry, dispatch-table entry, pointer run or code materialization resolves directly to 0x82BA77D0.",
+      "No Xbox graphics import is called directly by SXDK-001.",
+      "Ghidra's reduced inbound reference set is incomplete for this two-call target; generated source and closure independently preserve both exact call sites."
+    ]
+  },
+  "producers": [
+    {
+      "producer_id": "FETCH-SXDK-001",
+      "generated_name": "sub_82BA77D0",
+      "boundary": { "start": "0x82BA77D0", "end": "0x82BA7894", "size": "0xC4", "instruction_count": 49 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.110.cpp", "sha256": "4168294DC783D211919D0D178732E50A8014CF8E750187BF66491437E7473C10", "size": 1035313, "start_line": 20979, "end_line": 21103, "generated_name": "sub_82BA77D0" },
+      "provenance": ["Trusted TU1 pdata [0x82BA77D0,0x82BA7894).", "Generated 49-instruction body and exact two-call census.", "Pinned ReXGlue SET_CONSTANT FETCH decode."],
+      "packet_operation": "One PM4_SET_CONSTANT packet with selector type 1 (FETCH) and six payload dwords.",
+      "descriptor_transformation": "Copies six descriptor dwords synchronously; normalizes the encoded address fields in dwords 1 and 5; advances device[0x30].",
+      "callers": [
+        { "caller": "sub_82BA7B28", "site": "0x82BA81CC", "type": "DIRECT" },
+        { "caller": "sub_82BA83C0", "site": "0x82BA85D8", "type": "DIRECT" }
+      ],
+      "callees": ["0x82CA940C", "0x821E8EC0"],
+      "xbox_graphics_imports": [],
+      "reachability_class": "CONDITIONALLY REACHABLE",
+      "relation_to_sxdk": "The accepted SXDK-001 method itself.",
+      "operation_family": "texture/sampler/resource binding",
+      "title_system": "Internal copy/scale/present cluster only; exact public title system remains unnamed.",
+      "thread_queue_ownership": { "producer": "Synchronous on caller thread", "consumer": "Asynchronous ReXGlue Xenos command processor", "thread_identity": "UNKNOWN" },
+      "ownership_lifetime": { "descriptor": "Borrowed through synchronous return", "guest_resource": "Deferred mapping/coherency lifetime not joined statically", "retirement": "UNKNOWN" },
+      "coverage_class": "Two direct internal callers; not representative of ordinary title rendering.",
+      "known_bypasses": ["sub_82BAC718 direct Type 0 texture producer", "sub_8221B010 dynamic state/draw family", "indirect-buffer payloads"],
+      "classification": "QUALIFIED NARROW METHOD",
+      "claim_status": "CONFIRMED",
+      "confidence": "HIGH",
+      "missing_facts": ["Public XDK name", "runtime frequency", "guest-resource retirement join", "ordinary material call root"],
+      "minimum_promotion_evidence": ["A static or bounded runtime chain from multiple ordinary material/mesh roots to this family with enumerated bypasses and preserved lifetime joins."],
+      "relation_to_prior_evidence": { "g1_6a_candidate": "SXDK-001", "g1_6a_classification": "QUALIFIED REPRESENTATIVE METHOD", "refinement": "Technical qualification is preserved; G1.6B narrows architectural coverage." }
+    },
+    {
+      "producer_id": "FETCH-DIRECT-002",
+      "generated_name": "sub_82BAC718",
+      "boundary": { "start": "0x82BAC718", "end": "0x82BAD028", "size": "0x910", "instruction_count": 580 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.108.cpp", "sha256": "FE4EC0A3FD044E81052EA4A1B01F1A672F3AE578944816BC9EAB1F67B49076C1", "size": 1272471, "start_line": 20013, "end_line": 21369, "generated_name": "sub_82BAC718" },
+      "provenance": ["Trusted TU1 pdata [0x82BAC718,0x82BAD028).", "Generated Type 0 header 0x00054800 and six-word payload.", "Descriptor dword zero has low type bits 2, matching pinned texture FETCH semantics."],
+      "packet_operation": "Direct Type 0 write of six fetch-register dwords beginning at 0x4800, followed in the same method by shader load and DRAW_INDX_2 at 0x82BACD94.",
+      "descriptor_transformation": "Copies object dwords +0x1C..+0x30 with address normalization; it does not call SXDK-001.",
+      "callers": [{ "caller": "sub_82BAD028", "site": "0x82BAD100", "type": "DIRECT", "root_path": "sub_82BA34D8@0x82BA36CC -> sub_82BAD028" }],
+      "callees": ["0x82CA93F0", "0x8219CD68", "0x822154B0", "0x8221C7D8", "0x82213AD8", "0x82CA9480", "0x821E8EC0", "0x821969C8", "0x82BA4678", "0x82BA45E0", "0x832B9944", "0x82242668", "0x82CC6FB8", "0x82BABEA0"],
+      "xbox_graphics_imports": [],
+      "reachability_class": "CONDITIONALLY REACHABLE",
+      "relation_to_sxdk": "Independent confirmed texture producer and same-cluster bypass of SXDK-001.",
+      "operation_family": "textured draw/present-cluster state",
+      "title_system": "Present/copy/display cluster is a bounded inference from its exact sub_82BA34D8 path and same-method draw; public operation name is unknown.",
+      "thread_queue_ownership": { "producer": "Synchronous on sub_82BAD028 caller thread", "consumer": "Asynchronous ReXGlue Xenos command processor", "thread_identity": "UNKNOWN" },
+      "ownership_lifetime": { "descriptor": "Read from persistent object during call", "guest_resource": "Deferred lifetime not recovered", "retirement": "UNKNOWN" },
+      "coverage_class": "One direct caller in the same narrow lifecycle/present cluster.",
+      "known_bypasses": ["SXDK-001 two-caller family", "general sub_8221B010 draw roots"],
+      "classification": "STRONG STATIC CANDIDATE",
+      "claim_status": "CONFIRMED",
+      "confidence": "HIGH for packet and draw; MEDIUM for operation label",
+      "missing_facts": ["Complete r3-r10 ABI", "object ownership", "thread identity", "submission retirement", "public operation identity"],
+      "minimum_promotion_evidence": ["Recover all entry arguments, persistent offsets, resource retain/release and scheduling contracts without widening beyond this call chain."],
+      "relation_to_prior_evidence": { "accepted_g1_candidate": "sub_82BA34D8 cluster", "g1_5_divergence_ids": ["TEX-001", "DRAW-001"], "causality": "NOT CLAIMED" }
+    },
+    {
+      "producer_id": "FETCH-DYNAMIC-003",
+      "generated_name": "sub_82221B90",
+      "boundary": { "start": "0x82221B90", "end": "0x82221CE8", "size": "0x158", "instruction_count": 86 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.80.cpp", "sha256": "26317AE6898D78247F5992CD499AA2FD02EAEC0F67F1F712C2406C315D1913A0", "size": 1297220, "start_line": 1149, "end_line": 1348, "generated_name": "sub_82221B90" },
+      "provenance": ["Trusted TU1 pdata [0x82221B90,0x82221CE8).", "Generated C0022F00 LOAD_ALU_CONSTANT header and metadata-derived selector.", "Two direct calls from sub_82221858."],
+      "packet_operation": "PM4_LOAD_ALU_CONSTANT with selector index/type and count loaded from a runtime resource-metadata record.",
+      "descriptor_transformation": "Emits pointer/count block records; selector type r26>>14 can in principle be 0..3, but no embedded record proves type 1.",
+      "callers": [
+        { "caller": "sub_82221858", "site": "0x82221A50", "type": "DIRECT" },
+        { "caller": "sub_82221858", "site": "0x82221AD4", "type": "DIRECT" }
+      ],
+      "callees": ["0x82CA93F8", "0x821E8EC0", "0x82CA9480"],
+      "xbox_graphics_imports": [],
+      "reachability_class": "CONDITIONALLY REACHABLE",
+      "relation_to_sxdk": "Independent memory-backed constant loader; may bypass SXDK-001 when a runtime record selects texture FETCH.",
+      "operation_family": "bulk constant/fetch state restore",
+      "title_system": "State-object/resource-metadata family; title subsystem UNKNOWN.",
+      "thread_queue_ownership": { "producer": "Synchronous caller-thread packet writer", "consumer": "Asynchronous command processor", "thread_identity": "UNKNOWN" },
+      "ownership_lifetime": { "metadata": "Borrowed while emitting", "referenced_block": "Deferred packet pointer lifetime UNKNOWN", "retirement": "UNKNOWN" },
+      "coverage_class": "Texture-capable upper-bound member; actual texture use unresolved.",
+      "known_bypasses": ["SXDK-001", "sub_82BAC718", "sub_8222BFA0"],
+      "classification": "UNRESOLVED INDIRECT PRODUCER",
+      "claim_status": "UNKNOWN",
+      "confidence": "HIGH for dynamic loader; UNKNOWN for texture selection",
+      "missing_facts": ["Runtime selector record values", "record producer identity", "texture-type occurrence and frequency", "payload retirement"],
+      "minimum_promotion_evidence": ["Bounded evidence that at least one accepted record selects type 1 plus its exact producer/caller and resource-lifetime contract."],
+      "relation_to_prior_evidence": { "g1_6a_candidate": null, "g1_5_divergence_ids": ["TEX-001"], "causality": "NOT CLAIMED" }
+    },
+    {
+      "producer_id": "FETCH-DYNAMIC-004",
+      "generated_name": "sub_8222BFA0",
+      "boundary": { "start": "0x8222BFA0", "end": "0x8222C0E4", "size": "0x144", "instruction_count": 81 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.269.cpp", "sha256": "4115798E0FF1067CC1B3CFC445639EC83397E38026E0A094C409FA94ECD53684", "size": 1024437, "start_line": 1265, "end_line": 1454, "generated_name": "sub_8222BFA0" },
+      "provenance": ["Trusted TU1 pdata [0x8222BFA0,0x8222C0E4).", "Generated C0022F00 LOAD_ALU_CONSTANT header and metadata-derived selector.", "Three direct calls from sub_8221B010."],
+      "packet_operation": "PM4_LOAD_ALU_CONSTANT with selector and count loaded from object+0x28 or object+0x368 metadata streams.",
+      "descriptor_transformation": "Emits pointer/count records; selector type is dynamic and cannot be classified as texture from code alone.",
+      "callers": [
+        { "caller": "sub_8221B010", "site": "0x8221B1D4", "type": "DIRECT" },
+        { "caller": "sub_8221B010", "site": "0x8221B39C", "type": "DIRECT" },
+        { "caller": "sub_8221B010", "site": "0x8221B4A4", "type": "DIRECT" }
+      ],
+      "callees": ["0x82CA93F8", "0x832B9944", "0x82213AD8", "0x82CA9480", "0x821D1508", "0x821E8EC0"],
+      "xbox_graphics_imports": [],
+      "reachability_class": "CONDITIONALLY REACHABLE",
+      "relation_to_sxdk": "Independent state path used by six state-to-draw caller roots that do not call SXDK-001.",
+      "operation_family": "general draw-state constant/fetch restore",
+      "title_system": "General draw preparation is a bounded inference from six downstream DRAW_INDX emitters; material/character labels remain UNKNOWN.",
+      "thread_queue_ownership": { "producer": "Synchronous caller-thread packet writer", "consumer": "Asynchronous command processor", "thread_identity": "UNKNOWN" },
+      "ownership_lifetime": { "metadata": "Borrowed while emitting", "referenced_block": "Deferred packet pointer lifetime UNKNOWN", "retirement": "UNKNOWN" },
+      "coverage_class": "Texture-capable upper-bound member on a broad draw-state family; actual type-1 records unresolved.",
+      "known_bypasses": ["SXDK-001", "sub_82BAC718", "sub_82221B90"],
+      "classification": "UNRESOLVED INDIRECT PRODUCER",
+      "claim_status": "BOUNDED INFERENCE",
+      "confidence": "HIGH for draw-family connection; UNKNOWN for texture selection",
+      "missing_facts": ["Runtime selector record values", "which of six draw roots carry texture records", "title-system identity", "resource retirement"],
+      "minimum_promotion_evidence": ["Bounded selector-type metadata joined to one exact draw and its resource identity without capturing payload bodies."],
+      "relation_to_prior_evidence": { "g1_6a_candidate": null, "g1_5_divergence_ids": ["TEX-001", "DRAW-001"], "causality": "NOT CLAIMED" }
+    }
+  ],
+  "method_contracts": [
+    {
+      "candidate_id": "SXDK-002",
+      "generated_name": "sub_82BA7B28",
+      "boundary": { "start": "0x82BA7B28", "end": "0x82BA83C0", "size": "0x898", "instruction_count": 550 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.265.cpp", "sha256": "4928C6367157ACD1B414E0A2709FB2F10FC5F105E1C977641C5D9FC185ADC5B0", "size": 1023903, "start_line": 21165, "end_line": 22453, "generated_name": "sub_82BA7B28" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "meaning": "device-state pointer", "use": "PM4, cache and resource arrays", "claim_status": "CONFIRMED" },
+          { "register": "r4", "meaning": "page-relative byte offset in [0,0x3FFF]", "use": "Saved as r22 and combined with successive input entries", "claim_status": "BOUNDED INFERENCE" },
+          { "register": "r5", "meaning": "borrowed pointer to 32-bit guest page/address entries", "use": "Read and advanced by four bytes", "claim_status": "CONFIRMED" },
+          { "register": "r6", "meaning": "remaining entry count", "use": "Bounds descriptor/draw loop", "claim_status": "CONFIRMED" },
+          { "register": "r7", "meaning": "resource-record +0x10 dimension bound", "use": "Rounded/aligned for copy geometry", "claim_status": "CONFIRMED" },
+          { "register": "r8", "meaning": "resource-record +0x14 dimension bound", "use": "Rounded/aligned for copy geometry", "claim_status": "CONFIRMED" },
+          { "register": "r9", "meaning": "unused at entry", "use": "Overwritten before use", "claim_status": "CONFIRMED" },
+          { "register": "r10", "meaning": "unused at entry", "use": "Overwritten before use", "claim_status": "CONFIRMED" }
+        ],
+        "stack_arguments": [],
+        "return_behavior": { "meaning": "void-like; sole caller consumes no result", "claim_status": "CONFIRMED" },
+        "implicit_object": { "meaning": "r3 device owns PM4/cached state", "claim_status": "CONFIRMED" }
+      },
+      "persistent_state_offsets": [
+        { "offset": "0x10", "access": "READ_WRITE", "role": "dirty mask", "claim_status": "BOUNDED INFERENCE" },
+        { "offset": "0x20", "access": "READ_WRITE", "role": "dirty mask", "claim_status": "BOUNDED INFERENCE" },
+        { "offset": "0x30", "access": "READ_WRITE", "role": "PM4 cursor", "claim_status": "CONFIRMED" },
+        { "offset": "0x38", "access": "READ", "role": "PM4 capacity boundary", "claim_status": "CONFIRMED" },
+        { "offset": "0x29C0", "access": "READ_WRITE", "role": "cached flags", "claim_status": "BOUNDED INFERENCE" },
+        { "offset": "0x3098", "access": "READ", "role": "four-entry resource array", "claim_status": "BOUNDED INFERENCE" }
+      ],
+      "callback_contract": { "invoked_by": "sub_82BA8928 at 0x82BA8C78", "registration": "Indirectly exposed through the SXDK-003 callback record", "invocation_thread": "UNKNOWN", "record_lifetime": "UNKNOWN" },
+      "call_relationships": {
+        "direct_callers": [{ "address": "0x82BA8928", "site": "0x82BA8C78" }],
+        "key_callees": [
+          { "address": "0x82BA79D0", "site": "0x82BA7F5C", "role": "fixed draw-state/draw emitter" },
+          { "address": "0x82BA77D0", "site": "0x82BA81CC", "role": "texture-fetch descriptor emitter" },
+          { "address": "0x82206888", "site": "0x82BA8338", "role": "vertex-fetch/draw setup" },
+          { "address": "0x821E8EC0", "site": "0x82BA7E08", "role": "capacity helper" },
+          { "address": "0x82BA2748", "site": "0x82BA83AC", "role": "order/submission helper, exact name unknown" }
+        ],
+        "complete_direct_callee_addresses": ["0x821F5028", "0x821FC178", "0x82264590", "0x822869A0", "0x822154B0", "0x8221C7D8", "0x821E8EC0", "0x82213AD8", "0x82CA9480", "0x82BA76F8", "0x82BA79D0", "0x82CA99B0", "0x821FB650", "0x82BA77D0", "0x82206888", "0x821FC320", "0x82BA2748"],
+        "direct_xbox_graphics_imports": []
+      },
+      "thread_queue_ownership": { "producer": "Synchronous on SXDK-003 invocation thread", "consumer": "Asynchronous ReXGlue PM4 consumer", "thread_identity": "UNKNOWN", "ordering": "save/setup/draw/restore order is explicit" },
+      "ownership_lifetime": { "input_entries": "Borrowed for the call", "stack_descriptor": "Borrowed only through each synchronous SXDK-001 call", "guest_resource": "Address survives in PM4; mapping/coherency and retirement join UNKNOWN" },
+      "recursion_reentrancy": { "direct_recursion": false, "indirect_recursion": "No cycle in recovered direct graph", "reentrancy_safety": "UNKNOWN because device cache and cursor are mutated without a proved lock" },
+      "operation": { "family": "render-target/resource copy-scale preparation", "semantics": "Builds texture descriptors, binds fixed shader/draw state, emits GPU work and restores cached state", "claim_status": "BOUNDED INFERENCE" },
+      "side_effects": ["Advances PM4 cursor", "Mutates and restores dirty/cached state", "Emits texture, vertex, shader and draw packets", "Touches resource helpers and possible submission ordering"],
+      "forwarding_obligations": ["Preserve r4 offset and entry iteration", "Preserve exact descriptor transformation", "Preserve state save/restore and dirty masks", "Preserve packet ordering and resource lifetime", "Preserve all helper calls and submission side effects"],
+      "coverage": { "class": "NARROW INTERNAL COPY/SCALE", "covered": "Only SXDK-003 route", "bypasses": ["parallel sub_82BA83C0", "sub_82BAC718", "six general state-to-draw roots"] },
+      "classification": "STRONG STATIC CANDIDATE",
+      "claim_status": "BOUNDED INFERENCE",
+      "confidence": "MEDIUM-HIGH",
+      "missing_facts": ["Dispatcher invocation thread", "exact source protocol types", "resource retirement join", "helper retain/release semantics"],
+      "minimum_promotion_evidence": ["Recover dispatcher ownership/threading and the resource submission-to-retirement contract; confirm helper lifetime effects from all exact use sites."]
+    },
+    {
+      "candidate_id": "SXDK-003",
+      "generated_name": "sub_82BA8928",
+      "boundary": { "start": "0x82BA8928", "end": "0x82BA8D2C", "size": "0x404", "instruction_count": 257 },
+      "generated_mapping": { "path": "generated/default/fable2_recomp.130.cpp", "sha256": "0A6CD19DD979846B81C967F81DE1FD317983968F37E1235F0FA7E1B5DB00A625", "size": 1024438, "start_line": 21039, "end_line": 21616, "generated_name": "sub_82BA8928" },
+      "abi": {
+        "register_arguments": [
+          { "register": "r3", "meaning": "device-state pointer", "use": "Persistent table, limits and delegated PM4", "claim_status": "CONFIRMED" },
+          { "register": "r4", "meaning": "flags", "use": "Bit zero selects table reset/early success", "claim_status": "CONFIRMED" },
+          { "register": "r5", "meaning": "borrowed pointer to 32-bit guest page/address entries", "use": "Dereferenced and advanced", "claim_status": "CONFIRMED" },
+          { "register": "r6", "meaning": "entry count", "use": "Decremented during validation and passed to SXDK-002", "claim_status": "CONFIRMED" },
+          { "register": "r7", "meaning": "page-relative byte offset", "use": "Added to entry, advanced by 0x1000 and wrapped below 0x4000", "claim_status": "BOUNDED INFERENCE" },
+          { "register": "r8", "meaning": "borrowed output pointer", "use": "Receives bounded result copy", "claim_status": "CONFIRMED" },
+          { "register": "r9", "meaning": "output capacity", "use": "Clamps copy to 1560 bytes", "claim_status": "CONFIRMED" },
+          { "register": "r10", "meaning": "unused at entry", "use": "Overwritten before use", "claim_status": "CONFIRMED" }
+        ],
+        "stack_arguments": [],
+        "return_behavior": { "meaning": "r3 status 0, 6 or 7; enum names unknown", "claim_status": "CONFIRMED" },
+        "implicit_object": { "meaning": "r3 device supplied by callback dispatcher", "claim_status": "BOUNDED INFERENCE" }
+      },
+      "persistent_state_offsets": [
+        { "offset": "0x5420", "access": "READ_WRITE", "role": "mode flags", "claim_status": "BOUNDED INFERENCE" },
+        { "offset": "0x54B4", "access": "READ", "role": "first dimension bound", "claim_status": "CONFIRMED" },
+        { "offset": "0x54B8", "access": "READ", "role": "second dimension bound", "claim_status": "CONFIRMED" },
+        { "offset": "0x5528", "access": "CONTAINER", "role": "accepted G1.6A containing table-record base; exact source-level field layout remains unnamed", "claim_status": "BOUNDED INFERENCE" },
+        { "offset": "0x5530", "access": "READ_WRITE", "role": "exact 1536-byte table payload start", "claim_status": "CONFIRMED" },
+        { "offset": "0x5B30", "access": "READ_WRITE", "role": "table-present flag", "claim_status": "BOUNDED INFERENCE" }
+      ],
+      "callback_contract": {
+        "registration": "sub_82BAA2B8 creates a 64-byte stack block whose 60-byte payload begins at +4; device context is at +0, and callback 0x82BA8928 is stored at +0x3C after materialization at 0x82BAA338/0x82BAA358.",
+        "dispatcher": "Global object 0x82000910 virtual slot +0x18, invoked with r3=82 and r4=record pointer.",
+        "proved": "Address exposure and registration record construction.",
+        "unknown": "Whether the dispatcher copies the stack record, callback selection rules, invocation ABI beyond use sites, thread, queue and retention lifetime."
+      },
+      "call_relationships": {
+        "direct_callers": [],
+        "address_taken": [{ "high_site": "0x82BAA338", "low_site": "0x82BAA358", "registrar": "sub_82BAA2B8" }],
+        "key_callees": [
+          { "address": "0x82BAEA88", "site": "0x82BA8AD0", "role": "table/scaler command setup" },
+          { "address": "0x82BA7B28", "site": "0x82BA8C78", "role": "copy/scale draw producer" },
+          { "address": "0x821D1508", "site": "0x82BA8D1C", "role": "input cleanup; exact ownership semantics unknown" }
+        ],
+        "complete_direct_callee_addresses": ["0x82CA99B0", "0x82BA47B8", "0x821E8EC0", "0x82CA9480", "0x82BAEA88", "0x82BA45E0", "0x82BA7B28", "0x821D1508"],
+        "direct_xbox_graphics_imports": []
+      },
+      "thread_queue_ownership": { "producer": "Synchronous after callback invocation", "registrar_thread": "UNKNOWN", "invocation_thread": "UNKNOWN", "consumer": "Asynchronous ReXGlue PM4 consumer", "synchronization": "No explicit lock recovered in method" },
+      "ownership_lifetime": { "registration_record": "Stack-local; safe deferral requires dispatcher copy, not statically proved", "input_entries": "Borrowed through synchronous call", "output": "Borrowed and written before return", "cleanup": "sub_821D1508 occurs after output copy; transfer/release meaning UNKNOWN", "guest_resource_retirement": "UNKNOWN" },
+      "recursion_reentrancy": { "direct_recursion": false, "indirect_recursion": "No cycle in recovered direct graph", "reentrancy_safety": "UNKNOWN due persistent table/device mutation and unresolved scheduler" },
+      "operation": { "family": "resource/target copy-scale callback", "semantics": "Validates translated input, optionally updates a 1536-byte cached table, delegates GPU copy/scale work, copies bounded output and returns status", "claim_status": "BOUNDED INFERENCE" },
+      "side_effects": ["May clear or replace 1536-byte table and flag", "May mutate mode bit", "Writes min(r9,1560) output bytes", "Returns exact status 0/6/7", "Delegates PM4 work", "Calls cleanup after output"],
+      "forwarding_obligations": ["Preserve validation and exact statuses", "Preserve reset and table comparison/copy", "Preserve bounded output before cleanup", "Preserve callback-thread assumptions without inventing affinity", "Preserve delegated GPU order and resource lifetime"],
+      "coverage": { "class": "ONE REGISTERED CALLBACK FAMILY", "covered": "One address-taken registration record", "bypasses": ["parallel sub_82BA83C0", "sub_82BAC718", "general draw-state family"] },
+      "classification": "STRONG STATIC CANDIDATE",
+      "claim_status": "BOUNDED INFERENCE",
+      "confidence": "MEDIUM-HIGH",
+      "missing_facts": ["Dispatcher ABI and record-copy behavior", "invocation thread/queue", "protocol type names", "cleanup ownership", "resource retirement"],
+      "minimum_promotion_evidence": ["Resolve global 0x82000910 dispatcher registration/invocation contract, record retention, thread/queue and cleanup-to-retirement ownership joins."]
+    }
+  ],
+  "lifetime_model": [
+    {
+      "stage": "1_DESCRIPTOR_POINTER",
+      "proved": "SXDK-001 reads all six dwords synchronously and does not retain r5; its borrowed-pointer requirement ends on return.",
+      "not_proved": "Source allocation class or mutability outside the call.",
+      "forwarding_obligation": "Copy or consume all six words before returning; do not retain the caller's temporary descriptor pointer.",
+      "claim_status": "CONFIRMED",
+      "confidence": "HIGH"
+    },
+    {
+      "stage": "2_PM4_PACKET_WORDS",
+      "proved": "Six transformed words and header are copied to the device command buffer and device[0x30] advances.",
+      "not_proved": "Exact host submission time and overwrite/retirement boundary.",
+      "forwarding_obligation": "Preserve packet contents, cursor/capacity semantics and command ordering until consumer ownership transfers.",
+      "claim_status": "CONFIRMED",
+      "confidence": "HIGH"
+    },
+    {
+      "stage": "3_REFERENCED_GUEST_RESOURCE",
+      "proved": "Address bits referring to guest resource memory survive in the emitted descriptor; no retain is visible in SXDK-001.",
+      "not_proved": "Resource identity, allocation owner, mapping/coherency lifetime or a release-to-fence join.",
+      "forwarding_obligation": "Keep the referenced guest memory valid and coherent through asynchronous consumption and preserve invalidation/release ordering.",
+      "claim_status": "BOUNDED INFERENCE",
+      "confidence": "MEDIUM"
+    },
+    {
+      "stage": "4_REXGLUE_XENOS_CACHE",
+      "proved": "Pinned ReXGlue consumes FETCH writes into register state and marks texture constants dirty for later binding/cache use.",
+      "not_proved": "Which Fable draw consumes a given descriptor or the exact title-level invalidation link.",
+      "forwarding_obligation": "Preserve fetch-slot replacement, dirty-state propagation and cache invalidation semantics.",
+      "claim_status": "CONFIRMED",
+      "confidence": "HIGH for consumer semantics; UNKNOWN for title draw join"
+    },
+    {
+      "stage": "5_SUBMISSION_COHERENCY_RETIREMENT",
+      "proved": "Capacity/order helpers and asynchronous consumption boundaries exist around the producer family.",
+      "not_proved": "Fence, interrupt, decommit/release and teardown joins for the referenced guest allocation.",
+      "forwarding_obligation": "Preserve submission order, coherency, invalidation and exact retirement before releasing or reusing guest resource memory.",
+      "claim_status": "UNKNOWN",
+      "confidence": "LOW"
+    }
+  ],
+  "coverage_accounting": {
+    "texture_capable_methods": { "lower_bound": 2, "upper_bound_with_dynamic_metadata": 4, "unbounded_indirect_buffer_content": true },
+    "confirmed_texture_producers": { "count": 2, "ids": ["FETCH-SXDK-001", "FETCH-DIRECT-002"] },
+    "unresolved_dynamic_producers": { "count": 2, "ids": ["FETCH-DYNAMIC-003", "FETCH-DYNAMIC-004"] },
+    "sxdk_001_direct_producers": { "count": 1, "ids": ["FETCH-SXDK-001"], "direct_call_sites": 2, "unique_callers": 2 },
+    "sxdk_001_bypassing_confirmed_producers": { "count": 1, "ids": ["FETCH-DIRECT-002"] },
+    "rejected_non_texture_methods": {
+      "count": 4,
+      "items": [
+        { "generated_name": "sub_821EFAC0", "reason": "Type 0 six-word descriptors have low type bits 3: vertex FETCH." },
+        { "generated_name": "sub_82206888", "reason": "Type 0 six-word descriptors have low type bits 3: vertex FETCH." },
+        { "generated_name": "sub_82205F68", "reason": "Type 0 slot-31 payload contains invalid/vertex types 1,1,3 and no texture type 2." },
+        { "generated_name": "sub_8227D150", "reason": "All ten call-site selector pairs resolve to LOAD_ALU_CONSTANT type 0, never texture FETCH type 1." }
+      ]
+    },
+    "draw_root_bypasses": {
+      "count": 6,
+      "shared_state_method": "sub_8221B010",
+      "routes": [
+        { "caller": "sub_8221C3E8", "state_call": "0x8221C470", "draw_site": "0x8221C6B4" },
+        { "caller": "sub_82217DB8", "state_call": "0x82217E9C", "draw_site": "0x8221819C" },
+        { "caller": "sub_82205F68", "state_call": "0x82206034", "draw_site": "0x822062E8" },
+        { "caller": "sub_82207AF8", "state_call": "0x82207C68", "draw_site": "0x82207F20" },
+        { "caller": "sub_8221C898", "state_call": "0x8221C984", "draw_site": "0x8221CBA8" },
+        { "caller": "sub_8221DFC0", "state_call": "0x8221E04C", "draw_site": "0x8221E2FC" }
+      ],
+      "claim": "These are exact state-to-draw segments that do not call SXDK-001. Calling them ordinary/general draw preparation is a bounded inference; specific title-system identities are unknown."
+    },
+    "unknown_bucket": {
+      "dynamic_selector_methods": 2,
+      "indirect_buffer_builders": ["sub_822866E0", "sub_8219CD68"],
+      "set_state_record_builders": ["sub_831BA458", "sub_831BA630", "sub_831BA810"],
+      "closure_indirect_sites": 4526,
+      "closure_uncovered_executable_bytes": 124624,
+      "treatment": "Not counted as confirmed texture producers and not collapsed into a percentage."
+    },
+    "conclusion": "SXDK-001 is technically qualified but covers only two direct internal calls. A confirmed same-cluster producer and six general state-to-draw segments bypass it; static evidence does not connect it to broad ordinary material rendering."
+  },
+  "title_system_assessment": [
+    { "system": "copy/scale/present cluster", "classification": "NARROW CONNECTION", "claim_status": "BOUNDED INFERENCE", "evidence": "Both SXDK-001 routes and direct producer sub_82BAC718 converge on the accepted sub_82BA34D8 lifecycle/present cluster and emit fixed textured draws." },
+    { "system": "ordinary material/mesh rendering", "classification": "NOT CONNECTED TO SXDK-001", "claim_status": "BOUNDED INFERENCE", "evidence": "Six general state-to-draw roots use sub_8221B010/sub_8222BFA0 and bypass SXDK-001; selector contents remain dynamic." },
+    { "system": "character", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence maps a character draw to any producer." },
+    { "system": "terrain", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence." },
+    { "system": "particles", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence." },
+    { "system": "UI", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence." },
+    { "system": "video", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "BINK executable coverage does not identify a texture producer or route to SXDK-001." },
+    { "system": "post-processing", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence." },
+    { "system": "shadow", "classification": "UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No accepted call chain or state-use evidence." },
+    { "system": "resolve/EDRAM", "classification": "BYPASSES OR UNKNOWN", "claim_status": "UNKNOWN", "evidence": "No qualified resolve/EDRAM semantic method was recovered on the bounded fetch trail; indirect-buffer content remains opaque." }
+  ],
+  "adjacent_methods": [
+    {
+      "candidate_id": "ADJ-FETCH-DRAW-001",
+      "generated_name": "sub_82BAC718",
+      "boundary": { "start": "0x82BAC718", "end": "0x82BAD028", "size": "0x910", "instruction_count": 580 },
+      "operation": "Direct texture FETCH register write, shader load and DRAW_INDX_2 in the present cluster.",
+      "relation": "Confirmed same-cluster bypass of SXDK-001 and therefore material to coverage accounting.",
+      "classification": "STRONG STATIC CANDIDATE",
+      "claim_status": "CONFIRMED",
+      "missing_facts": ["Full ABI", "persistent object contract", "thread identity", "resource retirement", "public operation name"],
+      "minimum_promotion_evidence": ["Complete the G1.6A method qualification fields for this exact one-caller path."]
+    }
+  ],
+  "rejected_hypotheses": [
+    { "hypothesis": "SXDK-001 is a title-wide texture-binding entry point.", "status": "REJECTED", "evidence": "Only two direct calls exist; an independent confirmed texture writer and six general state-to-draw roots bypass it." },
+    { "hypothesis": "The two dynamic LOAD_ALU_CONSTANT helpers are confirmed texture producers.", "status": "REJECTED", "evidence": "Their selector type comes from runtime metadata; code alone does not prove type 1." },
+    { "hypothesis": "Every direct write to 0x4800 is texture state.", "status": "REJECTED", "evidence": "Three direct writers encode vertex or invalid-vertex descriptor types, while only sub_82BAC718 encodes texture type 2." },
+    { "hypothesis": "The three SET_STATE record builders restore texture fetch state.", "status": "REJECTED", "evidence": "No fetch selector is decoded, they use a separate record allocator path, and neither pinned command processor implements SET_STATE execution." },
+    { "hypothesis": "SXDK-003's 60-byte callback payload may be borrowed asynchronously from the registrar stack.", "status": "REJECTED", "evidence": "The record storage is stack-local; safe deferred invocation requires a dispatcher copy, but whether that copy occurs is UNKNOWN." },
+    { "hypothesis": "Static reachability establishes black-dog or player-skin causality.", "status": "REJECTED", "evidence": "No affected-character draw, resource or shader is joined to any recovered producer." }
+  ],
+  "historical_artifact_limitation": {
+    "known_deleted_paths": [
+      "C:/Dev/Fable2Recomp/fable2-run-047.1.log",
+      "C:/Dev/Fable2Recomp/fable2-run-047.log",
+      "C:/Dev/Fable2Recomp/fable2-run-048.log"
+    ],
+    "treatment": "User-confirmed historical deletion before G1.6A. The files were not searched for, recovered, recreated or substituted. Aggregate --verify-artifacts may fail only these existing G1.5D artifact checks; focused G1.6B inputs are verified separately."
+  },
+  "phase_decision": {
+    "result": "STATIC COVERAGE NARROW",
+    "reason": "A correct six-dword texture seam with two direct callers cannot represent ordinary title rendering when another confirmed texture writer and a six-root state-to-draw family bypass it, and the remaining dynamic paths are unresolved rather than evidence of broad coverage.",
+    "next_phase": "Effective configuration/capability snapshot followed by bounded draw-decision correlation design",
+    "next_experiment_id": "EXP-CONFIG-CAP-001",
+    "implementation_authorized": false
+  }
+}

@@ -19,7 +19,7 @@ if (-not (Test-Path -LiteralPath $cmakeCachePath -PathType Leaf)) {
 
 $rexglueDirectoryLine = Select-String `
     -LiteralPath $cmakeCachePath `
-    -Pattern '^rexglue_DIR:PATH=(.+)$'
+    -Pattern '^rexglue_DIR:[^=]+=(.+)$'
 
 if ($null -eq $rexglueDirectoryLine) {
     throw "rexglue_DIR was not found in '$cmakeCachePath'."

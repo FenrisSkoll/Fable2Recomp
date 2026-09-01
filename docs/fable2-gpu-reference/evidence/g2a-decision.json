@@ -1,0 +1,52 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-g2a-decision-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5D",
+  "generated_on": "2026-09-01",
+  "pins": {
+    "fable_branch": "fable2-native-renderer-g1.5-reference",
+    "fable_commit": "3cef954120e062974f3fcdf707ac302aa0e2d44e",
+    "paused_g2a_branch": "fable2-native-renderer-g2a-forwarding-proof",
+    "paused_g2a_commit": "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51",
+    "paused_g2a_tree": "910e80108c2d9e7d8474866506f1c9e23ede601c",
+    "rexglue_commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194"
+  },
+  "part_a": {
+    "decision_id": "G2A-PART-A",
+    "decision": "REVISE G2A BEFORE RESUMING",
+    "preserved_original_design": "CONFIRMED SOURCE VALID: the strong sub_82BA34D8 wrapper delegates to a distinct __imp__sub_82BA34D8 original body, and synthetic disabled/enabled/recursion cases passed. Linked production behavior remains unproved.",
+    "linked_binary_value": "Still worth proving as a bounded mechanism result because it validates the general preserved-original wrapper technique and can later support swap correlation. It cannot diagnose the black surfaces.",
+    "capture_infrastructure_proportionality": "The checkpoint's session writer, summaries, generalized records and lifecycle are disproportionate to a single present-hook exact-once proof. They also add noexcept filesystem/logging risks that are unrelated to mechanism.",
+    "boundary_fitness": "sub_82BA34D8 retains enough information for exact-once forwarding and title swap correlation (device/front-buffer-like r3/r4 plus flags) but loses shader, texture, register, draw, EDRAM and resource-lifetime provenance.",
+    "retain": [
+      "Strong wrapper symbol sub_82BA34D8.",
+      "Distinct preserved original symbol __imp__sub_82BA34D8.",
+      "Default-off and fail-open forwarding.",
+      "Synthetic disabled, enabled, exception and recursion exact-once fixtures.",
+      "Source verifier checks that the generated body remains untouched.",
+      "Only bounded counters or linked symbol evidence needed for the mechanism result."
+    ],
+    "remove_or_defer": [
+      "General session/capture writer and extensible record infrastructure.",
+      "r3/r4 metadata capture beyond what a later separately designed swap-correlation experiment requires.",
+      "Partial summaries, file rotation and lifecycle behavior not needed to prove exact-once.",
+      "Benchmarks and gameplay validation until a separately authorized evidence experiment needs the hook.",
+      "Debug packaging/link work solely to solve the current _ITERATOR_DEBUG_LEVEL mismatch."
+    ],
+    "validation_route": "Revise on the paused G2A branch, build/link the normal Release production target, prove wrapper/original symbol separation and exact-once behavior with synthetic/default-off routes, and treat Debug packaging as separate future work. Do not use the Debug _ITERATOR_DEBUG_LEVEL mismatch as renderer evidence.",
+    "rationale": "This follows from the exact source/checkpoint evidence: the wrapper mechanism is sound enough to justify a smaller linked proof, while its present-only metadata is too weak for the primary defect question. Sunk cost is not a reason to retain the generalized capture framework.",
+    "experiment_ids": [
+      "EXP-G2A-LINK-001",
+      "EXP-SWAP-CORRELATION-001"
+    ]
+  },
+  "part_b": {
+    "decision_id": "G2-PART-B",
+    "decision": "STATIC XDK METHOD RECOVERY",
+    "timing_relative_to_part_a": "INDEPENDENTLY",
+    "rationale": "G1 proves lifecycle and swap functions but not draw/resource/shader/target methods. Recovering one representative exact TU1 static XDK method is the smallest safe test of the preferred semantic boundary and should be prioritized before designing low-level runtime metadata. Part A may be completed separately because safe forwarding and useful diagnosis are different questions.",
+    "first_experiment_id": "EXP-STATIC-XDK-001"
+  },
+  "relationship": "Part A is a mechanism-only gate and remains insufficient for the black-surface investigation. Part B is the primary next evidence-acquisition gate; it can proceed independently and should be prioritized before any runtime correlation design.",
+  "authorization": "DECISION ONLY; DO NOT RESUME OR IMPLEMENT"
+}

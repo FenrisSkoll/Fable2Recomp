@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-fable-relevance-v1.schema.json",
+  "title": "Fable II G1.5D divergence relevance assessment",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "pins",
+    "authoritative_input",
+    "evidence_ladder",
+    "fable_evidence",
+    "records",
+    "counts"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "corpus": {
+      "const": "Fable II Native Renderer G1.5D"
+    },
+    "generated_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "pins": {
+      "type": "object",
+      "required": [
+        "fable_repository",
+        "g1",
+        "paused_g2a",
+        "rexglue_repository",
+        "canary_repository",
+        "active_gpu_artifact"
+      ]
+    },
+    "authoritative_input": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256",
+        "record_count"
+      ]
+    },
+    "evidence_ladder": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "$ref": "#/$defs/ladder"
+      }
+    },
+    "fable_evidence": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "records": {
+      "type": "array",
+      "minItems": 37,
+      "maxItems": 37,
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "records",
+        "by_source_confidence",
+        "by_fable_reachability",
+        "by_causal_relevance",
+        "by_applicability"
+      ]
+    }
+  },
+  "$defs": {
+    "classificationSource": {
+      "enum": [
+        "CONFIRMED SOURCE",
+        "PROBABLE SOURCE",
+        "UNKNOWN SOURCE",
+        "NOT APPLICABLE"
+      ]
+    },
+    "classificationReachability": {
+      "enum": [
+        "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "CONFIRMED TU1 STATIC REACHABILITY",
+        "PROBABLE FOR FABLE II",
+        "UNKNOWN FOR FABLE II",
+        "NOT OBSERVED IN RUN 047/048",
+        "NOT APPLICABLE TO CURRENT FABLE ARTIFACT"
+      ]
+    },
+    "classificationCausal": {
+      "enum": [
+        "CAUSALLY CONFIRMED",
+        "SUPPORTED CANDIDATE",
+        "PLAUSIBLE BUT UNCORRELATED",
+        "CONTRADICTED BY EXISTING EVIDENCE",
+        "NOT RELEVANT TO THIS SYMPTOM",
+        "UNKNOWN"
+      ]
+    },
+    "applicability": {
+      "enum": [
+        "hosting/integration only",
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract",
+        "future enhancement only",
+        "current artifact not applicable"
+      ]
+    },
+    "ladder": {
+      "type": "object",
+      "required": [
+        "level",
+        "definition",
+        "status",
+        "proven",
+        "source_connected_only",
+        "gap_to_next",
+        "experiment_ids"
+      ],
+      "properties": {
+        "level": {
+          "pattern": "^L[0-5]$"
+        },
+        "definition": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "REACHED",
+            "NOT REACHED"
+          ]
+        },
+        "proven": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_connected_only": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gap_to_next": {
+          "type": "string"
+        },
+        "experiment_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^EXP-[A-Z0-9-]+$"
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "evidence_id",
+        "kind",
+        "path",
+        "status",
+        "facts"
+      ],
+      "properties": {
+        "evidence_id": {
+          "pattern": "^FBL-[A-Z0-9-]+$"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer"
+        },
+        "sha256": {
+          "pattern": "^[0-9A-F]{64}$"
+        },
+        "status": {
+          "enum": [
+            "COMMITTED",
+            "IGNORED LOCAL",
+            "EXTERNAL LOCAL",
+            "STATIC SOURCE"
+          ]
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "required": [
+        "repository",
+        "commit",
+        "paths",
+        "summary"
+      ],
+      "properties": {
+        "repository": {
+          "enum": [
+            "rexglue",
+            "canary"
+          ]
+        },
+        "commit": {
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "paths": {
+          "type": "array",
+          "minItems": 1
+        },
+        "summary": {
+          "type": "string"
+        }
+      }
+    },
+    "evidenceDimension": {
+      "type": "object",
+      "required": [
+        "classification",
+        "evidence_refs",
+        "rationale"
+      ],
+      "properties": {
+        "classification": {
+          "type": "string"
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "pattern": "^FBL-[A-Z0-9-]+$"
+          }
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "gap": {
+      "type": "object",
+      "required": [
+        "exact_missing_fact",
+        "minimum_evidence_needed",
+        "observation_symbol_or_address",
+        "static_analysis_can_obtain",
+        "later_tooling_required",
+        "user_gameplay_required",
+        "decision_unlocked"
+      ],
+      "properties": {
+        "exact_missing_fact": {
+          "type": "string"
+        },
+        "minimum_evidence_needed": {
+          "type": "string"
+        },
+        "observation_symbol_or_address": {
+          "type": "string"
+        },
+        "static_analysis_can_obtain": {
+          "enum": [
+            "YES",
+            "PARTIAL",
+            "NO"
+          ]
+        },
+        "later_tooling_required": {
+          "type": "boolean"
+        },
+        "user_gameplay_required": {
+          "type": "boolean"
+        },
+        "decision_unlocked": {
+          "type": "string"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "record_id",
+        "subsystem",
+        "behaviour",
+        "source_identity",
+        "source_confidence",
+        "fable_reachability",
+        "causal_relevance",
+        "applicability",
+        "configuration_inputs",
+        "minimum_discriminating_evidence",
+        "later_observation_boundaries",
+        "open_question_ids",
+        "experiment_ids",
+        "evidence_gap"
+      ],
+      "properties": {
+        "record_id": {
+          "pattern": "^[A-Z]{2,3}-[0-9]{3}$"
+        },
+        "subsystem": {
+          "type": "string"
+        },
+        "behaviour": {
+          "type": "string"
+        },
+        "source_identity": {
+          "type": "object",
+          "required": [
+            "direction",
+            "rexglue",
+            "canary",
+            "material_divergences",
+            "historical_provenance"
+          ],
+          "properties": {
+            "direction": {
+              "type": "string"
+            },
+            "rexglue": {
+              "$ref": "#/$defs/implementation"
+            },
+            "canary": {
+              "$ref": "#/$defs/implementation"
+            },
+            "material_divergences": {
+              "type": "array"
+            },
+            "historical_provenance": {
+              "type": "object"
+            }
+          }
+        },
+        "source_confidence": {
+          "$ref": "#/$defs/classificationSource"
+        },
+        "fable_reachability": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/evidenceDimension"
+            },
+            {
+              "properties": {
+                "classification": {
+                  "$ref": "#/$defs/classificationReachability"
+                }
+              }
+            }
+          ]
+        },
+        "causal_relevance": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/evidenceDimension"
+            },
+            {
+              "properties": {
+                "classification": {
+                  "$ref": "#/$defs/classificationCausal"
+                }
+              }
+            }
+          ]
+        },
+        "applicability": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/applicability"
+          }
+        },
+        "configuration_inputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "minimum_discriminating_evidence": {
+          "type": "string"
+        },
+        "later_observation_boundaries": {
+          "type": "array",
+          "items": {
+            "pattern": "^(G1|REX)-[A-Z0-9-]+$"
+          }
+        },
+        "open_question_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^OQ-[A-Z0-9-]+$"
+          }
+        },
+        "experiment_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^EXP-[A-Z0-9-]+$"
+          }
+        },
+        "evidence_gap": {
+          "$ref": "#/$defs/gap"
+        }
+      }
+    }
+  }
+}

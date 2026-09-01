@@ -1,0 +1,269 @@
+{
+  "schema": "fable2-native-renderer-hook-inventory",
+  "schema_version": 1,
+  "workstream_gate": "G1",
+  "result": "PASS WITH LIMITATIONS",
+  "target": {
+    "title": "Fable II Game of the Year Edition",
+    "title_id": "0x4D5307F1",
+    "media_id": "0x716F0A0D",
+    "title_update": "TU1",
+    "version": "0.0.1.26",
+    "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+    "xexp_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+    "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "executable_fingerprint": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357"
+  },
+  "confidence_counts": {
+    "confirmed": 5,
+    "strong_hypothesis": 4,
+    "weak_hypothesis": 2
+  },
+  "operation_coverage": [
+    { "operation": "device_create", "status": "strong_hypothesis", "candidates": ["0x82B6EA60", "0x82B6F6C0", "0x82BA6990"] },
+    { "operation": "device_destroy", "status": "confirmed_lifecycle_only", "candidates": ["0x82BA6968", "0x82BA6C18"] },
+    { "operation": "resource_surface_create", "status": "unknown", "candidates": [] },
+    { "operation": "texture_vertex_index_lock_unlock", "status": "unknown", "candidates": [] },
+    { "operation": "render_target_depth_surface", "status": "unknown", "candidates": [] },
+    { "operation": "vertex_declaration_stream_source", "status": "unknown", "candidates": [] },
+    { "operation": "shader_create_bind", "status": "unknown", "candidates": [] },
+    { "operation": "shader_constants", "status": "unknown", "candidates": [] },
+    { "operation": "textures_sampler_state", "status": "unknown", "candidates": [] },
+    { "operation": "render_blend_depth_raster_viewport_scissor_state", "status": "unknown", "candidates": [] },
+    { "operation": "clear", "status": "unknown", "candidates": [] },
+    { "operation": "primitive_indexed_draw", "status": "unknown", "candidates": [] },
+    { "operation": "resolve_copy", "status": "raw_pm4_only", "candidates": [] },
+    { "operation": "query_predication_synchronization", "status": "raw_pm4_only", "candidates": [] },
+    { "operation": "swap_present", "status": "confirmed", "candidates": ["0x82B6FA48", "0x82BA34D8"] },
+    { "operation": "engine_render_command_queue", "status": "strong_hypothesis", "candidates": ["0x82AAC208"] }
+  ],
+  "candidates": [
+    {
+      "guest_address": "0x82AAC208",
+      "exclusive_end": "0x82AAC54C",
+      "size": "0x344",
+      "generated_name": "sub_82AAC208",
+      "confidence": "strong_hypothesis",
+      "role": "Lionhead asynchronous render-command queue processing",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 209 PPC instructions",
+        "TU1 string reference at 0x82AAC254 to ProcessAsyncCommandQueues timing label",
+        "exact-image Ghidra data reference at 0x82AAA2E8",
+        "Ghidra .pdata record 0x82133E70"
+      ],
+      "direct_callers": [],
+      "indirect_callers_or_refs": ["data reference 0x82AAA2E8"],
+      "observed_arguments_and_layout": "Generated body is consistent with an object method and queue processing, but G1 did not establish a stable public command structure or per-command layout.",
+      "distinguishing_evidence": "The title-owned diagnostic label identifies queue processing; no evidence yet proves this function is the enqueue boundary or that commands preserve D3D semantics.",
+      "forwarding": "conditional",
+      "expected_side_effects_and_risks": "May consume multiple queues, mutate queue ownership, signal synchronization, or recurse into Xbox graphics methods. Hook only after thread/order behaviour is traced.",
+      "seam_disposition": "engine_boundary_discovery_lead"
+    },
+    {
+      "guest_address": "0x82B6EA60",
+      "exclusive_end": "0x82B6EBC0",
+      "size": "0x160",
+      "generated_name": "sub_82B6EA60",
+      "confidence": "strong_hypothesis",
+      "role": "title-level graphics device creation orchestration",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 88 PPC instructions",
+        "directly calls sub_82B6F6C0",
+        "later invokes the presentation path"
+      ],
+      "direct_callers": ["0x82A1AC98"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Prepares device initialization inputs and calls the lower allocation/initialization bridge; complete input structure semantics are not confirmed.",
+      "distinguishing_evidence": "It is above Vd/ring setup and coordinates title state, but could be a Fable wrapper rather than the Xbox CreateDevice implementation.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Global device publication, ownership, initial presentation, and failure cleanup must remain byte-for-byte guest behaviour.",
+      "seam_disposition": "shadow_lifecycle_candidate"
+    },
+    {
+      "guest_address": "0x82B6F6C0",
+      "exclusive_end": "0x82B6F9CC",
+      "size": "0x30C",
+      "generated_name": "sub_82B6F6C0",
+      "confidence": "strong_hypothesis",
+      "role": "graphics device allocation and initialization bridge",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 195 PPC instructions",
+        "allocates 0x5E80 bytes",
+        "passes the object and a 0x7C-byte initialization/presentation block to sub_82BA6990",
+        "Ghidra .pdata record 0x82136A80"
+      ],
+      "direct_callers": ["0x82B6EA60"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "The allocated device-like object is 0x5E80 bytes. A 0x7C-byte block is forwarded into the confirmed GPU/device initializer.",
+      "distinguishing_evidence": "Allocation size, downstream Vd initialization, and title creation flow distinguish it from a small thunk; the exact XDK API name is unconfirmed.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Allocation identity, constructor ordering, virtual/function tables, reference counts, and failure cleanup must be preserved.",
+      "seam_disposition": "shadow_lifecycle_candidate"
+    },
+    {
+      "guest_address": "0x82B6FA48",
+      "exclusive_end": "0x82B6FBE0",
+      "size": "0x198",
+      "generated_name": "sub_82B6FA48",
+      "confidence": "strong_hypothesis",
+      "role": "title-level frame/present coordinator",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 102 PPC instructions",
+        "direct call to sub_82BA34D8",
+        "Ghidra .pdata record 0x82136A90"
+      ],
+      "direct_callers": ["0x82A1B560"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Loads the global device, manages related object references, and passes a device plus front-buffer/surface-like object into sub_82BA34D8.",
+      "distinguishing_evidence": "It retains title object/reference semantics above the confirmed VdSwap emitter, but G1 does not prove it is the sole engine frame boundary.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Reference lifetime, frame pacing, error propagation, and any re-entrant presentation callbacks must remain unchanged.",
+      "seam_disposition": "shadow_present_candidate"
+    },
+    {
+      "guest_address": "0x82BA2830",
+      "exclusive_end": "0x82BA2CA0",
+      "size": "0x470",
+      "generated_name": "sub_82BA2830",
+      "confidence": "confirmed",
+      "role": "Xbox graphics command/ring transport setup",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 284 PPC instructions",
+        "direct imports VdInitializeRingBuffer, VdEnableRingBufferRPtrWriteBack, and VdSetSystemCommandBufferGpuIdentifierAddress",
+        "Ghidra .pdata record 0x82137788"
+      ],
+      "direct_callers": ["0x821C3858", "0x82B6EBC0", "0x82B6F4C0", "0x82BA6990", "0x82BA6C18"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Operates on the device object and allocates/configures guest physical command buffers, read-pointer writeback, and GPU identifier storage.",
+      "distinguishing_evidence": "Named Vd imports prove transport setup rather than a semantic draw/resource API.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Guest physical allocations, MMIO-visible addresses, ring ownership, and writeback setup are renderer-critical and must not be bypassed.",
+      "seam_disposition": "transport_oracle_not_native_seam"
+    },
+    {
+      "guest_address": "0x82BA34D8",
+      "exclusive_end": "0x82BA3BFC",
+      "size": "0x724",
+      "generated_name": "sub_82BA34D8",
+      "confidence": "confirmed",
+      "role": "Xbox graphics swap/present command emitter",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 457 PPC instructions",
+        "direct imports VdGetSystemCommandBuffer and VdSwap",
+        "Ghidra .pdata record 0x821377C0",
+        "exact-image Ghidra call reference at 0x82B6FB00"
+      ],
+      "direct_callers": ["0x82B6EA60", "0x82B6F1D0", "0x82B6FA48", "0x82BA5D08"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Callers pass r3 as a device-like object, r4 as a front-buffer/surface-like object, and r5 as flags. The function obtains a system command buffer and reaches VdSwap.",
+      "distinguishing_evidence": "The VdSwap call proves presentation transport. Its large body and command-buffer management distinguish it from a thunk; it is below the title coordinator but above PM4 consumption.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Must preserve command-buffer writes, front-buffer metadata, pacing, callbacks, synchronization, return value, and all guest-visible errors.",
+      "seam_disposition": "primary_confirmed_shadow_hook"
+    },
+    {
+      "guest_address": "0x82BA6968",
+      "exclusive_end": "0x82BA6990",
+      "size": "0x28",
+      "generated_name": "sub_82BA6968",
+      "confidence": "confirmed",
+      "role": "compact Xbox graphics engine shutdown helper",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 10 PPC instructions",
+        "direct import VdShutdownEngines",
+        "Ghidra .pdata record 0x821378C0"
+      ],
+      "direct_callers": [],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Forwards a device/engine shutdown operation; no additional stable object layout was established.",
+      "distinguishing_evidence": "The VdShutdownEngines import confirms lifecycle semantics; absence of a generated direct caller leaves invocation ownership unresolved.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "May be indirect/function-table invoked. Duplicate shutdown or missing engine teardown would be fatal.",
+      "seam_disposition": "shadow_lifecycle_candidate"
+    },
+    {
+      "guest_address": "0x82BA6990",
+      "exclusive_end": "0x82BA6C18",
+      "size": "0x288",
+      "generated_name": "sub_82BA6990",
+      "confidence": "confirmed",
+      "role": "Xbox graphics device/engine initialization",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 162 PPC instructions",
+        "direct imports VdInitializeEngines and VdSetGraphicsInterruptCallback",
+        "calls sub_82BA2830",
+        "Ghidra .pdata record 0x821378C8",
+        "exact-image Ghidra call reference at 0x82B6F928"
+      ],
+      "direct_callers": ["0x82B6F6C0"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Receives the 0x5E80-byte device-like allocation and 0x7C-byte initialization block. Initializes critical sections at device offsets 0x3A60 and 0x3A7C before engine/ring setup.",
+      "distinguishing_evidence": "Vd engine/interrupt imports and downstream ring setup prove GPU lifecycle initialization; the public XDK function name remains unknown.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Critical-section state, interrupt callback, guest ring allocation, and partial-initialization cleanup must stay exact.",
+      "seam_disposition": "shadow_lifecycle_candidate"
+    },
+    {
+      "guest_address": "0x82BA6C18",
+      "exclusive_end": "0x82BA6EB8",
+      "size": "0x2A0",
+      "generated_name": "sub_82BA6C18",
+      "confidence": "confirmed",
+      "role": "Xbox graphics device shutdown",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 168 PPC instructions",
+        "direct imports VdSetGraphicsInterruptCallback and VdShutdownEngines",
+        "Ghidra .pdata record 0x821378D0"
+      ],
+      "direct_callers": ["0x82A4DB78", "0x82A8A840", "0x82B6F9D0", "0x82BA2218"],
+      "indirect_callers_or_refs": [],
+      "observed_arguments_and_layout": "Operates on the device object, disables the graphics callback, tears down engine/ring state, and participates in object cleanup.",
+      "distinguishing_evidence": "Named shutdown and callback imports prove the lifecycle role; it is a full cleanup routine rather than a thunk.",
+      "forwarding": "yes",
+      "expected_side_effects_and_risks": "Ordering against in-flight work, callback removal, ring teardown, guest allocations, and references must be preserved.",
+      "seam_disposition": "shadow_lifecycle_candidate"
+    },
+    {
+      "guest_address": "0x8328D6F8",
+      "exclusive_end": "0x8328D744",
+      "size": "0x4C",
+      "generated_name": "sub_8328D6F8",
+      "confidence": "weak_hypothesis",
+      "role": "Outline Renderer registration or construction",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 19 PPC instructions",
+        "TU1 reference at 0x8328D70C to label Outline Renderer",
+        "exact-image Ghidra data reference at 0x832D5504",
+        "Ghidra .pdata record 0x82162C00"
+      ],
+      "direct_callers": [],
+      "indirect_callers_or_refs": ["data reference 0x832D5504"],
+      "observed_arguments_and_layout": "G1 did not establish a renderer object layout or a render-operation ABI.",
+      "distinguishing_evidence": "The label proves an engine renderer concept exists, but not that this short function submits rendering work; it may only register a subsystem/type.",
+      "forwarding": "conditional",
+      "expected_side_effects_and_risks": "Hooking a registration constructor could corrupt startup/type tables while yielding no frame commands.",
+      "seam_disposition": "do_not_hook_without_more_evidence"
+    },
+    {
+      "guest_address": "0x83290138",
+      "exclusive_end": "0x83290184",
+      "size": "0x4C",
+      "generated_name": "sub_83290138",
+      "confidence": "weak_hypothesis",
+      "role": "LightingManager Renderer registration or construction",
+      "provenance": [
+        "exact TU1 generated ReXGlue body: 19 PPC instructions",
+        "TU1 reference at 0x8329014C to label LightingManager Renderer",
+        "exact-image Ghidra data reference at 0x832D57C4",
+        "Ghidra .pdata record 0x82162EE8"
+      ],
+      "direct_callers": [],
+      "indirect_callers_or_refs": ["data reference 0x832D57C4"],
+      "observed_arguments_and_layout": "G1 did not establish a renderer object layout or a render-operation ABI.",
+      "distinguishing_evidence": "The label proves a Lionhead renderer identity, not a command/draw method. The function may only register or construct it.",
+      "forwarding": "conditional",
+      "expected_side_effects_and_risks": "Premature hooking risks registration/type initialization with no semantic capture value.",
+      "seam_disposition": "do_not_hook_without_more_evidence"
+    }
+  ]
+}

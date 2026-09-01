@@ -1,0 +1,1025 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-experiment-backlog-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5D",
+  "generated_on": "2026-09-01",
+  "pins": {
+    "fable_commit": "3cef954120e062974f3fcdf707ac302aa0e2d44e",
+    "rexglue_commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+    "active_dll_sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99"
+  },
+  "capture_root_contract": {
+    "requirement": "Every future runtime record must be placed beneath a per-run directory under out/gpu-evidence-runs only after git check-ignore confirms the exact directory is ignored.",
+    "forbidden_locations": [
+      "repository documentation directories",
+      "generated source directories",
+      "game assets",
+      "user save/profile directories",
+      "reference repositories"
+    ],
+    "verification": "Before and after each later experiment: git check-ignore -v <exact-directory>, git status --short --untracked-files=all, bounded size/file count, then retain or delete only that exact verified directory."
+  },
+  "experiments": [
+    {
+      "experiment_id": "EXP-STATIC-XDK-001",
+      "order": 1,
+      "type": "STATIC",
+      "question_answered": "Can exact TU1 static analysis recover representative draw, resource, shader and render-target methods with a stable ABI, or is recovery currently blocked?",
+      "hypothesis": "Static Xbox D3D/XDK code near the confirmed lifecycle/swap cluster retains more useful title semantics than PM4 and can be identified without execution.",
+      "exact_source_symbol_or_guest_boundary": [
+        "TU1 loaded post-patch image SHA-256 BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+        "sub_82B6EA60",
+        "sub_82B6F6C0",
+        "sub_82B6FA48",
+        "sub_82BA34D8",
+        "sub_82AAC208 discovery lead"
+      ],
+      "minimum_fields_required": [
+        "candidate guest start/end/size",
+        "exact callers/callees and Xbox graphics imports",
+        "r3-r10 and stack argument use",
+        "persistent object offsets and state mutations",
+        "thread/queue evidence",
+        "operation coverage and forwarding side effects",
+        "explicit recovery-blocked reason if no representative method qualifies"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "new executable bytes or disassembly bodies in committed evidence"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": false,
+        "fail_open": false,
+        "requirements": [
+          "Read-only analysis only; no runtime switch exists."
+        ]
+      },
+      "control_run": "Not applicable. Reproduce results against the exact TU1 image and compare only with accepted G1 addresses.",
+      "user_action": "None.",
+      "criteria": {
+        "pass": "At least one representative method has exact TU1 boundary, ABI, ownership/threading, side effects and operation meaning; or a precise, reproducible blocker is documented.",
+        "fail": "A candidate is promoted from a name/string/call resemblance without exact ABI and control-flow evidence.",
+        "inconclusive": "Semantics are plausible but ABI, coverage, ownership or threading remains ambiguous."
+      },
+      "rollback": "No repository/runtime state changes beyond documentation; discard only incorrect documentation edits.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "PRIVATE EXECUTABLE DERIVATIVE RISK",
+        "notes": "Commit addresses, hashes, ranges and provenance only; never commit executable bytes."
+      },
+      "dependencies": [],
+      "decision_unlocked": "Determines whether the preferred high semantic seam is viable and whether low-level correlation should be the next primary gate.",
+      "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-G2A-LINK-001",
+      "order": 2,
+      "type": "BUILD/ABI",
+      "question_answered": "Can a revised minimal sub_82BA34D8 wrapper link in the production Release binary and forward exactly once with disabled/enabled and recursion guards intact?",
+      "hypothesis": "The preserved-original __imp__sub_82BA34D8 design is mechanically valid, but the general capture infrastructure is unnecessary for this proof.",
+      "exact_source_symbol_or_guest_boundary": [
+        "sub_82BA34D8",
+        "__imp__sub_82BA34D8",
+        "paused checkpoint 47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51"
+      ],
+      "minimum_fields_required": [
+        "linked symbol/RVA proof",
+        "disabled wrapper count/original count",
+        "enabled wrapper count/original count",
+        "recursion-case wrapper/original counts",
+        "exception/fail-open result",
+        "Release binary identity"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "guest r3/r4 memory dereferences",
+        "general session/capture records"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Preserved original executes exactly once on every path.",
+          "No production log or file output is required for exact-once proof."
+        ]
+      },
+      "control_run": "Unmodified accepted Release binary or hook compiled default-off, followed by synthetic exact-once fixtures.",
+      "user_action": "None for build/synthetic proof; runtime execution is a separately authorized later step.",
+      "criteria": {
+        "pass": "Release links the wrapper and original as distinct symbols; all synthetic/default-off/on/recursion cases execute the original exactly once.",
+        "fail": "Link fails, symbol identity collapses, original count differs from one, or an exception can suppress forwarding.",
+        "inconclusive": "Source/synthetic proof passes but no linked Release symbol proof exists."
+      },
+      "rollback": "Revert the revised G2A branch commit; do not touch the accepted G1.5 documentation branch runtime.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "NO PAYLOAD CAPTURE",
+        "notes": "Build/link change only; runtime use remains unauthorized."
+      },
+      "dependencies": [],
+      "decision_unlocked": "Completes or rejects the swap-hook mechanism proof without claiming diagnostic value.",
+      "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-CONFIG-CAP-001",
+      "order": 3,
+      "type": "RUNTIME METADATA",
+      "question_answered": "What effective GPU configuration and D3D12 host capabilities apply to the exact active DLL and RTX 5080?",
+      "hypothesis": "Several candidate paths are gated by configuration or capability, so source identity alone cannot establish applicability.",
+      "exact_source_symbol_or_guest_boundary": [
+        "anisotropic_override",
+        "clear_memory_page_state",
+        "async_shader_compilation",
+        "D3D12 provider capability initialization",
+        "PipelineCache::ConfigurePipeline"
+      ],
+      "minimum_fields_required": [
+        "active DLL SHA-256 and size",
+        "adapter name/vendor/device",
+        "backend",
+        "effective anisotropic_override",
+        "effective clear_memory_page_state",
+        "effective async_shader_compilation",
+        "draw resolution scale and ROV/interlock selection",
+        "vblank/vsync/present mode",
+        "D3D12 alpha-factor capability",
+        "listed D3D12 feature tiers already present in Run 047/048"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "full process environment",
+        "unrelated filesystem paths"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Emit once after configuration is finalized.",
+          "If metadata output fails, continue with unchanged effective settings."
+        ]
+      },
+      "control_run": "Same exact binary with snapshot disabled; compare only initialization outcome and artifact identity.",
+      "user_action": "Launch and exit at the shortest authorized no-input checkpoint; no gameplay.",
+      "criteria": {
+        "pass": "One bounded record contains every required effective value and exact artifact/adapter identity.",
+        "fail": "Enabling the snapshot changes any setting, startup outcome or GPU provider selection.",
+        "inconclusive": "Any required value remains implicit/default-derived rather than recorded."
+      },
+      "rollback": "Disable the single metadata switch and delete only the verified ignored experiment directory.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "SYSTEM METADATA ONLY",
+        "notes": "No payload, process environment or unrelated paths."
+      },
+      "dependencies": [],
+      "decision_unlocked": "Determines applicability of CFG-001, PIP-002 and PIP-003 and conditions all later conclusions.",
+      "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-SWAP-CORRELATION-001",
+      "order": 4,
+      "type": "RUNTIME METADATA",
+      "question_answered": "How do TU1 sub_82BA34D8 calls relate to VdSwap, XE_SWAP, guest-output mailbox refresh and DXGI Present?",
+      "hypothesis": "Monotonic IDs can establish correlation without frame images or draw payloads; the mapping may not be one-to-one.",
+      "exact_source_symbol_or_guest_boundary": [
+        "sub_82BA34D8",
+        "VdSwap_entry",
+        "PM4_XE_SWAP",
+        "Presenter::RefreshGuestOutput",
+        "D3D12Presenter::PaintAndPresentImpl"
+      ],
+      "minimum_fields_required": [
+        "monotonic swap_id",
+        "boundary name",
+        "host monotonic timestamp",
+        "guest thread ID at title/import boundary",
+        "ring/submission sequence at XE_SWAP",
+        "mailbox generation",
+        "present sequence/result"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "front-buffer contents",
+        "r3/r4 guest object dereferences"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Bounded ring buffer or line count.",
+          "Forward original before optional record failure.",
+          "Drop records rather than block presentation."
+        ]
+      },
+      "control_run": "Same checkpoint with correlation disabled; startup and presentation must match.",
+      "user_action": "At an authorized checkpoint, load the designated save, remain stationary for five seconds, then exit normally.",
+      "criteria": {
+        "pass": "Every recorded title swap maps deterministically to its downstream events or an explicitly classified drop/coalesce path.",
+        "fail": "Correlation changes forwarding, mailbox publication or present behavior.",
+        "inconclusive": "IDs are missing at a hop or events cannot be joined unambiguously."
+      },
+      "rollback": "Disable correlation and remove only the verified ignored bounded records.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "METADATA ONLY",
+        "notes": "No images, guest object contents or gameplay input text."
+      },
+      "dependencies": [
+        "EXP-G2A-LINK-001"
+      ],
+      "decision_unlocked": "Establishes presentation correlation and whether the swap wrapper has continuing evidence value.",
+      "estimated_evidence_level": "L2"
+    },
+    {
+      "experiment_id": "EXP-DRAW-DECISION-001",
+      "order": 5,
+      "type": "RUNTIME METADATA",
+      "question_answered": "For each bounded draw, did ReXGlue render, produce no effect, reject zero extent, wait/skip for a pending pipeline, or fail?",
+      "hypothesis": "A compact IssueDraw outcome record is the smallest low-level discriminator before any resource capture.",
+      "exact_source_symbol_or_guest_boundary": [
+        "D3D12CommandProcessor::IssueDraw",
+        "PrimitiveProcessor::Process",
+        "PipelineCache::ConfigurePipeline",
+        "D3D12CommandProcessor::EndSubmission"
+      ],
+      "minimum_fields_required": [
+        "frame/swap correlation ID if available",
+        "submission_id",
+        "draw_id",
+        "opcode/topology",
+        "indexed flag and counts",
+        "computed extent class",
+        "predication result",
+        "primitive processing result",
+        "pipeline hash/readiness",
+        "outcome enum RENDERED|NO_EFFECT|ZERO_EXTENT|PENDING_PIPELINE|FAILURE",
+        "failure/skip reason enum"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "complete register dumps"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Fixed-size record and bounded count.",
+          "Record failure drops metadata only.",
+          "No draw decision may depend on capture state."
+        ]
+      },
+      "control_run": "Same scene and binary with metadata disabled.",
+      "user_action": "Load the designated Run 047 comparison save, reach the exact stationary character/dog viewpoint, wait five seconds, then exit.",
+      "criteria": {
+        "pass": "Every bounded IssueDraw has one terminal outcome and can join submission and optional swap IDs.",
+        "fail": "Capture changes draw count/outcome or a record failure affects rendering.",
+        "inconclusive": "Outcomes are ambiguous, unbounded, or cannot be correlated."
+      },
+      "rollback": "Disable metadata and delete only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "METADATA ONLY",
+        "notes": "High event rate requires strict bounds; no payloads."
+      },
+      "dependencies": [
+        "EXP-STATIC-XDK-001",
+        "EXP-CONFIG-CAP-001"
+      ],
+      "decision_unlocked": "Reaches L3 draw decisions and selects which shader/resource experiments are warranted.",
+      "estimated_evidence_level": "L3"
+    },
+    {
+      "experiment_id": "EXP-SHADER-IDENTITY-001",
+      "order": 6,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Which privacy-preserving shader and pipeline identities belong to affected draws, and do they contain candidate operation classes?",
+      "hypothesis": "Stage/type/length hashes plus analysis flags identify repeated affected shaders without storing microcode.",
+      "exact_source_symbol_or_guest_boundary": [
+        "PipelineCache::LoadShader",
+        "Shader::AnalyzeUcode",
+        "PipelineCache::ConfigurePipeline",
+        "D3D12CommandProcessor::IssueDraw"
+      ],
+      "minimum_fields_required": [
+        "draw_id",
+        "shader stage",
+        "stable ucode hash",
+        "ucode dword count",
+        "pipeline hash",
+        "analysis flags for fetch/export/tessellation/memexport",
+        "scalar operation-class bitset for SHD-002",
+        "ready/pending/failure result"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "shader disassembly",
+        "host DXIL/SPIR-V/DXBC"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Hash already resident bytes in memory without copying to disk.",
+          "Fixed-size analysis bitsets only."
+        ]
+      },
+      "control_run": "Same scene with identity records disabled.",
+      "user_action": "Use the exact bounded character/dog checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Affected draw IDs join stable shader/pipeline hashes and required analysis flags with no body output.",
+        "fail": "Any shader body or disassembly is persisted, or rendering changes.",
+        "inconclusive": "Hashes cannot be joined to draw outcomes or affected draws remain unidentified."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored hash records.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "HASHES AND FLAGS ONLY",
+        "notes": "No proprietary shader body."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "decision_unlocked": "Scopes SHD-002 and provides identities required for L4 correlation.",
+      "estimated_evidence_level": "L3"
+    },
+    {
+      "experiment_id": "EXP-VERTEX-FETCH-001",
+      "order": 7,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Do affected draws exercise VTX-001, VTX-002 or VTX-003?",
+      "hypothesis": "Topology/result, bounds masks and address-class metadata are sufficient to qualify all three vertex candidates.",
+      "exact_source_symbol_or_guest_boundary": [
+        "PrimitiveProcessor::Process",
+        "Shader::AnalyzeUcode",
+        "D3D12CommandProcessor::IssueDraw",
+        "Memory::LookupHeap"
+      ],
+      "minimum_fields_required": [
+        "draw_id",
+        "guest topology",
+        "tessellation mode",
+        "primitive result",
+        "vertex fetch slot/base/size/stride",
+        "element index and out-of-range lane mask",
+        "index address class",
+        "whether any address lies in 0x7F000000..0x7FC7FFFF",
+        "masked/unmasked address hash"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "vertex/index buffer payloads"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Record only draws selected by bounded draw IDs or shader hashes.",
+          "No guest memory read beyond values already used by the renderer."
+        ]
+      },
+      "control_run": "Same scene with vertex metadata disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Each VTX candidate is confirmed applicable or cleared for the affected draw set.",
+        "fail": "Metadata requires new buffer reads, captures payloads or changes primitive processing.",
+        "inconclusive": "Affected draw IDs cannot be selected or address/bounds fields are incomplete."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "ADDRESS METADATA ONLY",
+        "notes": "Hash resource identity and never store buffer contents."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-SHADER-IDENTITY-001"
+      ],
+      "decision_unlocked": "Confirms or clears VTX-001 through VTX-003 for the exact affected draws.",
+      "estimated_evidence_level": "L4"
+    },
+    {
+      "experiment_id": "EXP-TEXTURE-METADATA-001",
+      "order": 8,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Do affected draws exercise TEX-002 through TEX-007, and which resource lifetime supplies each fetch?",
+      "hypothesis": "Fetch/layout/validity metadata can qualify all six texture divergences without texture dumps.",
+      "exact_source_symbol_or_guest_boundary": [
+        "D3D12CommandProcessor::UpdateBindings",
+        "D3D12TextureCache::RequestTextures",
+        "TextureCache::Texture::MakeUpToDateAndWatch",
+        "SharedMemory::RequestRanges"
+      ],
+      "minimum_fields_required": [
+        "draw_id and shader hash",
+        "fetch slot/instruction dimension",
+        "format and num_format",
+        "component bits/scale class",
+        "base_page and mip_page",
+        "mip_min_level",
+        "width/height/depth",
+        "literal swizzle tuple",
+        "sampler filters and LOD range",
+        "hashed base/mip resource ranges",
+        "validity generation before/after",
+        "watch/current/outdated flags",
+        "binding/layout hash"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "texture names if sourced from private paths"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Select only affected draw/shader IDs.",
+          "Hash addresses with a per-run non-secret deterministic scheme documented for joining.",
+          "No additional guest-memory reads or upload changes."
+        ]
+      },
+      "control_run": "Same scene with texture metadata disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Each TEX-002..TEX-007 predicate is computable for each affected binding and joins a draw outcome.",
+        "fail": "Payload, private path/name or unbounded address data is stored, or capture changes cache validity.",
+        "inconclusive": "Bindings cannot be joined or one required predicate is unavailable."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "HASHED RESOURCE METADATA",
+        "notes": "No texture payloads or private asset paths."
+      },
+    "dependencies": [
+      "EXP-DRAW-DECISION-001",
+      "EXP-SHADER-IDENTITY-001"
+    ],
+      "decision_unlocked": "Confirms or clears TEX-002 through TEX-007 and advances affected resources toward L4.",
+      "estimated_evidence_level": "L4"
+    },
+    {
+      "experiment_id": "EXP-EDRAM-RESOLVE-001",
+      "order": 9,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Do affected passes exercise RT-002 through RT-005 and how are their results consumed?",
+      "hypothesis": "ResolveInfo, pass/alias IDs and value-class summaries are enough; no surface capture is needed.",
+      "exact_source_symbol_or_guest_boundary": [
+        "D3D12RenderTargetCache::Update",
+        "draw_util::GetResolveInfo",
+        "D3D12RenderTargetCache::Resolve",
+        "SharedMemory::RangeWrittenByGpu"
+      ],
+      "minimum_fields_required": [
+        "draw/pass/resolve IDs",
+        "EDRAM bases and pitches",
+        "color/depth formats",
+        "MSAA/sample layout",
+        "alias IDs",
+        "resolve coordinates/extents",
+        "ResolveInfo hash",
+        "source/destination formats",
+        "copy_dest_number",
+        "resolution scale",
+        "written range/hash and consumer ID",
+        "value classification within normal float16|above 65504|exponent 31"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "per-pixel values",
+        "surface dumps"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Select bounded passes joined to affected draws.",
+          "Value data limited to min/max/classification, not samples."
+        ]
+      },
+      "control_run": "Same scene with EDRAM/resolve metadata disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Each RT-002..RT-005 predicate is computable and affected results join a consumer or are explicitly unconsumed.",
+        "fail": "Any surface/pixel payload is persisted or capture changes resolve/barrier behavior.",
+        "inconclusive": "Passes cannot join affected draws or required ResolveInfo fields are missing."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "METADATA AND VALUE CLASSES ONLY",
+        "notes": "No render-target payload."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "decision_unlocked": "Confirms or clears RT-002 through RT-005 and supplies the EDRAM leg of L4.",
+      "estimated_evidence_level": "L4"
+    },
+    {
+      "experiment_id": "EXP-ZPD-REPORT-001",
+      "order": 10,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Does Fable use EVENT_WRITE_ZPD in the scene and does any report span submissions or reuse a slot before retirement?",
+      "hypothesis": "Query lifecycle metadata alone can qualify DRW-002.",
+      "exact_source_symbol_or_guest_boundary": [
+        "D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD",
+        "D3D12CommandProcessor::EndSubmission"
+      ],
+      "minimum_fields_required": [
+        "packet sequence",
+        "report slot",
+        "begin/end flag",
+        "submission_id",
+        "host query segment ID",
+        "retirement sequence",
+        "same-slot reuse flag",
+        "fake/strict/host mode",
+        "consumer operation ID"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "query result payload beyond a boolean lifecycle classification"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Never alter query mode or waits.",
+          "Bound by the same scene window."
+        ]
+      },
+      "control_run": "Same scene with query metadata disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "DRW-002 is confirmed reachable with complete lifetime/reuse metadata or cleared because no ZPD operation occurs in the bounded affected path.",
+        "fail": "Query ordering/result changes or capture adds waits.",
+        "inconclusive": "ZPD occurs but slot/submission/retirement cannot be joined."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "QUERY LIFECYCLE ONLY",
+        "notes": "No query result stream."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "decision_unlocked": "Confirms or clears DRW-002.",
+      "estimated_evidence_level": "L3"
+    },
+    {
+      "experiment_id": "EXP-REGISTER-RESET-001",
+      "order": 11,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Does TU1 read any Canary-seeded reset register before its first write, and does an affected draw consume it?",
+      "hypothesis": "First-read/first-write ordering can qualify REG-001 without a full register trace.",
+      "exact_source_symbol_or_guest_boundary": [
+        "RegisterFile::RegisterFile",
+        "D3D12CommandProcessor::WriteRegister",
+        "D3D12CommandProcessor::IssueDraw"
+      ],
+      "minimum_fields_required": [
+        "seeded register index",
+        "ReXGlue initial zero and Canary seeded value",
+        "first read sequence",
+        "first write sequence/value",
+        "consuming draw_id",
+        "read-before-write boolean"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "registers outside the finite Canary-seeded set"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Finite allowlist of seeded registers only.",
+          "Observation must not seed or modify ReXGlue register values."
+        ]
+      },
+      "control_run": "Same scene with first-read bookkeeping disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Every seeded register is classified written-before-read, read-before-write with consuming draw, or never read in the bounded path.",
+        "fail": "Any initial value changes or bookkeeping affects draw state.",
+        "inconclusive": "Reads cannot be associated with order/consumer."
+      },
+      "rollback": "Disable bookkeeping and remove only the verified ignored summary.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "FINITE REGISTER METADATA",
+        "notes": "No full register dump."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "decision_unlocked": "Confirms or clears REG-001 for the affected scene.",
+      "estimated_evidence_level": "L3"
+    },
+    {
+      "experiment_id": "EXP-MEM-LIFECYCLE-001",
+      "order": 12,
+      "type": "RUNTIME METADATA",
+      "question_answered": "Do affected resource ranges undergo unwatched decommit/release/protect-to-writable transitions before GPU cache consumption?",
+      "hypothesis": "Mapping generation, watch state and hashed consumer identity can qualify MEM-002.",
+      "exact_source_symbol_or_guest_boundary": [
+        "PhysicalHeap::TriggerCallbacks",
+        "PhysicalHeap::Release",
+        "PhysicalHeap::Protect",
+        "SharedMemory::RequestRanges",
+        "SharedMemory::RangeWrittenByGpu"
+      ],
+      "minimum_fields_required": [
+        "hashed range identity and page count",
+        "mapping operation",
+        "old/new protection or committed state",
+        "watch-armed boolean",
+        "invalidation callback boolean",
+        "validity generation",
+        "next hashed cache consumer",
+        "submission/draw ID"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "memory contents",
+        "unrelated allocation map"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Record only ranges later selected by bounded texture/RT/shader identities.",
+          "No new watches or callbacks."
+        ]
+      },
+      "control_run": "Same scene with lifecycle metadata disabled.",
+      "user_action": "Use the exact bounded checkpoint defined for EXP-DRAW-DECISION-001.",
+      "criteria": {
+        "pass": "Every affected range has a complete mapping/watch/invalidation/consumer sequence or MEM-002 is cleared for the bounded path.",
+        "fail": "Observation arms watches, changes callbacks/protection or captures contents.",
+        "inconclusive": "Affected consumers cannot be joined to lifecycle generations."
+      },
+      "rollback": "Disable metadata and remove only the verified ignored records.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "HASHED RANGE METADATA",
+        "notes": "No memory payload or broad allocation inventory."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "decision_unlocked": "Confirms or clears MEM-002 and conditions TEX-002.",
+      "estimated_evidence_level": "L4"
+    },
+    {
+      "experiment_id": "EXP-CHARACTER-PAIR-001",
+      "order": 13,
+      "type": "USER CHECKPOINT",
+      "question_answered": "Can capture-off and capture-on runs reproduce the same affected character/dog scene without observable perturbation and join affected draws/resources?",
+      "hypothesis": "A shortest paired checkpoint can validate metadata transparency and identify the L4 affected set.",
+      "exact_source_symbol_or_guest_boundary": [
+        "designated existing TU1 save",
+        "existing Run 047 screenshot viewpoints",
+        "bounded metadata switches from qualified experiments"
+      ],
+      "minimum_fields_required": [
+        "exact executable/DLL/config identities",
+        "save identity hash without save contents",
+        "checkpoint start/end timestamps",
+        "capture enabled boolean",
+        "metadata record counts/drop counts",
+        "user confirmation of same scene/viewpoint and visible symptom",
+        "existing screenshot hashes as scene references; no automatic screenshot required"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "new screenshots unless the user separately authorizes them",
+        "user input text"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "First run capture-off, second capture-on, same save and route.",
+          "Hard time/record cap and visible exit path."
+        ]
+      },
+      "control_run": "Capture-off run first with exact same binary, DLL, config, save, route, stationary five-second window and exit.",
+      "user_action": "Load the designated existing TU1 save; take the shortest route to the exact Run 047 character-and-dog viewpoint; stop moving, hold the same camera for five seconds, then exit. Repeat once with capture enabled. Do not perform side activities.",
+      "criteria": {
+        "pass": "Both runs reach the same scene/symptom, capture-on remains bounded with no drops that break joins, and affected draw/resource/pass identities are produced.",
+        "fail": "Capture-on changes progress, image symptom, timing materially, crashes, blocks, or emits forbidden data.",
+        "inconclusive": "Scene/camera differs, records drop, or identities cannot be joined."
+      },
+      "rollback": "Disable all capture switches and remove only both verified ignored run directories.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "USER-CONTROLLED GAMEPLAY; METADATA ONLY",
+        "notes": "No automated gameplay and no new screenshot unless separately authorized."
+      },
+      "dependencies": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-SHADER-IDENTITY-001",
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-EDRAM-RESOLVE-001"
+      ],
+      "decision_unlocked": "Establishes L4 affected identities and validates capture transparency.",
+      "estimated_evidence_level": "L4"
+    },
+    {
+      "experiment_id": "EXP-CANDIDATE-AB-001",
+      "order": 14,
+      "type": "CONTROLLED A/B",
+      "question_answered": "Does one L4-qualified divergent behavior cause or clear the observed black surfaces?",
+      "hypothesis": "Changing exactly one proven-reachable behavior while holding scene, configuration and artifact lineage constant can reach L5.",
+      "exact_source_symbol_or_guest_boundary": [
+        "Exactly one source symbol selected only after EXP-CHARACTER-PAIR-001",
+        "affected draw/resource/pass identities from L4"
+      ],
+      "minimum_fields_required": [
+        "candidate record_id",
+        "exact one-behavior patch identity",
+        "A/B executable and DLL hashes",
+        "identical config/save/checkpoint",
+        "affected draw/resource/pass IDs",
+        "user-observed symptom outcome",
+        "all non-target metadata equality checks"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "combined multi-fix patches",
+        "unbounded gameplay"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "A is unchanged oracle behavior.",
+          "B changes exactly one qualified behavior.",
+          "No automatic fallback may hide a failure."
+        ]
+      },
+      "control_run": "A is the exact unchanged oracle configuration at the paired checkpoint.",
+      "user_action": "Run the exact shortest checkpoint once under A and once under B in randomized or documented order; report only whether the predeclared black surfaces changed.",
+      "criteria": {
+        "pass": "Exactly one behavior differs and a reproducible outcome ties it to the symptom or clears it while all join metadata remains equivalent.",
+        "fail": "Multiple behaviors/configuration/artifacts differ, or B destabilizes unrelated execution.",
+        "inconclusive": "Outcome varies, scene differs or the affected identities do not match."
+      },
+      "rollback": "Remove the one-behavior experimental change and verify the exact oracle hashes/settings are restored.",
+      "risk_and_privacy_classification": {
+        "risk": "HIGH",
+        "privacy": "USER GAMEPLAY; NO PAYLOAD CAPTURE",
+        "notes": "Runtime behavior changes and therefore requires explicit later authorization."
+      },
+      "dependencies": [
+        "EXP-CHARACTER-PAIR-001"
+      ],
+      "decision_unlocked": "Provides the first permissible CAUSALLY CONFIRMED or controlled-clearance classification at L5.",
+      "estimated_evidence_level": "L5"
+    },
+    {
+      "experiment_id": "EXP-KEYBOARD-UI-001",
+      "order": 15,
+      "type": "USER CHECKPOINT",
+      "question_answered": "Does the naturally reached Fable keyboard flow preserve focus, async completion, z-order, repaint, resize and cancellation?",
+      "hypothesis": "The existing static and Run 047 route will satisfy the bounded host-UI contract independently of guest Xenos drawing.",
+      "exact_source_symbol_or_guest_boundary": [
+        "sub_826CDF60 callsite",
+        "sub_82CC2E90",
+        "0x832B9AC4 __imp__XamShowKeyboardUI",
+        "XamShowKeyboardUI_entry",
+        "KeyboardInputDialog"
+      ],
+      "minimum_fields_required": [
+        "dialog open/close event",
+        "guest overlapped ID/hash",
+        "focus owner",
+        "completion result and extended error",
+        "cancelled/confirmed boolean",
+        "UIDrawer z-order/repaint generation",
+        "resize/safe-area state",
+        "shutdown cancellation result"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "entered keyboard text",
+        "clipboard contents",
+        "keystroke sequence"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Never log input text or individual keys.",
+          "Preserve headless fallback and async guest completion."
+        ]
+      },
+      "control_run": "Existing Run 047 line 42673 proves execution only; a future checkpoint compares metadata disabled/enabled.",
+      "user_action": "Only when the user naturally reaches the same naming flow: open the keyboard, enter a user-chosen non-sensitive test name, confirm, and exit at the next safe point. A separate natural visit may test cancellation.",
+      "criteria": {
+        "pass": "Guest result completes exactly once with correct focus/z-order/repaint and no text persisted.",
+        "fail": "Focus leaks, completion is missing/duplicated, text is logged, resize/shutdown hangs or guest output is obscured incorrectly.",
+        "inconclusive": "The natural flow is not reached or only confirm/cancel half of the contract is tested."
+      },
+      "rollback": "Disable UI metadata and remove only verified ignored event records; do not alter achievement/save data.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "SENSITIVE INPUT EXCLUDED",
+        "notes": "No text or keystrokes may be recorded."
+      },
+      "dependencies": [],
+      "decision_unlocked": "Validates the keyboard portion of the future presenter contract.",
+      "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-ACHIEVEMENT-UI-001",
+      "order": 16,
+      "type": "USER CHECKPOINT",
+      "question_answered": "Does a naturally earned Fable achievement preserve guest write routing, persistence/event delivery, toast queue, z-order and shutdown?",
+      "hypothesis": "The existing TU1 sub_82CC27F8 route and Run 047 unlocks will feed the ReXGlue achievement store and host toast without traversing guest Xenos drawing.",
+      "exact_source_symbol_or_guest_boundary": [
+        "sub_82CC27F8",
+        "XMsgStartIORequest app 0xFB message 0x000B0008",
+        "XgiApp::DispatchMessageSync",
+        "KernelState::UnlockAchievement",
+        "ReXApp achievement notification queue"
+      ],
+      "minimum_fields_required": [
+        "message ID and bounded achievement ID",
+        "guest request/completion identity",
+        "persistence result",
+        "event/toast enqueue/dequeue IDs",
+        "UIDrawer z-order/repaint generation",
+        "duplicate suppression",
+        "shutdown/cancellation result"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots unless the experiment explicitly requires a user checkpoint",
+        "saves, XEX/XEXP bytes, game assets or proprietary filenames beyond already documented artifact identifiers",
+        "unbounded register, memory or packet dumps",
+        "achievement database contents beyond the single bounded ID",
+        "profile/user-identifying data"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": true,
+        "fail_open": true,
+        "requirements": [
+          "Do not modify unlock eligibility or manufacture an unlock.",
+          "Metadata failure must not affect persistence or guest result."
+        ]
+      },
+      "control_run": "Run 047 records IDs 11 and 60 as prior execution evidence; future validation uses metadata disabled/enabled only for a new natural unlock.",
+      "user_action": "Only after the user names a naturally reachable, not-yet-unlocked achievement checkpoint: perform exactly that achievement action, observe one toast, then exit at the next safe point. Do not grind or play around.",
+      "criteria": {
+        "pass": "One guest write produces one persisted unlock/event/toast with correct z-order and clean shutdown.",
+        "fail": "Unlock is duplicated/lost, persistence changes under metadata, toast ordering fails or user/profile data is emitted.",
+        "inconclusive": "No natural unlock occurs or prior state makes the result ambiguous."
+      },
+      "rollback": "Disable UI metadata; do not delete or edit legitimate achievement persistence.",
+      "risk_and_privacy_classification": {
+        "risk": "MEDIUM",
+        "privacy": "PROFILE DATA MINIMIZED",
+        "notes": "Single achievement ID only; no user/profile payload."
+      },
+      "dependencies": [],
+      "decision_unlocked": "Validates the achievement portion of the future presenter contract.",
+      "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-STATIC-XDK-002",
+      "order": 17,
+      "type": "STATIC",
+      "status": "COMPLETED_STATIC_COVERAGE_NARROW",
+      "question_answered": "Does SXDK-001 belong to a broad title-side texture-fetch family, or only to a narrow specialised path?",
+      "hypothesis": "An exhaustive generated-source, closure, packet-construction and address-taken census can bound the texture-fetch producer family without execution.",
+      "exact_source_symbol_or_guest_boundary": [
+        "TU1 loaded post-patch image SHA-256 BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+        "SXDK-001 sub_82BA77D0 [0x82BA77D0,0x82BA7894)",
+        "SXDK-002 sub_82BA7B28 [0x82BA7B28,0x82BA83C0)",
+        "SXDK-003 sub_82BA8928 [0x82BA8928,0x82BA8D2C)",
+        "whole generated TU1 packet-producer census"
+      ],
+      "minimum_fields_required": [
+        "all direct, indirect, callback, table and unresolved routes to SXDK-001",
+        "all recoverable texture-fetch producers and explicit blind spots",
+        "complete bounded SXDK-002 and SXDK-003 contracts",
+        "descriptor, packet, guest-resource, cache and retirement lifetimes",
+        "exact coverage, bypass and unknown accounting",
+        "ordinary-rendering and title-system assessment without runtime claims"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots, saves, XEX/XEXP bytes or game assets",
+        "unbounded register, memory or packet dumps",
+        "executable bytes, bulk disassembly or decompiler listings",
+        "runtime instrumentation or title execution"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": false,
+        "fail_open": false,
+        "requirements": [
+          "Read-only static analysis only; no runtime switch exists.",
+          "Static reachability is never reported as runtime execution."
+        ]
+      },
+      "control_run": "Not applicable; reproduce from the exact pinned image, generated source and accepted static-analysis records.",
+      "user_action": "None.",
+      "criteria": {
+        "pass": "Producer and route census proves either broad ordinary-rendering coverage or a bounded narrow result with explicit bypass and unknown buckets.",
+        "fail": "Dynamic selectors, unresolved indirect buffers or source names are treated as proof of title-system execution.",
+        "inconclusive": "Unresolved static routes retain a bounded static resolution path with enough decision value to defer the coverage choice."
+      },
+      "rollback": "No runtime state exists; revert only incorrect documentation, evidence, schema or verifier changes.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "PRIVATE EXECUTABLE DERIVATIVE RISK",
+        "notes": "Addresses, hashes, ranges, counts and concise non-reconstructive descriptions only."
+      },
+      "dependencies": [
+        "EXP-STATIC-XDK-001"
+      ],
+      "decision_unlocked": "Established STATIC COVERAGE NARROW and selected EXP-CONFIG-CAP-001 before bounded draw-decision correlation.",
+      "estimated_evidence_level": "L1"
+    }
+  ],
+  "counts": {
+    "experiments": 17,
+    "by_type": {
+      "BUILD/ABI": 1,
+      "CONTROLLED A/B": 1,
+      "RUNTIME METADATA": 10,
+      "STATIC": 2,
+      "USER CHECKPOINT": 3
+    },
+    "by_estimated_evidence_level": {
+      "L1": 6,
+      "L2": 1,
+      "L3": 4,
+      "L4": 5,
+      "L5": 1
+    }
+  }
+}

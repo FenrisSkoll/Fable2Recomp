@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-static-xdk-seam-coverage-v1.schema.json",
+  "title": "Fable II G1.6B static XDK seam coverage evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "corpus",
+    "phase",
+    "experiment_id",
+    "generated_on",
+    "primary_result",
+    "pins",
+    "starting_state",
+    "analysis_inputs",
+    "coverage_boundaries",
+    "search_strategies",
+    "sxdk_001_routes",
+    "producers",
+    "method_contracts",
+    "lifetime_model",
+    "coverage_accounting",
+    "title_system_assessment",
+    "adjacent_methods",
+    "rejected_hypotheses",
+    "historical_artifact_limitation",
+    "phase_decision"
+  ],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.6B" },
+    "phase": { "const": "G1.6B - Static Seam Qualification and Coverage" },
+    "experiment_id": { "const": "EXP-STATIC-XDK-002" },
+    "generated_on": { "type": "string", "format": "date" },
+    "primary_result": { "enum": ["STATIC COVERAGE SUFFICIENT", "STATIC COVERAGE NARROW", "INCONCLUSIVE"] },
+    "pins": { "type": "object", "minProperties": 6 },
+    "starting_state": {
+      "type": "object",
+      "required": ["required_branch", "required_commit", "required_tree", "working_branch", "paused_g2a_incorporated"]
+    },
+    "analysis_inputs": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["input_id", "path", "provenance", "status", "purpose"]
+      }
+    },
+    "coverage_boundaries": {
+      "type": "object",
+      "required": ["executable_ranges", "generated", "entrypoint_closure", "blind_spots"]
+    },
+    "search_strategies": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["strategy_id", "scope", "result", "limitation"]
+      }
+    },
+    "sxdk_001_routes": {
+      "type": "object",
+      "required": ["target", "direct_call_site_count", "unique_direct_caller_count", "indirect_reference_count", "routes", "negative_findings"]
+    },
+    "producers": {
+      "type": "array",
+      "minItems": 4,
+      "items": { "$ref": "#/$defs/producer" }
+    },
+    "method_contracts": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/method" }
+    },
+    "lifetime_model": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["stage", "proved", "not_proved", "forwarding_obligation", "claim_status", "confidence"]
+      }
+    },
+    "coverage_accounting": {
+      "type": "object",
+      "required": ["texture_capable_methods", "confirmed_texture_producers", "unresolved_dynamic_producers", "sxdk_001_direct_producers", "sxdk_001_bypassing_confirmed_producers", "rejected_non_texture_methods", "draw_root_bypasses", "unknown_bucket", "conclusion"]
+    },
+    "title_system_assessment": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["system", "classification", "claim_status", "evidence"]
+      }
+    },
+    "adjacent_methods": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/adjacent" } },
+    "rejected_hypotheses": { "type": "array", "minItems": 4, "items": { "type": "object", "required": ["hypothesis", "status", "evidence"] } },
+    "historical_artifact_limitation": { "type": "object", "required": ["known_deleted_paths", "treatment"] },
+    "phase_decision": {
+      "type": "object",
+      "required": ["result", "reason", "next_phase", "next_experiment_id", "implementation_authorized"]
+    }
+  },
+  "$defs": {
+    "boundary": {
+      "type": "object",
+      "required": ["start", "end", "size", "instruction_count"],
+      "properties": {
+        "start": { "pattern": "^0x[0-9A-F]{8}$" },
+        "end": { "pattern": "^0x[0-9A-F]{8}$" },
+        "size": { "pattern": "^0x[0-9A-F]+$" },
+        "instruction_count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "mapping": {
+      "type": "object",
+      "required": ["path", "sha256", "size", "start_line", "end_line", "generated_name"]
+    },
+    "producer": {
+      "type": "object",
+      "required": [
+        "producer_id", "generated_name", "boundary", "generated_mapping", "provenance",
+        "packet_operation", "descriptor_transformation", "callers", "reachability_class",
+        "relation_to_sxdk", "operation_family", "title_system", "thread_queue_ownership",
+        "ownership_lifetime", "coverage_class", "known_bypasses", "classification",
+        "claim_status", "confidence", "missing_facts", "minimum_promotion_evidence",
+        "relation_to_prior_evidence"
+      ],
+      "properties": {
+        "producer_id": { "pattern": "^FETCH-[A-Z0-9-]+$" },
+        "generated_name": { "type": "string" },
+        "boundary": { "$ref": "#/$defs/boundary" },
+        "generated_mapping": { "$ref": "#/$defs/mapping" },
+        "provenance": { "type": "array", "minItems": 2, "items": { "type": "string" } },
+        "packet_operation": { "type": "string" },
+        "descriptor_transformation": { "type": "string" },
+        "callers": { "type": "array" },
+        "reachability_class": { "enum": ["STATICALLY REACHABLE", "CONDITIONALLY REACHABLE", "ADDRESS-TAKEN CALLER UNRESOLVED", "UNREACHABLE IN ACCEPTED CLOSURE", "OUTSIDE RECOVERED COVERAGE", "UNKNOWN STATIC LIMITATION"] },
+        "relation_to_sxdk": { "type": "string" },
+        "operation_family": { "type": "string" },
+        "title_system": { "type": "string" },
+        "thread_queue_ownership": { "type": "object" },
+        "ownership_lifetime": { "type": "object" },
+        "coverage_class": { "type": "string" },
+        "known_bypasses": { "type": "array", "items": { "type": "string" } },
+        "classification": { "$ref": "#/$defs/classification" },
+        "claim_status": { "$ref": "#/$defs/claim_status" },
+        "confidence": { "type": "string" },
+        "missing_facts": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "minimum_promotion_evidence": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "relation_to_prior_evidence": { "type": "object" }
+      }
+    },
+    "method": {
+      "type": "object",
+      "required": ["candidate_id", "generated_name", "boundary", "generated_mapping", "abi", "persistent_state_offsets", "callback_contract", "call_relationships", "thread_queue_ownership", "ownership_lifetime", "recursion_reentrancy", "operation", "side_effects", "forwarding_obligations", "coverage", "classification", "claim_status", "confidence", "missing_facts", "minimum_promotion_evidence"],
+      "properties": {
+        "candidate_id": { "enum": ["SXDK-002", "SXDK-003"] },
+        "generated_name": { "type": "string" },
+        "boundary": { "$ref": "#/$defs/boundary" },
+        "generated_mapping": { "$ref": "#/$defs/mapping" },
+        "abi": { "type": "object", "required": ["register_arguments", "stack_arguments", "return_behavior", "implicit_object"] },
+        "persistent_state_offsets": { "type": "array", "minItems": 1 },
+        "callback_contract": { "type": "object" },
+        "call_relationships": { "type": "object" },
+        "thread_queue_ownership": { "type": "object" },
+        "ownership_lifetime": { "type": "object" },
+        "recursion_reentrancy": { "type": "object" },
+        "operation": { "type": "object" },
+        "side_effects": { "type": "array", "minItems": 1 },
+        "forwarding_obligations": { "type": "array", "minItems": 1 },
+        "coverage": { "type": "object" },
+        "classification": { "$ref": "#/$defs/classification" },
+        "claim_status": { "$ref": "#/$defs/claim_status" },
+        "confidence": { "type": "string" },
+        "missing_facts": { "type": "array", "minItems": 1 },
+        "minimum_promotion_evidence": { "type": "array", "minItems": 1 }
+      }
+    },
+    "adjacent": {
+      "type": "object",
+      "required": ["candidate_id", "generated_name", "boundary", "operation", "relation", "classification", "claim_status", "missing_facts", "minimum_promotion_evidence"]
+    },
+    "classification": {
+      "enum": ["QUALIFIED REPRESENTATIVE METHOD", "QUALIFIED NARROW METHOD", "STRONG STATIC CANDIDATE", "DISCOVERY LEAD ONLY", "REJECTED AS SEMANTIC SEAM", "UNRESOLVED INDIRECT PRODUCER"]
+    },
+    "claim_status": {
+      "enum": ["CONFIRMED", "BOUNDED INFERENCE", "PLAUSIBLE", "UNKNOWN", "REJECTED"]
+    }
+  }
+}

@@ -1,0 +1,219 @@
+{
+  "$id": "https://github.com/FenrisSkoll/Fable2Recomp/tools/schemas/fable2-indirect-target-import-plan-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Dry-run-only reviewed Fable II indirect-target manifest import plan.",
+  "properties": {
+    "counts": {
+      "type": "object"
+    },
+    "fixture_results": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "ignored_ordinary_returns": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "inputs": {
+      "properties": {
+        "closure": {
+          "type": "object"
+        },
+        "generated_registration": {
+          "type": "object"
+        },
+        "ghidra_maps": {
+          "type": "array"
+        },
+        "manifest": {
+          "required": [
+            "file_name",
+            "sha256",
+            "function_count"
+          ],
+          "type": "object"
+        },
+        "shared_evidence": {
+          "type": "object"
+        },
+        "summary": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "summary",
+        "manifest",
+        "closure",
+        "shared_evidence",
+        "generated_registration",
+        "ghidra_maps"
+      ],
+      "type": "object"
+    },
+    "mode": {
+      "const": "dry_run"
+    },
+    "plan_id": {
+      "pattern": "^P4PLAN-[0-9A-F]{20}$",
+      "type": "string"
+    },
+    "proposals": {
+      "items": {
+        "properties": {
+          "automatic_application_permitted": {
+            "type": "boolean"
+          },
+          "candidate_id": {
+            "pattern": "^P4-[0-9A-F]{16}$",
+            "type": "string"
+          },
+          "classification": {
+            "enum": [
+              "strong_new_function",
+              "probable_new_function",
+              "conflicting_range"
+            ]
+          },
+          "proposal": {
+            "required": [
+              "entry",
+              "end",
+              "size",
+              "size_value",
+              "size_provenance"
+            ],
+            "type": "object"
+          },
+          "target": {
+            "pattern": "^0x[0-9A-F]{8}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "target",
+          "classification",
+          "proposal",
+          "automatic_application_permitted"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "safety": {
+      "properties": {
+        "atomic_replace": {
+          "const": true
+        },
+        "canonical_manifest_modified": {
+          "const": false
+        },
+        "dry_run_is_default": {
+          "const": true
+        },
+        "explicit_apply_flag_required": {
+          "const": true
+        },
+        "placeholder_implementations_supported": {
+          "const": false
+        },
+        "reviewed_candidate_selection_required": {
+          "const": true
+        },
+        "runtime_observation_establishes_size": {
+          "const": false
+        },
+        "stale_manifest_rejected": {
+          "const": true
+        }
+      },
+      "required": [
+        "canonical_manifest_modified",
+        "dry_run_is_default",
+        "explicit_apply_flag_required",
+        "reviewed_candidate_selection_required",
+        "stale_manifest_rejected",
+        "atomic_replace",
+        "placeholder_implementations_supported",
+        "runtime_observation_establishes_size"
+      ],
+      "type": "object"
+    },
+    "schema": {
+      "properties": {
+        "name": {
+          "const": "fable2-indirect-target-import-plan"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "targets": {
+      "items": {
+        "properties": {
+          "candidate_id": {
+            "type": "string"
+          },
+          "classification": {
+            "enum": [
+              "existing_manifest_function",
+              "existing_function_internal_entry",
+              "known_jump_table_case",
+              "known_exception_landing_pad",
+              "known_import_or_kernel_target",
+              "strong_new_function",
+              "probable_new_function",
+              "ambiguous_target",
+              "invalid_or_non_executable_target",
+              "conflicting_range"
+            ]
+          },
+          "evidence": {
+            "minItems": 1,
+            "type": "array"
+          },
+          "target": {
+            "pattern": "^0x[0-9A-F]{8}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "target",
+          "classification",
+          "evidence"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "tool": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "tool",
+    "mode",
+    "inputs",
+    "counts",
+    "fixture_results",
+    "ignored_ordinary_returns",
+    "targets",
+    "proposals",
+    "safety",
+    "plan_id"
+  ],
+  "title": "Fable II indirect-target import plan v1",
+  "type": "object"
+}

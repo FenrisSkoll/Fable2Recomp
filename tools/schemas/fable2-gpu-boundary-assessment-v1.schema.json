@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-boundary-assessment-v1.schema.json",
+  "title": "Fable II G1.5D purpose-specific boundary assessment",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "pins",
+    "purpose_definitions",
+    "boundaries",
+    "counts"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "corpus": {
+      "const": "Fable II Native Renderer G1.5D"
+    },
+    "generated_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "pins": {
+      "type": "object"
+    },
+    "purpose_definitions": {
+      "type": "object",
+      "required": [
+        "transparent_forwarding_mechanism_proof",
+        "presentation_frame_correlation",
+        "draw_resource_defect_diagnosis",
+        "eventual_renderer_replacement"
+      ]
+    },
+    "boundaries": {
+      "type": "array",
+      "minItems": 29,
+      "maxItems": 29,
+      "items": {
+        "$ref": "#/$defs/boundary"
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "boundaries",
+        "g1_candidate_hooks",
+        "rexglue_observation_surfaces",
+        "by_disposition"
+      ]
+    }
+  },
+  "$defs": {
+    "disposition": {
+      "enum": [
+        "RETAIN AS ORACLE",
+        "FORWARDING PROOF ONLY",
+        "PRESENT CORRELATION LATER",
+        "TARGETED OBSERVATION LATER",
+        "STATIC METHOD RECOVERY TARGET",
+        "WRAP AFTER ABI PROOF",
+        "REPLACE EVENTUALLY",
+        "REJECT AS PRIMARY SEAM",
+        "UNDECIDED"
+      ]
+    },
+    "purpose": {
+      "type": "object",
+      "required": [
+        "value",
+        "rationale"
+      ],
+      "properties": {
+        "value": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "NONE",
+            "UNKNOWN"
+          ]
+        },
+        "rationale": {
+          "type": "string"
+        }
+      }
+    },
+    "boundary": {
+      "type": "object",
+      "required": [
+        "boundary_id",
+        "origin",
+        "exact_address_or_symbol",
+        "source_location",
+        "inputs",
+        "outputs",
+        "persistent_state",
+        "threading",
+        "semantics_retained",
+        "semantics_lost",
+        "existing_fable_evidence",
+        "side_effects",
+        "forwarding_feasibility",
+        "observation_value",
+        "replacement_value",
+        "evidence_required",
+        "purposes",
+        "stage_disposition",
+        "related_divergence_ids",
+        "experiment_ids"
+      ],
+      "properties": {
+        "boundary_id": {
+          "pattern": "^(G1|REX)-[A-Z0-9-]+$"
+        },
+        "origin": {
+          "enum": [
+            "G1_CANDIDATE",
+            "REXGLUE_OBSERVATION"
+          ]
+        },
+        "g1_candidate_address": {
+          "pattern": "^0x[0-9A-F]{8}$"
+        },
+        "exact_address_or_symbol": {
+          "type": "string"
+        },
+        "source_location": {
+          "type": "string"
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "persistent_state": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "threading": {
+          "type": "string"
+        },
+        "semantics_retained": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "semantics_lost": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "existing_fable_evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "side_effects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "forwarding_feasibility": {
+          "type": "string"
+        },
+        "observation_value": {
+          "type": "string"
+        },
+        "replacement_value": {
+          "type": "string"
+        },
+        "evidence_required": {
+          "type": "string"
+        },
+        "purposes": {
+          "type": "object",
+          "required": [
+            "transparent_forwarding_mechanism_proof",
+            "presentation_frame_correlation",
+            "draw_resource_defect_diagnosis",
+            "eventual_renderer_replacement"
+          ],
+          "properties": {
+            "transparent_forwarding_mechanism_proof": {
+              "$ref": "#/$defs/purpose"
+            },
+            "presentation_frame_correlation": {
+              "$ref": "#/$defs/purpose"
+            },
+            "draw_resource_defect_diagnosis": {
+              "$ref": "#/$defs/purpose"
+            },
+            "eventual_renderer_replacement": {
+              "$ref": "#/$defs/purpose"
+            }
+          }
+        },
+        "stage_disposition": {
+          "$ref": "#/$defs/disposition"
+        },
+        "related_divergence_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^[A-Z]{2,3}-[0-9]{3}$"
+          }
+        },
+        "experiment_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^EXP-[A-Z0-9-]+$"
+          }
+        }
+      }
+    }
+  }
+}

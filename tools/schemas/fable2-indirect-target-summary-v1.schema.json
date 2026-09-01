@@ -1,0 +1,176 @@
+{
+  "$id": "https://github.com/FenrisSkoll/Fable2Recomp/tools/schemas/fable2-indirect-target-summary-v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Deterministically sorted, multi-run Xenia indirect-target summary.",
+  "properties": {
+    "counts": {
+      "type": "object"
+    },
+    "determinism": {
+      "type": "object"
+    },
+    "identity": {
+      "properties": {
+        "expected_image_sha256": {
+          "description": "Canonical expected patched-image SHA-256 used for configuration and evidence selection; per-run observed module fingerprints are retained separately.",
+          "pattern": "^[0-9A-F]{64}$",
+          "type": "string"
+        },
+        "identity_strength": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "expected_image_sha256",
+        "identity_strength"
+      ],
+      "type": "object"
+    },
+    "pairs": {
+      "items": {
+        "properties": {
+          "branch_kind": {
+            "enum": [
+              "bctr",
+              "bctrl",
+              "bclr",
+              "blr"
+            ]
+          },
+          "hit_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "link": {
+            "type": "boolean"
+          },
+          "observed_runs": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "ordinary_return": {
+            "type": "boolean"
+          },
+          "run_hit_counts": {
+            "type": "object"
+          },
+          "source": {
+            "pattern": "^0x[0-9A-F]{8}$",
+            "type": "string"
+          },
+          "source_module": {
+            "type": "string"
+          },
+          "target": {
+            "pattern": "^0x[0-9A-F]{8}$",
+            "type": "string"
+          },
+          "target_module": {
+            "type": "string"
+          },
+          "target_validity": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "thread_observations": {
+            "items": {
+              "properties": {
+                "first_sequence": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "hit_count": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "last_sequence": {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "run_id": {
+                  "type": "string"
+                },
+                "thread_key": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "run_id",
+                "thread_key",
+                "first_sequence",
+                "last_sequence",
+                "hit_count"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "branch_kind",
+          "link",
+          "ordinary_return",
+          "source_module",
+          "target_module",
+          "hit_count",
+          "run_hit_counts",
+          "observed_runs",
+          "thread_observations",
+          "target_validity"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "quarantine": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "runs": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "schema": {
+      "properties": {
+        "name": {
+          "const": "fable2-xenia-indirect-target-summary"
+        },
+        "version": {
+          "const": 1
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ],
+      "type": "object"
+    },
+    "tool": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "tool",
+    "identity",
+    "counts",
+    "runs",
+    "quarantine",
+    "pairs",
+    "determinism"
+  ],
+  "title": "Fable II Xenia indirect-target summary v1",
+  "type": "object"
+}

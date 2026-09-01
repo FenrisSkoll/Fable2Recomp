@@ -17,6 +17,30 @@ VERIFY = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(VERIFY)
 
 
+class IdentityContractTests(unittest.TestCase):
+    def test_container_provenance_is_not_a_schema_three_report_field(self) -> None:
+        identity = {
+            "base_xex_sha256": "A" * 64,
+            "title_update_sha256": "B" * 64,
+            "title_update_container_file": "synthetic-tu-container",
+            "title_update_container_sha256": "C" * 64,
+            "patched_image_sha256": "D" * 64,
+            "executable_memory_fingerprint_algorithm": "synthetic-v1",
+            "executable_memory_sha256": "E" * 64,
+        }
+
+        schema_three = VERIFY.report_identity_contract_keys(identity, 3)
+        self.assertIn("base_xex_sha256", schema_three)
+        self.assertIn("title_update_sha256", schema_three)
+        self.assertIn("patched_image_sha256", schema_three)
+        self.assertIn("executable_memory_sha256", schema_three)
+        self.assertNotIn("title_update_container_file", schema_three)
+        self.assertNotIn("title_update_container_sha256", schema_three)
+
+        schema_one = VERIFY.report_identity_contract_keys(identity, 1)
+        self.assertNotIn("executable_memory_sha256", schema_one)
+
+
 def site(
     address: str,
     cluster_id: str,

@@ -1,6 +1,6 @@
-# G1.6A open questions
+# G1.6B open questions
 
-This ledger is generated from the authoritative [Fable relevance matrix](evidence/fable2-relevance-matrix.json), ownership and G2 decisions, plus the [G1.6A static XDK method inventory](evidence/static-xdk-method-inventory.json). An unknown remains unknown until its stated minimum evidence exists.
+This ledger is generated from the authoritative [Fable relevance matrix](evidence/fable2-relevance-matrix.json), ownership and G2 decisions, the [G1.6A static XDK method inventory](evidence/static-xdk-method-inventory.json), and the [G1.6B seam-coverage evidence](evidence/static-xdk-seam-coverage.json). An unknown remains unknown until its stated minimum evidence exists.
 
 ## Cross-cutting questions
 
@@ -10,16 +10,46 @@ This ledger is generated from the authoritative [Fable relevance matrix](evidenc
 
 ### `OQ-STATIC-XDK-COVERAGE`
 
-- Exact missing fact: Which TU1 paths produce texture fetch state, which ordinary material/render paths call or bypass `SXDK-001`, and who owns the callback and resource-retirement joins around `SXDK-002`/`SXDK-003`.
-- Minimum evidence: Exhaustive static producer/caller enumeration for the pinned image, typed callback registration/record flow, lifetime joins, and a bounded covered/bypassed operation inventory.
-- Observation point: `sub_82BA77D0`, direct callers `sub_82BA7B28` and `sub_82BA83C0`, address-taken wrapper `sub_82BA8928`.
-- Static analysis: YES; later tooling: no; user gameplay: no.
-- Decision unlocked: Determines whether the qualified seam is merely an internal copy/scale method or a useful broader diagnosis/replacement surface.
-- Experiment: `EXP-STATIC-XDK-002`.
+**RESOLVED by `EXP-STATIC-XDK-002`: STATIC COVERAGE NARROW.** The exact
+method-level lower bound is two confirmed texture producers; two additional
+metadata-driven methods are texture-capable but unresolved. `SXDK-001` has two
+direct callers, while `sub_82BAC718` and six common state-to-draw segments
+bypass it. No ordinary material/mesh or named character, terrain, particle, UI,
+video, post-processing or shadow root is statically connected to it. See the
+[G1.6B report](13-static-xdk-seam-coverage.md).
+
+- Remaining missing fact: Which dynamic selector records and indirect-buffer
+  payloads feed the affected ordinary draws, and which host decision consumes
+  them.
+- Minimum evidence: The effective configuration/capability snapshot, followed
+  by bounded draw-decision correlation that joins selector/binding identity
+  without payload capture.
+- Observation point: begin with `EXP-CONFIG-CAP-001`, then
+  `EXP-DRAW-DECISION-001` if separately authorized.
+- Static analysis: EXHAUSTED FOR THIS DECISION; later tooling: yes; user
+  gameplay: only under a separately authorized bounded runtime phase.
+- Decision unlocked: Rejects G1.6C interception-contract design as the next
+  phase and retains `SXDK-001` only as a narrow supplemental seam.
 
 ### `OQ-LIONHEAD-ASYNC-ABI`
 
 Does `sub_82AAC208` have a stable queue ABI, known producer/consumer threads, ownership, recursion behavior and representative operation coverage? Until proved, it is discovery-only.
+
+### `OQ-SXDK-CALLBACK-OWNERSHIP`
+
+- Exact missing fact: Whether the global `0x82000910` dispatcher copies the
+  `sub_82BAA2B8` stack registration block, which thread invokes `SXDK-003`, and
+  how `sub_821D1508` joins cleanup to guest-resource retirement.
+- Minimum evidence: Exact dispatcher registration/invocation ABI, record
+  retention proof, callback thread/queue identity and release-to-submission
+  retirement join.
+- Observation point: `sub_82BAA2B8` materialization
+  `0x82BAA338/0x82BAA358`, dispatcher virtual slot `+0x18`,
+  `sub_82BA8928`, `sub_821D1508`.
+- Static analysis: PARTIAL; later tooling: yes if this narrow seam is revisited;
+  user gameplay: no for ABI recovery.
+- Decision unlocked: Could promote `SXDK-002`/`SXDK-003` technically, but would
+  not reverse the proved narrow title-coverage decision by itself.
 
 ### `OQ-OWNERSHIP-INTERFACE`
 

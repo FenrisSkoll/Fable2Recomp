@@ -57,6 +57,9 @@ The independent Canary baseline is
 34. [G1.6A static XDK method recovery](12-static-xdk-method-recovery.md)
 35. [G1.6A static method inventory](evidence/static-xdk-method-inventory.json)
 36. [G1.6A completion and handoff](g1.6a-completion.md)
+37. [G1.6B static seam qualification and coverage](13-static-xdk-seam-coverage.md)
+38. [G1.6B static seam coverage evidence](evidence/static-xdk-seam-coverage.json)
+39. [G1.6B completion and handoff](g1.6b-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and
@@ -115,17 +118,36 @@ and [completion record](g1.6a-completion.md) are review and handoff views.
 for one six-dword texture-fetch binding operation. Its coverage is explicitly
 narrow; this result does not authorize interception or renderer work.
 
+## G1.6B evidence index
+
+The G1.6B result is represented by the
+[static XDK seam coverage evidence](evidence/static-xdk-seam-coverage.json),
+validated by [static XDK seam coverage
+v1](../../tools/schemas/fable2-gpu-static-xdk-seam-coverage-v1.schema.json).
+The evidence is authoritative for the exhaustive `SXDK-001` route census,
+recoverable texture-producer inventory, bounded `SXDK-002`/`SXDK-003`
+contracts, five-stage lifetime model, bypass accounting, title-system unknown
+bucket and phase decision. The [G1.6B report](13-static-xdk-seam-coverage.md)
+and [completion record](g1.6b-completion.md) are review and handoff views.
+
+G1.6B returns **STATIC COVERAGE NARROW**. `SXDK-001` remains technically
+qualified but is refined to **QUALIFIED NARROW METHOD** for architectural use:
+it has exactly two direct callers, while an independent confirmed texture
+producer and six common state-to-draw roots bypass it. This does not authorize
+interception, instrumentation, G2A work or renderer implementation.
+
 Validate the corpus from the repository root with:
 
 ```powershell
 python .\tools\Verify-Fable2GpuReference.py `
     --sdk-root C:\Dev\rexglue-sdk-v0.10 `
     --canary-root C:\Dev\Fable2NativeRendererResearch\xenia-canary `
-        --verify-artifacts
+    --verify-artifacts
 ```
 
 Omit `--verify-artifacts` on a machine without the ignored local build, SDK
-package, cited Run 047/048 evidence and local G1.6A static-analysis reports.
+package, cited Run 047/048 evidence and local G1.6A/G1.6B static-analysis
+reports.
 Source, generated mapping, JSON-schema, history, pin, cross-link, count, phase
 hygiene and Markdown-link checks still run. Omit `--canary-root` to use the path
 recorded in the evidence.
@@ -136,7 +158,13 @@ recorded in the evidence.
   evidence, or an identified existing runtime log.
 - `PROBABLE`: multiple indicators agree, but the exact runtime route has not
   been observed.
+- `BOUNDED INFERENCE`: exact observations bound the interpretation, but do not
+  establish the source-level name, runtime path or frequency.
+- `PLAUSIBLE`: a possible interpretation lacking enough evidence for a bounded
+  conclusion.
 - `UNKNOWN`: the static corpus cannot establish the claim.
+- `REJECTED`: available evidence contradicts the claim or is insufficient in a
+  way that has been explicitly tested.
 - `NOT APPLICABLE`: the path exists in source but is excluded from the current
   artifact or scope.
 

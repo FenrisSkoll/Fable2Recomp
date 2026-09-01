@@ -946,19 +946,76 @@
       "dependencies": [],
       "decision_unlocked": "Validates the achievement portion of the future presenter contract.",
       "estimated_evidence_level": "L1"
+    },
+    {
+      "experiment_id": "EXP-STATIC-XDK-002",
+      "order": 17,
+      "type": "STATIC",
+      "status": "COMPLETED_STATIC_COVERAGE_NARROW",
+      "question_answered": "Does SXDK-001 belong to a broad title-side texture-fetch family, or only to a narrow specialised path?",
+      "hypothesis": "An exhaustive generated-source, closure, packet-construction and address-taken census can bound the texture-fetch producer family without execution.",
+      "exact_source_symbol_or_guest_boundary": [
+        "TU1 loaded post-patch image SHA-256 BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+        "SXDK-001 sub_82BA77D0 [0x82BA77D0,0x82BA7894)",
+        "SXDK-002 sub_82BA7B28 [0x82BA7B28,0x82BA83C0)",
+        "SXDK-003 sub_82BA8928 [0x82BA8928,0x82BA8D2C)",
+        "whole generated TU1 packet-producer census"
+      ],
+      "minimum_fields_required": [
+        "all direct, indirect, callback, table and unresolved routes to SXDK-001",
+        "all recoverable texture-fetch producers and explicit blind spots",
+        "complete bounded SXDK-002 and SXDK-003 contracts",
+        "descriptor, packet, guest-resource, cache and retirement lifetimes",
+        "exact coverage, bypass and unknown accounting",
+        "ordinary-rendering and title-system assessment without runtime claims"
+      ],
+      "data_explicitly_forbidden": [
+        "shader bytecode or translated shader bodies",
+        "texture, render-target, depth, EDRAM or buffer payloads",
+        "screenshots, saves, XEX/XEXP bytes or game assets",
+        "unbounded register, memory or packet dumps",
+        "executable bytes, bulk disassembly or decompiler listings",
+        "runtime instrumentation or title execution"
+      ],
+      "default_off_fail_open_requirements": {
+        "default_off": false,
+        "fail_open": false,
+        "requirements": [
+          "Read-only static analysis only; no runtime switch exists.",
+          "Static reachability is never reported as runtime execution."
+        ]
+      },
+      "control_run": "Not applicable; reproduce from the exact pinned image, generated source and accepted static-analysis records.",
+      "user_action": "None.",
+      "criteria": {
+        "pass": "Producer and route census proves either broad ordinary-rendering coverage or a bounded narrow result with explicit bypass and unknown buckets.",
+        "fail": "Dynamic selectors, unresolved indirect buffers or source names are treated as proof of title-system execution.",
+        "inconclusive": "Unresolved static routes retain a bounded static resolution path with enough decision value to defer the coverage choice."
+      },
+      "rollback": "No runtime state exists; revert only incorrect documentation, evidence, schema or verifier changes.",
+      "risk_and_privacy_classification": {
+        "risk": "LOW",
+        "privacy": "PRIVATE EXECUTABLE DERIVATIVE RISK",
+        "notes": "Addresses, hashes, ranges, counts and concise non-reconstructive descriptions only."
+      },
+      "dependencies": [
+        "EXP-STATIC-XDK-001"
+      ],
+      "decision_unlocked": "Established STATIC COVERAGE NARROW and selected EXP-CONFIG-CAP-001 before bounded draw-decision correlation.",
+      "estimated_evidence_level": "L1"
     }
   ],
   "counts": {
-    "experiments": 16,
+    "experiments": 17,
     "by_type": {
       "BUILD/ABI": 1,
       "CONTROLLED A/B": 1,
       "RUNTIME METADATA": 10,
-      "STATIC": 1,
+      "STATIC": 2,
       "USER CHECKPOINT": 3
     },
     "by_estimated_evidence_level": {
-      "L1": 5,
+      "L1": 6,
       "L2": 1,
       "L3": 4,
       "L4": 5,

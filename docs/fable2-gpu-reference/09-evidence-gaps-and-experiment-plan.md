@@ -1,5 +1,13 @@
 # Evidence gaps and minimum experiment plan
 
+> **G1.6B addendum:** `EXP-STATIC-XDK-002` was added after this G1.5D plan and
+> completed as **STATIC COVERAGE NARROW**. Its authoritative scope and result
+> are in the [G1.6B coverage evidence](evidence/static-xdk-seam-coverage.json)
+> and [report](13-static-xdk-seam-coverage.md). It depends on
+> `EXP-STATIC-XDK-001` and selects the already planned
+> `EXP-CONFIG-CAP-001` as the next gate. The original G1.5D ordering below is
+> preserved as historical planning evidence.
+
 ## Decision
 
 Do not run this backlog in G1.5D. The next primary gate is the static experiment `EXP-STATIC-XDK-001`. It asks whether a representative TU1 draw/resource/shader/target seam is recoverable before the project pays the cost and risk of runtime metadata.

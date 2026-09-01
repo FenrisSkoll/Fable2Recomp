@@ -1,5 +1,11 @@
 # Evidence gaps and minimum experiment plan
 
+> **Current supersession:** **G2A RETIRED — DO NOT RESUME.**
+> `EXP-G2A-LINK-001` and its dependent `EXP-SWAP-CORRELATION-001` remain below
+> only as dated G1.5D planning evidence; they are not active gates and must not
+> be used to restart the abandoned implementation. See the
+> [G2A retirement record](g2a-retirement.md).
+
 > **G1.6B addendum:** `EXP-STATIC-XDK-002` was added after this G1.5D plan and
 > completed as **STATIC COVERAGE NARROW**. Its authoritative scope and result
 > are in the [G1.6B coverage evidence](evidence/static-xdk-seam-coverage.json)

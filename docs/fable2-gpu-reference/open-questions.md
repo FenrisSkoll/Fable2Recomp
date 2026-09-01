@@ -2,6 +2,10 @@
 
 This ledger is generated from the authoritative [Fable relevance matrix](evidence/fable2-relevance-matrix.json), ownership and G2 decisions, the [G1.6A static XDK method inventory](evidence/static-xdk-method-inventory.json), and the [G1.6B seam-coverage evidence](evidence/static-xdk-seam-coverage.json). An unknown remains unknown until its stated minimum evidence exists.
 
+Current supersession: **G2A RETIRED — DO NOT RESUME.** Historical G2A
+questions and experiment IDs are retained for provenance, but no G2A gate is
+active. See the [G2A retirement record](g2a-retirement.md).
+
 ## Cross-cutting questions
 
 ### `OQ-STATIC-XDK-METHODS`
@@ -57,11 +61,17 @@ Is there a single-owner interface—present in or validly added to ReXGlue—tha
 
 ### `OQ-G2A-LINKED-PROOF`
 
-Can the revised minimal `sub_82BA34D8` wrapper and distinct `__imp__sub_82BA34D8` body link in the Release production binary and execute the original exactly once? Gate: `EXP-G2A-LINK-001`.
+**CLOSED BY RETIREMENT, NOT PROVED.** The revised minimal
+`sub_82BA34D8`/`__imp__sub_82BA34D8` Release proof was never performed.
+Historical gate `EXP-G2A-LINK-001` is retired and must not be resumed.
 
 ### `OQ-SWAP-CORRELATION`
 
-Is the mapping between `sub_82BA34D8`, `VdSwap_entry`, `XE_SWAP`, mailbox refresh and DXGI Present one-to-one, coalesced or dropped? Gate: `EXP-SWAP-CORRELATION-001`.
+The mapping between `sub_82BA34D8`, `VdSwap_entry`, `XE_SWAP`, mailbox refresh
+and DXGI Present remains unknown. Historical gate
+`EXP-SWAP-CORRELATION-001` is retired with G2A. Any future presentation-only
+question requires a new, separately authorized design that does not resurrect
+the abandoned implementation.
 
 ### `OQ-DRAW-PROVENANCE`
 
@@ -220,7 +230,8 @@ Which bounded draw IDs produce the black dog and player-skin surfaces, and what 
 - Observation point: `sub_82BA34D8 / VdSwap_entry / Presenter::RefreshGuestOutput / D3D12Presenter::PaintAndPresentImpl`
 - Static analysis: PARTIAL; later tooling: yes; user gameplay: yes.
 - Decision unlocked: Establishes presentation correlation; it does not diagnose black surfaces.
-- Experiments: `EXP-SWAP-CORRELATION-001`.
+- Experiments: historical `EXP-SWAP-CORRELATION-001` is retired; no active
+  replacement experiment is selected.
 
 ### `OQ-PRE-002` — `PRE-002`
 

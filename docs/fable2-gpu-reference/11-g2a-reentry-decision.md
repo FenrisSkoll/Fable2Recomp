@@ -1,5 +1,10 @@
 # G2A re-entry decision
 
+> **Superseded current status:** **G2A RETIRED — DO NOT RESUME.** This chapter
+> and its JSON companion preserve the dated G1.5D decision and the evidence
+> available at that time; they no longer authorize a revision or later
+> mechanism proof. See the [G2A retirement record](g2a-retirement.md).
+
 The authoritative two-part decision is [`g2a-decision.json`](evidence/g2a-decision.json). This document does not resume G2A or authorize implementation.
 
 ## Part A — **REVISE G2A BEFORE RESUMING**

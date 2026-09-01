@@ -19,6 +19,11 @@ The independent Canary baseline is
 `3a44f20c7bc66db1da583e8a6f0ab740e31908e9`, tree
 `c343b0a5796590fadc3b78c993bfada51e7e9148`.
 
+Current status: **G2A RETIRED — DO NOT RESUME.** The dated G1.5D decision and
+G1.6 evidence remain unchanged as historical records. The superseding audit,
+path inventory and local-branch disposition are in the
+[G2A retirement record](g2a-retirement.md).
+
 ## Reading order
 
 1. [Scope, evidence rules and immutable pins](00-scope-and-pins.md)
@@ -60,6 +65,7 @@ The independent Canary baseline is
 37. [G1.6B static seam qualification and coverage](13-static-xdk-seam-coverage.md)
 38. [G1.6B static seam coverage evidence](evidence/static-xdk-seam-coverage.json)
 39. [G1.6B completion and handoff](g1.6b-completion.md)
+40. [G2A retirement record](g2a-retirement.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and

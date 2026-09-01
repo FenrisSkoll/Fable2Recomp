@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only validator for the Fable II G1.5A-D GPU reference corpus."""
+"""Read-only validator for the Fable II G1.5A-D and G1.6A GPU reference corpus."""
 
 from __future__ import annotations
 
@@ -58,6 +58,12 @@ G2A_DECISION_SCHEMA_PATH = (
     SCHEMA_ROOT / "fable2-gpu-g2a-decision-v1.schema.json"
 )
 G1_CANDIDATE_PATH = ROOT / "docs" / "fable2-native-renderer" / "candidate-hook-inventory.json"
+STATIC_XDK_PATH = EVIDENCE_ROOT / "static-xdk-method-inventory.json"
+STATIC_XDK_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-static-xdk-method-inventory-v1.schema.json"
+)
+STATIC_XDK_REPORT_PATH = DOC_ROOT / "12-static-xdk-method-recovery.md"
+STATIC_XDK_COMPLETION_PATH = DOC_ROOT / "g1.6a-completion.md"
 
 REQUIRED_DOCUMENTS = (
     "README.md",
@@ -105,6 +111,9 @@ REQUIRED_DOCUMENTS = (
     "evidence/experiment-backlog.json",
     "evidence/g2a-decision.json",
     "g1.5d-completion.md",
+    "12-static-xdk-method-recovery.md",
+    "evidence/static-xdk-method-inventory.json",
+    "g1.6a-completion.md",
 )
 
 CONFIDENCE = ("CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE")
@@ -1362,6 +1371,650 @@ def validate_g15d_evidence(
             )
 
 
+def validate_g16a_evidence(
+    inventory: dict[str, Any],
+    sdk_override: Path | None,
+    canary_override: Path | None,
+    verify_artifacts: bool,
+    validation: Validation,
+) -> None:
+    expected_loaded_image = (
+        "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00"
+    )
+    expected_classifications = [
+        "QUALIFIED REPRESENTATIVE METHOD",
+        "STRONG STATIC CANDIDATE",
+        "DISCOVERY LEAD ONLY",
+        "REJECTED AS SEMANTIC SEAM",
+        "RECOVERY BLOCKED",
+    ]
+    expected_candidates = {
+        "SXDK-001": (
+            "sub_82BA77D0",
+            "0x82BA77D0",
+            "0x82BA7894",
+            "0xC4",
+            49,
+            "QUALIFIED REPRESENTATIVE METHOD",
+            "generated/default/fable2_recomp.110.cpp",
+            1035313,
+            "4168294DC783D211919D0D178732E50A8014CF8E750187BF66491437E7473C10",
+            20979,
+            21103,
+        ),
+        "SXDK-002": (
+            "sub_82BA7B28",
+            "0x82BA7B28",
+            "0x82BA83C0",
+            "0x898",
+            550,
+            "STRONG STATIC CANDIDATE",
+            "generated/default/fable2_recomp.265.cpp",
+            1023903,
+            "4928C6367157ACD1B414E0A2709FB2F10FC5F105E1C977641C5D9FC185ADC5B0",
+            21165,
+            22453,
+        ),
+        "SXDK-003": (
+            "sub_82BA8928",
+            "0x82BA8928",
+            "0x82BA8D2C",
+            "0x404",
+            257,
+            "STRONG STATIC CANDIDATE",
+            "generated/default/fable2_recomp.130.cpp",
+            1024438,
+            "0A6CD19DD979846B81C967F81DE1FD317983968F37E1235F0FA7E1B5DB00A625",
+            21039,
+            21616,
+        ),
+        "SXDK-004": (
+            "sub_82AAC208",
+            "0x82AAC208",
+            "0x82AAC54C",
+            "0x344",
+            209,
+            "DISCOVERY LEAD ONLY",
+            "generated/default/fable2_recomp.85.cpp",
+            1056093,
+            "44D379173BD4C2D525FF55F90BDD9A33E3F3D30FFEAF5A2942EDA82077EC9F3C",
+            18657,
+            19135,
+        ),
+        "SXDK-005": (
+            "sub_82BA34D8",
+            "0x82BA34D8",
+            "0x82BA3BFC",
+            "0x724",
+            457,
+            "REJECTED AS SEMANTIC SEAM",
+            "generated/default/fable2_recomp.22.cpp",
+            1023789,
+            "4714D7C3B08CBB01F0E9A41D087E2E1033ABECC3C11AA773940AC14F377D38F3",
+            21478,
+            22516,
+        ),
+        "SXDK-006": (
+            "sub_82BA6990",
+            "0x82BA6990",
+            "0x82BA6C18",
+            "0x288",
+            162,
+            "REJECTED AS SEMANTIC SEAM",
+            "generated/default/fable2_recomp.161.cpp",
+            1024073,
+            "61E087C55D11D54F92D83356DD2C8AD8BBE45082846167C57A9F20866CCAD10B",
+            21718,
+            22093,
+        ),
+    }
+
+    if inventory.get("primary_result") != "STATIC SEAM QUALIFIED":
+        validation.error("G1.6A primary result must be STATIC SEAM QUALIFIED")
+    if inventory.get("strongest_candidate_id") != "SXDK-001":
+        validation.error("G1.6A strongest candidate must be SXDK-001")
+    if inventory.get("classifications") != expected_classifications:
+        validation.error("G1.6A classification vocabulary or order changed")
+
+    pins = inventory.get("pins", {})
+    expected_pin_fields = {
+        ("fable_start", "branch"): "fable2-native-renderer-g1.5-reference",
+        ("fable_start", "commit"): "78c5d66807abf19f67966bd0c3d8301c29990ae4",
+        ("fable_start", "tree"): "e1881f9de89824feb051b58300374c924747605b",
+        (
+            "fable_start",
+            "working_branch",
+        ): "fable2-native-renderer-g1.6a-static-xdk-recovery",
+        ("g1_accepted_base", "commit"): "c44e8c16f4422f9a828caf30899ac989170b8a8c",
+        (
+            "paused_g2a",
+            "commit",
+        ): "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51",
+        ("paused_g2a", "tree"): "910e80108c2d9e7d8474866506f1c9e23ede601c",
+        ("tu1", "loaded_image_sha256"): expected_loaded_image,
+        ("tu1", "loaded_image_base"): "0x82000000",
+        ("tu1", "loaded_image_size"): "0x01620000",
+        ("tu1", "entry_point"): "0x82CC21C0",
+        (
+            "rexglue",
+            "commit",
+        ): "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+        ("rexglue", "tree"): "b78b06b8ac650467372236a3a262864e069a9382",
+        (
+            "canary",
+            "commit",
+        ): "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+        ("canary", "tree"): "c343b0a5796590fadc3b78c993bfada51e7e9148",
+        (
+            "active_gpu_plugin",
+            "sha256",
+        ): "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99",
+        ("active_gpu_plugin", "size"): 2770944,
+        ("active_gpu_plugin", "backend"): "D3D12_ONLY",
+    }
+    for (group, field), expected in expected_pin_fields.items():
+        actual = pins.get(group, {}).get(field)
+        if actual != expected:
+            validation.error(
+                f"G1.6A pin mismatch {group}.{field}: "
+                f"recorded {actual!r}, expected {expected!r}"
+            )
+    if pins.get("paused_g2a", {}).get("incorporated") is not False:
+        validation.error("G1.6A must record paused G2A as not incorporated")
+
+    fable_start = expected_pin_fields[("fable_start", "commit")]
+    g1_base = expected_pin_fields[("g1_accepted_base", "commit")]
+    paused_g2a = expected_pin_fields[("paused_g2a", "commit")]
+    git_checks = (
+        (fable_start, expected_pin_fields[("fable_start", "tree")], "G1.6A start"),
+        (paused_g2a, expected_pin_fields[("paused_g2a", "tree")], "paused G2A"),
+    )
+    for commit, expected_tree, label in git_checks:
+        if run_git(ROOT, "cat-file", "-e", f"{commit}^{{commit}}").returncode != 0:
+            validation.error(f"{label} commit is unavailable: {commit}")
+            continue
+        actual_tree = git_text(ROOT, "rev-parse", f"{commit}^{{tree}}")
+        if actual_tree != expected_tree:
+            validation.error(
+                f"{label} tree mismatch: expected {expected_tree!r}, "
+                f"actual {actual_tree!r}"
+            )
+    if run_git(ROOT, "merge-base", "--is-ancestor", g1_base, fable_start).returncode != 0:
+        validation.error("G1 accepted base is not an ancestor of the G1.6A start")
+    if run_git(ROOT, "merge-base", "--is-ancestor", fable_start, "HEAD").returncode != 0:
+        validation.error("G1.6A HEAD does not descend from the required start")
+    if run_git(ROOT, "merge-base", "--is-ancestor", paused_g2a, "HEAD").returncode == 0:
+        validation.error("paused G2A is an ancestor of G1.6A HEAD")
+    current_branch = git_text(ROOT, "branch", "--show-current")
+    expected_branch = expected_pin_fields[("fable_start", "working_branch")]
+    if current_branch != expected_branch:
+        validation.error(
+            f"G1.6A working branch mismatch: expected {expected_branch!r}, "
+            f"actual {current_branch!r}"
+        )
+
+    changed_paths: set[str] = set()
+    changed_text = git_text(ROOT, "diff", "--name-only", fable_start, "--")
+    if changed_text is not None:
+        changed_paths.update(line.replace("\\", "/") for line in changed_text.splitlines())
+    status = run_git(
+        ROOT, "status", "--porcelain=v1", "--untracked-files=all"
+    ).stdout
+    for line in status.splitlines():
+        if len(line) < 4:
+            continue
+        path = line[3:]
+        if " -> " in path:
+            path = path.split(" -> ", 1)[1]
+        changed_paths.add(path.replace("\\", "/"))
+    exact_allowed_paths = {
+        "tools/Verify-Fable2GpuReference.py",
+        "tools/schemas/fable2-gpu-static-xdk-method-inventory-v1.schema.json",
+    }
+    required_phase_paths = {
+        "docs/fable2-gpu-reference/12-static-xdk-method-recovery.md",
+        "docs/fable2-gpu-reference/evidence/static-xdk-method-inventory.json",
+        "docs/fable2-gpu-reference/g1.6a-completion.md",
+        "docs/fable2-gpu-reference/README.md",
+        "docs/fable2-gpu-reference/open-questions.md",
+        *exact_allowed_paths,
+    }
+    for path in sorted(changed_paths):
+        allowed = path.startswith("docs/fable2-gpu-reference/") or path in exact_allowed_paths
+        if not allowed:
+            validation.error(f"G1.6A phase hygiene rejects changed path: {path}")
+        candidate_path = ROOT / path
+        if candidate_path.is_file() and candidate_path.stat().st_size > 1024 * 1024:
+            validation.error(f"G1.6A changed file exceeds bounded evidence size: {path}")
+        if Path(path).suffix.lower() in {
+            ".xex",
+            ".xexp",
+            ".dll",
+            ".exe",
+            ".bin",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".sav",
+            ".dmp",
+        }:
+            validation.error(f"G1.6A forbidden payload type changed: {path}")
+    missing_phase_paths = required_phase_paths - changed_paths
+    if missing_phase_paths:
+        validation.error(
+            f"G1.6A required phase paths are absent from the start diff: "
+            f"{sorted(missing_phase_paths)!r}"
+        )
+
+    candidates = inventory.get("candidates", [])
+    candidate_ids = [candidate.get("candidate_id") for candidate in candidates]
+    if candidate_ids != list(expected_candidates):
+        validation.error(
+            f"G1.6A candidates must be unique and ordered: {list(expected_candidates)!r}; "
+            f"actual {candidate_ids!r}"
+        )
+    actual_counts = {
+        "candidates": len(candidates),
+        "by_classification": {
+            classification: sum(
+                candidate.get("classification", {}).get("value") == classification
+                for candidate in candidates
+            )
+            for classification in expected_classifications
+        },
+    }
+    if inventory.get("counts") != actual_counts:
+        validation.error(
+            f"G1.6A counts mismatch: recorded {inventory.get('counts')!r}, "
+            f"actual {actual_counts!r}"
+        )
+
+    generated_chunks: dict[str, str] = {}
+    for candidate in candidates:
+        candidate_id = candidate.get("candidate_id")
+        expected = expected_candidates.get(str(candidate_id))
+        if expected is None:
+            continue
+        (
+            expected_name,
+            expected_start,
+            expected_end,
+            expected_size,
+            expected_instruction_count,
+            expected_classification,
+            expected_path,
+            expected_file_size,
+            expected_file_hash,
+            expected_start_line,
+            expected_end_line,
+        ) = expected
+        boundary = candidate.get("boundary", {})
+        actual_identity = (
+            candidate.get("generated_name"),
+            boundary.get("start"),
+            boundary.get("end"),
+            boundary.get("size"),
+            boundary.get("instruction_count"),
+            candidate.get("classification", {}).get("value"),
+        )
+        expected_identity = expected[:6]
+        if actual_identity != expected_identity:
+            validation.error(
+                f"G1.6A {candidate_id} identity mismatch: "
+                f"recorded {actual_identity!r}, expected {expected_identity!r}"
+            )
+        try:
+            start = int(str(boundary.get("start")), 16)
+            end = int(str(boundary.get("end")), 16)
+            size = int(str(boundary.get("size")), 16)
+            instruction_count = int(boundary.get("instruction_count"))
+        except (TypeError, ValueError):
+            validation.error(f"G1.6A {candidate_id} has an invalid boundary")
+        else:
+            if end - start != size or instruction_count * 4 != size:
+                validation.error(
+                    f"G1.6A {candidate_id} boundary arithmetic is inconsistent"
+                )
+            for relationship in candidate.get("call_relationships", {}).get(
+                "direct_callees", []
+            ):
+                try:
+                    site = int(str(relationship.get("site")), 16)
+                except (TypeError, ValueError):
+                    validation.error(
+                        f"G1.6A {candidate_id} has an invalid callee site"
+                    )
+                else:
+                    if not start <= site < end:
+                        validation.error(
+                            f"G1.6A {candidate_id} callee site lies outside its boundary: "
+                            f"{relationship.get('site')!r}"
+                        )
+            for imported in candidate.get("call_relationships", {}).get(
+                "xbox_graphics_imports", []
+            ):
+                try:
+                    site = int(str(imported.get("site")), 16)
+                except (TypeError, ValueError):
+                    validation.error(
+                        f"G1.6A {candidate_id} has an invalid import site"
+                    )
+                else:
+                    if not start <= site < end:
+                        validation.error(
+                            f"G1.6A {candidate_id} import site lies outside its boundary: "
+                            f"{imported.get('site')!r}"
+                        )
+
+        provenance = candidate.get("provenance", {})
+        if provenance.get("loaded_image_sha256") != expected_loaded_image:
+            validation.error(f"G1.6A {candidate_id} loaded-image pin mismatch")
+        mapping = provenance.get("generated_mapping", {})
+        actual_mapping = (
+            mapping.get("path"),
+            mapping.get("size"),
+            mapping.get("sha256"),
+            mapping.get("start_line"),
+            mapping.get("end_line"),
+            mapping.get("generated_name"),
+        )
+        expected_mapping = (
+            expected_path,
+            expected_file_size,
+            expected_file_hash,
+            expected_start_line,
+            expected_end_line,
+            expected_name,
+        )
+        if actual_mapping != expected_mapping:
+            validation.error(
+                f"G1.6A {candidate_id} generated mapping mismatch: "
+                f"recorded {actual_mapping!r}, expected {expected_mapping!r}"
+            )
+        generated_path = ROOT / expected_path
+        if not generated_path.is_file():
+            validation.error(
+                f"G1.6A {candidate_id} generated source is unavailable: {generated_path}"
+            )
+        else:
+            if generated_path.stat().st_size != expected_file_size:
+                validation.error(
+                    f"G1.6A {candidate_id} generated source size mismatch"
+                )
+            if sha256(generated_path) != expected_file_hash:
+                validation.error(
+                    f"G1.6A {candidate_id} generated source hash mismatch"
+                )
+            lines = generated_path.read_text(encoding="utf-8").splitlines()
+            if expected_end_line > len(lines):
+                validation.error(
+                    f"G1.6A {candidate_id} generated line range exceeds the file"
+                )
+            else:
+                first_line = lines[expected_start_line - 1].strip()
+                expected_definition = (
+                    f"DEFINE_REX_FUNC({expected_name}, {expected_start}, false) {{"
+                )
+                if first_line != expected_definition:
+                    validation.error(
+                        f"G1.6A {candidate_id} generated definition mismatch: "
+                        f"{first_line!r}"
+                    )
+                chunk_lines = lines[expected_start_line - 1 : expected_end_line]
+                comment_count = sum(line.startswith("\t// ") for line in chunk_lines)
+                if comment_count != expected_instruction_count:
+                    validation.error(
+                        f"G1.6A {candidate_id} generated instruction count mismatch: "
+                        f"expected {expected_instruction_count}, actual {comment_count}"
+                    )
+                generated_chunks[str(candidate_id)] = "\n".join(chunk_lines)
+
+        registers = [
+            entry.get("register")
+            for entry in candidate.get("abi", {}).get("register_arguments", [])
+        ]
+        expected_registers = [f"r{index}" for index in range(3, 11)]
+        if registers != expected_registers:
+            validation.error(
+                f"G1.6A {candidate_id} must classify r3-r10 exactly once and in order"
+            )
+        classification = candidate.get("classification", {})
+        if not classification.get("evidence"):
+            validation.error(f"G1.6A {candidate_id} classification lacks evidence")
+        if not classification.get("missing_facts"):
+            validation.error(f"G1.6A {candidate_id} lacks explicit missing facts")
+        if not classification.get("minimum_evidence_to_change"):
+            validation.error(
+                f"G1.6A {candidate_id} lacks minimum reclassification evidence"
+            )
+
+    strongest = next(
+        (candidate for candidate in candidates if candidate.get("candidate_id") == "SXDK-001"),
+        {},
+    )
+    strongest_callers = {
+        (entry.get("address"), entry.get("site"))
+        for entry in strongest.get("call_relationships", {}).get("direct_callers", [])
+    }
+    if strongest_callers != {
+        ("0x82BA7B28", "0x82BA81CC"),
+        ("0x82BA83C0", "0x82BA85D8"),
+    }:
+        validation.error("G1.6A SXDK-001 direct caller evidence changed")
+    strongest_callees = {
+        (entry.get("address"), entry.get("site"))
+        for entry in strongest.get("call_relationships", {}).get("direct_callees", [])
+    }
+    if strongest_callees != {("0x821E8EC0", "0x82BA77FC")}:
+        validation.error("G1.6A SXDK-001 direct callee evidence changed")
+    if strongest.get("call_relationships", {}).get("xbox_graphics_imports") != []:
+        validation.error("G1.6A SXDK-001 must not claim a direct Xbox import")
+    strongest_chunk = generated_chunks.get("SXDK-001", "")
+    for required_text in (
+        "ctx.lr = 0x82BA7800;",
+        "sub_821E8EC0(ctx, base);",
+        "// oris r11,r11,49158",
+        "// ori r11,r11,11520",
+        "// li r9,1",
+        "// rlwimi r10,r9,16,0,20",
+    ):
+        if required_text not in strongest_chunk:
+            validation.error(
+                f"G1.6A SXDK-001 generated evidence lacks {required_text!r}"
+            )
+    caller_chunk = generated_chunks.get("SXDK-002", "")
+    for required_text in ("ctx.lr = 0x82BA81D0;", "sub_82BA77D0(ctx, base);"):
+        if required_text not in caller_chunk:
+            validation.error(
+                f"G1.6A SXDK-002 caller evidence lacks {required_text!r}"
+            )
+
+    expected_imports = {
+        "SXDK-005": {
+            ("VdGetSystemCommandBuffer", "0x832BA774", "0x82BA36D8"),
+            ("VdSwap", "0x832BA784", "0x82BA373C"),
+            ("VdSetDisplayMode", "0x832BA834", "0x82BA3854"),
+            ("VdGetCurrentDisplayInformation", "0x832BA7D4", "0x82BA385C"),
+            ("VdPersistDisplay", "0x832BA764", "0x82BA3B04"),
+        },
+        "SXDK-006": {
+            ("VdInitializeEngines", "0x832BA7F4", "0x82BA69E4"),
+            ("VdSetGraphicsInterruptCallback", "0x832BA814", "0x82BA6A28"),
+            ("VdIsHSIOTrainingSucceeded", "0x832BA824", "0x82BA6BD4"),
+        },
+    }
+    candidates_by_id = {
+        candidate.get("candidate_id"): candidate for candidate in candidates
+    }
+    for candidate_id, expected in expected_imports.items():
+        actual = {
+            (entry.get("name"), entry.get("address"), entry.get("site"))
+            for entry in candidates_by_id.get(candidate_id, {})
+            .get("call_relationships", {})
+            .get("xbox_graphics_imports", [])
+        }
+        if actual != expected:
+            validation.error(
+                f"G1.6A {candidate_id} Xbox graphics import evidence changed"
+            )
+
+    phase_decision = inventory.get("phase_decision", {})
+    if phase_decision.get("result") != inventory.get("primary_result"):
+        validation.error("G1.6A phase decision disagrees with the primary result")
+    if phase_decision.get("next_phase") != (
+        "G1.6B - Static Seam Qualification and Coverage"
+    ):
+        validation.error("G1.6A next phase must be G1.6B static qualification/coverage")
+    if phase_decision.get("next_experiment_id") != "EXP-STATIC-XDK-002":
+        validation.error("G1.6A next experiment must be EXP-STATIC-XDK-002")
+
+    prose = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (STATIC_XDK_REPORT_PATH, STATIC_XDK_COMPLETION_PATH)
+        if path.is_file()
+    )
+    for required_text in (
+        "STATIC SEAM QUALIFIED",
+        "EXP-STATIC-XDK-001",
+        "EXP-STATIC-XDK-002",
+        "0x82BA77D0",
+        "0x82BA7894",
+        *expected_candidates,
+    ):
+        if required_text not in prose:
+            validation.error(f"G1.6A prose lacks required evidence {required_text!r}")
+
+    input_records = {
+        record.get("input_id"): record for record in inventory.get("analysis_inputs", [])
+    }
+    expected_inputs = {
+        "INPUT-PROVENANCE": (
+            "tools/fable2-entrypoint-closure-evidence.json",
+            4768,
+            "10F9411631AE08D653FB1CDCA192E364CF499BB56948A6E72F93384632786CC7",
+        ),
+        "INPUT-CLOSURE": (
+            "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json",
+            341019731,
+            "665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397",
+        ),
+        "INPUT-GHIDRA": (
+            "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/ghidra-function-map.json",
+            96710692,
+            "03516B3A1F33433E493739418C9939D4FF1AEB0989F4ACEF2FD4D8204A077F58",
+        ),
+        "INPUT-JUMPS": (
+            "out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/jump-table-recovery.json",
+            81223154,
+            "B1FE26FB9119DAF7E7E0196CBDBA8CCA087BE190BF156FE0B12DF116379ED89A",
+        ),
+    }
+    for input_id, (relative, expected_size, expected_hash) in expected_inputs.items():
+        record = input_records.get(input_id, {})
+        if record.get("path") != relative:
+            validation.error(f"G1.6A analysis input path changed for {input_id}")
+        provenance = str(record.get("provenance", ""))
+        if str(expected_size) not in provenance or expected_hash not in provenance:
+            validation.error(f"G1.6A analysis input provenance changed for {input_id}")
+        path = ROOT / relative
+        must_verify = input_id == "INPUT-PROVENANCE" or verify_artifacts
+        if must_verify:
+            if not path.is_file():
+                validation.error(f"G1.6A analysis input is unavailable: {path}")
+            else:
+                if path.stat().st_size != expected_size:
+                    validation.error(f"G1.6A analysis input size mismatch: {path}")
+                if sha256(path) != expected_hash:
+                    validation.error(f"G1.6A analysis input hash mismatch: {path}")
+        if record.get("status") == "IGNORED LOCAL READ-ONLY":
+            ignored = run_git(ROOT, "check-ignore", "-q", "--", relative)
+            if ignored.returncode != 0:
+                validation.error(f"G1.6A local input is not ignored: {relative}")
+
+    sdk_pin = pins.get("rexglue", {})
+    sdk_repo = (
+        sdk_override.resolve()
+        if sdk_override is not None
+        else Path(str(sdk_pin.get("path", "")))
+    )
+    if not sdk_repo.is_dir():
+        validation.error(f"G1.6A ReXGlue repository is unavailable: {sdk_repo}")
+    else:
+        sdk_checks = (
+            ("HEAD", git_text(sdk_repo, "rev-parse", "HEAD"), sdk_pin.get("commit")),
+            (
+                "tree",
+                git_text(sdk_repo, "rev-parse", "HEAD^{tree}"),
+                sdk_pin.get("tree"),
+            ),
+            (
+                "branch",
+                git_text(sdk_repo, "branch", "--show-current"),
+                sdk_pin.get("branch"),
+            ),
+        )
+        for label, actual, expected in sdk_checks:
+            if actual != expected:
+                validation.error(
+                    f"G1.6A ReXGlue {label} mismatch: expected {expected!r}, "
+                    f"actual {actual!r}"
+                )
+        sdk_status_text = git_text(
+            sdk_repo, "status", "--short", "--untracked-files=all"
+        )
+        sdk_status = [] if sdk_status_text in (None, "") else sdk_status_text.splitlines()
+        if sdk_status != sdk_pin.get("allowed_preexisting_status"):
+            validation.error(
+                f"G1.6A ReXGlue status mismatch: expected "
+                f"{sdk_pin.get('allowed_preexisting_status')!r}, actual {sdk_status!r}"
+            )
+
+    canary_pin = pins.get("canary", {})
+    canary_repo = (
+        canary_override.resolve()
+        if canary_override is not None
+        else Path(str(canary_pin.get("path", "")))
+    )
+    if not canary_repo.is_dir():
+        validation.error(f"G1.6A Canary repository is unavailable: {canary_repo}")
+    else:
+        canary_checks = (
+            ("HEAD", git_text(canary_repo, "rev-parse", "HEAD"), canary_pin.get("commit")),
+            (
+                "tree",
+                git_text(canary_repo, "rev-parse", "HEAD^{tree}"),
+                canary_pin.get("tree"),
+            ),
+            (
+                "branch",
+                git_text(canary_repo, "branch", "--show-current"),
+                canary_pin.get("branch"),
+            ),
+        )
+        for label, actual, expected in canary_checks:
+            if actual != expected:
+                validation.error(
+                    f"G1.6A Canary {label} mismatch: expected {expected!r}, "
+                    f"actual {actual!r}"
+                )
+        canary_status = git_text(
+            canary_repo, "status", "--short", "--untracked-files=all"
+        )
+        if canary_status != "":
+            validation.error(f"G1.6A Canary worktree is not clean: {canary_status!r}")
+
+    if verify_artifacts:
+        plugin = pins.get("active_gpu_plugin", {})
+        plugin_path = ROOT / str(plugin.get("path", ""))
+        if not plugin_path.is_file():
+            validation.error(f"G1.6A active GPU plugin is unavailable: {plugin_path}")
+        else:
+            if plugin_path.stat().st_size != plugin.get("size"):
+                validation.error("G1.6A active GPU plugin size mismatch")
+            if sha256(plugin_path) != plugin.get("sha256"):
+                validation.error("G1.6A active GPU plugin hash mismatch")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -1411,6 +2064,8 @@ def main() -> int:
     experiment_backlog_schema = load_json(EXPERIMENT_BACKLOG_SCHEMA_PATH, validation)
     g2a_decision_schema = load_json(G2A_DECISION_SCHEMA_PATH, validation)
     g1_candidates = load_json(G1_CANDIDATE_PATH, validation)
+    static_xdk_inventory = load_json(STATIC_XDK_PATH, validation)
+    static_xdk_schema = load_json(STATIC_XDK_SCHEMA_PATH, validation)
     if inventory and inventory_schema:
         validate_with_schema(inventory, inventory_schema, "source inventory", validation)
     if subsystem_map and map_schema:
@@ -1471,6 +2126,13 @@ def main() -> int:
             g2a_decision,
             g2a_decision_schema,
             "G2A decision",
+            validation,
+        )
+    if static_xdk_inventory and static_xdk_schema:
+        validate_with_schema(
+            static_xdk_inventory,
+            static_xdk_schema,
+            "static XDK method inventory",
             validation,
         )
 
@@ -1541,6 +2203,15 @@ def main() -> int:
         if args.verify_artifacts:
             validate_g15d_artifacts(fable_relevance, validation)
 
+    if static_xdk_inventory:
+        validate_g16a_evidence(
+            static_xdk_inventory,
+            args.sdk_root,
+            args.canary_root,
+            args.verify_artifacts,
+            validation,
+        )
+
     validate_markdown_links(validation)
 
     for warning in validation.warnings:
@@ -1551,7 +2222,7 @@ def main() -> int:
         print(f"FAIL: {len(validation.errors)} error(s), {len(validation.warnings)} warning(s)")
         return 1
     print(
-        f"PASS: G1.5A/G1.5B/G1.5C/G1.5D GPU reference validated "
+        f"PASS: G1.5A/G1.5B/G1.5C/G1.5D/G1.6A GPU reference validated "
         f"({len(validation.warnings)} warning(s))"
     )
     return 0

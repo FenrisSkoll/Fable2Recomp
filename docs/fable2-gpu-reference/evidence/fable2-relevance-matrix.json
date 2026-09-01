@@ -1,0 +1,4148 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-fable-relevance-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5D",
+  "generated_on": "2026-09-01",
+  "pins": {
+    "fable_repository": {
+      "path": "C:\\Dev\\Fable2Recomp",
+      "branch": "fable2-native-renderer-g1.5-reference",
+      "commit": "3cef954120e062974f3fcdf707ac302aa0e2d44e",
+      "tree": "e5bcb4029052927c01f0895ac945fb3baa722496"
+    },
+    "g1": {
+      "branch": "fable2-native-renderer-g1-audit",
+      "commit": "c44e8c16f4422f9a828caf30899ac989170b8a8c",
+      "tree": "f5bde8e945f2d2ab6764c4d9c38f0f3550cac40c"
+    },
+    "paused_g2a": {
+      "branch": "fable2-native-renderer-g2a-forwarding-proof",
+      "commit": "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51",
+      "tree": "910e80108c2d9e7d8474866506f1c9e23ede601c"
+    },
+    "rexglue_repository": {
+      "path": "C:\\Dev\\rexglue-sdk-v0.10",
+      "branch": "fable2-v0.10-migration",
+      "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+      "tree": "b78b06b8ac650467372236a3a262864e069a9382"
+    },
+    "canary_repository": {
+      "path": "C:\\Dev\\Fable2NativeRendererResearch\\xenia-canary",
+      "branch": "canary_experimental",
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "tree": "c343b0a5796590fadc3b78c993bfada51e7e9148"
+    },
+    "active_gpu_artifact": {
+      "filename": "rexgpu-xenos.dll",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\rexgpu-xenos.dll",
+      "size": 2770944,
+      "sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99",
+      "backend": "D3D12 only"
+    }
+  },
+  "authoritative_input": {
+    "path": "docs/fable2-gpu-reference/evidence/divergence-matrix.json",
+    "sha256": "B4BED324837E092BE29BE91D2C5E55CCA6CEFC9884FAFE150CE04F8F02DC261C",
+    "record_count": 37
+  },
+  "evidence_ladder": [
+    {
+      "level": "L0",
+      "definition": "GPU plugin/backend initialized",
+      "status": "REACHED",
+      "proven": [
+        "The exact active rexgpu-xenos.dll loaded and initialized D3D12 on NVIDIA GeForce RTX 5080 in Run 047 and Run 048."
+      ],
+      "source_connected_only": [],
+      "gap_to_next": "None; L0 is complete for the exact D3D12 artifact.",
+      "experiment_ids": []
+    },
+    {
+      "level": "L1",
+      "definition": "Fable swap request and presented output exist",
+      "status": "REACHED",
+      "proven": [
+        "TU1 sub_82BA34D8 statically reaches VdSwap.",
+        "Run 047 produced presented Fable output with a localized black-surface symptom."
+      ],
+      "source_connected_only": [
+        "No monotonic ID yet proves one-to-one propagation from the title call through mailbox refresh to DXGI Present."
+      ],
+      "gap_to_next": "Identify the exact Fable packet/draw/copy/query stream without payload capture.",
+      "experiment_ids": [
+        "EXP-STATIC-XDK-001",
+        "EXP-SWAP-CORRELATION-001",
+        "EXP-DRAW-DECISION-001"
+      ]
+    },
+    {
+      "level": "L2",
+      "definition": "Exact Fable packet/draw/copy/query stream identified",
+      "status": "NOT REACHED",
+      "proven": [],
+      "source_connected_only": [
+        "Pinned ReXGlue source identifies observation points; a source call graph is not a Fable runtime trace."
+      ],
+      "gap_to_next": "Bounded stream IDs and operation metadata for the exact scene.",
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-ZPD-REPORT-001",
+        "EXP-EDRAM-RESOLVE-001"
+      ]
+    },
+    {
+      "level": "L3",
+      "definition": "Per-draw registers, pipeline decision, bindings and skip/failure result identified",
+      "status": "NOT REACHED",
+      "proven": [],
+      "source_connected_only": [
+        "Run logs contain shader/pipeline hashes but do not correlate them to affected draws or outcomes."
+      ],
+      "gap_to_next": "Minimal per-draw decision, shader/pipeline identity and binding metadata.",
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001",
+        "EXP-SHADER-IDENTITY-001",
+        "EXP-TEXTURE-METADATA-001"
+      ]
+    },
+    {
+      "level": "L4",
+      "definition": "Affected character draw, shader, texture, EDRAM pass and resource lifetime identified",
+      "status": "NOT REACHED",
+      "proven": [],
+      "source_connected_only": [
+        "Screenshots localize the visible symptom but carry no GPU provenance."
+      ],
+      "gap_to_next": "Correlate one affected draw through shader, texture, EDRAM and lifetime identities.",
+      "experiment_ids": [
+        "EXP-CHARACTER-PAIR-001"
+      ]
+    },
+    {
+      "level": "L5",
+      "definition": "Controlled evidence ties one divergent behaviour to the symptom or clears it",
+      "status": "NOT REACHED",
+      "proven": [],
+      "source_connected_only": [
+        "No controlled A/B result exists for any divergence."
+      ],
+      "gap_to_next": "After L4, change exactly one qualified behavior under a paired controlled checkpoint.",
+      "experiment_ids": [
+        "EXP-CANDIDATE-AB-001"
+      ]
+    }
+  ],
+  "fable_evidence": [
+    {
+      "evidence_id": "FBL-TITLE-IDENTITY",
+      "kind": "TU1 identity corpus",
+      "path": "docs/fable2-discovery-pipeline/01-known-facts-and-baseline.md",
+      "status": "COMMITTED",
+      "facts": [
+        "Fable II GOTY TU1 title/media/version 0x4D5307F1 / 0x716F0A0D / 0.0.1.26.",
+        "Loaded post-patch image SHA-256 BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00."
+      ]
+    },
+    {
+      "evidence_id": "FBL-G1-SWAP-STATIC",
+      "kind": "TU1 static generated-code and Ghidra evidence",
+      "path": "docs/fable2-native-renderer/candidate-hook-inventory.json",
+      "status": "COMMITTED",
+      "facts": [
+        "sub_82BA34D8 occupies [0x82BA34D8, 0x82BA3BFC), size 0x724, 457 PPC instructions.",
+        "The function directly reaches VdGetSystemCommandBuffer and VdSwap."
+      ]
+    },
+    {
+      "evidence_id": "FBL-RUN047-LOG-A",
+      "kind": "accepted runtime log",
+      "path": "C:\\Dev\\Fable2Recomp\\fable2-run-047.1.log",
+      "size": 5242848,
+      "sha256": "BDE01B61B5E8C04298BE17C3702BD3B1FA4ED122A47991BA99A0052C12FBA0C5",
+      "status": "IGNORED LOCAL",
+      "facts": [
+        "Loaded GPU plugin xenos from rexgpu-xenos.dll and initialized D3D12 on NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Created GPU Commands and GPU VSync host threads.",
+        "Recorded XamShowKeyboardUI at line 42673."
+      ]
+    },
+    {
+      "evidence_id": "FBL-RUN047-LOG-B",
+      "kind": "accepted rotated runtime log continuation",
+      "path": "C:\\Dev\\Fable2Recomp\\fable2-run-047.log",
+      "size": 3276167,
+      "sha256": "A32254435C900A6688EC8ECA3583FA364A2F377F5AAB9CB5A455CA3562E7E8FF",
+      "status": "IGNORED LOCAL",
+      "facts": [
+        "Recorded XGI message 0x000B0008 outcomes for achievement IDs 11 and 60.",
+        "The accepted user-controlled run continued to Bowerstone Market without a demonstrated GPU blocking failure."
+      ]
+    },
+    {
+      "evidence_id": "FBL-RUN048-LOG",
+      "kind": "bounded no-input runtime smoke log",
+      "path": "C:\\Dev\\Fable2Recomp\\fable2-run-048.log",
+      "size": 631212,
+      "sha256": "893C6143A43598DE0F79D3B9370C70E11182ECE803D8828F27CEE4BBD6A5FD6D",
+      "status": "IGNORED LOCAL",
+      "facts": [
+        "Loaded the same xenos plugin and initialized D3D12 presentation on NVIDIA GeForce RTX 5080.",
+        "This was not gameplay validation and contains no character-draw provenance."
+      ]
+    },
+    {
+      "evidence_id": "FBL-RUN047-IMAGE-001",
+      "kind": "accepted screenshot",
+      "path": "C:\\Dev\\Fable2Phase4Seed\\runtime-run-047\\fable2_2026_08_31_23_04_46_860.png",
+      "size": 3520996,
+      "sha256": "6378410C35E8DE09BA8492DBB83ED310A0AF88293AB2C07500BBC8249183D015",
+      "status": "EXTERNAL LOCAL",
+      "facts": [
+        "Dog and exposed player skin/head surfaces are black while environment, lighting and clothing render.",
+        "The image contains no draw, shader, texture, EDRAM or lifetime provenance."
+      ]
+    },
+    {
+      "evidence_id": "FBL-RUN047-IMAGE-002",
+      "kind": "accepted screenshot",
+      "path": "C:\\Dev\\Fable2Phase4Seed\\runtime-run-047\\fable2_2026_08_31_23_05_20_600.png",
+      "size": 3990161,
+      "sha256": "E99F15C2466CD2F10B4EF97C328C8A326030F31058C2AE09132F30DE3FA0AEEB",
+      "status": "EXTERNAL LOCAL",
+      "facts": [
+        "The same localized black dog/player-skin symptom coexists with rendered UI and scene content.",
+        "Visual similarity alone does not identify a divergent GPU behaviour."
+      ]
+    },
+    {
+      "evidence_id": "FBL-PRESENT-SOURCE",
+      "kind": "pinned ReXGlue static source",
+      "path": "C:\\Dev\\rexglue-sdk-v0.10\\src\\ui\\d3d12\\d3d12_presenter.cpp",
+      "status": "STATIC SOURCE",
+      "facts": [
+        "Guest output is composed before Presenter::ExecuteUIDrawersFromUIThread.",
+        "Host UI is then composed before DXGI Present."
+      ]
+    },
+    {
+      "evidence_id": "FBL-KEYBOARD-STATIC",
+      "kind": "TU1 generated import/callsite evidence",
+      "path": "generated/default/fable2_recomp.15.cpp",
+      "status": "STATIC SOURCE",
+      "facts": [
+        "Import address 0x832B9AC4 registers __imp__XamShowKeyboardUI.",
+        "sub_82CC2E90 is a direct thunk and the title calls it at guest LR 0x826CDF64."
+      ]
+    },
+    {
+      "evidence_id": "FBL-ACHIEVEMENT-STATIC",
+      "kind": "TU1 generated message-route evidence",
+      "path": "generated/default/fable2_recomp.123.cpp",
+      "status": "STATIC SOURCE",
+      "facts": [
+        "sub_82CC27F8 calls XMsgStartIORequest with app 0xFB, message 0x000B0008, buffer length 8.",
+        "Pinned ReXGlue routes this to XgiApp::DispatchMessageSync and UnlockAchievement."
+      ]
+    }
+  ],
+  "records": [
+    {
+      "record_id": "BCK-001",
+      "subsystem": "Backend boundaries",
+      "behaviour": "Backend set present in the exact deployed ReXGlue GPU artifact versus pinned Canary source",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/CMakeLists.txt",
+              "symbols": [
+                "REXGLUE_USE_D3D12",
+                "REXGLUE_USE_VULKAN"
+              ]
+            },
+            {
+              "path": "src/graphics/plugin_main.cpp",
+              "symbols": [
+                "D3D12GraphicsSystem",
+                "VulkanGraphicsSystem"
+              ]
+            }
+          ],
+          "summary": "The pinned source contains D3D12 and Vulkan, but the verified rexgpu-xenos.dll was built with D3D12 enabled and Vulkan disabled."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/app/xenia_main.cc",
+              "symbols": [
+                "EmulatorApp::CreateGraphicsSystem",
+                "D3D12GraphicsSystem",
+                "VulkanGraphicsSystem",
+                "NullGraphicsSystem"
+              ]
+            }
+          ],
+          "summary": "Pinned Canary source exposes D3D12, Vulkan and null factories, with platform and configuration selection."
+        },
+        "material_divergences": [
+          "The exact Fable deployment can execute only the ReXGlue D3D12 backend; Canary source comparison spans additional backends that are not in that artifact."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-c22a33e2"
+          ],
+          "summary": "The plugin extraction explains deployment form; exact backend inclusion is confirmed by G1.5A CMake-cache and binary evidence rather than commit intent."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Backend boundaries path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "hosting/integration only",
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Retain the exact DLL hash and D3D12 provider identity with every later result.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-BCK-001"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "No missing fact for active backend identity; individual behavior rows carry causal questions.",
+        "minimum_evidence_needed": "Retain the exact DLL hash and D3D12 provider identity with every later result.",
+        "observation_symbol_or_address": "Runtime::CreateGraphicsSystem / rexgpu-xenos.dll",
+        "static_analysis_can_obtain": "YES",
+        "later_tooling_required": false,
+        "user_gameplay_required": false,
+        "decision_unlocked": "Keeps later evidence scoped to the deployed D3D12 artifact."
+      }
+    },
+    {
+      "record_id": "BCK-002",
+      "subsystem": "Backend boundaries",
+      "behaviour": "Shared GPU architecture and D3D12/Vulkan/null capability boundaries",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/graphics_system.cpp",
+              "symbols": [
+                "D3D12GraphicsSystem::CreateCommandProcessor"
+              ]
+            },
+            {
+              "path": "src/graphics/vulkan/graphics_system.cpp",
+              "symbols": [
+                "VulkanGraphicsSystem::CreateCommandProcessor"
+              ]
+            }
+          ],
+          "summary": "ReXGlue shares GPU modeling above D3D12/Vulkan backends and contains MoltenVK adaptations; it has no Canary null backend and current Fable packaging excludes Vulkan."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_graphics_system.cc",
+              "symbols": [
+                "D3D12GraphicsSystem::CreateCommandProcessor"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/vulkan/vulkan_graphics_system.cc",
+              "symbols": [
+                "VulkanGraphicsSystem::CreateCommandProcessor"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/null/null_graphics_system.cc",
+              "symbols": [
+                "NullGraphicsSystem::CreateCommandProcessor"
+              ]
+            }
+          ],
+          "summary": "Canary retains shared GPU behavior above D3D12/Vulkan and a null backend, with provider capability branches and current per-backend implementations."
+        },
+        "material_divergences": [
+          "Backend inventory, host capability surfaces and MoltenVK-specific adaptation differ; these are not a ranking of implementation correctness."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-5f5d7f6f"
+          ],
+          "summary": "ReXGlue's direct commit records its MoltenVK adaptations and runtime-discovery packaging."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "NOT APPLICABLE TO CURRENT FABLE ARTIFACT",
+        "evidence_refs": [],
+        "rationale": "The exact active artifact is D3D12-only or this row is host tooling rather than current guest execution."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "hosting/integration only",
+        "future renderer contract",
+        "current artifact not applicable"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "A separately pinned Vulkan-capable artifact would be required for any future claim.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-BCK-002"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "Vulkan behavior is outside the D3D12-only artifact.",
+        "minimum_evidence_needed": "A separately pinned Vulkan-capable artifact would be required for any future claim.",
+        "observation_symbol_or_address": "Plugin manifest and CreateGraphicsSystem",
+        "static_analysis_can_obtain": "YES",
+        "later_tooling_required": false,
+        "user_gameplay_required": false,
+        "decision_unlocked": "None for the current artifact."
+      }
+    },
+    {
+      "record_id": "BND-001",
+      "subsystem": "Plugin/runtime boundary",
+      "behaviour": "GPU construction, runtime ABI, ownership and dispatch",
+      "source_identity": {
+        "direction": "REXGLUE-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/ui/rex_app.cpp",
+              "symbols": [
+                "ReXApp::SetupPresentation"
+              ]
+            },
+            {
+              "path": "src/system/gpu_plugin_loader.cpp",
+              "symbols": [
+                "LoadGpuPlugin"
+              ]
+            },
+            {
+              "path": "src/graphics/plugin_main.cpp",
+              "symbols": [
+                "rex_gpu_create"
+              ]
+            }
+          ],
+          "summary": "ReXApp loads rexgpu-xenos at runtime, creates an IGraphicsSystem through the plugin ABI, and retains runtime-side ownership and shutdown control."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/app/xenia_main.cc",
+              "symbols": [
+                "EmulatorApp::CreateGraphicsSystem"
+              ]
+            },
+            {
+              "path": "src/xenia/emulator.cc",
+              "symbols": [
+                "Emulator::Setup"
+              ]
+            }
+          ],
+          "summary": "Canary selects and owns an in-process D3D12, Vulkan or null GraphicsSystem factory as part of Emulator setup; it has no ReXGlue plugin ABI."
+        },
+        "material_divergences": [
+          "ReXGlue introduces a runtime-loaded GPU plugin ABI and IGraphicsSystem integration boundary absent from Canary."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-55a836fb",
+            "REX-c22a33e2"
+          ],
+          "summary": "Direct ReXGlue commits route GPU access through IGraphicsSystem and extract the Xenos implementation into a runtime-loaded plugin."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Plugin/runtime boundary path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "hosting/integration only",
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Static proof of a new ownership interface or a complete replacement provider contract.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-BND-001"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "The corpus does not provide a second composable graphics owner beside IGraphicsSystem.",
+        "minimum_evidence_needed": "Static proof of a new ownership interface or a complete replacement provider contract.",
+        "observation_symbol_or_address": "rex::graphics::IGraphicsSystem",
+        "static_analysis_can_obtain": "YES",
+        "later_tooling_required": false,
+        "user_gameplay_required": false,
+        "decision_unlocked": "Determines whether eventual replacement can avoid implementing the current GPU ABI."
+      }
+    },
+    {
+      "record_id": "BND-002",
+      "subsystem": "Plugin/runtime boundary",
+      "behaviour": "Presentation and guest-GPU initialization, memory callbacks, interrupts, register ownership and shutdown",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/graphics_system.cpp",
+              "symbols": [
+                "GraphicsSystem::SetupPresentation",
+                "GraphicsSystem::SetupGuestGpu",
+                "GraphicsSystem::Shutdown"
+              ]
+            },
+            {
+              "path": "include/rex/graphics/graphics_system.h",
+              "symbols": [
+                "RegisterFile register_file_"
+              ]
+            }
+          ],
+          "summary": "ReXGlue splits presentation from guest-GPU setup, embeds the register file, connects runtime memory and interrupt callbacks through IGraphicsSystem, and shuts down through the plugin owner."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/graphics_system.cc",
+              "symbols": [
+                "GraphicsSystem::Setup",
+                "GraphicsSystem::Shutdown"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/graphics_system.h",
+              "symbols": [
+                "RegisterFile* register_file_"
+              ]
+            }
+          ],
+          "summary": "Canary performs one GraphicsSystem setup sequence and allocates the register file in guest-addressable fixed memory while using Emulator-owned memory and interrupt facilities."
+        },
+        "material_divergences": [
+          "Initialization phases and register-file storage ownership differ; the callback and interrupt plumbing terminate in different host integration layers."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-506eee89",
+            "REX-55a836fb"
+          ],
+          "summary": "ReXGlue history directly records the setup split and IGraphicsSystem routing, but does not claim a guest-visible correction."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Plugin/runtime boundary path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "hosting/integration only",
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "An ownership table tied to setup, memory callbacks, interrupts, vblank, presenter and shutdown interfaces.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-BND-002"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "Which lifecycle services could be retained if rendering ownership changes.",
+        "minimum_evidence_needed": "An ownership table tied to setup, memory callbacks, interrupts, vblank, presenter and shutdown interfaces.",
+        "observation_symbol_or_address": "IGraphicsSystem::Setup / Shutdown",
+        "static_analysis_can_obtain": "YES",
+        "later_tooling_required": false,
+        "user_gameplay_required": false,
+        "decision_unlocked": "Gates any ownership transition."
+      }
+    },
+    {
+      "record_id": "CFG-001",
+      "subsystem": "Configuration and policy",
+      "behaviour": "Accuracy, performance, cache and host-capability defaults",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/texture/cache.cpp",
+              "symbols": [
+                "anisotropic_override",
+                "pre_mask_resolve_l2_block"
+              ]
+            },
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "clear_memory_page_state"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "async_shader_compilation"
+              ]
+            }
+          ],
+          "summary": "ReXGlue defaults anisotropic_override to 3 and clear_memory_page_state to true, exposes ReX-specific hot-reload and diagnostic controls, and gates selected compatibility/performance paths."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/gpu_flags.cc",
+              "symbols": [
+                "anisotropic_override"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "clear_memory_page_state"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "async_shader_compilation"
+              ]
+            }
+          ],
+          "summary": "Canary defaults anisotropic_override to -1 and clear_memory_page_state to false and has a different current set of accuracy/performance and capability switches."
+        },
+        "material_divergences": [
+          "Default filtering, memory-validity refresh and several optional execution paths differ even when source algorithms are otherwise shared."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-6124b362",
+            "REX-bb4a536c"
+          ],
+          "summary": "ReXGlue history explains its current single-validity state and a gated resolve pre-mask, but not every default-policy divergence."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "NOT OBSERVED IN RUN 047/048",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The existing logs identify the adapter and several D3D12 features but do not enumerate the complete effective GPU configuration."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "A metadata-only configuration/capability snapshot from the exact DLL and RTX 5080; existing logs prove only adapter and listed D3D12 features.",
+      "later_observation_boundaries": [
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-CFG-001"
+      ],
+      "experiment_ids": [
+        "EXP-CONFIG-CAP-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The complete effective Run 047/048 GPU CVar snapshot, including anisotropic_override=effective value, clear_memory_page_state, async_shader_compilation and relevant host-capability branches.",
+        "minimum_evidence_needed": "A metadata-only configuration/capability snapshot from the exact DLL and RTX 5080; existing logs prove only adapter and listed D3D12 features.",
+        "observation_symbol_or_address": "async_shader_compilation / anisotropic_override / clear_memory_page_state",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": false,
+        "decision_unlocked": "Separates code identity from configuration-dependent behavior."
+      }
+    },
+    {
+      "record_id": "CMD-001",
+      "subsystem": "Ring and command buffers",
+      "behaviour": "Ring reads, type-0/type-1/type-2/type-3 PM4 decoding, indirect buffers and XE_SWAP dispatch",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "CommandProcessor::WorkerThreadMain",
+                "CommandProcessor::ExecutePacket",
+                "ExecutePacketType3_XE_SWAP"
+              ]
+            }
+          ],
+          "summary": "ReXGlue keeps ring execution and PM4 handlers largely in one CommandProcessor translation unit."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "CommandProcessor::WorkerThreadMain"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+              "symbols": [
+                "COMMAND_PROCESSOR::ExecutePacket",
+                "COMMAND_PROCESSOR::ExecutePacketType3_XE_SWAP"
+              ]
+            }
+          ],
+          "summary": "Canary splits the same ring worker and templated PM4 handlers between CommandProcessor and pm4_command_processor_implement.h."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "Current call-chain comparison found the same meaningful PM4 opcode coverage; file movement alone is not a material divergence."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED TU1 STATIC REACHABILITY",
+        "evidence_refs": [
+          "FBL-G1-SWAP-STATIC"
+        ],
+        "rationale": "Exact TU1 generated code reaches VdSwap and the source-connected XE_SWAP dispatch, but no runtime packet stream is identified."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-G1-SWAP-STATIC"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Only packet opcode, ring sequence ID and submission ID for a bounded scene.",
+      "later_observation_boundaries": [
+        "REX-EXECUTE-PACKET3"
+      ],
+      "open_question_ids": [
+        "OQ-CMD-001"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Runtime ordering and identity of packets beyond the statically proven XE_SWAP operation.",
+        "minimum_evidence_needed": "Only packet opcode, ring sequence ID and submission ID for a bounded scene.",
+        "observation_symbol_or_address": "CommandProcessor::ExecutePacketType3",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Determines which detailed observation records are reachable."
+      }
+    },
+    {
+      "record_id": "CMD-002",
+      "subsystem": "Ring and command buffers",
+      "behaviour": "Waits, events, interrupts, coherency requests and operation triggers",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "ExecutePacketType3_WAIT_REG_MEM",
+                "ExecutePacketType3_EVENT_WRITE",
+                "ExecutePacketType3_INTERRUPT",
+                "CommandProcessor::MakeCoherent"
+              ]
+            }
+          ],
+          "summary": "ReXGlue evaluates waits, writes events, invokes interrupts and accepts invalidate/coherency operations, with explicit incomplete coherency work."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+              "symbols": [
+                "ExecutePacketType3_WAIT_REG_MEM",
+                "ExecutePacketType3_EVENT_WRITE",
+                "ExecutePacketType3_INTERRUPT"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "CommandProcessor::MakeCoherent"
+              ]
+            }
+          ],
+          "summary": "Canary retains equivalent wait, event, interrupt and coherency dispatch behavior, including the same incomplete useful cache invalidation work."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "No material current divergence was established; shared TODOs are retained as limitations."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Opcode and ordering metadata for only those packet classes.",
+      "later_observation_boundaries": [
+        "REX-EXECUTE-PACKET3"
+      ],
+      "open_question_ids": [
+        "OQ-CMD-002"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether TU1 emits the specific wait/event/coherency/interrupt operations in the affected scene.",
+        "minimum_evidence_needed": "Opcode and ordering metadata for only those packet classes.",
+        "observation_symbol_or_address": "CommandProcessor::ExecutePacketType3",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Determines whether synchronization divergence analysis is needed."
+      }
+    },
+    {
+      "record_id": "DIA-001",
+      "subsystem": "Diagnostics and robustness",
+      "behaviour": "GPU trace capture, playback and source-side inspection tools",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/CMakeLists.txt",
+              "symbols": [
+                "gpu"
+              ]
+            },
+            {
+              "path": "include/rex/graphics/command_processor.h",
+              "symbols": [
+                "class CommandProcessor"
+              ]
+            }
+          ],
+          "summary": "ReXGlue intentionally removed the partially intact Snappy-backed GPU trace-capture system and directs trace users to Xenia."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/trace_writer.cc",
+              "symbols": [
+                "TraceWriter"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/trace_reader.cc",
+              "symbols": [
+                "TraceReader"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/trace_player.cc",
+              "symbols": [
+                "TracePlayer"
+              ]
+            }
+          ],
+          "summary": "Canary retains trace writing, reading and playback infrastructure and related GPU inspection support."
+        },
+        "material_divergences": [
+          "Canary can produce and consume its GPU trace format; ReXGlue cannot in the pinned source."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-71782a3b"
+          ],
+          "summary": "ReXGlue's commit explicitly says the system had no working viewers and recommends Xenia for this form of capture."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "NOT APPLICABLE TO CURRENT FABLE ARTIFACT",
+        "evidence_refs": [],
+        "rationale": "The exact active artifact is D3D12-only or this row is host tooling rather than current guest execution."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "future enhancement only",
+        "current artifact not applicable"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "A later tooling authorization and privacy review.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-DIA-001"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "No guest-behavior fact is missing; diagnostic tooling is deferred.",
+        "minimum_evidence_needed": "A later tooling authorization and privacy review.",
+        "observation_symbol_or_address": "Canary trace infrastructure",
+        "static_analysis_can_obtain": "YES",
+        "later_tooling_required": false,
+        "user_gameplay_required": false,
+        "decision_unlocked": "None for current compatibility."
+      }
+    },
+    {
+      "record_id": "DIA-002",
+      "subsystem": "Diagnostics and robustness",
+      "behaviour": "Assertions, unsupported guest behavior, fallbacks, device loss and TODO policy",
+      "source_identity": {
+        "direction": "INSUFFICIENT EVIDENCE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "CheckSubmissionFence",
+                "GetDeviceRemovedReason"
+              ]
+            },
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "REXGPU_ERROR",
+                "assert_always"
+              ]
+            }
+          ],
+          "summary": "ReXGlue logs, asserts or fails unsupported operations, includes D3D12 device-removal reporting and retains fake or incomplete paths where explicitly configured."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "GetDeviceRemovedReason"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "XELOGE",
+                "assert"
+              ]
+            }
+          ],
+          "summary": "Canary has broadly equivalent error/device-loss and unsupported-operation handling, plus newer per-feature diagnostics; exhaustive semantic equivalence was not proven for every assertion and TODO."
+        },
+        "material_divergences": [
+          "Individual diagnostics and TODOs differ, but no single guest-visible policy difference was proven across the entire broad category."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-25f2501b"
+          ],
+          "summary": "A ReXGlue commit confirms one device-removal fix in its query path; broad diagnostic ancestry is not established."
+        }
+      },
+      "source_confidence": "PROBABLE SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "future enhancement only"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "The first exact diagnostic, source branch and outcome if such a failure occurs.",
+      "later_observation_boundaries": [],
+      "open_question_ids": [
+        "OQ-DIA-002"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "No exact Fable GPU failure has selected an unsupported/fallback/device-loss path.",
+        "minimum_evidence_needed": "The first exact diagnostic, source branch and outcome if such a failure occurs.",
+        "observation_symbol_or_address": "REX_FATAL / unsupported packet branches",
+        "static_analysis_can_obtain": "NO",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Narrows robustness work to a demonstrated failure."
+      }
+    },
+    {
+      "record_id": "DRW-001",
+      "subsystem": "Draw initiation and geometry",
+      "behaviour": "Draw initiation, primitive and index handling, extents and predication",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "D3D12CommandProcessor::IssueDraw"
+              ]
+            },
+            {
+              "path": "src/graphics/primitive_processor.cpp",
+              "symbols": [
+                "PrimitiveProcessor::Process"
+              ]
+            },
+            {
+              "path": "src/graphics/util/draw_extent_estimator.cpp",
+              "symbols": [
+                "DrawExtentEstimator::EstimateMaxY"
+              ]
+            }
+          ],
+          "summary": "ReXGlue normalizes draw state, topology, endian-aware indices, extents and predicate/query decisions before backend submission."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "D3D12CommandProcessor::IssueDraw"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/primitive_processor.cc",
+              "symbols": [
+                "PrimitiveProcessor::Process"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/draw_extent_estimator.cc",
+              "symbols": [
+                "DrawExtentEstimator"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same general draw-normalization chain with later special cases recorded separately."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "Equivalent common behavior was traced through the call chains, not inferred from names alone."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Draw initiation and geometry path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "One per-draw decision record with draw ID, primitive/index counts, extents, predication and outcome.",
+      "later_observation_boundaries": [
+        "REX-ISSUE-DRAW",
+        "REX-PRIMITIVE-PROCESS"
+      ],
+      "open_question_ids": [
+        "OQ-DRW-001"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The topology, predication and outcome of the affected character draws.",
+        "minimum_evidence_needed": "One per-draw decision record with draw ID, primitive/index counts, extents, predication and outcome.",
+        "observation_symbol_or_address": "D3D12CommandProcessor::IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Raises evidence from broad draw execution to L3."
+      }
+    },
+    {
+      "record_id": "DRW-002",
+      "subsystem": "Draw initiation and geometry",
+      "behaviour": "EVENT_WRITE_ZPD occlusion-query lifecycle and result retirement",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD",
+                "active_occlusion_query_"
+              ]
+            }
+          ],
+          "summary": "ReXGlue's active D3D12 path holds one host query, ends/resolves/waits synchronously, and can fall back to a fixed fake sample count."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+              "symbols": [
+                "ExecutePacketType3_EVENT_WRITE_ZPD"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "CommandProcessor::BeginZPDReport",
+                "CommandProcessor::EndZPDReport",
+                "CommandProcessor::OnZPDQueryResolved"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_zpd_query_pool.cc",
+              "symbols": [
+                "D3D12ZPDQueryPool"
+              ]
+            }
+          ],
+          "summary": "Canary owns a shared logical report lifecycle spanning submissions and passes, segmenting and asynchronously retiring D3D12/Vulkan host-query or counter-buffer results with fast, strict and fake modes."
+        },
+        "material_divergences": [
+          "Canary supports multi-segment, same-slot-reuse and asynchronous report lifetimes; ReXGlue's active path is a single synchronous D3D12 query lifecycle."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-fbd620c2",
+            "REX-e6407f3a",
+            "REX-25f2501b",
+            "REX-8e6baaec"
+          ],
+          "summary": "Canary documents the new logical report design; ReXGlue history documents its backend port and two local D3D12/sentinel corrections."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Opcode, report slot, begin/end sequence, submission ID and retirement/reuse result; no query payload.",
+      "later_observation_boundaries": [
+        "REX-ISSUE-DRAW",
+        "REX-PRIMITIVE-PROCESS"
+      ],
+      "open_question_ids": [
+        "OQ-DRW-002"
+      ],
+      "experiment_ids": [
+        "EXP-ZPD-REPORT-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether EVENT_WRITE_ZPD is used, which report slots are opened/closed across submissions, and whether a slot is reused before retirement.",
+        "minimum_evidence_needed": "Opcode, report slot, begin/end sequence, submission ID and retirement/reuse result; no query payload.",
+        "observation_symbol_or_address": "D3D12CommandProcessor::ExecutePacketType3_EVENT_WRITE_ZPD / EndSubmission",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Tests whether ZPD lifetime can affect the scene."
+      }
+    },
+    {
+      "record_id": "MEM-001",
+      "subsystem": "Guest/shared memory and synchronization",
+      "behaviour": "Shared-memory watches, validity, upload/download, barriers, queues, fences and resource lifetime",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/shared_memory.cpp",
+              "symbols": [
+                "SharedMemory::Initialize",
+                "SharedMemory::WatchMemoryRange",
+                "SharedMemory::RangeWrittenByGpu"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "AwaitAllQueueOperationsCompletion"
+              ]
+            }
+          ],
+          "summary": "ReXGlue maintains physical-page validity and watches, upload/download ownership, D3D12 transitions, submissions, fences and deferred resource release."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/shared_memory.cc",
+              "symbols": [
+                "SharedMemory::Initialize",
+                "SharedMemory::WatchMemoryRange",
+                "SharedMemory::RangeWrittenByGpu"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "AwaitAllQueueOperationsCompletion"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same broad watch/validity/upload/download and D3D12 submission/fence model, with invalidation lifecycle differences recorded separately."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-6124b362"
+          ],
+          "summary": "ReXGlue removed its own double-buffered validity experiment; current broad validity ownership is equivalent, while unwatched invalidation remains separate."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "PROBABLE FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Rendered output and pinned source make the broad subsystem use probable, but the exact divergent branch or affected state is not directly observed."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Hashed resource identity, range, validity transition and submission ordering.",
+      "later_observation_boundaries": [
+        "REX-SHARED-REQUEST-RANGES",
+        "REX-SHARED-RANGE-WRITTEN"
+      ],
+      "open_question_ids": [
+        "OQ-MEM-001"
+      ],
+      "experiment_ids": [
+        "EXP-MEM-LIFECYCLE-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Which guest resource ranges and cache consumers back the affected draws.",
+        "minimum_evidence_needed": "Hashed resource identity, range, validity transition and submission ordering.",
+        "observation_symbol_or_address": "SharedMemory::RequestRanges / RangeWrittenByGpu",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Provides resource lifetime context without payloads."
+      }
+    },
+    {
+      "record_id": "MEM-002",
+      "subsystem": "Guest/shared memory and synchronization",
+      "behaviour": "Invalidation callbacks for unwatched decommit, release and protect-to-writable ranges",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/system/xmemory.cpp",
+              "symbols": [
+                "PhysicalHeap::TriggerCallbacks",
+                "PhysicalHeap::Release",
+                "PhysicalHeap::Protect"
+              ]
+            }
+          ],
+          "summary": "ReXGlue's callback path returns without firing when no watched bits are armed, including lifecycle changes on otherwise unwatched ranges."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/memory.cc",
+              "symbols": [
+                "Memory::TriggerPhysicalMemoryCallbacks",
+                "PhysicalHeap::Release",
+                "PhysicalHeap::Protect"
+              ]
+            }
+          ],
+          "summary": "Canary raises invalidation callbacks for decommit, release and protect-to-writable even if no watch is armed; it also resolves access at system-page granularity and validates unwatched write faults."
+        },
+        "material_divergences": [
+          "Canary invalidates GPU-side consumers on unwatched mapping lifecycle changes that ReXGlue's callback gate can omit."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-aed81ca9"
+          ],
+          "summary": "The Canary commit explicitly combines system-page access, write-fault validation and unwatched lifecycle invalidation; only the last remains materially divergent from current ReXGlue in this row."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Mapping operation, range, watch state, validity generation and hashed cache consumer identity.",
+      "later_observation_boundaries": [
+        "REX-SHARED-REQUEST-RANGES",
+        "REX-SHARED-RANGE-WRITTEN"
+      ],
+      "open_question_ids": [
+        "OQ-MEM-002"
+      ],
+      "experiment_ids": [
+        "EXP-MEM-LIFECYCLE-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected range is decommitted, released or protected writable while unwatched and later consumed from a GPU cache.",
+        "minimum_evidence_needed": "Mapping operation, range, watch state, validity generation and hashed cache consumer identity.",
+        "observation_symbol_or_address": "PhysicalHeap::TriggerCallbacks / SharedMemory::RequestRanges",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms or clears the unwatched invalidation path."
+      }
+    },
+    {
+      "record_id": "PIP-001",
+      "subsystem": "Pipeline and state assembly",
+      "behaviour": "Pipeline descriptions, descriptor/binding layouts, specialization, keys and invalidation",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/pipeline_cache.cpp",
+              "symbols": [
+                "PipelineCache::ConfigurePipeline",
+                "GetCurrentStateDescription"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "UpdateBindings"
+              ]
+            }
+          ],
+          "summary": "ReXGlue derives pipeline descriptions and hashes from translated shaders, render-target and fixed-function state and manages descriptor/root binding invalidation."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+              "symbols": [
+                "PipelineCache::ConfigurePipeline",
+                "GetCurrentStateDescription"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "UpdateBindings"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same broad state-description, hashing, root-signature and binding pipeline with later state fields and capability paths separated below."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "Equivalent current state assembly was established at the behavior level."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Pipeline and state assembly path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw ID, VS/PS hashes, pipeline hash, root/binding layout hash and readiness.",
+      "later_observation_boundaries": [
+        "REX-CONFIGURE-PIPELINE",
+        "REX-ISSUE-DRAW",
+        "REX-END-SUBMISSION"
+      ],
+      "open_question_ids": [
+        "OQ-PIP-001"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Which pipeline hashes and binding layout correspond to the affected character draws.",
+        "minimum_evidence_needed": "Draw ID, VS/PS hashes, pipeline hash, root/binding layout hash and readiness.",
+        "observation_symbol_or_address": "PipelineCache::ConfigurePipeline / UpdateBindings",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Correlates draw outcomes without shader bodies."
+      }
+    },
+    {
+      "record_id": "PIP-002",
+      "subsystem": "Pipeline and state assembly",
+      "behaviour": "Asynchronous D3D12 shader and pipeline creation",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/pipeline_cache.cpp",
+              "symbols": [
+                "PipelineCache::ConfigurePipeline",
+                "PipelineCache::EndSubmission",
+                "Await creation of all queued pipelines"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "async_shader_compilation",
+                "GetD3D12PipelineByHandle"
+              ]
+            }
+          ],
+          "summary": "ReXGlue may skip the initiating draw while a pipeline is unavailable, then drains queued work and waits for busy creation threads at submission end."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+              "symbols": [
+                "PipelineCache::ConfigurePipeline",
+                "PipelineCache::EndSubmission",
+                "Draws will be skipped until pipelines are ready"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "Skipping draw - pipeline not ready"
+              ]
+            }
+          ],
+          "summary": "Canary leaves creation running across submissions and skips every draw whose pipeline remains unavailable, re-fetching the root signature when ready."
+        },
+        "material_divergences": [
+          "ReXGlue bounds missing draws to the current submission by waiting at its end; Canary prioritizes lower frame-time stalls and may skip across submissions."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-source-async"
+          ],
+          "summary": "Pinned Canary source explicitly states the no-wait/skipped-draw performance rationale; the exact origin commit is unavailable within the shallow history."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "PROBABLE FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Rendered output and pinned source make the broad subsystem use probable, but the exact divergent branch or affected state is not directly observed."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent.",
+        "Run logs show pipeline creation on multiple host threads but do not record the effective async_shader_compilation value or per-draw readiness."
+      ],
+      "minimum_discriminating_evidence": "Draw ID, pipeline hash, async setting, configure result, ready/pending state, skip outcome and submission-end wait state.",
+      "later_observation_boundaries": [
+        "REX-CONFIGURE-PIPELINE",
+        "REX-ISSUE-DRAW",
+        "REX-END-SUBMISSION"
+      ],
+      "open_question_ids": [
+        "OQ-PIP-002"
+      ],
+      "experiment_ids": [
+        "EXP-CONFIG-CAP-001",
+        "EXP-DRAW-DECISION-001",
+        "EXP-SHADER-IDENTITY-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The effective async setting, pipeline readiness at each affected draw, exact skip reason and readiness by EndSubmission.",
+        "minimum_evidence_needed": "Draw ID, pipeline hash, async setting, configure result, ready/pending state, skip outcome and submission-end wait state.",
+        "observation_symbol_or_address": "PipelineCache::ConfigurePipeline / D3D12CommandProcessor::IssueDraw / EndSubmission",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms or clears missing draws caused by pipeline readiness."
+      }
+    },
+    {
+      "record_id": "PIP-003",
+      "subsystem": "Pipeline and state assembly",
+      "behaviour": "D3D12 constant-alpha blend factors on hosts without alpha-factor support",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/pipeline_cache.cpp",
+              "symbols": [
+                "kBlendFactorMap",
+                "D3D12_BLEND_BLEND_FACTOR"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "D3DOMSetBlendFactor"
+              ]
+            }
+          ],
+          "summary": "ReXGlue maps guest constant-alpha through the common blend factor and sends the four independent RB_BLEND values without a provider capability branch."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+              "symbols": [
+                "IsAlphaBlendFactorSupported",
+                "D3D12_BLEND_ALPHA_FACTOR"
+              ]
+            },
+            {
+              "path": "src/xenia/ui/d3d12/d3d12_provider.h",
+              "symbols": [
+                "IsAlphaBlendFactorSupported"
+              ]
+            }
+          ],
+          "summary": "Canary uses D3D12 alpha-factor enums when supported and emulates alpha-only constant factors through the common factor on older hosts."
+        },
+        "material_divergences": [
+          "On hosts lacking D3D12 alpha-factor support, an alpha-only constant can use a different factor component in ReXGlue."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-4cc584f4"
+          ],
+          "summary": "The direct Canary commit identifies the RTV constant-alpha correction; its one-line message does not provide broader title rationale."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent.",
+        "Run logs report rasterizer-ordered views=yes but do not report D3D12 alpha-factor capability."
+      ],
+      "minimum_discriminating_evidence": "Capability bit plus RB_BLENDCONTROL, RB_BLEND_ALPHA and color values for the affected draw.",
+      "later_observation_boundaries": [
+        "REX-CONFIGURE-PIPELINE",
+        "REX-ISSUE-DRAW",
+        "REX-END-SUBMISSION"
+      ],
+      "open_question_ids": [
+        "OQ-PIP-003"
+      ],
+      "experiment_ids": [
+        "EXP-CONFIG-CAP-001",
+        "EXP-DRAW-DECISION-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether RTX 5080 exposes alpha-factor support and whether an affected draw uses constant-alpha blend factors with divergent alpha/color constants.",
+        "minimum_evidence_needed": "Capability bit plus RB_BLENDCONTROL, RB_BLEND_ALPHA and color values for the affected draw.",
+        "observation_symbol_or_address": "PipelineCache::ConfigurePipeline / D3D12CommandProcessor::IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms applicability of constant-alpha fallback."
+      }
+    },
+    {
+      "record_id": "PRE-001",
+      "subsystem": "Swap and presentation",
+      "behaviour": "XE_SWAP request, mailbox publication, guest-output refresh, present, resize and shutdown",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "ExecutePacketType3_XE_SWAP"
+              ]
+            },
+            {
+              "path": "src/ui/presenter.cpp",
+              "symbols": [
+                "Presenter::RefreshGuestOutput",
+                "Presenter::PaintAndPresent"
+              ]
+            },
+            {
+              "path": "src/ui/d3d12/d3d12_presenter.cpp",
+              "symbols": [
+                "D3D12Presenter::PaintAndPresentImpl"
+              ]
+            }
+          ],
+          "summary": "ReXGlue routes XE_SWAP through backend IssueSwap and TextureCache into a mailbox-style Presenter, then composes runtime UI and presents through D3D12."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+              "symbols": [
+                "ExecutePacketType3_XE_SWAP"
+              ]
+            },
+            {
+              "path": "src/xenia/ui/presenter.cc",
+              "symbols": [
+                "Presenter::RefreshGuestOutput",
+                "Presenter::PaintAndPresent"
+              ]
+            },
+            {
+              "path": "src/xenia/ui/d3d12/d3d12_presenter.cc",
+              "symbols": [
+                "D3D12Presenter::PaintAndPresentImpl"
+              ]
+            }
+          ],
+          "summary": "Canary uses the same guest swap-to-mailbox-to-provider-present chain within its monolithic UI ownership."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "The guest-visible swap chain is equivalent; surrounding UI ownership differs but does not change the compared swap behavior."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-G1-SWAP-STATIC"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Swap and presentation path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-G1-SWAP-STATIC"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Monotonic IDs and timestamps only at sub_82BA34D8, VdSwap_entry, RefreshGuestOutput and PaintAndPresentImpl.",
+      "later_observation_boundaries": [
+        "G1-HOOK-82BA34D8",
+        "REX-VD-SWAP",
+        "REX-PRESENTER-REFRESH",
+        "REX-D3D12-PAINT-PRESENT"
+      ],
+      "open_question_ids": [
+        "OQ-PRE-001"
+      ],
+      "experiment_ids": [
+        "EXP-SWAP-CORRELATION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The exact one-to-one or many-to-one relation between title swap requests, mailbox publication, refresh and DXGI Present.",
+        "minimum_evidence_needed": "Monotonic IDs and timestamps only at sub_82BA34D8, VdSwap_entry, RefreshGuestOutput and PaintAndPresentImpl.",
+        "observation_symbol_or_address": "sub_82BA34D8 / VdSwap_entry / Presenter::RefreshGuestOutput / D3D12Presenter::PaintAndPresentImpl",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Establishes presentation correlation; it does not diagnose black surfaces."
+      }
+    },
+    {
+      "record_id": "PRE-002",
+      "subsystem": "Swap and presentation",
+      "behaviour": "Guest vblank generation, counters and host frame limiting",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/graphics_system.cpp",
+              "symbols": [
+                "GPU VSync",
+                "VdQueryVideoMode",
+                "last_frame_time +="
+              ]
+            }
+          ],
+          "summary": "ReXGlue creates a guest VSync thread from the configured video mode and catches up missed intervals in a while loop independently of presentation."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/graphics_system.cc",
+              "symbols": [
+                "GPU Frame limiter",
+                "framerate_limit",
+                "D1MODE_V_COUNTER"
+              ]
+            }
+          ],
+          "summary": "Canary runs a title-aware host frame limiter controlled by framerate_limit/vsync, increments D1MODE_V_COUNTER, and uses host sleep/spin pacing."
+        },
+        "material_divergences": [
+          "Timing source, configuration, counter handling, title-open gating and catch-up behavior differ."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "REX-75e339bd"
+          ],
+          "summary": "ReXGlue directly records its catch-up pacing correction; the full divergence's earlier ancestry is not established in the available Canary shallow history."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Swap and presentation path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "NOT RELEVANT TO THIS SYMPTOM",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG"
+        ],
+        "rationale": "This row concerns hosting, diagnostics, packet/presentation plumbing, or excluded backends; the localized black surfaces do not select it as a causal path."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Vblank counter and swap correlation only if a later timing hypothesis arises.",
+      "later_observation_boundaries": [
+        "G1-HOOK-82BA34D8",
+        "REX-VD-SWAP",
+        "REX-PRESENTER-REFRESH",
+        "REX-D3D12-PAINT-PRESENT"
+      ],
+      "open_question_ids": [
+        "OQ-PRE-002"
+      ],
+      "experiment_ids": [],
+      "evidence_gap": {
+        "exact_missing_fact": "No timing-sensitive link to the localized black surfaces is demonstrated.",
+        "minimum_evidence_needed": "Vblank counter and swap correlation only if a later timing hypothesis arises.",
+        "observation_symbol_or_address": "GraphicsSystem::VsyncWorker",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Determines whether pacing investigation is justified."
+      }
+    },
+    {
+      "record_id": "REG-001",
+      "subsystem": "Registers and dirty state",
+      "behaviour": "Register-file reset values",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/register_file.cpp",
+              "symbols": [
+                "RegisterFile::RegisterFile",
+                "std::memset"
+              ]
+            }
+          ],
+          "summary": "ReXGlue zeroes the register file at construction and does not seed nonzero Xenos reset defaults."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/register_file.cc",
+              "symbols": [
+                "RegisterFile::RegisterFile",
+                "VGT_MAX_VTX_INDX",
+                "PA_SC_AA_MASK"
+              ]
+            }
+          ],
+          "summary": "Canary zeroes the file and then seeds confirmed nonzero retail-hardware context-register defaults, intentionally excluding tessellation levels."
+        },
+        "material_divergences": [
+          "Reads before a guest write return zero in ReXGlue but a nonzero hardware reset value for the registers initialized by Canary."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-e20f2696"
+          ],
+          "summary": "The Canary commit records retail-console reads corroborated by AMD and Mesa defaults and explains the deliberate tessellation omission."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Register index, seeded value, first read sequence, first write sequence and consuming draw ID.",
+      "later_observation_boundaries": [
+        "REX-WRITE-REGISTER",
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-REG-001"
+      ],
+      "experiment_ids": [
+        "EXP-REGISTER-RESET-001",
+        "EXP-DRAW-DECISION-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "For every Canary-seeded register, whether TU1 reads it before the first guest write and which draw consumes that value.",
+        "minimum_evidence_needed": "Register index, seeded value, first read sequence, first write sequence and consuming draw ID.",
+        "observation_symbol_or_address": "D3D12CommandProcessor::WriteRegister / D3D12CommandProcessor::IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms or clears reset-default relevance."
+      }
+    },
+    {
+      "record_id": "REG-002",
+      "subsystem": "Registers and dirty state",
+      "behaviour": "Register writes, fetch-constant dirty ranges and operation-triggered state invalidation",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/command_processor.cpp",
+              "symbols": [
+                "CommandProcessor::WriteRegister"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "D3D12CommandProcessor::WriteRegister"
+              ]
+            }
+          ],
+          "summary": "ReXGlue writes the register file and propagates dirty state to shaders, texture fetches, samplers and fixed-function state."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/command_processor.cc",
+              "symbols": [
+                "CommandProcessor::WriteRegister"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "D3D12CommandProcessor::WriteRegister"
+              ]
+            }
+          ],
+          "summary": "Canary propagates the same categories of register and fetch-constant invalidation through reorganized current code."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "The pinned implementations have equivalent current bulk-fetch invalidation boundaries; older fixed history is not a current divergence."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "PROBABLE FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Rendered output and pinned source make the broad subsystem use probable, but the exact divergent branch or affected state is not directly observed."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw ID plus changed-register indices and hashed state snapshot; no broad register dump.",
+      "later_observation_boundaries": [
+        "REX-WRITE-REGISTER",
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-REG-002"
+      ],
+      "experiment_ids": [
+        "EXP-DRAW-DECISION-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The exact register writes consumed by the affected character draws.",
+        "minimum_evidence_needed": "Draw ID plus changed-register indices and hashed state snapshot; no broad register dump.",
+        "observation_symbol_or_address": "D3D12CommandProcessor::WriteRegister / IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Links guest state to a draw decision."
+      }
+    },
+    {
+      "record_id": "RT-001",
+      "subsystem": "Render targets, EDRAM and resolves",
+      "behaviour": "Host-RT and interlock ownership, MSAA surfaces, copies, clears, resolves and EDRAM alias tracking",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/render_target/cache.cpp",
+              "symbols": [
+                "RenderTargetCache::Update",
+                "RenderTargetCache::ClearCache"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/render_target_cache.cpp",
+              "symbols": [
+                "D3D12RenderTargetCache"
+              ]
+            }
+          ],
+          "summary": "ReXGlue implements host-render-target and ROV paths, tile ownership and overlap transfer, depth/color clears, resolves and cache invalidation."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/render_target_cache.cc",
+              "symbols": [
+                "RenderTargetCache::Update",
+                "RenderTargetCache::ClearCache"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_render_target_cache.cc",
+              "symbols": [
+                "D3D12RenderTargetCache"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same broad host-RT/interlock, ownership, transfer, clear and resolve model, with layout and conversion corrections recorded separately."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "The common architecture is semantically equivalent at this comparison granularity."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "PROBABLE FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Rendered output and pinned source make the broad subsystem use probable, but the exact divergent branch or affected state is not directly observed."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw/pass ID, EDRAM base/pitch, formats, MSAA, alias generation and resolve ID.",
+      "later_observation_boundaries": [
+        "REX-RT-UPDATE",
+        "REX-GET-RESOLVE-INFO",
+        "REX-RT-RESOLVE"
+      ],
+      "open_question_ids": [
+        "OQ-RT-001"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Which render-target passes, aliases and resolves produce or consume the affected character surfaces.",
+        "minimum_evidence_needed": "Draw/pass ID, EDRAM base/pitch, formats, MSAA, alias generation and resolve ID.",
+        "observation_symbol_or_address": "D3D12RenderTargetCache::Update / Resolve",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Identifies the relevant EDRAM subpath."
+      }
+    },
+    {
+      "record_id": "RT-002",
+      "subsystem": "Render targets, EDRAM and resolves",
+      "behaviour": "Canonical 1x, 2x and 4x EDRAM sample addressing",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator_rb.cpp",
+              "symbols": [
+                "SpirvShaderTranslator::FSI_LoadEdramOffsets"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/render_target_cache.cpp",
+              "symbols": [
+                "GetOrCreateTransferPipelines"
+              ]
+            }
+          ],
+          "summary": "ReXGlue uses the older sample layout and pair-specific transfer assumptions."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/shaders/edram.xesli",
+              "symbols": [
+                "XeEdramOffsetBytes"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_render_target_cache.cc",
+              "symbols": [
+                "GetOrCreateTransferPipelines",
+                "XeEdramOffsetBytes"
+              ]
+            }
+          ],
+          "summary": "Canary canonicalizes guest sample coordinates in 4x4 blocks for 1x, 2x and 4x and applies that scheme across resolves, clears, transfers, dumps and interlock paths."
+        },
+        "material_divergences": [
+          "Aliased views, MSAA sample positions and transfers address different EDRAM locations for affected patterns."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-437a7280"
+          ],
+          "summary": "The commit provides the new address equations and explains why the old 2x2 subdivision shuffled aliased views."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Pass ID, EDRAM bases/pitches, MSAA, alias IDs, sample coordinates and resolve coordinates.",
+      "later_observation_boundaries": [
+        "REX-RT-UPDATE",
+        "REX-GET-RESOLVE-INFO",
+        "REX-RT-RESOLVE"
+      ],
+      "open_question_ids": [
+        "OQ-RT-002"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected pass uses a divergent 1x/2x/4x canonical EDRAM pattern.",
+        "minimum_evidence_needed": "Pass ID, EDRAM bases/pitches, MSAA, alias IDs, sample coordinates and resolve coordinates.",
+        "observation_symbol_or_address": "D3D12RenderTargetCache::Update / GetResolveInfo / Resolve",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms canonical-addressing applicability."
+      }
+    },
+    {
+      "record_id": "RT-003",
+      "subsystem": "Render targets, EDRAM and resolves",
+      "behaviour": "Readback of resolution-scaled resolves",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/d3d12/command_processor.cpp",
+              "symbols": [
+                "IssueCopy_ReadbackResolvePath"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/render_target_cache.cpp",
+              "symbols": [
+                "RenderTargetCache::Resolve"
+              ]
+            }
+          ],
+          "summary": "ReXGlue's D3D12 readback rereads destination state and copies using the older scaled range and written-length handling."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+              "symbols": [
+                "IssueCopy_ReadbackResolvePath"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_render_target_cache.cc",
+              "symbols": [
+                "D3D12RenderTargetCache::Resolve"
+              ]
+            }
+          ],
+          "summary": "Canary uses ResolveInfo-derived format/size, binds the written extent, validates group alignment and committed writable destination, rejects unsupported ranges, and truncates non-whole-tile tails."
+        },
+        "material_divergences": [
+          "Source window, destination interpretation, validity guards and tail handling differ for scaled resolve readback."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-a635ac64",
+            "REX-bb4a536c"
+          ],
+          "summary": "Canary's commit explicitly documents the downscale-CS contract; ReXGlue later gated an independent pre-mask behavior for a non-Fable title issue."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "ResolveInfo identity, scale, written extent, destination range/hash and later consumer ID.",
+      "later_observation_boundaries": [
+        "REX-RT-UPDATE",
+        "REX-GET-RESOLVE-INFO",
+        "REX-RT-RESOLVE"
+      ],
+      "open_question_ids": [
+        "OQ-RT-003"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected scaled resolve is read back and consumed from shared memory.",
+        "minimum_evidence_needed": "ResolveInfo identity, scale, written extent, destination range/hash and later consumer ID.",
+        "observation_symbol_or_address": "draw_util::GetResolveInfo / D3D12RenderTargetCache::Resolve / SharedMemory::RangeWrittenByGpu",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms scaled-readback applicability."
+      }
+    },
+    {
+      "record_id": "RT-004",
+      "subsystem": "Render targets, EDRAM and resolves",
+      "behaviour": "8_8_8_8_GAMMA and fixed-number resolve conversion",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/util/draw.cpp",
+              "symbols": [
+                "GetResolveInfo"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/render_target_cache.cpp",
+              "symbols": [
+                "D3D12RenderTargetCache::Resolve"
+              ]
+            }
+          ],
+          "summary": "ReXGlue lacks Canary's PWL gamma decode during resolve and its copy_dest_number-dependent fixed destination packing."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/draw_util.cc",
+              "symbols": [
+                "GetResolveInfo",
+                "copy_dest_number",
+                "decode_pwl_gamma"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/shaders/resolve.xesli",
+              "symbols": [
+                "XeResolveDecodePWLGammaSource"
+              ]
+            }
+          ],
+          "summary": "Canary unconditionally enables 8_8_8_8_GAMMA EDRAM piecewise-linear decode before resolve/conversion and packs fixed destinations according to copy_dest_number."
+        },
+        "material_divergences": [
+          "Gamma-space values and fixed destination component packing differ for the affected resolve formats."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-d1195052",
+            "CAN-fc48d37c"
+          ],
+          "summary": "The introducing commit records both resolve changes and initially default-enables PWL decoding; a later direct commit removes the decode/num_format CVars, leaving the pinned behavior unconditional."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Source/destination formats, copy_dest_number, coordinates, destination hash and consumer ID.",
+      "later_observation_boundaries": [
+        "REX-RT-UPDATE",
+        "REX-GET-RESOLVE-INFO",
+        "REX-RT-RESOLVE"
+      ],
+      "open_question_ids": [
+        "OQ-RT-004"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected resolve uses 8_8_8_8_GAMMA or fixed-number conversion and the copy_dest_number consumed.",
+        "minimum_evidence_needed": "Source/destination formats, copy_dest_number, coordinates, destination hash and consumer ID.",
+        "observation_symbol_or_address": "draw_util::GetResolveInfo / D3D12RenderTargetCache::Resolve",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms gamma/fixed-number conversion applicability."
+      }
+    },
+    {
+      "record_id": "RT-005",
+      "subsystem": "Render targets, EDRAM and resolves",
+      "behaviour": "Extended-range Xenos float16 render-target and memexport packing",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/render_target/cache.cpp",
+              "symbols": [
+                "Use the extended-range encoding"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator_rb.cpp",
+              "symbols": [
+                "k_16_16_FLOAT",
+                "Xenos extended-range float16"
+              ]
+            }
+          ],
+          "summary": "ReXGlue retains a TODO for universal extended-range encoding and uses host float16 behavior in affected pack/unpack paths."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/render_target_cache.cc",
+              "symbols": [
+                "extended-range encoding"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_rb.cc",
+              "symbols": [
+                "PackFloat16x2ExtendedRange",
+                "UnpackFloat16x2ExtendedRange"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_memexport.cc",
+              "symbols": [
+                "PackFloat16x2ExtendedRange"
+              ]
+            }
+          ],
+          "summary": "Canary treats exponent 31 as finite up to 131008 in render-target and memexport pack/unpack rather than host Inf/NaN semantics."
+        },
+        "material_divergences": [
+          "Values above 65504 and exponent-31 encodings differ in clamp, pack and unpack behavior."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-3ff230d2"
+          ],
+          "summary": "The commit explicitly identifies the guest exponent-31 finite range and the old clamp/Inf behavior."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Format, pass/shader hash, min/max/classified value range and consumer ID; no pixel or buffer payload.",
+      "later_observation_boundaries": [
+        "REX-RT-UPDATE",
+        "REX-GET-RESOLVE-INFO",
+        "REX-RT-RESOLVE"
+      ],
+      "open_question_ids": [
+        "OQ-RT-005"
+      ],
+      "experiment_ids": [
+        "EXP-EDRAM-RESOLVE-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether affected render-target or memexport values use extended float16 encodings above 65504 or exponent 31.",
+        "minimum_evidence_needed": "Format, pass/shader hash, min/max/classified value range and consumer ID; no pixel or buffer payload.",
+        "observation_symbol_or_address": "D3D12RenderTargetCache::Resolve / Shader::AnalyzeUcode",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms extended-float16 applicability."
+      }
+    },
+    {
+      "record_id": "SHD-001",
+      "subsystem": "Shaders",
+      "behaviour": "Shader loading, microcode parsing, control flow, constants, fetches, exports, host generation, hashes and caches",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/translator.cpp",
+              "symbols": [
+                "Shader::AnalyzeUcode"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator.cpp",
+              "symbols": [
+                "DxbcShaderTranslator"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/pipeline_cache.cpp",
+              "symbols": [
+                "PipelineCache::LoadShader"
+              ]
+            }
+          ],
+          "summary": "ReXGlue hashes and analyzes Xenos microcode, translates control flow, constants, fetches and exports, compiles host shaders, and persists shader/pipeline descriptions."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/shader_translator.cc",
+              "symbols": [
+                "Shader::AnalyzeUcode"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator.cc",
+              "symbols": [
+                "DxbcShaderTranslator"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+              "symbols": [
+                "PipelineCache::LoadShader"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same broad analysis, translation, hashing and cache chain, with material instruction changes recorded separately."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "High source ancestry and direct call-chain tracing support equivalence at this granularity; no source-body copy is included."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "CONFIRMED EXISTING RUNTIME EXECUTION",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing Run 047/048 evidence directly establishes the broad Shaders path described here; this does not establish every divergent sub-behaviour or any causal link."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-LOG-A",
+          "FBL-RUN048-LOG",
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw ID, stage hashes, pipeline hash, analysis flags and outcome; no microcode body.",
+      "later_observation_boundaries": [
+        "REX-LOAD-SHADER",
+        "REX-ANALYZE-UCODE",
+        "REX-CONFIGURE-PIPELINE"
+      ],
+      "open_question_ids": [
+        "OQ-SHD-001"
+      ],
+      "experiment_ids": [
+        "EXP-SHADER-IDENTITY-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "The VS/PS identities and pipeline decisions for the affected character draws.",
+        "minimum_evidence_needed": "Draw ID, stage hashes, pipeline hash, analysis flags and outcome; no microcode body.",
+        "observation_symbol_or_address": "PipelineCache::LoadShader / Shader::AnalyzeUcode / ConfigurePipeline",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Identifies shaders safely enough for focused static analysis."
+      }
+    },
+    {
+      "record_id": "SHD-002",
+      "subsystem": "Shaders",
+      "behaviour": "Scalar approximation precision versus a title-specific tessellation workaround",
+      "source_identity": {
+        "direction": "SEMANTICALLY DIFFERENT",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator.cpp",
+              "symbols": [
+                "4D5307F2",
+                "kQuadDomainPatchIndexed"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator.cpp",
+              "symbols": [
+                "kQuadDomainPatchIndexed"
+              ]
+            }
+          ],
+          "summary": "ReXGlue retains a legacy title-ID-specific quad-domain index/coordinate workaround and lacks Canary's generalized scalar-result precision reduction."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator_alu.cc",
+              "symbols": [
+                "ReduceFloatPrecision"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_alu.cc",
+              "symbols": [
+                "ReduceFloatPrecision"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/shader_interpreter.cc",
+              "symbols": [
+                "ReduceFloatPrecision"
+              ]
+            }
+          ],
+          "summary": "Canary removes that AC6-specific workaround and rounds EXP/LOG/RCP/RSQ/SQRT-family scalar results to 21 mantissa bits in translators and interpreter."
+        },
+        "material_divergences": [
+          "The implementations modify different operations: ReXGlue changes a title-specific tessellation input while Canary changes a family of scalar ALU results globally."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-3a44f20c"
+          ],
+          "summary": "Canary's pinned commit explicitly replaces the workaround, but states exact hardware precision and halfway behavior are still unconfirmed."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Shader hash, operation-class bitset, operand/result classification or controlled hash comparison; no shader body.",
+      "later_observation_boundaries": [
+        "REX-LOAD-SHADER",
+        "REX-ANALYZE-UCODE",
+        "REX-CONFIGURE-PIPELINE"
+      ],
+      "open_question_ids": [
+        "OQ-SHD-002"
+      ],
+      "experiment_ids": [
+        "EXP-SHADER-IDENTITY-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected Fable shader executes EXP/LOG/RCP/RSQ/SQRT-family scalar operations on precision-sensitive values; the hardware precision model remains unresolved.",
+        "minimum_evidence_needed": "Shader hash, operation-class bitset, operand/result classification or controlled hash comparison; no shader body.",
+        "observation_symbol_or_address": "Shader::AnalyzeUcode / translated scalar ALU path",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms applicability and scopes a later controlled precision test."
+      }
+    },
+    {
+      "record_id": "TEX-001",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Texture keys, layout, tiling, endian conversion, caching, residency, aliases, watches and sampler binding",
+      "source_identity": {
+        "direction": "SAME BEHAVIOUR, DIFFERENT STRUCTURE",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/texture/util.cpp",
+              "symbols": [
+                "GetGuestTextureLayout"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/texture/cache.cpp",
+              "symbols": [
+                "TextureCache::RequestTextures",
+                "TextureCache::Texture::MakeUpToDateAndWatch"
+              ]
+            },
+            {
+              "path": "src/graphics/d3d12/texture_cache.cpp",
+              "symbols": [
+                "D3D12TextureCache"
+              ]
+            }
+          ],
+          "summary": "ReXGlue derives guest texture layout and keys, tracks base/mip residency and memory watches, uploads endian/tiling-converted data, and binds cached textures and samplers."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/texture_util.cc",
+              "symbols": [
+                "GetGuestTextureLayout"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/texture_cache.cc",
+              "symbols": [
+                "TextureCache::RequestTextures",
+                "TextureCache::Texture::MakeUpToDateAndWatch"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/d3d12/d3d12_texture_cache.cc",
+              "symbols": [
+                "D3D12TextureCache"
+              ]
+            }
+          ],
+          "summary": "Canary retains the same broad cache, watch, layout, upload and binding architecture, with material format and invalidation changes recorded separately."
+        },
+        "material_divergences": [],
+        "historical_provenance": {
+          "history_ids": [],
+          "summary": "Equivalent behavior was traced through shared and D3D12 call chains; later special cases are separate records."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "PROBABLE FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Rendered output and pinned source make the broad subsystem use probable, but the exact divergent branch or affected state is not directly observed."
+      },
+      "causal_relevance": {
+        "classification": "UNKNOWN",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Existing evidence establishes only broad subsystem execution or structure; it neither supports nor clears this row as a cause."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw ID, shader hash, fetch slot, binding hash, resource range hash and validity generation.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-001"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Which fetches and resource identities feed the affected character draws.",
+        "minimum_evidence_needed": "Draw ID, shader hash, fetch slot, binding hash, resource range hash and validity generation.",
+        "observation_symbol_or_address": "D3D12CommandProcessor::UpdateBindings / D3D12TextureCache::RequestTextures",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Identifies affected resources without texture payloads."
+      }
+    },
+    {
+      "record_id": "TEX-002",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Shared-memory validity check before declaring a texture current",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/texture/cache.cpp",
+              "symbols": [
+                "TextureCache::Texture::MakeUpToDateAndWatch"
+              ]
+            },
+            {
+              "path": "include/rex/graphics/shared_memory.h",
+              "symbols": [
+                "class SharedMemory"
+              ]
+            }
+          ],
+          "summary": "ReXGlue MakeUpToDateAndWatch clears outdated flags and installs watches without first querying whether the backing shared-memory range is valid."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/texture_cache.cc",
+              "symbols": [
+                "TextureCache::Texture::MakeUpToDateAndWatch",
+                "IsRangeValid"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/shared_memory.h",
+              "symbols": [
+                "IsRangeValid"
+              ]
+            }
+          ],
+          "summary": "Canary MakeUpToDateAndWatch leaves base or mip data outdated if the backing range is invalid before installing a watch."
+        },
+        "material_divergences": [
+          "ReXGlue can mark invalidated backing data current; Canary defers currency until the range is valid."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-9781a75a"
+          ],
+          "summary": "The Canary commit explicitly attributes the change to avoiding stale texture state after invalidation."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Hashed resource ID, base/mip ranges, validity before/after, watch state and consuming draw ID.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-002"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected base/mip range is invalid when MakeUpToDateAndWatch declares it current and whether the cached texture is consumed.",
+        "minimum_evidence_needed": "Hashed resource ID, base/mip ranges, validity before/after, watch state and consuming draw ID.",
+        "observation_symbol_or_address": "TextureCache::Texture::MakeUpToDateAndWatch / SharedMemory::RequestRanges",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms or clears stale texture currency."
+      }
+    },
+    {
+      "record_id": "TEX-003",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Integer num_format component scaling",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "include/rex/graphics/pipeline/texture/info.h",
+              "symbols": [
+                "struct FormatInfo"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator_fetch.cpp",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessTextureFetchInstruction"
+              ]
+            }
+          ],
+          "summary": "ReXGlue has no texture_integer_scale_bits table or equivalent authoritative per-component integer scaling step in its translators."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/texture_info.h",
+              "symbols": [
+                "struct FormatInfo",
+                "component_bits"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator.h",
+              "symbols": [
+                "texture_integer_scale_bits"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator.h",
+              "symbols": [
+                "texture_integer_scale_bits"
+              ]
+            }
+          ],
+          "summary": "Canary derives authoritative per-component integer scales from FormatInfo and applies them after sign/gamma handling and before exponent bias in both translators."
+        },
+        "material_divergences": [
+          "Integer texture fetch values can differ by format-dependent scale factors."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-d1195052"
+          ],
+          "summary": "The commit calls the table authoritative and reports broad title fixes; those reports are not evidence for Fable."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Shader hash, fetch slot, format, num_format, component bits/scales and draw ID.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-003"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected fetch uses integer num_format scaling and which components/format are consumed.",
+        "minimum_evidence_needed": "Shader hash, fetch slot, format, num_format, component bits/scales and draw ID.",
+        "observation_symbol_or_address": "Shader::AnalyzeUcode / D3D12TextureCache::RequestTextures",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms integer-scaling applicability."
+      }
+    },
+    {
+      "record_id": "TEX-004",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Normalized unsigned fixed texture-fetch rounding",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator_fetch.cpp",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessTextureFetchInstruction"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator_fetch.cpp",
+              "symbols": [
+                "SpirvShaderTranslator::ProcessTextureFetchInstruction"
+              ]
+            }
+          ],
+          "summary": "ReXGlue does not apply Canary's Q16-oriented rounding for filtered normalized unsigned fixed samples."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+              "symbols": [
+                "Round normalized results to 16 fractional bits",
+                "65536.0f"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_fetch.cc",
+              "symbols": [
+                "65536.0f",
+                "integer_scale_bits_packed"
+              ]
+            }
+          ],
+          "summary": "Canary rounds filtered normalized unsigned fixed fetches; signed and integer fetches are unchanged."
+        },
+        "material_divergences": [
+          "Filtered normalized unsigned fixed samples differ at rounding boundaries."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-0c843efb"
+          ],
+          "summary": "The commit cites guest Q16 comparisons in two non-Fable titles as the reason for rounding."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Shader hash, fetch slot, format, num_format, filter/sampler state and value-class boundary flag.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-004"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected fetch is filtered normalized unsigned fixed and rounding-sensitive.",
+        "minimum_evidence_needed": "Shader hash, fetch slot, format, num_format, filter/sampler state and value-class boundary flag.",
+        "observation_symbol_or_address": "Shader::AnalyzeUcode / D3D12TextureCache::RequestTextures",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms normalized-rounding applicability."
+      }
+    },
+    {
+      "record_id": "TEX-005",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Base-map selection when base and mip pages differ",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/texture/util.cpp",
+              "symbols": [
+                "mip_min_level",
+                "base_page"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/texture/cache.cpp",
+              "symbols": [
+                "key.base_page = key.mip_page"
+              ]
+            }
+          ],
+          "summary": "ReXGlue can suppress the base map solely because mip_min_level is nonzero and folds base_page to mip_page."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/texture_util.cc",
+              "symbols": [
+                "mip_min_level",
+                "base_page == mip_page"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/texture_cache.cc",
+              "symbols": [
+                "base_page",
+                "mip_page"
+              ]
+            }
+          ],
+          "summary": "Canary preserves a separate base allocation and clamps the base-map sampler to LOD 0; suppression requires the base and mip pages to be the same."
+        },
+        "material_divergences": [
+          "A separate base allocation can be lost in ReXGlue but retained and sampled at level zero in Canary."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-4a863a0e"
+          ],
+          "summary": "The commit explicitly distinguishes sampler mip_min_level from allocation presence and identifies the fixed regression."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Fetch slot, base_page, mip_page, mip_min_level, dimensions, sampler LOD and draw ID.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-005"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected fetch has distinct base/mip pages with nonzero mip_min_level and samples base LOD 0.",
+        "minimum_evidence_needed": "Fetch slot, base_page, mip_page, mip_min_level, dimensions, sampler LOD and draw ID.",
+        "observation_symbol_or_address": "D3D12TextureCache::RequestTextures / UpdateBindings",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms base-map selection applicability."
+      }
+    },
+    {
+      "record_id": "TEX-006",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Runtime layout selection for promoted tfetch1D instructions",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator_fetch.cpp",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessTextureFetchInstruction",
+                "instr.dimension"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator_fetch.cpp",
+              "symbols": [
+                "SpirvShaderTranslator::ProcessTextureFetchInstruction",
+                "instr.dimension"
+              ]
+            }
+          ],
+          "summary": "ReXGlue uses the promoted coordinate dimension and lacks Canary's runtime retention of the instruction's actual one-dimensional layout."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+              "symbols": [
+                "instr.dimension",
+                "k1D"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_fetch.cc",
+              "symbols": [
+                "instr.dimension",
+                "k1D"
+              ]
+            }
+          ],
+          "summary": "Canary selects actual 1D layout at runtime even where source-coordinate handling promotes the instruction, and limits rows accordingly."
+        },
+        "material_divergences": [
+          "Wide one-dimensional bindings may be laid out as promoted two-dimensional resources in ReXGlue."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-7cd47947"
+          ],
+          "summary": "The commit records preserving one title's 2D case while fixing another title's wide 1D bindings."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Shader hash, instruction slot, source dimension, runtime layout, width/height and draw ID.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-006"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected shader contains promoted tfetch1D and the bound resource layout/dimensions differ.",
+        "minimum_evidence_needed": "Shader hash, instruction slot, source dimension, runtime layout, width/height and draw ID.",
+        "observation_symbol_or_address": "Shader::AnalyzeUcode / D3D12TextureCache::RequestTextures",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms 1D-layout applicability."
+      }
+    },
+    {
+      "record_id": "TEX-007",
+      "subsystem": "Textures and samplers",
+      "behaviour": "Dummy texture headers containing only literal swizzles",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/texture/cache.cpp",
+              "symbols": [
+                "TextureCache::BindingInfoFromFetchConstant",
+                "fetch.swizzle"
+              ]
+            }
+          ],
+          "summary": "ReXGlue can discard bindings whose fetch result is composed only of literal zero and one swizzles."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/texture_cache.cc",
+              "symbols": [
+                "TextureCache::BindingInfoFromFetchConstant",
+                "fetch.swizzle"
+              ]
+            }
+          ],
+          "summary": "Canary still creates the declared texture dimensions and retains literal swizzles for a dummy header."
+        },
+        "material_divergences": [
+          "Binding existence and declared dimensions differ for all-literal swizzle headers."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-ec5e0f40"
+          ],
+          "summary": "The commit message explicitly states the changed dummy-header behavior."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Fetch slot, literal swizzle tuple, declared dimensions, binding-present flag and layout hash.",
+      "later_observation_boundaries": [
+        "REX-UPDATE-BINDINGS",
+        "REX-REQUEST-TEXTURES",
+        "REX-SHARED-REQUEST-RANGES"
+      ],
+      "open_question_ids": [
+        "OQ-TEX-007"
+      ],
+      "experiment_ids": [
+        "EXP-TEXTURE-METADATA-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected fetch header contains only literal swizzles and whether binding existence changes the layout.",
+        "minimum_evidence_needed": "Fetch slot, literal swizzle tuple, declared dimensions, binding-present flag and layout hash.",
+        "observation_symbol_or_address": "D3D12TextureCache::RequestTextures / UpdateBindings",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms dummy-header applicability."
+      }
+    },
+    {
+      "record_id": "VTX-001",
+      "subsystem": "Vertex fetch and primitive conversion",
+      "behaviour": "Tessellated triangle-strip and triangle-fan conversion",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/primitive_processor.cpp",
+              "symbols": [
+                "PrimitiveProcessor::Process",
+                "kTriangleStrip",
+                "kTriangleFan"
+              ]
+            }
+          ],
+          "summary": "ReXGlue rejects tessellated triangle strips and fans; its tessellation path accepts triangle lists and supported patch forms."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/primitive_processor.cc",
+              "symbols": [
+                "PrimitiveProcessor::Process",
+                "kTriangleStrip",
+                "kTriangleFan"
+              ]
+            }
+          ],
+          "summary": "Canary normalizes tessellated strips and fans to triangle-list host draws, constructing a conversion buffer at runtime when needed."
+        },
+        "material_divergences": [
+          "Canary executes two tessellated topologies that ReXGlue rejects."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-3eab2b8b"
+          ],
+          "summary": "The Canary commit explicitly describes topology normalization and runtime conversion-buffer construction."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Draw ID, guest topology, tessellation mode, primitive-processing result and exact no-draw outcome.",
+      "later_observation_boundaries": [
+        "REX-PRIMITIVE-PROCESS",
+        "REX-ANALYZE-UCODE",
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-VTX-001"
+      ],
+      "experiment_ids": [
+        "EXP-VERTEX-FETCH-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected Fable draw emits a tessellated triangle strip or fan and whether processing rejects it.",
+        "minimum_evidence_needed": "Draw ID, guest topology, tessellation mode, primitive-processing result and exact no-draw outcome.",
+        "observation_symbol_or_address": "PrimitiveProcessor::Process / D3D12CommandProcessor::IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms topology-conversion applicability."
+      }
+    },
+    {
+      "record_id": "VTX-002",
+      "subsystem": "Vertex fetch and primitive conversion",
+      "behaviour": "Vertex-fetch bounds and out-of-range lane values",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator_fetch.cpp",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessVertexFetchInstruction",
+                "Bound checking is not done"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/spirv_translator_fetch.cpp",
+              "symbols": [
+                "SpirvShaderTranslator::ProcessVertexFetchInstruction"
+              ]
+            }
+          ],
+          "summary": "ReXGlue's translators may load complete words beyond the fetch-constant size from shared memory."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessVertexFetchInstruction",
+                "Words at or past the end of the fetch buffer"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/spirv_shader_translator_fetch.cc",
+              "symbols": [
+                "SpirvShaderTranslator::ProcessVertexFetchInstruction",
+                "Words at or past the end of the fetch buffer"
+              ]
+            }
+          ],
+          "summary": "Canary clamps words at or beyond the fetch-constant size to zero in both translators."
+        },
+        "material_divergences": [
+          "Out-of-range lanes can expose adjacent shared-memory contents in ReXGlue but are zero in Canary."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-9e9d3cdd"
+          ],
+          "summary": "The commit states that zero is the real-hardware result."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Shader hash, fetch slot, base, size, element index, lane byte offsets and out-of-range mask.",
+      "later_observation_boundaries": [
+        "REX-PRIMITIVE-PROCESS",
+        "REX-ANALYZE-UCODE",
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-VTX-002"
+      ],
+      "experiment_ids": [
+        "EXP-VERTEX-FETCH-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether an affected vertex fetch addresses lanes at or beyond its fetch-constant size.",
+        "minimum_evidence_needed": "Shader hash, fetch slot, base, size, element index, lane byte offsets and out-of-range mask.",
+        "observation_symbol_or_address": "Shader::AnalyzeUcode / PrimitiveProcessor::Process / IssueDraw",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms bounds-zeroing applicability."
+      }
+    },
+    {
+      "record_id": "VTX-003",
+      "subsystem": "Vertex fetch and primitive conversion",
+      "behaviour": "XPS physical heap and GPU L2 address wrapping",
+      "source_identity": {
+        "direction": "CANARY-ONLY",
+        "rexglue": {
+          "repository": "rexglue",
+          "commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+          "paths": [
+            {
+              "path": "src/system/xmemory.cpp",
+              "symbols": [
+                "Memory::LookupHeap",
+                "0x7F000000"
+              ]
+            },
+            {
+              "path": "src/graphics/pipeline/shader/dxbc_translator_fetch.cpp",
+              "symbols": [
+                "DxbcShaderTranslator::ProcessVertexFetchInstruction"
+              ]
+            }
+          ],
+          "summary": "ReXGlue labels the 0x7F region as possible XPS but does not back it as a physical heap and does not wrap L2 fetch/index addresses to backing storage."
+        },
+        "canary": {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "paths": [
+            {
+              "path": "src/xenia/memory.cc",
+              "symbols": [
+                "0x7F000000",
+                "physical_heap"
+              ]
+            },
+            {
+              "path": "src/xenia/gpu/dxbc_shader_translator_fetch.cc",
+              "symbols": [
+                "0x1FFFFFFC"
+              ]
+            }
+          ],
+          "summary": "Canary maps 0x7F000000 through 0x7FC7FFFF as a physical heap and masks L2 addresses in vertex fetch, index and translator paths."
+        },
+        "material_divergences": [
+          "Canary provides real backing and address wrapping for XPS; ReXGlue does not."
+        ],
+        "historical_provenance": {
+          "history_ids": [
+            "CAN-22708301"
+          ],
+          "summary": "The direct parent of the pinned Canary revision introduces the heap and the fetch/index/translator wraps."
+        }
+      },
+      "source_confidence": "CONFIRMED SOURCE",
+      "fable_reachability": {
+        "classification": "UNKNOWN FOR FABLE II",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "Neither TU1 static evidence nor Run 047/048 identifies execution of the exact behaviour."
+      },
+      "causal_relevance": {
+        "classification": "PLAUSIBLE BUT UNCORRELATED",
+        "evidence_refs": [
+          "FBL-RUN047-IMAGE-001",
+          "FBL-RUN047-IMAGE-002"
+        ],
+        "rationale": "The source difference could affect guest-visible output, but no existing draw, shader, texture, EDRAM, resource-lifetime or controlled A/B evidence correlates it with the black surfaces."
+      },
+      "applicability": [
+        "general Xenos contract",
+        "possible black-surface diagnosis",
+        "future renderer contract"
+      ],
+      "configuration_inputs": [
+        "Active rexgpu-xenos.dll SHA-256 8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99, size 2770944.",
+        "Current artifact backend is D3D12 only; no Vulkan conclusion is permitted.",
+        "Run 047/048 adapter is NVIDIA GeForce RTX 5080, vendor 0x10DE, device 0x2C02.",
+        "Effective GPU CVars are an explicit unresolved input under CFG-001 unless the row is configuration-independent."
+      ],
+      "minimum_discriminating_evidence": "Allocation/range class, masked and unmasked address, fetch/index use and draw ID.",
+      "later_observation_boundaries": [
+        "REX-PRIMITIVE-PROCESS",
+        "REX-ANALYZE-UCODE",
+        "REX-ISSUE-DRAW"
+      ],
+      "open_question_ids": [
+        "OQ-VTX-003"
+      ],
+      "experiment_ids": [
+        "EXP-VERTEX-FETCH-001",
+        "EXP-CANDIDATE-AB-001"
+      ],
+      "evidence_gap": {
+        "exact_missing_fact": "Whether any affected allocation or vertex/index address enters 0x7F000000..0x7FC7FFFF or requires L2 wrapping.",
+        "minimum_evidence_needed": "Allocation/range class, masked and unmasked address, fetch/index use and draw ID.",
+        "observation_symbol_or_address": "Memory::LookupHeap / PrimitiveProcessor::Process",
+        "static_analysis_can_obtain": "PARTIAL",
+        "later_tooling_required": true,
+        "user_gameplay_required": true,
+        "decision_unlocked": "Confirms XPS applicability."
+      }
+    }
+  ],
+  "counts": {
+    "records": 37,
+    "by_source_confidence": {
+      "CONFIRMED SOURCE": 36,
+      "PROBABLE SOURCE": 1
+    },
+    "by_fable_reachability": {
+      "CONFIRMED EXISTING RUNTIME EXECUTION": 8,
+      "CONFIRMED TU1 STATIC REACHABILITY": 1,
+      "NOT APPLICABLE TO CURRENT FABLE ARTIFACT": 2,
+      "NOT OBSERVED IN RUN 047/048": 1,
+      "PROBABLE FOR FABLE II": 5,
+      "UNKNOWN FOR FABLE II": 20
+    },
+    "by_causal_relevance": {
+      "NOT RELEVANT TO THIS SYMPTOM": 10,
+      "PLAUSIBLE BUT UNCORRELATED": 19,
+      "UNKNOWN": 8
+    },
+    "by_applicability": {
+      "current artifact not applicable": 2,
+      "future enhancement only": 2,
+      "future renderer contract": 35,
+      "general Xenos contract": 34,
+      "hosting/integration only": 4,
+      "possible black-surface diagnosis": 20
+    }
+  }
+}

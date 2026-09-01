@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only validator for the Fable II G1.5A/G1.5B/G1.5C GPU corpus."""
+"""Read-only validator for the Fable II G1.5A-D GPU reference corpus."""
 
 from __future__ import annotations
 
@@ -37,6 +37,27 @@ DIVERGENCE_MATRIX_SCHEMA_PATH = (
 DIVERGENCE_HISTORY_SCHEMA_PATH = (
     SCHEMA_ROOT / "fable2-gpu-divergence-history-v1.schema.json"
 )
+FABLE_RELEVANCE_PATH = EVIDENCE_ROOT / "fable2-relevance-matrix.json"
+BOUNDARY_ASSESSMENT_PATH = EVIDENCE_ROOT / "boundary-assessment.json"
+REPLACEMENT_SEAMS_PATH = EVIDENCE_ROOT / "replacement-seams.json"
+EXPERIMENT_BACKLOG_PATH = EVIDENCE_ROOT / "experiment-backlog.json"
+G2A_DECISION_PATH = EVIDENCE_ROOT / "g2a-decision.json"
+FABLE_RELEVANCE_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-fable-relevance-v1.schema.json"
+)
+BOUNDARY_ASSESSMENT_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-boundary-assessment-v1.schema.json"
+)
+REPLACEMENT_SEAMS_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-replacement-seams-v1.schema.json"
+)
+EXPERIMENT_BACKLOG_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-experiment-backlog-v1.schema.json"
+)
+G2A_DECISION_SCHEMA_PATH = (
+    SCHEMA_ROOT / "fable2-gpu-g2a-decision-v1.schema.json"
+)
+G1_CANDIDATE_PATH = ROOT / "docs" / "fable2-native-renderer" / "candidate-hook-inventory.json"
 
 REQUIRED_DOCUMENTS = (
     "README.md",
@@ -71,6 +92,19 @@ REQUIRED_DOCUMENTS = (
     "evidence/divergence-matrix.json",
     "evidence/divergence-history.json",
     "g1.5c-completion.md",
+    "06-fable2-relevance-assessment.md",
+    "07-boundary-and-ownership-reassessment.md",
+    "08-system-ui-and-presentation-contract.md",
+    "09-evidence-gaps-and-experiment-plan.md",
+    "10-custom-renderer-reference-architecture.md",
+    "11-g2a-reentry-decision.md",
+    "open-questions.md",
+    "evidence/fable2-relevance-matrix.json",
+    "evidence/boundary-assessment.json",
+    "evidence/replacement-seams.json",
+    "evidence/experiment-backlog.json",
+    "evidence/g2a-decision.json",
+    "g1.5d-completion.md",
 )
 
 CONFIDENCE = ("CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE")
@@ -920,6 +954,414 @@ def validate_artifacts(inventory: dict[str, Any], validation: Validation) -> Non
             )
 
 
+def validate_g15d_artifacts(
+    relevance: dict[str, Any], validation: Validation
+) -> None:
+    for artifact in relevance.get("fable_evidence", []):
+        if artifact.get("status") not in ("IGNORED LOCAL", "EXTERNAL LOCAL"):
+            continue
+        path = Path(str(artifact.get("path", "")))
+        if not path.is_absolute():
+            path = ROOT / path
+        if not path.is_file():
+            validation.error(f"G1.5D cited local evidence is unavailable: {path}")
+            continue
+        expected_size = artifact.get("size")
+        if expected_size is not None and path.stat().st_size != expected_size:
+            validation.error(
+                f"G1.5D evidence size mismatch {path}: "
+                f"recorded {expected_size!r}, actual {path.stat().st_size!r}"
+            )
+        expected_hash = artifact.get("sha256")
+        if isinstance(expected_hash, str):
+            actual_hash = sha256(path)
+            if actual_hash != expected_hash:
+                validation.error(
+                    f"G1.5D evidence hash mismatch {path}: "
+                    f"recorded {expected_hash!r}, actual {actual_hash!r}"
+                )
+
+
+def validate_g15d_evidence(
+    relevance: dict[str, Any],
+    boundary_assessment: dict[str, Any],
+    replacement_seams: dict[str, Any],
+    experiment_backlog: dict[str, Any],
+    g2a_decision: dict[str, Any],
+    divergence_matrix: dict[str, Any],
+    g1_candidates: dict[str, Any],
+    validation: Validation,
+) -> None:
+    source_records = divergence_matrix.get("records", [])
+    relevance_records = relevance.get("records", [])
+    if not isinstance(source_records, list) or not isinstance(relevance_records, list):
+        validation.error("G1.5D relevance records are unavailable")
+        return
+
+    source_by_id = {record.get("record_id"): record for record in source_records}
+    relevance_ids = [record.get("record_id") for record in relevance_records]
+    expected_ids = sorted(source_by_id)
+    if relevance_ids != expected_ids:
+        validation.error(
+            "G1.5D relevance IDs must contain the 37 authoritative IDs once and sorted: "
+            f"actual {relevance_ids!r}"
+        )
+    if len(relevance_ids) != 37 or len(set(relevance_ids)) != 37:
+        validation.error("G1.5D relevance matrix must contain exactly 37 unique records")
+
+    source_confidence_map = {
+        "CONFIRMED": "CONFIRMED SOURCE",
+        "PROBABLE": "PROBABLE SOURCE",
+        "UNKNOWN": "UNKNOWN SOURCE",
+        "NOT APPLICABLE": "NOT APPLICABLE",
+    }
+    evidence_ids = {
+        entry.get("evidence_id") for entry in relevance.get("fable_evidence", [])
+    }
+    if None in evidence_ids or len(evidence_ids) != len(relevance.get("fable_evidence", [])):
+        validation.error("G1.5D Fable evidence IDs are invalid or duplicated")
+
+    record_boundary_refs: set[str] = set()
+    record_experiment_refs: set[str] = set()
+    record_open_question_refs: set[str] = set()
+    for record in relevance_records:
+        record_id = record.get("record_id")
+        source_record = source_by_id.get(record_id)
+        if source_record is None:
+            continue
+        identity = record.get("source_identity", {})
+        expected_identity = {
+            "direction": source_record.get("direction"),
+            "rexglue": source_record.get("rexglue"),
+            "canary": source_record.get("canary"),
+            "material_divergences": source_record.get("material_divergences"),
+            "historical_provenance": source_record.get("historical_provenance"),
+        }
+        if identity != expected_identity:
+            validation.error(
+                f"G1.5D relevance {record_id}: source identity/provenance changed"
+            )
+        expected_source_confidence = source_confidence_map.get(
+            source_record.get("source_confidence")
+        )
+        if record.get("source_confidence") != expected_source_confidence:
+            validation.error(
+                f"G1.5D relevance {record_id}: source confidence mismatch"
+            )
+        for dimension in ("fable_reachability", "causal_relevance"):
+            for evidence_id in record.get(dimension, {}).get("evidence_refs", []):
+                if evidence_id not in evidence_ids:
+                    validation.error(
+                        f"G1.5D relevance {record_id}: unknown evidence ID {evidence_id!r}"
+                    )
+        causal = record.get("causal_relevance", {}).get("classification")
+        if causal == "CAUSALLY CONFIRMED":
+            validation.error(
+                f"G1.5D relevance {record_id}: causal confirmation lacks an existing controlled A/B"
+            )
+        record_boundary_refs.update(record.get("later_observation_boundaries", []))
+        record_experiment_refs.update(record.get("experiment_ids", []))
+        record_open_question_refs.update(record.get("open_question_ids", []))
+
+    expected_relevance_counts = {
+        "records": len(relevance_records),
+        "by_source_confidence": counted(
+            [str(record.get("source_confidence")) for record in relevance_records]
+        ),
+        "by_fable_reachability": counted(
+            [
+                str(record.get("fable_reachability", {}).get("classification"))
+                for record in relevance_records
+            ]
+        ),
+        "by_causal_relevance": counted(
+            [
+                str(record.get("causal_relevance", {}).get("classification"))
+                for record in relevance_records
+            ]
+        ),
+        "by_applicability": counted(
+            [
+                str(value)
+                for record in relevance_records
+                for value in record.get("applicability", [])
+            ]
+        ),
+    }
+    if relevance.get("counts") != expected_relevance_counts:
+        validation.error(
+            "G1.5D relevance counts mismatch: "
+            f"recorded {relevance.get('counts')!r}, "
+            f"expected {expected_relevance_counts!r}"
+        )
+
+    ladder = relevance.get("evidence_ladder", [])
+    ladder_levels = [entry.get("level") for entry in ladder]
+    ladder_status = [entry.get("status") for entry in ladder]
+    if ladder_levels != ["L0", "L1", "L2", "L3", "L4", "L5"]:
+        validation.error(f"G1.5D evidence ladder is invalid: {ladder_levels!r}")
+    if ladder_status != [
+        "REACHED",
+        "REACHED",
+        "NOT REACHED",
+        "NOT REACHED",
+        "NOT REACHED",
+        "NOT REACHED",
+    ]:
+        validation.error(
+            "G1.5D existing evidence must not be promoted beyond L1"
+        )
+
+    boundaries = boundary_assessment.get("boundaries", [])
+    boundary_ids = [entry.get("boundary_id") for entry in boundaries]
+    if len(boundary_ids) != 29 or len(set(boundary_ids)) != 29:
+        validation.error("G1.5D boundary assessment must contain 29 unique boundaries")
+    boundary_id_set = set(boundary_ids)
+    if not record_boundary_refs.issubset(boundary_id_set):
+        validation.error(
+            "G1.5D relevance references unknown boundaries: "
+            f"{sorted(record_boundary_refs - boundary_id_set)!r}"
+        )
+
+    expected_g1_addresses = {
+        candidate.get("guest_address") for candidate in g1_candidates.get("candidates", [])
+    }
+    actual_g1_addresses = [
+        entry.get("g1_candidate_address")
+        for entry in boundaries
+        if entry.get("origin") == "G1_CANDIDATE"
+    ]
+    if (
+        len(actual_g1_addresses) != 11
+        or len(set(actual_g1_addresses)) != 11
+        or set(actual_g1_addresses) != expected_g1_addresses
+    ):
+        validation.error(
+            "G1.5D boundary assessment must contain every G1 candidate exactly once"
+        )
+
+    expected_observation_symbols = {
+        "VdSwap_entry",
+        "CommandProcessor::ExecutePacketType3",
+        "D3D12CommandProcessor::WriteRegister",
+        "D3D12CommandProcessor::IssueDraw",
+        "PrimitiveProcessor::Process",
+        "PipelineCache::LoadShader",
+        "Shader::AnalyzeUcode",
+        "PipelineCache::ConfigurePipeline",
+        "D3D12CommandProcessor::UpdateBindings",
+        "D3D12TextureCache::RequestTextures",
+        "D3D12RenderTargetCache::Update",
+        "draw_util::GetResolveInfo",
+        "D3D12RenderTargetCache::Resolve",
+        "SharedMemory::RequestRanges",
+        "SharedMemory::RangeWrittenByGpu",
+        "D3D12CommandProcessor::EndSubmission",
+        "Presenter::RefreshGuestOutput",
+        "D3D12Presenter::PaintAndPresentImpl",
+    }
+    observation_symbols = [
+        entry.get("exact_address_or_symbol")
+        for entry in boundaries
+        if entry.get("origin") == "REXGLUE_OBSERVATION"
+    ]
+    if (
+        len(observation_symbols) != 18
+        or len(set(observation_symbols)) != 18
+        or set(observation_symbols) != expected_observation_symbols
+    ):
+        validation.error(
+            "G1.5D boundary assessment must contain every required ReXGlue "
+            "observation surface exactly once"
+        )
+    rexglue_pin = relevance.get("pins", {}).get("rexglue_repository", {})
+    rexglue_path = Path(str(rexglue_pin.get("path", "")))
+    rexglue_commit = rexglue_pin.get("commit")
+    if not rexglue_path.is_dir() or not isinstance(rexglue_commit, str):
+        validation.error("G1.5D ReXGlue boundary source pin is unavailable")
+    else:
+        for entry in boundaries:
+            if entry.get("origin") != "REXGLUE_OBSERVATION":
+                continue
+            source_path = entry.get("source_location")
+            symbol = entry.get("exact_address_or_symbol")
+            if not isinstance(source_path, str) or not isinstance(symbol, str):
+                validation.error(
+                    f"G1.5D boundary has invalid source locator: {entry!r}"
+                )
+                continue
+            source = git_text(
+                rexglue_path, "show", f"{rexglue_commit}:{source_path}"
+            )
+            if source is None:
+                validation.error(
+                    f"G1.5D boundary {entry.get('boundary_id')}: "
+                    f"missing ReXGlue source {source_path}"
+                )
+            elif symbol not in source:
+                validation.error(
+                    f"G1.5D boundary {entry.get('boundary_id')}: "
+                    f"missing symbol {symbol!r} in {source_path}"
+                )
+
+    expected_boundary_counts = {
+        "boundaries": len(boundaries),
+        "g1_candidate_hooks": len(actual_g1_addresses),
+        "rexglue_observation_surfaces": len(observation_symbols),
+        "by_disposition": counted(
+            [str(entry.get("stage_disposition")) for entry in boundaries]
+        ),
+    }
+    if boundary_assessment.get("counts") != expected_boundary_counts:
+        validation.error(
+            "G1.5D boundary counts mismatch: "
+            f"recorded {boundary_assessment.get('counts')!r}, "
+            f"expected {expected_boundary_counts!r}"
+        )
+
+    stages = replacement_seams.get("stages", [])
+    if [stage.get("stage_id") for stage in stages] != [
+        "STAGE-A",
+        "STAGE-B",
+        "STAGE-C",
+    ]:
+        validation.error("G1.5D ownership stages must be A, B and C in order")
+    if replacement_seams.get("ownership_transition_conclusion", {}).get(
+        "classification"
+    ) != "MORE EVIDENCE REQUIRED":
+        validation.error(
+            "G1.5D must not claim a proved incremental ownership transition"
+        )
+
+    experiments = experiment_backlog.get("experiments", [])
+    experiment_ids = [entry.get("experiment_id") for entry in experiments]
+    if len(experiment_ids) != len(set(experiment_ids)):
+        validation.error("G1.5D experiment IDs are duplicated")
+    experiment_id_set = set(experiment_ids)
+    orders = [entry.get("order") for entry in experiments]
+    if orders != list(range(1, len(experiments) + 1)):
+        validation.error(
+            f"G1.5D experiments are not in dependency order: {orders!r}"
+        )
+    experiment_order = {
+        entry.get("experiment_id"): entry.get("order") for entry in experiments
+    }
+    for experiment in experiments:
+        experiment_id = experiment.get("experiment_id")
+        for dependency in experiment.get("dependencies", []):
+            if dependency not in experiment_id_set:
+                validation.error(
+                    f"G1.5D experiment {experiment_id}: unknown dependency {dependency!r}"
+                )
+            elif experiment_order[dependency] >= experiment.get("order"):
+                validation.error(
+                    f"G1.5D experiment {experiment_id}: dependency {dependency!r} "
+                    "does not precede it"
+                )
+    all_experiment_refs = set(record_experiment_refs)
+    for entry in boundaries:
+        all_experiment_refs.update(entry.get("experiment_ids", []))
+    for entry in relevance.get("evidence_ladder", []):
+        all_experiment_refs.update(entry.get("experiment_ids", []))
+    all_experiment_refs.update(
+        g2a_decision.get("part_a", {}).get("experiment_ids", [])
+    )
+    first_experiment = g2a_decision.get("part_b", {}).get("first_experiment_id")
+    if isinstance(first_experiment, str):
+        all_experiment_refs.add(first_experiment)
+    if not all_experiment_refs.issubset(experiment_id_set):
+        validation.error(
+            "G1.5D evidence references unknown experiments: "
+            f"{sorted(all_experiment_refs - experiment_id_set)!r}"
+        )
+    expected_experiment_counts = {
+        "experiments": len(experiments),
+        "by_type": counted([str(entry.get("type")) for entry in experiments]),
+        "by_estimated_evidence_level": counted(
+            [str(entry.get("estimated_evidence_level")) for entry in experiments]
+        ),
+    }
+    if experiment_backlog.get("counts") != expected_experiment_counts:
+        validation.error(
+            "G1.5D experiment counts mismatch: "
+            f"recorded {experiment_backlog.get('counts')!r}, "
+            f"expected {expected_experiment_counts!r}"
+        )
+
+    if g2a_decision.get("part_a", {}).get("decision") != (
+        "REVISE G2A BEFORE RESUMING"
+    ):
+        validation.error("G1.5D Part A decision changed")
+    if g2a_decision.get("part_b", {}).get("decision") != (
+        "STATIC XDK METHOD RECOVERY"
+    ):
+        validation.error("G1.5D Part B decision changed")
+    if g2a_decision.get("part_b", {}).get("timing_relative_to_part_a") != (
+        "INDEPENDENTLY"
+    ):
+        validation.error("G1.5D Part B relationship to Part A changed")
+
+    replacement_open_questions = {
+        question_id
+        for seam in replacement_seams.get("seam_decisions", [])
+        for question_id in seam.get("open_question_ids", [])
+    }
+    all_open_question_refs = record_open_question_refs | replacement_open_questions
+    open_questions_path = DOC_ROOT / "open-questions.md"
+    open_question_text = (
+        open_questions_path.read_text(encoding="utf-8")
+        if open_questions_path.is_file()
+        else ""
+    )
+    open_question_ids = set(re.findall(r"\bOQ-[A-Z0-9-]+\b", open_question_text))
+    if not all_open_question_refs.issubset(open_question_ids):
+        validation.error(
+            "G1.5D evidence references undocumented open questions: "
+            f"{sorted(all_open_question_refs - open_question_ids)!r}"
+        )
+
+    prose_checks = (
+        ("06-fable2-relevance-assessment.md", relevance_ids),
+        ("07-boundary-and-ownership-reassessment.md", boundary_ids),
+        ("09-evidence-gaps-and-experiment-plan.md", experiment_ids),
+    )
+    for relative_path, stable_ids in prose_checks:
+        path = DOC_ROOT / relative_path
+        contents = path.read_text(encoding="utf-8") if path.is_file() else ""
+        for stable_id in stable_ids:
+            if isinstance(stable_id, str) and stable_id not in contents:
+                validation.error(
+                    f"G1.5D stable ID {stable_id} is absent from {relative_path}"
+                )
+
+    pin_checks = (
+        (
+            ROOT,
+            relevance.get("pins", {}).get("g1", {}),
+            "G1.5D G1 pin",
+        ),
+        (
+            ROOT,
+            relevance.get("pins", {}).get("paused_g2a", {}),
+            "G1.5D paused G2A pin",
+        ),
+    )
+    for repo, pin, label in pin_checks:
+        commit = pin.get("commit")
+        if not isinstance(commit, str):
+            validation.error(f"{label} has no commit")
+            continue
+        if run_git(repo, "cat-file", "-e", f"{commit}^{{commit}}").returncode != 0:
+            validation.error(f"{label} commit is unavailable: {commit}")
+            continue
+        actual_tree = git_text(repo, "rev-parse", f"{commit}^{{tree}}")
+        if actual_tree != pin.get("tree"):
+            validation.error(
+                f"{label} tree mismatch: recorded {pin.get('tree')!r}, "
+                f"actual {actual_tree!r}"
+            )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -956,6 +1398,19 @@ def main() -> int:
     divergence_history = load_json(DIVERGENCE_HISTORY_PATH, validation)
     divergence_matrix_schema = load_json(DIVERGENCE_MATRIX_SCHEMA_PATH, validation)
     divergence_history_schema = load_json(DIVERGENCE_HISTORY_SCHEMA_PATH, validation)
+    fable_relevance = load_json(FABLE_RELEVANCE_PATH, validation)
+    boundary_assessment = load_json(BOUNDARY_ASSESSMENT_PATH, validation)
+    replacement_seams = load_json(REPLACEMENT_SEAMS_PATH, validation)
+    experiment_backlog = load_json(EXPERIMENT_BACKLOG_PATH, validation)
+    g2a_decision = load_json(G2A_DECISION_PATH, validation)
+    fable_relevance_schema = load_json(FABLE_RELEVANCE_SCHEMA_PATH, validation)
+    boundary_assessment_schema = load_json(
+        BOUNDARY_ASSESSMENT_SCHEMA_PATH, validation
+    )
+    replacement_seams_schema = load_json(REPLACEMENT_SEAMS_SCHEMA_PATH, validation)
+    experiment_backlog_schema = load_json(EXPERIMENT_BACKLOG_SCHEMA_PATH, validation)
+    g2a_decision_schema = load_json(G2A_DECISION_SCHEMA_PATH, validation)
+    g1_candidates = load_json(G1_CANDIDATE_PATH, validation)
     if inventory and inventory_schema:
         validate_with_schema(inventory, inventory_schema, "source inventory", validation)
     if subsystem_map and map_schema:
@@ -981,6 +1436,41 @@ def main() -> int:
             divergence_history,
             divergence_history_schema,
             "divergence history",
+            validation,
+        )
+    if fable_relevance and fable_relevance_schema:
+        validate_with_schema(
+            fable_relevance,
+            fable_relevance_schema,
+            "Fable relevance matrix",
+            validation,
+        )
+    if boundary_assessment and boundary_assessment_schema:
+        validate_with_schema(
+            boundary_assessment,
+            boundary_assessment_schema,
+            "boundary assessment",
+            validation,
+        )
+    if replacement_seams and replacement_seams_schema:
+        validate_with_schema(
+            replacement_seams,
+            replacement_seams_schema,
+            "replacement seams",
+            validation,
+        )
+    if experiment_backlog and experiment_backlog_schema:
+        validate_with_schema(
+            experiment_backlog,
+            experiment_backlog_schema,
+            "experiment backlog",
+            validation,
+        )
+    if g2a_decision and g2a_decision_schema:
+        validate_with_schema(
+            g2a_decision,
+            g2a_decision_schema,
+            "G2A decision",
             validation,
         )
 
@@ -1027,6 +1517,30 @@ def main() -> int:
                     validation,
                 )
 
+    if all(
+        (
+            fable_relevance,
+            boundary_assessment,
+            replacement_seams,
+            experiment_backlog,
+            g2a_decision,
+            divergence_matrix,
+            g1_candidates,
+        )
+    ):
+        validate_g15d_evidence(
+            fable_relevance,
+            boundary_assessment,
+            replacement_seams,
+            experiment_backlog,
+            g2a_decision,
+            divergence_matrix,
+            g1_candidates,
+            validation,
+        )
+        if args.verify_artifacts:
+            validate_g15d_artifacts(fable_relevance, validation)
+
     validate_markdown_links(validation)
 
     for warning in validation.warnings:
@@ -1037,7 +1551,7 @@ def main() -> int:
         print(f"FAIL: {len(validation.errors)} error(s), {len(validation.warnings)} warning(s)")
         return 1
     print(
-        f"PASS: G1.5A/G1.5B/G1.5C GPU reference validated "
+        f"PASS: G1.5A/G1.5B/G1.5C/G1.5D GPU reference validated "
         f"({len(validation.warnings)} warning(s))"
     )
     return 0

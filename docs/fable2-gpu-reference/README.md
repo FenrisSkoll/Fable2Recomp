@@ -1,9 +1,12 @@
 # Fable II GPU reference corpus
 
-This is the permanent G1.5A/G1.5B/G1.5C source reference for the ReXGlue and
-pinned Xenia Canary Xenos GPU architectures. Each implementation is documented
-first on its own terms, then compared through source and primary history. The
-corpus is not a renderer proposal and contains no capture or runtime changes.
+This is the permanent G1.5A-D source and Fable-evidence reference for the
+ReXGlue and pinned Xenia Canary Xenos GPU architectures. Each implementation is
+documented first on its own terms, compared through source and primary history,
+then reassessed against exact Fable evidence, purpose-specific boundaries and
+renderer ownership. The reference architecture is a hypothesis, not
+implementation authorization. The corpus contains no capture or runtime
+changes.
 
 The source baseline is ReXGlue
 `956c6a8b5da4c54b9899a2593e9c67c26de30194`. The active Release artifact is
@@ -42,6 +45,14 @@ The independent Canary baseline is
 23. [Divergence history and rationale](04-divergence-history-and-rationale.md)
 24. [Accuracy, performance and architecture classification](05-accuracy-performance-architecture-classification.md)
 25. [G1.5C completion and handoff](g1.5c-completion.md)
+26. [Fable II relevance assessment](06-fable2-relevance-assessment.md)
+27. [Boundary and ownership reassessment](07-boundary-and-ownership-reassessment.md)
+28. [System-UI and presentation contract](08-system-ui-and-presentation-contract.md)
+29. [Evidence gaps and experiment plan](09-evidence-gaps-and-experiment-plan.md)
+30. [Custom-renderer reference architecture](10-custom-renderer-reference-architecture.md)
+31. [G2A re-entry decision](11-g2a-reentry-decision.md)
+32. [Open questions](open-questions.md)
+33. [G1.5D completion and handoff](g1.5d-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and
@@ -64,18 +75,40 @@ The matrix is authoritative for classifications, counts, preliminary Fable
 relevance, renderer implications, and open questions; the Markdown chapters
 are review views.
 
+## G1.5D evidence index
+
+The G1.5D synthesis is represented by:
+
+- [the Fable relevance matrix](evidence/fable2-relevance-matrix.json), validated
+  by [Fable relevance v1](../../tools/schemas/fable2-gpu-fable-relevance-v1.schema.json);
+- [the purpose-specific boundary assessment](evidence/boundary-assessment.json),
+  validated by [boundary assessment v1](../../tools/schemas/fable2-gpu-boundary-assessment-v1.schema.json);
+- [the staged replacement-seam and ownership decisions](evidence/replacement-seams.json),
+  validated by [replacement seams v1](../../tools/schemas/fable2-gpu-replacement-seams-v1.schema.json);
+- [the minimum experiment backlog](evidence/experiment-backlog.json), validated
+  by [experiment backlog v1](../../tools/schemas/fable2-gpu-experiment-backlog-v1.schema.json);
+- [the two-part G2 decision](evidence/g2a-decision.json), validated by
+  [G2A decision v1](../../tools/schemas/fable2-gpu-g2a-decision-v1.schema.json).
+
+The G1.5D JSON records are authoritative for classifications, counts, stable
+IDs, cross-links and decisions. Chapters 06-11 and the open-question ledger
+are review views. Existing local Run 047/048 logs and screenshots remain
+ignored or external; only their paths, sizes, hashes and bounded findings are
+committed.
+
 Validate the corpus from the repository root with:
 
 ```powershell
 python .\tools\Verify-Fable2GpuReference.py `
     --sdk-root C:\Dev\rexglue-sdk-v0.10 `
     --canary-root C:\Dev\Fable2NativeRendererResearch\xenia-canary `
-    --verify-artifacts
+        --verify-artifacts
 ```
 
-Omit `--verify-artifacts` on a machine without the ignored local build and SDK
-package. Source, symbol, JSON-schema, history, pin, cleanliness and link checks
-still run. Omit `--canary-root` to use the path recorded in the evidence.
+Omit `--verify-artifacts` on a machine without the ignored local build, SDK
+package and cited Run 047/048 evidence. Source, symbol, JSON-schema, history,
+pin, cross-link, count, cleanliness and Markdown-link checks still run. Omit
+`--canary-root` to use the path recorded in the evidence.
 
 ## Evidence language
 
@@ -90,3 +123,8 @@ still run. Omit `--canary-root` to use the path recorded in the evidence.
 Unless a Fable connection is explicitly `CONFIRMED`, the documents state the
 needed evidence and an existing later observation point. Source availability
 alone never proves title use.
+
+G1.5D further separates `CONFIRMED SOURCE`, Fable reachability and causal
+relevance. Broad subsystem execution never upgrades a divergent sub-behaviour
+to existing runtime execution, and no row is causally confirmed without a
+controlled result.

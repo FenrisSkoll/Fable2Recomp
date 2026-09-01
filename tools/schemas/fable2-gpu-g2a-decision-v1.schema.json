@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-g2a-decision-v1.schema.json",
+  "title": "Fable II G1.5D two-part G2 re-entry decision",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "pins",
+    "part_a",
+    "part_b",
+    "relationship",
+    "authorization"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "corpus": {
+      "const": "Fable II Native Renderer G1.5D"
+    },
+    "generated_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "pins": {
+      "type": "object"
+    },
+    "part_a": {
+      "type": "object",
+      "required": [
+        "decision_id",
+        "decision",
+        "preserved_original_design",
+        "linked_binary_value",
+        "capture_infrastructure_proportionality",
+        "boundary_fitness",
+        "retain",
+        "remove_or_defer",
+        "validation_route",
+        "rationale",
+        "experiment_ids"
+      ],
+      "properties": {
+        "decision_id": {
+          "const": "G2A-PART-A"
+        },
+        "decision": {
+          "enum": [
+            "RESUME G2A AS MECHANISM PROOF ONLY",
+            "REVISE G2A BEFORE RESUMING",
+            "DEFER G2A PENDING SPECIFIC EVIDENCE",
+            "ABANDON G2A"
+          ]
+        },
+        "preserved_original_design": {
+          "type": "string"
+        },
+        "linked_binary_value": {
+          "type": "string"
+        },
+        "capture_infrastructure_proportionality": {
+          "type": "string"
+        },
+        "boundary_fitness": {
+          "type": "string"
+        },
+        "retain": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "remove_or_defer": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation_route": {
+          "type": "string"
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "experiment_ids": {
+          "type": "array",
+          "items": {
+            "pattern": "^EXP-[A-Z0-9-]+$"
+          }
+        }
+      }
+    },
+    "part_b": {
+      "type": "object",
+      "required": [
+        "decision_id",
+        "decision",
+        "timing_relative_to_part_a",
+        "rationale",
+        "first_experiment_id"
+      ],
+      "properties": {
+        "decision_id": {
+          "const": "G2-PART-B"
+        },
+        "decision": {
+          "enum": [
+            "STATIC XDK METHOD RECOVERY",
+            "TARGETED LOW-LEVEL GPU CORRELATION DESIGN",
+            "PRESENTATION/SYSTEM-UI CONTRACT VALIDATION",
+            "MORE STATIC CORPUS RESEARCH",
+            "NO FURTHER WORK JUSTIFIED"
+          ]
+        },
+        "timing_relative_to_part_a": {
+          "enum": [
+            "BEFORE",
+            "AFTER",
+            "INDEPENDENTLY"
+          ]
+        },
+        "rationale": {
+          "type": "string"
+        },
+        "first_experiment_id": {
+          "pattern": "^EXP-[A-Z0-9-]+$"
+        }
+      }
+    },
+    "relationship": {
+      "type": "string"
+    },
+    "authorization": {
+      "const": "DECISION ONLY; DO NOT RESUME OR IMPLEMENT"
+    }
+  }
+}

@@ -1,0 +1,260 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-replacement-seams-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5D",
+  "generated_on": "2026-09-01",
+  "pins": {
+    "fable_commit": "3cef954120e062974f3fcdf707ac302aa0e2d44e",
+    "g1_commit": "c44e8c16f4422f9a828caf30899ac989170b8a8c",
+    "rexglue_commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+    "active_dll_sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99"
+  },
+  "stages": [
+    {
+      "stage_id": "STAGE-A",
+      "name": "Current compatibility/oracle mode",
+      "owners": {
+        "IGraphicsSystem": "Pinned ReXGlue runtime plus the loaded rexgpu-xenos.dll provider.",
+        "guest_ring_processing": "ReXGlue xenos CommandProcessor on the GPU Commands host thread.",
+        "register_state": "The single ReXGlue xenos RegisterFile and D3D12 command processor.",
+        "memory_callbacks": "ReXGlue Kernel Memory/PhysicalHeap and graphics SharedMemory.",
+        "interrupts": "ReXGlue graphics system and guest interrupt callback registered by the TU1 lifecycle path.",
+        "vblank": "ReXGlue GPU VSync host thread and guest-visible vblank counters/events.",
+        "command_submission": "D3D12CommandProcessor and its command lists, queues, fences, pipeline workers and caches.",
+        "presenter": "ReXGlue D3D12Presenter and swap chain.",
+        "host_ui": "ReXApp, ImGuiDrawer, UIDrawers and ReXGlue XAM dialogs/achievement notifications.",
+        "shutdown": "TU1 Xbox graphics lifecycle calls plus ReXGlue graphics/provider/presenter shutdown ordering."
+      },
+      "rexgpu_xenos_role": "Required and authoritative compatibility renderer/oracle. No mirror, bypass or second consumer exists.",
+      "semantic_layer_controlled": "The title emits its original Xbox D3D/XDK/Vd behavior; this project controls only static documentation and may later wrap a proven title function while always forwarding.",
+      "fallback_without_dual_ownership": "All operations remain unchanged and execute only through rexgpu-xenos.dll. There is no native fallback path in this stage.",
+      "entry_gate": [
+        "Already satisfied by the exact pinned Fable, ReXGlue and active DLL identities.",
+        "Any observation must be separately authorized, default-off and fail-open."
+      ],
+      "unproven": [
+        "No per-draw/resource provenance exists.",
+        "No renderer replacement seam or ownership transition exists."
+      ]
+    },
+    {
+      "stage_id": "STAGE-B",
+      "name": "Hybrid observation and incremental replacement mode",
+      "owners": {
+        "IGraphicsSystem": "ReXGlue/rexgpu-xenos remains the sole production IGraphicsSystem owner during observation.",
+        "guest_ring_processing": "ReXGlue remains the sole guest-ring consumer; shadow/title records must not consume or mutate the ring.",
+        "register_state": "ReXGlue retains the sole mutable register file; observations may snapshot minimal fields only.",
+        "memory_callbacks": "ReXGlue retains the sole watch, validity, upload, readback and guest-memory visibility owner.",
+        "interrupts": "ReXGlue retains sole interrupt ownership.",
+        "vblank": "ReXGlue retains sole vblank ownership.",
+        "command_submission": "ReXGlue retains sole production command submission ownership.",
+        "presenter": "ReXGlue retains the sole swap-chain/presenter owner.",
+        "host_ui": "ReXGlue continues composing UIDrawers after guest output.",
+        "shutdown": "ReXGlue remains the sole graphics and presentation shutdown owner."
+      },
+      "rexgpu_xenos_role": "Required as unchanged oracle during evidence acquisition. It may be observed or correlated, never mirrored as a second ring/render owner.",
+      "semantic_layer_controlled": "Proven title-level Xbox D3D/XDK wrappers may emit optional metadata or a normalized shadow description while their preserved original bodies execute exactly once.",
+      "fallback_without_dual_ownership": "Unknown or unimplemented title operations always take the preserved original path before any native side effect. Initial Stage B is observation-only. The pinned sources do not prove a way to mix native draws into the oracle output without double rendering or resource/presenter ownership.",
+      "entry_gate": [
+        "Recover at least one representative TU1 draw/resource/shader/target method with exact ABI, threading, ownership and coverage evidence.",
+        "Complete linked exact-once forwarding proof for any wrapper used.",
+        "Define bounded metadata schemas and ignored output paths.",
+        "Before incremental rendering, prove a single-owner output/resource integration interface that is not present in the current corpus."
+      ],
+      "unproven": [
+        "A viable incremental rendering ownership transition is not proved.",
+        "ReXGlue exposes no composable dual-GPU ABI in the pinned source.",
+        "Optional normalized title-specific IR remains a hypothesis until static XDK method recovery."
+      ]
+    },
+    {
+      "stage_id": "STAGE-C",
+      "name": "Eventual title-specific native-renderer mode",
+      "owners": {
+        "IGraphicsSystem": "UNDECIDED: either one future compatible graphics provider owns the full required contract, or a separately validated ReXGlue integration interface retains non-rendering GPU services. The pinned corpus proves neither model.",
+        "guest_ring_processing": "Exactly one owner is mandatory. It may remain a compatibility service or be intentionally retired only after complete title-operation coverage and service replacement proof.",
+        "register_state": "Exactly one authoritative guest-state owner or a proved retirement mapping; no shadow state may become independently mutable.",
+        "memory_callbacks": "ReXGlue services remain required unless a replacement proves identical guest memory visibility, watches, upload/readback and invalidation behavior.",
+        "interrupts": "ReXGlue ownership remains required until an equivalent guest interrupt contract is demonstrated.",
+        "vblank": "ReXGlue ownership remains required until equivalent guest vblank timing/counters/events are demonstrated.",
+        "command_submission": "One native backend submission owner selected only after packet/order/query/resource semantics are qualified.",
+        "presenter": "One guest-output mailbox and swap-chain owner. A future renderer may feed the ReXGlue presenter only if a stable producer interface is proved.",
+        "host_ui": "ReXGlue host UI contract remains after guest output unless deliberately reimplemented with compatible focus, async completion, persistence, z-order and cancellation.",
+        "shutdown": "One ordered owner must cancel/retire GPU, presenter and UI work without duplicate teardown."
+      },
+      "rexgpu_xenos_role": "Retained as oracle until replacement evidence is complete. Eventually replaceable only if one validated integration model covers every still-required GPU/runtime service; it is not assumed removable.",
+      "semantic_layer_controlled": "Preferred target is recovered Fable/Lionhead intent or static Xbox D3D/XDK operations, optionally normalized into backend-neutral title IR before D3D12 capability choices.",
+      "fallback_without_dual_ownership": "There is no proved per-operation native/oracle composition path. Entry requires a fail-closed coverage proof or an explicit single-owner handoff; otherwise Stage A remains active.",
+      "entry_gate": [
+        "Representative methods expand to demonstrably complete operation and lifecycle coverage for the chosen gameplay scope.",
+        "Resource/shader identity, ordering, queries, vblank, interrupts, memory visibility, mailbox and UI contracts have controlled evidence.",
+        "A single-owner integration interface is present and tested.",
+        "L5 controlled evidence exists for renderer-critical divergences selected by the affected scene."
+      ],
+      "unproven": [
+        "Whether the eventual renderer can avoid the complete GPU ABI.",
+        "Whether ReXGlue can retain guest GPU services while a title renderer owns output.",
+        "Whether a normalized IR is necessary or sufficient.",
+        "Whether any existing G1 candidate covers all renderer operations."
+      ]
+    }
+  ],
+  "seam_decisions": [
+    {
+      "seam_id": "SEAM-REXGPU-ABI",
+      "name": "ReXGlue GPU ABI version 1 / IGraphicsSystem provider",
+      "decision": "RETAIN AS ORACLE",
+      "supported_stage": [
+        "STAGE-A",
+        "STAGE-B"
+      ],
+      "evidence": [
+        "The exact active rexgpu-xenos.dll is loaded and initializes D3D12.",
+        "Pinned ReXGlue assigns ring, registers, memory callbacks, interrupts, vblank, submissions and presentation to this graphics system."
+      ],
+      "limitations": [
+        "Using the raw ABI as the primary title renderer seam would require emulator-scale Xenos behavior.",
+        "The ABI is mandatory for the currently deployed path but does not prove it must be the eventual renderer's semantic interface."
+      ],
+      "fallback": "All current and unimplemented operations remain on this sole oracle path.",
+      "open_question_ids": [
+        "OQ-OWNERSHIP-INTERFACE"
+      ]
+    },
+    {
+      "seam_id": "SEAM-STATIC-XDK",
+      "name": "Recovered static Xbox D3D/XDK operations",
+      "decision": "STATIC METHOD RECOVERY TARGET",
+      "supported_stage": [
+        "STAGE-B",
+        "STAGE-C"
+      ],
+      "evidence": [
+        "G1 proved title-side Xbox graphics lifecycle and swap functions around 0x82B6EA60..0x82BA6EB8.",
+        "Static XDK operations should retain more resource/state/draw meaning than PM4 or D3D12 internals."
+      ],
+      "limitations": [
+        "Representative draw/resource/shader/target methods are not identified.",
+        "Coverage, ABI, threading and ownership are unproved."
+      ],
+      "fallback": "Until a method is proved, execute the original TU1 path unchanged.",
+      "open_question_ids": [
+        "OQ-STATIC-XDK-METHODS",
+        "OQ-OWNERSHIP-INTERFACE"
+      ]
+    },
+    {
+      "seam_id": "SEAM-LIONHEAD-ASYNC",
+      "name": "Lionhead async layer around sub_82AAC208",
+      "decision": "UNDECIDED",
+      "supported_stage": [
+        "STAGE-B",
+        "STAGE-C"
+      ],
+      "evidence": [
+        "The ProcessAsyncCommandQueues label and exact TU1 body support a strong discovery hypothesis."
+      ],
+      "limitations": [
+        "Queue ABI, producer/consumer threading, ownership, recursion and operation coverage are not proved.",
+        "No direct generated caller is known."
+      ],
+      "fallback": "Discovery only; do not wrap until ABI proof.",
+      "open_question_ids": [
+        "OQ-LIONHEAD-ASYNC-ABI"
+      ]
+    },
+    {
+      "seam_id": "SEAM-TITLE-SWAP",
+      "name": "sub_82BA34D8 title swap-command emitter",
+      "decision": "FORWARDING PROOF ONLY",
+      "supported_stage": [
+        "STAGE-A",
+        "STAGE-B"
+      ],
+      "evidence": [
+        "Exact TU1 range [0x82BA34D8, 0x82BA3BFC), size 0x724, 457 PPC instructions.",
+        "Directly reaches VdGetSystemCommandBuffer and VdSwap.",
+        "Paused G2A preserves a distinct __imp__sub_82BA34D8 body."
+      ],
+      "limitations": [
+        "No draw, shader, texture, register, EDRAM or resource-lifetime provenance remains.",
+        "A linked production exact-once proof is absent."
+      ],
+      "fallback": "Preserved original body executes exactly once; otherwise no hook.",
+      "open_question_ids": [
+        "OQ-G2A-LINKED-PROOF",
+        "OQ-SWAP-CORRELATION"
+      ]
+    },
+    {
+      "seam_id": "SEAM-LOWLEVEL-OBS",
+      "name": "ReXGlue command/draw/resource observation surfaces",
+      "decision": "OBSERVATION ONLY",
+      "supported_stage": [
+        "STAGE-B"
+      ],
+      "evidence": [
+        "IssueDraw, ConfigurePipeline, RequestTextures, Resolve and SharedMemory surfaces expose discriminating low-level state."
+      ],
+      "limitations": [
+        "They have already lost Fable/Lionhead intent.",
+        "They are internal owners with side effects and cannot be promoted to replacement seams by observation value alone."
+      ],
+      "fallback": "Read minimal metadata while the unchanged oracle remains sole owner.",
+      "open_question_ids": [
+        "OQ-DRAW-PROVENANCE",
+        "OQ-OWNERSHIP-INTERFACE"
+      ]
+    },
+    {
+      "seam_id": "SEAM-PRESENTER",
+      "name": "Guest-output mailbox, UIDrawer composition and host Present",
+      "decision": "PRESENTATION CONTRACT",
+      "supported_stage": [
+        "STAGE-A",
+        "STAGE-B",
+        "STAGE-C"
+      ],
+      "evidence": [
+        "Pinned D3D12 source composes guest output before host UIDrawers and then DXGI Present.",
+        "Run 047 proves Fable keyboard and achievement host-UI routes execute."
+      ],
+      "limitations": [
+        "The presenter is too late to diagnose guest draw/resource defects.",
+        "A future guest-output producer interface is not proved."
+      ],
+      "fallback": "Retain the ReXGlue presenter and UI ordering until an equivalent single-owner contract exists.",
+      "open_question_ids": [
+        "OQ-OWNERSHIP-INTERFACE",
+        "OQ-SWAP-CORRELATION"
+      ]
+    },
+    {
+      "seam_id": "SEAM-NORMALIZED-TITLE-IR",
+      "name": "Optional normalized title-specific renderer IR",
+      "decision": "UNDECIDED",
+      "supported_stage": [
+        "STAGE-B",
+        "STAGE-C"
+      ],
+      "evidence": [
+        "A backend-neutral layer could separate guest semantics from D3D12 capability choices."
+      ],
+      "limitations": [
+        "No recovered operation set exists from which to derive the IR.",
+        "IR does not itself solve ownership, fallback, ordering, queries or presentation."
+      ],
+      "fallback": "Do not create an IR until static method recovery demonstrates repeated stable semantics.",
+      "open_question_ids": [
+        "OQ-STATIC-XDK-METHODS",
+        "OQ-OWNERSHIP-INTERFACE"
+      ]
+    }
+  ],
+  "ownership_transition_conclusion": {
+    "classification": "MORE EVIDENCE REQUIRED",
+    "finding": "The corpus proves current single ownership and useful complementary high-level/low-level evidence surfaces, but it does not prove a composable incremental renderer transition.",
+    "missing_interface": "Pinned ReXGlue provides no demonstrated interface for a title renderer and rexgpu-xenos.dll to share ring consumption, register/resource ownership, rendering output or the presenter without double work.",
+    "decision_gate": "Recover representative static XDK methods first, then prove one explicit single-owner integration model before any renderer implementation."
+  }
+}

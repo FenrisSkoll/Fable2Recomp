@@ -1,0 +1,287 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-subsystem-map-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5A",
+  "pinned_rexglue_commit": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+  "confidence_vocabulary": ["CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE"],
+  "subsystems": [
+    {
+      "id": "plugin-runtime-boundary",
+      "title": "Plugin loading, ABI and runtime ownership",
+      "coverage": "FULL",
+      "inputs": ["--gpu_plugin=xenos", "GpuCreateInfo ABI 1", "ReXApp WindowedAppContext", "Runtime FunctionDispatcher and KernelState"],
+      "persistent_state": ["process-lifetime DynamicLibrary handle", "Runtime-owned IGraphicsSystem", "GraphicsSystem provider, presenter, command processor and vblank worker"],
+      "outputs": ["D3D12GraphicsSystem instance in the current build", "MMIO mapping", "Vd service delegation"],
+      "xenos_vs_rexglue": "The IGraphicsSystem ABI, DLL naming and lifetime policy are ReXGlue-specific; the resulting GPU object models Xenos services.",
+      "backend_boundary": "rex_gpu_create chooses D3D12 before Vulkan for backend=any. The pinned DLL contains D3D12 and excludes Vulkan.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/ui/rex_app.cpp", "type": "function", "symbol": "ReXApp::SetupPresentation", "confidence": "CONFIRMED", "role": "loads the configured plugin and establishes presentation first" },
+        { "repository": "rexglue", "path": "src/system/gpu_plugin_loader.cpp", "type": "function", "symbol": "LoadGpuPlugin", "confidence": "CONFIRMED", "role": "loads rexgpu-xenos.dll, validates ABI and retains the library" },
+        { "repository": "rexglue", "path": "src/graphics/plugin_main.cpp", "type": "export", "symbol": "rex_gpu_create", "confidence": "CONFIRMED", "role": "constructs the compiled backend graphics system" },
+        { "repository": "rexglue", "path": "src/system/runtime.cpp", "type": "function", "symbol": "Runtime::Shutdown", "confidence": "CONFIRMED", "role": "shuts down and destroys the graphics system while the DLL remains loaded" }
+      ],
+      "fable_connection": { "status": "CONFIRMED", "evidence": "Fable CMake stages xenos and existing fable2-run-048.log records GPU plugin 'xenos' loaded and a D3D12 NVIDIA adapter.", "observation_point": "rex::system::LoadGpuPlugin" },
+      "unresolved": ["No runtime trace in G1.5A proves the exact ABI calls for any individual Fable frame; initialization is confirmed independently."]
+    },
+    {
+      "id": "command-processor",
+      "title": "Ring buffer, PM4 decoding, indirect buffers, waits and interrupts",
+      "coverage": "FULL",
+      "inputs": ["guest ring base and size", "write pointer MMIO", "Type 0/1/2/3 packets", "indirect buffer addresses"],
+      "persistent_state": ["ring pointers and read-pointer writeback", "worker thread and events", "ME bin masks", "interrupt callback", "swap counter"],
+      "outputs": ["register writes", "draw/copy/swap virtual calls", "guest memory writes", "guest interrupt dispatch"],
+      "xenos_vs_rexglue": "Packet encodings and register effects are Xenos-facing; worker scheduling, logging, sleep/yield policy and unsupported-opcode handling are ReXGlue choices.",
+      "backend_boundary": "The base CommandProcessor decodes packets. D3D12CommandProcessor implements draw, copy, swap and host query operations.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::WorkerThreadMain", "confidence": "CONFIRMED", "role": "consumes the primary ring and writes the read pointer" },
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::ExecutePacketType3", "confidence": "CONFIRMED", "role": "dispatches PM4 Type 3 opcodes" },
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::ExecutePacketType3_INDIRECT_BUFFER", "confidence": "CONFIRMED", "role": "translates and executes indirect command buffers" },
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::ExecutePacketType3_WAIT_REG_MEM", "confidence": "CONFIRMED", "role": "performs register/memory waits and coherency handling" }
+      ],
+      "fable_connection": { "status": "CONFIRMED", "evidence": "Accepted G1 proves sub_82BA34D8 reaches VdSwap, which emits PM4_XE_SWAP; it does not prove other packet classes for Fable.", "observation_point": "CommandProcessor::ExecutePacketType3" },
+      "unresolved": ["UNKNOWN FOR FABLE II: packet/opcode frequency and indirect-buffer topology. Evidence required: packet trace for the pinned TU1 image. Suggested later observation point: CommandProcessor::ExecutePacketType3."]
+    },
+    {
+      "id": "register-state",
+      "title": "GPU register file, writes, coherency and dirty state",
+      "coverage": "FULL",
+      "inputs": ["MMIO writes", "Type 0/1 packets", "SET_CONSTANT and shader-load packets"],
+      "persistent_state": ["0x5003-dword RegisterFile", "extended out-of-range register map", "D3D12 pipeline/binding invalidation flags"],
+      "outputs": ["typed register views", "fetch constants", "draw/copy state", "backend dirty-state notifications"],
+      "xenos_vs_rexglue": "Register indices and bit layouts are Xenos data; the generated table, extended map and per-backend dirty-state policy are implementation structures.",
+      "backend_boundary": "Base writes preserve register values. D3D12CommandProcessor::WriteRegister adds resource and pipeline invalidation decisions.",
+      "symbols": [
+        { "repository": "rexglue", "path": "include/rex/graphics/register_file.h", "type": "class", "symbol": "RegisterFile", "confidence": "CONFIRMED", "role": "owns indexed and extended register values" },
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::WriteRegister", "confidence": "CONFIRMED", "role": "applies generic register side effects" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::WriteRegister", "confidence": "CONFIRMED", "role": "invalidates D3D12 state and resource residency" },
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::MakeCoherent", "confidence": "CONFIRMED", "role": "handles COHER_STATUS_HOST waits with an incomplete cache notification path" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "register write trace tied to the pinned TU1 executable", "suggested_later_observation_point": "D3D12CommandProcessor::WriteRegister" },
+      "unresolved": ["The exact Fable register write sequence and dirty-state churn cannot be established statically.", "MakeCoherent clears the status but retains a TODO for resource-cache notification."]
+    },
+    {
+      "id": "draw-initiation",
+      "title": "Draw triggers, extents, topology, indices, predication and queries",
+      "coverage": "PARTIAL",
+      "inputs": ["DRAW_INDX or DRAW_INDX_2 packet", "primitive type", "index count/source/endian", "current register state"],
+      "persistent_state": ["bin predication state", "query state", "primitive-conversion cache", "draw extent estimates"],
+      "outputs": ["backend IssueDraw", "converted topology/index buffer", "optional query writes"],
+      "xenos_vs_rexglue": "Primitive types, reset indices and query packets are Xenos semantics; conversion algorithms, fake-query fallback and dropped unsupported immediate-index draws are ReXGlue behavior.",
+      "backend_boundary": "Base packet parsing builds IndexBufferInfo. Common PrimitiveProcessor converts unsupported topology; D3D12 binds and issues DrawInstanced/DrawIndexedInstanced.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::ExecutePacketType3Draw", "confidence": "CONFIRMED", "role": "parses draw packets and initiates the backend draw" },
+        { "repository": "rexglue", "path": "src/graphics/primitive_processor.cpp", "type": "function", "symbol": "PrimitiveProcessor::Process", "confidence": "CONFIRMED", "role": "normalizes topology, reset and index data" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::IssueDraw", "confidence": "CONFIRMED", "role": "configures resources and emits the host draw" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::BeginGuestOcclusionQuery", "confidence": "CONFIRMED", "role": "optional host occlusion-query path" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "draw packet plus register snapshot and returned IssueDraw result", "suggested_later_observation_point": "D3D12CommandProcessor::IssueDraw" },
+      "unresolved": ["Immediate-index draw support is absent.", "Predication and query parity are incomplete and Fable use is unknown.", "Static analysis cannot identify Fable's primitive mix or skipped draws."]
+    },
+    {
+      "id": "vertex-fetch",
+      "title": "Vertex fetch, formats, endian and index conversion",
+      "coverage": "PARTIAL",
+      "inputs": ["vertex fetch constants", "shader vertex-fetch analysis", "guest physical ranges", "index buffer metadata"],
+      "persistent_state": ["per-fetch residency", "shared-memory requests", "primitive conversion cache and watches"],
+      "outputs": ["host vertex SRV bindings", "host index buffer", "host topology"],
+      "xenos_vs_rexglue": "Fetch constants, formats and endian modes are Xenos-facing; shared-memory SRVs and topology expansion are host adaptation.",
+      "backend_boundary": "Shader analysis is common; D3D12 UpdateBindings requests shared ranges and creates descriptors, while D3D12PrimitiveProcessor owns converted host buffers.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/pipeline/shader/translator.cpp", "type": "function", "symbol": "Shader::GatherVertexFetchInformation", "confidence": "CONFIRMED", "role": "extracts vertex-fetch use from shader microcode" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::UpdateBindings", "confidence": "CONFIRMED", "role": "requests guest vertex ranges and binds D3D12 views" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/primitive_processor.cpp", "type": "function", "symbol": "D3D12PrimitiveProcessor::RequestHostConvertedIndexBufferForCurrentFrame", "confidence": "CONFIRMED", "role": "allocates host-converted indices" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "shader analysis and vertex/index fetch constants for a Fable draw", "suggested_later_observation_point": "D3D12CommandProcessor::UpdateBindings" },
+      "unresolved": ["Fable's vertex formats, endian modes and conversion paths are not known from static project evidence."]
+    },
+    {
+      "id": "textures-samplers",
+      "title": "Texture fetch, tiling, formats, cache and samplers",
+      "coverage": "PARTIAL",
+      "inputs": ["texture fetch constants", "shader texture-use mask", "guest physical texture/mip ranges", "sampler registers"],
+      "persistent_state": ["TextureKey-indexed cache", "LRU and memory budgets", "guest-memory watches", "D3D12 resources, SRVs and sampler descriptors"],
+      "outputs": ["converted host textures", "shader resource bindings", "translated samplers", "swap texture from fetch constant 0"],
+      "xenos_vs_rexglue": "Tiling, packed mips, formats, endian and fetch constants are Xenos concepts; compute conversion shaders, cache limits and D3D12 sampler approximations are implementation decisions.",
+      "backend_boundary": "Common code derives layouts, keys and watches. D3D12 creates resources and runs format/untiling load shaders.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/pipeline/texture/cache.cpp", "type": "function", "symbol": "TextureCache::BindingInfoFromFetchConstant", "confidence": "CONFIRMED", "role": "derives common texture binding information" },
+        { "repository": "rexglue", "path": "src/graphics/pipeline/texture/cache.cpp", "type": "function", "symbol": "TextureCache::RequestTextures", "confidence": "CONFIRMED", "role": "finds, validates and watches requested textures" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/texture_cache.cpp", "type": "function", "symbol": "D3D12TextureCache::LoadTextureDataFromResidentMemoryImpl", "confidence": "CONFIRMED", "role": "runs D3D12 conversion/load paths" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/texture_cache.cpp", "type": "function", "symbol": "D3D12TextureCache::NormalizeClampMode", "confidence": "CONFIRMED", "role": "maps unsupported D3D12 addressing cases to approximations" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "fetch constants, used-texture mask, TextureKey and load result for representative Fable draws", "suggested_later_observation_point": "D3D12TextureCache::RequestTextures" },
+      "unresolved": ["Fable texture formats and cache residency behavior are unobserved.", "Some Xenos clamp/filter and fetch details are approximate or retain TODOs."]
+    },
+    {
+      "id": "render-targets-edram",
+      "title": "Render targets, depth/stencil, EDRAM, MSAA, resolves and clears",
+      "coverage": "PARTIAL",
+      "inputs": ["RB and copy registers", "draw extents", "EDRAM tile ranges", "resolve vertex data"],
+      "persistent_state": ["EDRAM ownership map", "host render-target cache", "ROV EDRAM buffer when selected", "resolve pipelines and scaled-resolve ranges"],
+      "outputs": ["host render targets or ROV writes", "ownership transfers", "resolved guest-memory ranges", "clear operations"],
+      "xenos_vs_rexglue": "EDRAM tiles, formats, MSAA and copy registers are Xenos-facing; host-render-target ownership transfers and the ROV custom output-merger are alternative ReXGlue mappings.",
+      "backend_boundary": "Common RenderTargetCache computes attachment use, tile extents and ownership. D3D12 executes barriers, transfers, clears and resolve compute/direct paths.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/pipeline/render_target/cache.cpp", "type": "function", "symbol": "RenderTargetCache::Update", "confidence": "CONFIRMED", "role": "derives used attachments and EDRAM ownership transitions" },
+        { "repository": "rexglue", "path": "src/graphics/pipeline/render_target/cache.cpp", "type": "function", "symbol": "RenderTargetCache::ChangeOwnership", "confidence": "CONFIRMED", "role": "tracks tile aliasing and required transfers" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/render_target_cache.cpp", "type": "function", "symbol": "D3D12RenderTargetCache::Resolve", "confidence": "CONFIRMED", "role": "resolves/copies EDRAM into guest or scaled-resolve memory" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/render_target_cache.cpp", "type": "function", "symbol": "D3D12RenderTargetCache::PerformTransfersAndResolveClears", "confidence": "CONFIRMED", "role": "executes D3D12 alias transfers and clear work" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "copy-mode draw plus RB/COPY register snapshot and selected D3D12 render_target_path", "suggested_later_observation_point": "D3D12RenderTargetCache::Resolve" },
+      "unresolved": ["The runtime-selected Fable path is unproven: default D3D12 policy chooses host RTV for non-Intel and ROV for Intel when supported, but configuration may override it.", "Fable MSAA, aliasing, clear and resolve patterns are unknown."]
+    },
+    {
+      "id": "shader-translation",
+      "title": "Xenos shader loading, analysis, translation and caches",
+      "coverage": "PARTIAL",
+      "inputs": ["IM_LOAD guest microcode", "shader type and address", "register-derived modification key"],
+      "persistent_state": ["XXH3-keyed guest shader cache", "per-modification translations", "persistent xsh storage", "optional disassembly/dumps"],
+      "outputs": ["analysed control-flow/resource metadata", "DXBC translation", "D3D12 shader bytecode"],
+      "xenos_vs_rexglue": "Microcode and fetch/ALU/export semantics are Xenos; analysis structures, modification keys, DXBC generation and cache file formats are ReXGlue.",
+      "backend_boundary": "Shader::AnalyzeUcode and ShaderTranslator are common. DxbcShaderTranslator and D3D12Shader are current-backend-specific; SPIR-V is excluded from the current DLL.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/command_processor.cpp", "type": "function", "symbol": "CommandProcessor::ExecutePacketType3_IM_LOAD", "confidence": "CONFIRMED", "role": "loads vertex or pixel microcode from guest memory" },
+        { "repository": "rexglue", "path": "src/graphics/pipeline/shader/translator.cpp", "type": "function", "symbol": "Shader::AnalyzeUcode", "confidence": "CONFIRMED", "role": "parses Xenos control flow and resource usage" },
+        { "repository": "rexglue", "path": "src/graphics/pipeline/shader/translator.cpp", "type": "function", "symbol": "ShaderTranslator::TranslateAnalyzedShader", "confidence": "CONFIRMED", "role": "walks analysed instructions into a host translation" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/pipeline_cache.cpp", "type": "function", "symbol": "PipelineCache::TranslateAnalyzedShader", "confidence": "CONFIRMED", "role": "creates and stores current DXBC translations" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "IM_LOAD address/length/hash and translation result for each observed Fable shader", "suggested_later_observation_point": "PipelineCache::LoadShader" },
+      "unresolved": ["No Fable shader hashes, modification keys or translation failures are established by G1.5A.", "Static source contains unsupported instruction/fetch cases whose relevance to Fable is unknown."]
+    },
+    {
+      "id": "pipeline-bindings",
+      "title": "Host pipeline state, descriptors, constants and invalidation",
+      "coverage": "PARTIAL",
+      "inputs": ["analysed vertex/pixel shaders", "register state", "primitive processing result", "render-target mode"],
+      "persistent_state": ["XXH3-keyed pipeline descriptions", "D3D12 PSOs and root signatures", "bindless/bindful descriptor pools", "system constant snapshots", "async creation queues"],
+      "outputs": ["configured D3D12 PSO/root signature", "descriptors and constants", "host draw readiness or asynchronous skip"],
+      "xenos_vs_rexglue": "Xenos render state and constants are inputs; PSO decomposition, root signatures, descriptor strategy and asynchronous creation are host implementation policy.",
+      "backend_boundary": "Common analysis feeds D3D12 PipelineCache and D3D12CommandProcessor binding code. Vulkan owns separate cache/binding machinery and is not in the DLL.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/d3d12/pipeline_cache.cpp", "type": "function", "symbol": "PipelineCache::ConfigurePipeline", "confidence": "CONFIRMED", "role": "hashes/selects/translates pipeline state" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/pipeline_cache.cpp", "type": "function", "symbol": "PipelineCache::CreateD3D12Pipeline", "confidence": "CONFIRMED", "role": "creates the D3D12 PSO" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::UpdateSystemConstantValues", "confidence": "CONFIRMED", "role": "translates current registers into host system constants" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::RequestViewBindfulDescriptors", "confidence": "CONFIRMED", "role": "allocates binding descriptors when bindless is unavailable/disabled" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "pipeline description hash, compilation state and descriptor mode for representative Fable draws", "suggested_later_observation_point": "PipelineCache::ConfigurePipeline" },
+      "unresolved": ["With asynchronous shader/pipeline compilation, an incomplete pipeline can cause a draw to return without rendering; Fable exposure is unknown.", "No Fable pipeline cache population or hit-rate data exists in G1.5A."]
+    },
+    {
+      "id": "memory-synchronization",
+      "title": "Shared memory, watches, resource lifetime, barriers, queues and fences",
+      "coverage": "PARTIAL",
+      "inputs": ["guest physical reads/writes", "resource range requests", "GPU-written ranges", "submission boundaries"],
+      "persistent_state": ["512 MiB host GPU memory mirror", "system-page validity/GPU-write bitmaps", "range/global watches", "D3D12 resource state", "submission fences and three-frame contexts"],
+      "outputs": ["uploaded guest ranges", "invalidated cache entries", "readback guest data", "barriers and queue submissions", "retired resources"],
+      "xenos_vs_rexglue": "A coherent 512 MiB physical space is the emulated target; page bitmaps, watch callbacks, sparse allocation, upload pools and fence retirement are ReXGlue/D3D12 mechanisms.",
+      "backend_boundary": "Common SharedMemory owns validity and watches. D3D12SharedMemory owns resources, transitions and uploads; D3D12CommandProcessor owns submission fences and reclamation.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/shared_memory.cpp", "type": "function", "symbol": "SharedMemory::RequestRanges", "confidence": "CONFIRMED", "role": "makes guest ranges resident/current for GPU consumers" },
+        { "repository": "rexglue", "path": "src/graphics/shared_memory.cpp", "type": "function", "symbol": "SharedMemory::RangeWrittenByGpu", "confidence": "CONFIRMED", "role": "marks GPU output and fires invalidation watches" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/shared_memory.cpp", "type": "function", "symbol": "D3D12SharedMemory::UploadRanges", "confidence": "CONFIRMED", "role": "uploads invalid guest pages through D3D12" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::EndSubmission", "confidence": "CONFIRMED", "role": "executes command lists, signals fences and rotates frame state" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "range requests, invalidations, barriers, queue submission and fence events correlated to a Fable frame", "suggested_later_observation_point": "D3D12CommandProcessor::EndSubmission" },
+      "unresolved": ["Fable's upload/readback volume and synchronization pressure are unobserved.", "Resolve and memexport readback behavior is configuration-dependent."]
+    },
+    {
+      "id": "d3d12-backend",
+      "title": "D3D12 implementation and shared-backend boundary",
+      "coverage": "FULL",
+      "inputs": ["backend=any factory request", "host DXGI adapters", "D3D12 feature support", "common GPU operations"],
+      "persistent_state": ["D3D12Provider device and direct queue", "D3D12CommandProcessor context", "D3D12 caches and descriptor pools"],
+      "outputs": ["D3D12 command lists", "queue submissions", "guest-output textures", "device-loss diagnostics"],
+      "xenos_vs_rexglue": "This is the host realization of common Xenos-derived state; API loading, feature policy and resource layouts are D3D12-specific.",
+      "backend_boundary": "The current DLL is compiled with REXGLUE_USE_D3D12=ON and REXGLUE_USE_VULKAN=OFF. Vulkan source is present but NOT APPLICABLE to this artifact.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/graphics/plugin_main.cpp", "type": "function", "symbol": "D3D12GraphicsSystem", "confidence": "CONFIRMED", "role": "factory result for backend=any in this build" },
+        { "repository": "rexglue", "path": "src/ui/d3d12/d3d12_provider.cpp", "type": "function", "symbol": "D3D12Provider::Initialize", "confidence": "CONFIRMED", "role": "loads APIs, selects an adapter, creates device and direct queue" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::SetupContext", "confidence": "CONFIRMED", "role": "creates D3D12 fences, lists and GPU caches" },
+        { "repository": "rexglue", "path": "src/graphics/CMakeLists.txt", "type": "build condition", "symbol": "REXGLUE_USE_VULKAN", "confidence": "NOT APPLICABLE", "role": "excluded backend in the current artifact" }
+      ],
+      "fable_connection": { "status": "CONFIRMED", "evidence": "fable2-run-048.log records NVIDIA GeForce RTX 5080 and Direct3D 12 feature enumeration after loading rexgpu-xenos.dll.", "observation_point": "D3D12Provider::Initialize" },
+      "unresolved": ["Actual per-frame feature-path selection still depends on registers, cvars and device features."]
+    },
+    {
+      "id": "presentation",
+      "title": "VdSwap, guest output, swap chain, frame boundaries and shutdown",
+      "coverage": "PARTIAL",
+      "inputs": ["VdSwap six-dword request", "PM4_XE_SWAP packet", "front-buffer fetch constant 0", "window surface state"],
+      "persistent_state": ["swap counter", "three-mailbox guest outputs", "three-buffer DXGI swap chain", "surface/presenter state", "guest vblank worker"],
+      "outputs": ["R10G10B10A2 guest-output texture", "post-effect/composed back buffer", "DXGI Present", "guest vblank interrupts"],
+      "xenos_vs_rexglue": "VdSwap packet transport and guest video mode are Xbox-facing; mailbox dropping, post-processing, flip-discard swap chain, tearing and UI-thread scheduling are host policies.",
+      "backend_boundary": "Base Presenter owns mailbox/paint flow. D3D12Presenter owns swap-chain resources and DXGI Present. GraphicsSystem vblank is separate from host presentation.",
+      "symbols": [
+        { "repository": "fable2", "path": "docs/fable2-native-renderer/candidate-hook-inventory.json", "type": "guest function", "symbol": "sub_82BA34D8", "confidence": "CONFIRMED", "role": "accepted Fable TU1 swap-command emitter [0x82BA34D8,0x82BA3BFC)" },
+        { "repository": "rexglue", "path": "src/kernel/xboxkrnl/xboxkrnl_video.cpp", "type": "export", "symbol": "VdSwap_entry", "confidence": "CONFIRMED", "role": "serializes front-buffer fetch and PM4_XE_SWAP" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::IssueSwap", "confidence": "CONFIRMED", "role": "loads fetch constant 0, renders guest output and ends a swap submission" },
+        { "repository": "rexglue", "path": "src/ui/d3d12/d3d12_presenter.cpp", "type": "function", "symbol": "D3D12Presenter::PaintAndPresentImpl", "confidence": "CONFIRMED", "role": "composes and calls IDXGISwapChain::Present" }
+      ],
+      "fable_connection": { "status": "CONFIRMED TO PACKET EMISSION; UNKNOWN THROUGH HOST PRESENT FOR FABLE II", "evidence_required": "one correlated event chain from sub_82BA34D8 through VdSwap_entry, ExecutePacketType3_XE_SWAP, IssueSwap, RefreshGuestOutput and PaintAndPresentImpl", "suggested_later_observation_point": "CommandProcessor::ExecutePacketType3_XE_SWAP" },
+      "unresolved": ["No G1.5A trace correlates one Fable guest call to one DXGI Present.", "Host Present uses interval 0 with optional tearing, while guest vblank timing is a separate worker; observed pacing and frame drops cannot be inferred statically."]
+    },
+    {
+      "id": "diagnostics-errors",
+      "title": "Diagnostics, unsupported features, configuration and device loss",
+      "coverage": "FULL",
+      "inputs": ["invalid plugin/ABI requests", "unsupported PM4 or shader operations", "D3D12 HRESULT/device-removal state", "GPU/UI cvars"],
+      "persistent_state": ["cvar registry", "one-shot unsupported-format reports", "host-GPU-loss atomic flag", "optional RenderDoc and shader dump state"],
+      "outputs": ["categorized logs/assertions", "fallback or skipped operations", "fatal device-loss termination", "optional DRED diagnostics"],
+      "xenos_vs_rexglue": "Unsupported guest encodings originate in the emulated interface; logging severity, fake values, skip policy and fatal host-device-loss behavior are ReXGlue choices.",
+      "backend_boundary": "Common code reports packet/shader limitations; D3D12 adds feature probes, format reporting and DRED. Vulkan diagnostics are outside the active artifact.",
+      "symbols": [
+        { "repository": "rexglue", "path": "src/system/gpu_plugin_loader.cpp", "type": "function", "symbol": "LoadGpuPlugin", "confidence": "CONFIRMED", "role": "reports missing DLL, exports, ABI or factory failure" },
+        { "repository": "rexglue", "path": "src/graphics/graphics_system.cpp", "type": "function", "symbol": "GraphicsSystem::OnHostGpuLossFromAnyThread", "confidence": "CONFIRMED", "role": "turns device loss into a fatal error; recovery is TODO" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/command_processor.cpp", "type": "function", "symbol": "D3D12CommandProcessor::LogDeviceRemovalDiagnostics", "confidence": "CONFIRMED", "role": "logs D3D12 removal and DRED evidence" },
+        { "repository": "rexglue", "path": "src/graphics/d3d12/texture_cache.cpp", "type": "field", "symbol": "unsupported_format_features_used_", "confidence": "CONFIRMED", "role": "aggregates unsupported texture format reports per frame" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "exact runtime warning/error plus preceding guest packet/register state", "suggested_later_observation_point": "first REXGPU_ERROR or host device-removal path" },
+      "unresolved": ["The relevance of individual TODO, approximation and fallback paths to Fable is unknown until observed.", "No dedicated first-party GPU tests were found at the pinned commit."]
+    },
+    {
+      "id": "system-ui-composition",
+      "title": "Bounded Xbox system-UI integration with host presentation",
+      "coverage": "PARTIAL",
+      "inputs": ["guest XamShowKeyboardUI export", "XGI achievement-write app message 0x000B0008", "host window input"],
+      "persistent_state": ["ReXApp-owned ImGuiDrawer and ImmediateDrawer", "host keyboard dialog", "thread-safe achievement-toast queue"],
+      "outputs": ["guest keyboard result buffer/completion", "host achievement toast", "UI draw commands over the composed guest output"],
+      "xenos_vs_rexglue": "The guest requests enter through XAM/XGI-facing handlers, but the inspected keyboard dialog and achievement toast are ReXGlue host UI. They are not emitted as guest Xenos draws.",
+      "backend_boundary": "ImGuiDrawer registers as a Presenter UIDrawer. In D3D12Presenter::PaintAndPresentImpl, the guest output is painted first, then ExecuteUIDrawersFromUIThread draws overlays into the host back buffer before its present transition and DXGI Present.",
+      "symbols": [
+        { "repository": "fable2", "path": "src/fable2_app.h", "type": "application subclass", "symbol": "class Fable2App", "confidence": "CONFIRMED", "role": "does not replace the default ReXApp overlay/presentation setup or achievement notification factory" },
+        { "repository": "rexglue", "path": "src/kernel/xam/xam_ui.cpp", "type": "guest export handler", "symbol": "XamShowKeyboardUI_entry", "confidence": "CONFIRMED", "role": "creates the host KeyboardInputDialog when an ImGuiDrawer is available" },
+        { "repository": "rexglue", "path": "src/ui/imgui_drawer.cpp", "type": "function", "symbol": "ImGuiDrawer::AddDialog", "confidence": "CONFIRMED", "role": "attaches the host dialog drawer to Presenter and host input" },
+        { "repository": "rexglue", "path": "src/kernel/xam/apps/xgi_app.cpp", "type": "app-message handler", "symbol": "XGIUserWriteAchievements", "confidence": "CONFIRMED", "role": "message 0x000B0008 forwards observed achievement IDs to KernelState" },
+        { "repository": "rexglue", "path": "src/ui/overlay/achievement_toast.cpp", "type": "function", "symbol": "AchievementToastDialog::Push", "confidence": "CONFIRMED", "role": "queues a host-side achievement notification" },
+        { "repository": "rexglue", "path": "src/ui/d3d12/d3d12_presenter.cpp", "type": "function", "symbol": "ExecuteUIDrawersFromUIThread", "confidence": "CONFIRMED", "role": "composites host UI after guest output and before DXGI presentation" }
+      ],
+      "fable_connection": { "status": "UNKNOWN FOR FABLE II", "evidence_required": "a direct Fable TU1 call/event showing the dog-naming flow reaches XamShowKeyboardUI, and a direct title event showing achievement message 0x000B0008 reaches the toast callback", "suggested_later_observation_point": "XamShowKeyboardUI_entry and XgiApp::DispatchMessageSync case 0x000B0008" },
+      "unresolved": ["G1.5D REQUIREMENT: establish whether Fable's dog-naming path calls XamShowKeyboardUI and whether its result returns through the expected guest completion path; do not infer this from the dialog implementation.", "G1.5D REQUIREMENT: establish the guest-facing title call that produces XGI message 0x000B0008 for Fable and correlate the host toast with the same unlock.", "The short direct trace did not identify a named ReXGlue XAM achievement-write export; only the XGI app-message handler is source-confirmed."]
+    }
+  ],
+  "relationships": [
+    { "from": "plugin-runtime-boundary", "to": "command-processor", "kind": "SetupGuestGpu constructs and starts the processor", "confidence": "CONFIRMED", "symbols": ["GraphicsSystem::SetupGuestGpu", "CommandProcessor::Initialize"] },
+    { "from": "command-processor", "to": "register-state", "kind": "Type 0/1/3 packets write persistent registers", "confidence": "CONFIRMED", "symbols": ["CommandProcessor::WriteRegister", "CommandProcessor::WriteRegisterRangeFromRing"] },
+    { "from": "command-processor", "to": "draw-initiation", "kind": "DRAW_INDX packets invoke IssueDraw", "confidence": "CONFIRMED", "symbols": ["CommandProcessor::ExecutePacketType3Draw", "D3D12CommandProcessor::IssueDraw"] },
+    { "from": "register-state", "to": "shader-translation", "kind": "IM_LOAD and program registers select microcode and translation modifications", "confidence": "CONFIRMED", "symbols": ["CommandProcessor::ExecutePacketType3_IM_LOAD", "PipelineCache::GetCurrentVertexShaderModification"] },
+    { "from": "shader-translation", "to": "vertex-fetch", "kind": "analysis produces vertex-fetch metadata consumed by bindings", "confidence": "CONFIRMED", "symbols": ["Shader::GatherVertexFetchInformation", "D3D12CommandProcessor::UpdateBindings"] },
+    { "from": "shader-translation", "to": "textures-samplers", "kind": "analysis produces texture-use masks and sampler bindings", "confidence": "CONFIRMED", "symbols": ["Shader::GatherTextureFetchInformation", "TextureCache::RequestTextures"] },
+    { "from": "draw-initiation", "to": "pipeline-bindings", "kind": "IssueDraw configures the current PSO and descriptors", "confidence": "CONFIRMED", "symbols": ["D3D12CommandProcessor::IssueDraw", "PipelineCache::ConfigurePipeline"] },
+    { "from": "draw-initiation", "to": "render-targets-edram", "kind": "draw/copy mode selects attachment update or resolve", "confidence": "CONFIRMED", "symbols": ["D3D12CommandProcessor::IssueDraw", "D3D12CommandProcessor::IssueCopy"] },
+    { "from": "memory-synchronization", "to": "textures-samplers", "kind": "guest memory watches invalidate and reload texture resources", "confidence": "CONFIRMED", "symbols": ["SharedMemory::FireWatches", "TextureCache::WatchCallback"] },
+    { "from": "render-targets-edram", "to": "memory-synchronization", "kind": "resolves and memexport mark guest ranges GPU-written", "confidence": "CONFIRMED", "symbols": ["D3D12RenderTargetCache::Resolve", "SharedMemory::RangeWrittenByGpu"] },
+    { "from": "d3d12-backend", "to": "memory-synchronization", "kind": "D3D12 resources, barriers, direct queue and fences realize common memory operations", "confidence": "CONFIRMED", "symbols": ["D3D12SharedMemory::UploadRanges", "D3D12CommandProcessor::EndSubmission"] },
+    { "from": "command-processor", "to": "presentation", "kind": "PM4_XE_SWAP invokes IssueSwap", "confidence": "CONFIRMED", "symbols": ["CommandProcessor::ExecutePacketType3_XE_SWAP", "D3D12CommandProcessor::IssueSwap"] },
+    { "from": "system-ui-composition", "to": "presentation", "kind": "Presenter composites registered host UIDrawers after guest output and before DXGI Present", "confidence": "CONFIRMED", "symbols": ["Presenter::ExecuteUIDrawersFromUIThread", "D3D12Presenter::PaintAndPresentImpl"] },
+    { "from": "presentation", "to": "diagnostics-errors", "kind": "present and device-loss failures enter common/D3D12 diagnostics", "confidence": "CONFIRMED", "symbols": ["D3D12Presenter::PaintAndPresentImpl", "GraphicsSystem::OnHostGpuLossFromAnyThread"] }
+  ],
+  "unresolved_questions": [
+    "UNKNOWN FOR FABLE II: Which PM4 opcodes, register ranges and indirect-buffer structures are exercised after the accepted G1 swap boundary? Evidence required: a bounded packet/register trace. Suggested later observation point: CommandProcessor::ExecutePacketType3.",
+    "UNKNOWN FOR FABLE II: Which shader hashes, texture/vertex formats, EDRAM paths and pipeline modifications are used? Evidence required: existing-symbol events for IssueDraw and its cache calls. Suggested later observation point: D3D12CommandProcessor::IssueDraw.",
+    "UNKNOWN FOR FABLE II: Does a particular sub_82BA34D8 call reach DXGI Present, get replaced in the guest-output mailbox, or fail earlier? Evidence required: correlated swap IDs. Suggested later observation points: ExecutePacketType3_XE_SWAP, IssueSwap, Presenter::RefreshGuestOutput and D3D12Presenter::PaintAndPresentImpl.",
+    "G1.5D REQUIREMENT: correlate the Fable dog-naming request, if any, with XamShowKeyboardUI_entry and the host-composited dialog; source existence alone does not prove title use.",
+    "G1.5D REQUIREMENT: identify the guest-facing Fable achievement-write call leading to XGI app message 0x000B0008 and correlate the resulting host toast with presentation.",
+    "UNKNOWN: The exact historical Xenia commit from which the ReXGlue GPU corpus was originally derived. Evidence required: import provenance or an exact source-tree match; not needed to establish the current ReXGlue v0.10 baseline.",
+    "UNKNOWN: Functional conformance of the pinned GPU code beyond existing runtime initialization evidence, because no dedicated first-party GPU tests were found and G1.5A adds no instrumentation."
+  ]
+}

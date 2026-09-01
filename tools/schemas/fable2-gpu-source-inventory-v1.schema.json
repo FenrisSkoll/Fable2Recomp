@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-source-inventory-v1.schema.json",
+  "title": "Fable II GPU reference source inventory",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "fable_repository",
+    "rexglue_repository",
+    "upstream_rexglue",
+    "canary_pin",
+    "target_identity",
+    "artifacts",
+    "source_scopes",
+    "key_files",
+    "test_inventory"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.5A" },
+    "generated_on": { "type": "string", "format": "date" },
+    "fable_repository": { "$ref": "#/$defs/repository" },
+    "rexglue_repository": { "$ref": "#/$defs/repository" },
+    "upstream_rexglue": { "type": "object" },
+    "canary_pin": { "type": "object" },
+    "target_identity": { "type": "object" },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "path", "size", "sha256"]
+      }
+    },
+    "source_scopes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["repository", "path", "git_object_sha1", "file_count", "role"]
+      }
+    },
+    "key_files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["repository", "path", "blob_sha1", "size", "role", "symbols"],
+        "properties": {
+          "symbols": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "test_inventory": { "type": "object" }
+  },
+  "$defs": {
+    "repository": {
+      "type": "object",
+      "required": ["path", "branch", "commit", "tree", "commit_date", "status"]
+    }
+  }
+}

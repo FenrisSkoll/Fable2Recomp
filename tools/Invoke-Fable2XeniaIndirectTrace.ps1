@@ -1,3 +1,13 @@
+<#
+.SYNOPSIS
+Preflights, launches, or post-processes a Fable II Xenia indirect-target trace.
+
+.DESCRIPTION
+GamePath is complete game media passed to Xenia as its final positional
+argument. AnalysisImagePath is the base XEX used with its adjacent XEXP only
+to verify the configured post-patch TU1 analysis-image identity. The analysis
+XEX is never used as the normal gameplay launch target.
+#>
 [CmdletBinding()]
 param(
     [ValidateSet("Preflight", "Launch", "PostRun")]
@@ -13,7 +23,9 @@ param(
 
     [string]$Fable2Repository = "C:\Dev\Fable2Recomp",
 
-    [string]$TitlePath,
+    [string]$GamePath = "D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso",
+
+    [string]$AnalysisImagePath = "D:\Fable2-Recomp\tu1\default.xex",
 
     [string]$RunRoot,
 
@@ -26,10 +38,6 @@ $ErrorActionPreference = "Stop"
 
 $fable2Root = [IO.Path]::GetFullPath($Fable2Repository)
 $xeniaRoot = [IO.Path]::GetFullPath($XeniaRepository)
-
-if ([string]::IsNullOrWhiteSpace($TitlePath)) {
-    $TitlePath = Join-Path $fable2Root "assets\tu1\default.xex"
-}
 
 if ([string]::IsNullOrWhiteSpace($RunRoot)) {
     $RunRoot = Join-Path $fable2Root "out\indirect-targets"
@@ -93,8 +101,10 @@ $preflightArguments = @(
     "preflight"
     "--xenia"
     $xeniaPath
-    "--title"
-    ([IO.Path]::GetFullPath($TitlePath))
+    "--game-path"
+    ([IO.Path]::GetFullPath($GamePath))
+    "--analysis-image-path"
+    ([IO.Path]::GetFullPath($AnalysisImagePath))
     "--output"
     $rawPath
     "--run-id"

@@ -8,21 +8,24 @@ traces into deterministic summaries and a dry-run evidence import plan. The
 canonical manifest is changed only by a separate, explicit, reviewed, guarded
 apply command.
 
-The implementation has four distinct validation levels:
+The implementation has five distinct validation levels:
 
 | Level | Status |
 | --- | --- |
 | Collector and tools implemented and unit-tested | complete |
 | Collector exercised by minimal PPC under Xenia's real JIT | complete |
-| Collector exercised by two bounded automated boots of the private GOTY TU1 title | complete |
+| Collector exercised by two bounded legacy loose-XEX boots with TU1 applied | complete, collector evidence only |
+| Corrected complete-media ISO workflow preflight | complete; launch pending user gameplay |
 | Collector exercised through interactive private-TU1 gameplay coverage | pending user gameplay |
 
 The two private-title runs are **not** described as gameplay. They booted the
-exact base title with Xenia reporting title-update application from
-`0.0.0.26` to `0.0.1.26`, then were deliberately terminated after bounded
-non-interactive collection. Both raw streams therefore have a usable final
-checkpoint but no footer and are correctly classified as
-`abnormal_or_unknown_no_footer`.
+loose base XEX with Xenia reporting title-update application from `0.0.0.26`
+to `0.0.1.26`, then were deliberately terminated after bounded non-interactive
+collection. They remain valid collector/identity evidence, but they do not
+validate complete disc-media mounting. Both raw streams therefore have a
+usable final checkpoint but no footer and are correctly classified as
+`abnormal_or_unknown_no_footer`. The corrected ISO workflow has been
+preflighted without launching Xenia and awaits the next user gameplay run.
 
 The merged automated evidence contains 6,358 stable source/target/branch pairs,
 279,936 hits and 6,039 distinct non-return targets. All 6,039 targets are
@@ -89,6 +92,8 @@ The exact private title identity remains:
 
 | Property | Value |
 | --- | --- |
+| complete-game launch media | `D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso` |
+| analysis base XEX | `D:\Fable2-Recomp\tu1\default.xex` |
 | base XEX SHA-256 | `88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662` |
 | extracted XEXP SHA-256 | `046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C` |
 | STFS container file | `TU_16L61VH_0000038000000.000000000008Q` |
@@ -100,11 +105,14 @@ The exact private title identity remains:
 | image base / size / entry | `0x82000000` / `0x01620000` / `0x82CC21C0` |
 | title / media / version | `0x4D5307F1` / `0x716F0A0D` / `0.0.1.26` |
 
-The loaded-module SHA-1 is not relabelled as the canonical patched-image
-SHA-256. Preflight proves the private base XEX, XEXP and installed STFS package;
-the trace header retains the configured canonical SHA-256; and post-run
-validation independently requires the repeatable observed Xenia module
-fingerprint, title metadata and executable ranges.
+The launch-media and analysis-image identities are separate layers. The ISO is
+complete game media and is passed only as Xenia's final positional argument;
+preflight deliberately does not calculate or substitute its SHA-256. The
+analysis base XEX and adjacent XEXP establish the inputs for the canonical
+post-patch image SHA-256. The loaded-module SHA-1 is likewise not relabelled as
+that SHA-256. The trace header retains the configured canonical post-patch
+SHA-256, and post-run validation independently requires the repeatable observed
+Xenia module fingerprint, title metadata and executable ranges.
 
 The validated pre-Phase-4 native host executable remains:
 
@@ -500,7 +508,9 @@ and no manifest mutation.
 
 ## Automated private-TU1 collection
 
-Two ignored local raw streams were retained for review:
+Two ignored local raw streams from the original loose-XEX workflow were
+retained for collector review. They are not evidence that the corrected ISO
+launch path works:
 
 | Run | Raw bytes / SHA-256 | Last complete checkpoint |
 | --- | --- | --- |
@@ -597,7 +607,8 @@ Exact results:
 
 | Validation | Result |
 | --- | --- |
-| Fable Python discovery/Phase 4 suite | 31/31 tests PASS in 0.152 s; final staged-content regression also passed in 0.194 s |
+| current Fable Python repository suite | 45/45 tests PASS in 2.462 s on the final no-launch preflight regression |
+| Phase 4 indirect-target module | 17/17 tests PASS in 0.273 s, including four launch-media regressions |
 | raw JSON schema | 40/40 committed JSONL records PASS |
 | summary/plan schemas | both production fixture artifacts PASS |
 | closure verifier | schema 3; 35,626 candidates; 55 strong; 180 probable; all mandatory fixtures PASS |
@@ -692,9 +703,26 @@ files because Phase 4 adds analysis tooling rather than manifest entries.
 
 The checked-in wrapper uses the exact Canary checkout/build, validates the
 private inputs and leaves output under the ignored Fable2Recomp `out` tree.
-Preflight verifies collection is enabled, the raw path does not exist, its
-parent and Xenia storage are writable, the base XEX/XEXP/STFS hashes match, and
-the STFS package is under Xenia's exact installed-content layout.
+`-GamePath` is complete game media and defaults to the GOTY ISO.
+`-AnalysisImagePath` is the base XEX used with its adjacent XEXP to validate
+the expected post-patch analysis identity; it is never appended to Xenia's
+normal gameplay argument list. The former conflated `-TitlePath` parameter was
+removed so an old command fails visibly rather than silently launching a loose
+XEX.
+
+Preflight requires a supported complete-media extension, rejects standalone
+`.xex`/`.elf` launch targets, verifies collection is enabled, verifies the raw
+path does not exist, and checks that its parent and Xenia storage are writable.
+It validates the base XEX/XEXP/STFS hashes and requires this exact installed TU
+directory:
+
+```text
+C:\Dev\Fable2Phase4Xenia\content\0000000000000000\4D5307F1\000B0000
+```
+
+Its JSON report separately prints launch media, analysis image inputs, content
+root, TU directory/package, storage root, title ID, media ID, version and
+expected patched analysis-image SHA-256.
 
 From `C:\Dev\Fable2Recomp`:
 
@@ -702,7 +730,11 @@ From `C:\Dev\Fable2Recomp`:
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Preflight `
     -RunId fable2-tu1-manual-001 `
-    -Label 'Fable II GOTY TU1 manual gameplay coverage'
+    -Label 'Fable II GOTY TU1 manual gameplay coverage' `
+    -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
+    -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
+    -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
+    -StorageRoot 'C:\Dev\Fable2Phase4Xenia\storage'
 ```
 
 Read the emitted command and identity report. Then launch:
@@ -711,8 +743,39 @@ Read the emitted command and identity report. Then launch:
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Launch `
     -RunId fable2-tu1-manual-001 `
-    -Label 'Fable II GOTY TU1 manual gameplay coverage'
+    -Label 'Fable II GOTY TU1 manual gameplay coverage' `
+    -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
+    -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
+    -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
+    -StorageRoot 'C:\Dev\Fable2Phase4Xenia\storage'
 ```
+
+The emitted Xenia array retains, among the other collector arguments, this
+ordering and identity separation:
+
+```text
+--indirect_target_trace_image_sha256=BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00
+--content_root=C:\Dev\Fable2Phase4Xenia\content
+--apply_title_update=true
+--storage_root=C:\Dev\Fable2Phase4Xenia\storage
+D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso
+```
+
+The ISO is the final positional argument. PowerShell invokes the executable
+with an argument array, and the printed reproducible command single-quotes
+every argument, so spaces in the GOTY filename are preserved.
+
+The no-launch `phase4-media-correction-preflight` run passed against the real
+local inputs. It reported `sha256_calculated=false` for the ISO, validated the
+base XEX, XEXP and installed STFS hashes, printed title `0x4D5307F1`, media
+`0x716F0A0D`, version `0.0.1.26`, and placed the GOTY ISO last in the generated
+argument array. No raw collector file was created and Xenia was not launched.
+
+Committed tests additionally prove that hashing the ISO is an error, the
+collector image argument remains
+`BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00`,
+standalone XEX/ELF launch media is rejected, a missing installed-TU directory
+is rejected, and the spaced ISO path remains one quoted argument.
 
 After closing Xenia, validate, summarize and dry-run the importer:
 
@@ -753,6 +816,9 @@ discovered, no menu/gamepad bot was created, and no story progress is claimed.
 
 - Interactive private-TU1 gameplay collection and gameplay-overhead sampling
   remain pending user action.
+- The corrected complete-game ISO workflow has passed preflight but has not yet
+  launched Xenia. The earlier automated streams used the loose-XEX workflow
+  and must not be described as complete-media validation.
 - Both automated private boot streams ended without a footer. Their last
   checkpoints are valid and error-free, but an orderly-shutdown sample is
   still desirable.

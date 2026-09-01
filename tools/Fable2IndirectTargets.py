@@ -37,8 +37,15 @@ SUMMARY_SCHEMA_NAME = "fable2-xenia-indirect-target-summary"
 SUMMARY_SCHEMA_VERSION = 1
 PLAN_SCHEMA_NAME = "fable2-indirect-target-import-plan"
 PLAN_SCHEMA_VERSION = 1
-TOOL_VERSION = "1.0.0"
+TOOL_VERSION = "1.1.0"
 UINT64_MAX = (1 << 64) - 1
+
+COMPLETE_GAME_MEDIA_TYPES = {
+    ".iso": "xbox_360_disc_image",
+    ".zar": "xenia_disc_archive",
+    ".xcp": "xbox_content_package",
+}
+LOOSE_EXECUTABLE_SUFFIXES = {".xex", ".elf"}
 
 CLASSIFICATIONS = {
     "existing_manifest_function",
@@ -2028,33 +2035,62 @@ def powershell_quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
 
 
+def complete_game_media_type(game_path: Path) -> str:
+    suffix = game_path.suffix.lower()
+    if suffix in LOOSE_EXECUTABLE_SUFFIXES:
+        raise Phase4Error(
+            "standalone XEX/ELF launch targets are forbidden for the normal "
+            "gameplay collector workflow; pass complete game media such as an "
+            "ISO with --game-path and use --analysis-image-path for the base XEX"
+        )
+    media_type = COMPLETE_GAME_MEDIA_TYPES.get(suffix)
+    if media_type is None:
+        supported = ", ".join(sorted(COMPLETE_GAME_MEDIA_TYPES))
+        raise Phase4Error(
+            f"unsupported complete-game launch media extension {suffix!r}; "
+            f"supported extensions are: {supported}"
+        )
+    return media_type
+
+
 def preflight(
     xenia: Path,
-    title: Path,
+    game_path: Path,
+    analysis_image_path: Path,
     output: Path,
     run_id: str,
     label: str,
     evidence_path: Path,
-    content_root: Path | None = None,
-    storage_root: Path | None = None,
+    content_root: Path,
+    storage_root: Path,
     title_update_package: Path | None = None,
 ) -> dict[str, Any]:
     if not xenia.is_file():
         raise Phase4Error(f"Xenia executable does not exist: {xenia}")
-    if not title.is_file():
-        raise Phase4Error(f"title executable does not exist: {title}")
+    if not game_path.is_file():
+        raise Phase4Error(f"complete-game launch media does not exist: {game_path}")
+    media_type = complete_game_media_type(game_path)
+    if not analysis_image_path.is_file():
+        raise Phase4Error(
+            f"analysis base XEX does not exist: {analysis_image_path}"
+        )
+    if analysis_image_path.suffix.lower() != ".xex":
+        raise Phase4Error(
+            "analysis image path must name the base XEX used with the adjacent XEXP"
+        )
     if output.exists():
         raise Phase4Error(f"collector output already exists: {output}")
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", run_id):
         raise Phase4Error("run ID must contain only letters, digits, dot, dash, underscore")
     contract = function_map.load_contract(evidence_path)
     identity = contract["expected_image_identity"]
-    base_hash = sha256_file(title)
+    base_hash = sha256_file(analysis_image_path)
     if base_hash != identity["base_xex_sha256"].upper():
         raise Phase4Error(
-            f"title XEX SHA-256 is {base_hash}, expected {identity['base_xex_sha256']}"
+            f"analysis base XEX SHA-256 is {base_hash}, "
+            f"expected {identity['base_xex_sha256']}"
         )
-    patch_path = title.with_suffix(".xexp")
+    patch_path = analysis_image_path.with_suffix(".xexp")
     if not patch_path.is_file():
         raise Phase4Error(f"extracted title-update XEXP does not exist: {patch_path}")
     patch_hash = sha256_file(patch_path)
@@ -2064,60 +2100,62 @@ def preflight(
             f"expected {identity['title_update_sha256']}"
         )
 
-    content_record: dict[str, Any] | None = None
-    if content_root is not None:
-        content_root = content_root.resolve()
-        if not content_root.is_dir():
-            raise Phase4Error(f"Xenia content root does not exist: {content_root}")
-        title_id = identity["title_id"].removeprefix("0x").upper()
-        expected_package = (
-            content_root
-            / "0000000000000000"
-            / title_id
-            / "000B0000"
-            / identity["title_update_container_file"]
+    content_root = content_root.resolve()
+    if not content_root.is_dir():
+        raise Phase4Error(f"Xenia content root does not exist: {content_root}")
+    title_id = identity["title_id"].removeprefix("0x").upper()
+    title_update_directory = (
+        content_root / "0000000000000000" / title_id / "000B0000"
+    )
+    if not title_update_directory.is_dir():
+        raise Phase4Error(
+            f"Xenia title-update content directory does not exist: "
+            f"{title_update_directory}"
         )
-        supplied_package = (
-            title_update_package.resolve()
-            if title_update_package is not None
-            else expected_package
+    expected_package = (
+        title_update_directory / identity["title_update_container_file"]
+    )
+    supplied_package = (
+        title_update_package.resolve()
+        if title_update_package is not None
+        else expected_package
+    )
+    try:
+        supplied_package.relative_to(content_root)
+    except ValueError as error:
+        raise Phase4Error(
+            "title-update package must be inside the configured content root"
+        ) from error
+    if supplied_package != expected_package:
+        raise Phase4Error(
+            f"title-update package must use Xenia's exact installer path: "
+            f"{expected_package}"
         )
-        try:
-            supplied_package.relative_to(content_root)
-        except ValueError as error:
-            raise Phase4Error(
-                "title-update package must be inside the configured content root"
-            ) from error
-        if supplied_package != expected_package:
-            raise Phase4Error(
-                f"title-update package must use Xenia's exact installer path: "
-                f"{expected_package}"
-            )
-        if not supplied_package.is_file():
-            raise Phase4Error(
-                f"title-update STFS package does not exist: {supplied_package}"
-            )
-        package_hash = sha256_file(supplied_package)
-        if package_hash != identity["title_update_container_sha256"].upper():
-            raise Phase4Error(
-                f"title-update STFS SHA-256 is {package_hash}, "
-                f"expected {identity['title_update_container_sha256']}"
-            )
-        content_record = {
-            "root": str(content_root),
-            "package": str(supplied_package),
-            "package_sha256": package_hash,
-            "package_layout_valid": True,
-        }
+    if not supplied_package.is_file():
+        raise Phase4Error(
+            f"title-update STFS package does not exist: {supplied_package}"
+        )
+    package_hash = sha256_file(supplied_package)
+    if package_hash != identity["title_update_container_sha256"].upper():
+        raise Phase4Error(
+            f"title-update STFS SHA-256 is {package_hash}, "
+            f"expected {identity['title_update_container_sha256']}"
+        )
+    content_record = {
+        "root": str(content_root),
+        "title_update_directory": str(title_update_directory),
+        "package": str(supplied_package),
+        "package_sha256": package_hash,
+        "package_layout_valid": True,
+    }
 
-    if storage_root is not None:
-        storage_root = storage_root.resolve()
-        storage_root.mkdir(parents=True, exist_ok=True)
-        try:
-            with tempfile.NamedTemporaryFile(dir=storage_root, delete=True):
-                pass
-        except OSError as error:
-            raise Phase4Error(f"Xenia storage root is not writable: {error}") from error
+    storage_root = storage_root.resolve()
+    storage_root.mkdir(parents=True, exist_ok=True)
+    try:
+        with tempfile.NamedTemporaryFile(dir=storage_root, delete=True):
+            pass
+    except OSError as error:
+        raise Phase4Error(f"Xenia storage root is not writable: {error}") from error
     output.parent.mkdir(parents=True, exist_ok=True)
     try:
         with tempfile.NamedTemporaryFile(dir=output.parent, delete=True):
@@ -2136,17 +2174,15 @@ def preflight(
         f"--indirect_target_trace_media_id={identity['media_id']}",
         f"--indirect_target_trace_version={identity['version']}",
     ]
-    if content_root is not None:
-        arguments.extend(
-            [
-                f"--content_root={content_root}",
-                "--apply_title_update=true",
-            ]
-        )
-    if storage_root is not None:
-        arguments.append(f"--storage_root={storage_root}")
+    arguments.extend(
+        [
+            f"--content_root={content_root}",
+            "--apply_title_update=true",
+            f"--storage_root={storage_root}",
+        ]
+    )
     arguments.append(f"--log_file={output.with_suffix('.xenia.log').resolve()}")
-    arguments.append(str(title.resolve()))
+    arguments.append(str(game_path.resolve()))
     command = "& " + " `\n    ".join(powershell_quote(value) for value in arguments)
     return {
         "status": "ready",
@@ -2158,20 +2194,44 @@ def preflight(
             "path": str(xenia.resolve()),
             "sha256": sha256_file(xenia),
         },
-        "title": {
-            "path": str(title.resolve()),
+        "launch_media": {
+            "path": str(game_path.resolve()),
+            "media_type": media_type,
+            "final_positional_argument": True,
+            "sha256_calculated": False,
+            "identity_role": "complete_game_media_only",
+        },
+        "analysis_image": {
+            "base_xex_path": str(analysis_image_path.resolve()),
             "base_xex_sha256": base_hash,
             "title_update_xexp": str(patch_path.resolve()),
             "title_update_xexp_sha256": patch_hash,
             "expected_patched_image_sha256": identity[
                 "patched_image_sha256"
             ].upper(),
+            "identity_role": (
+                "base_xex_plus_adjacent_xexp_validate_post_patch_loaded_guest_image"
+            ),
+        },
+        "title_identity": {
+            "title_id": identity["title_id"],
+            "media_id": identity["media_id"],
+            "version": identity["version"],
+            "expected_analysis_image_sha256": identity[
+                "patched_image_sha256"
+            ].upper(),
         },
         "content": content_record,
-        "storage_root": str(storage_root) if storage_root is not None else None,
+        "storage_root": str(storage_root),
         "arguments": arguments,
         "powershell_command": command,
-        "warning": "Preflight verifies the base XEX, extracted XEXP, and optional installed STFS identities. Confirm the Xenia log says the title update was applied before treating gameplay evidence as exact TU1.",
+        "warning": (
+            "The complete-game launch media is intentionally not used as the "
+            "executable-image identity. Preflight verifies the analysis base XEX, "
+            "extracted XEXP, and installed STFS package. Confirm the Xenia log "
+            "says the title update was applied before treating gameplay evidence "
+            "as exact TU1."
+        ),
     }
 
 
@@ -2254,7 +2314,8 @@ def command_apply(args: argparse.Namespace) -> int:
 def command_preflight(args: argparse.Namespace) -> int:
     result = preflight(
         args.xenia,
-        args.title,
+        args.game_path,
+        args.analysis_image_path,
         args.output,
         args.run_id,
         args.label,
@@ -2380,12 +2441,33 @@ def build_argument_parser() -> argparse.ArgumentParser:
         "preflight", help="verify identities/output and print the private launch command"
     )
     preflight_parser.add_argument("--xenia", type=Path, required=True)
-    preflight_parser.add_argument("--title", type=Path, required=True)
+    preflight_parser.add_argument(
+        "--game-path",
+        type=Path,
+        required=True,
+        help="complete game media passed as Xenia's final positional argument",
+    )
+    preflight_parser.add_argument(
+        "--analysis-image-path",
+        type=Path,
+        required=True,
+        help="base XEX whose adjacent XEXP validates the post-patch identity",
+    )
     preflight_parser.add_argument("--output", type=Path, required=True)
     preflight_parser.add_argument("--run-id", required=True)
     preflight_parser.add_argument("--label", default="Fable II TU1 manual coverage")
-    preflight_parser.add_argument("--content-root", type=Path)
-    preflight_parser.add_argument("--storage-root", type=Path)
+    preflight_parser.add_argument(
+        "--content-root",
+        type=Path,
+        required=True,
+        help="Xenia content root containing the installed title update",
+    )
+    preflight_parser.add_argument(
+        "--storage-root",
+        type=Path,
+        required=True,
+        help="writable Xenia storage root",
+    )
     preflight_parser.add_argument("--title-update-package", type=Path)
     add_evidence_arguments(preflight_parser)
     preflight_parser.set_defaults(handler=command_preflight)

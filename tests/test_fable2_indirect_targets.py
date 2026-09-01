@@ -9,6 +9,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -345,6 +346,179 @@ def manifest_text(newline: str = "\n") -> str:
 
 def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+class PreflightTests(unittest.TestCase):
+    def make_fixture(self, root: Path) -> dict[str, Path]:
+        xenia = root / "Xenia Canary" / "xenia_canary.exe"
+        game_path = (
+            root / "disc media" / "Fable II - Game of the Year Edition.iso"
+        )
+        analysis_image = root / "analysis image" / "default.xex"
+        analysis_patch = analysis_image.with_suffix(".xexp")
+        content_root = root / "Xenia Content"
+        storage_root = root / "Xenia Storage"
+        output = root / "trace output" / "xenia-indirect-targets.raw.jsonl"
+        evidence = root / "evidence.json"
+
+        title_id = "4D5307F1"
+        package_name = "TU_SYNTHETIC_PHASE4"
+        title_update_directory = (
+            content_root / "0000000000000000" / title_id / "000B0000"
+        )
+        package = title_update_directory / package_name
+
+        for path, content in (
+            (xenia, b"synthetic Xenia executable"),
+            (game_path, b"synthetic complete game media"),
+            (analysis_image, b"synthetic base XEX"),
+            (analysis_patch, b"synthetic title update XEXP"),
+            (package, b"synthetic installed STFS package"),
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+        document = contract()
+        identity = document["expected_image_identity"]
+        identity.update(
+            {
+                "base_xex_sha256": p4.sha256_file(analysis_image),
+                "title_update_sha256": p4.sha256_file(analysis_patch),
+                "title_update_container_file": package_name,
+                "title_update_container_sha256": p4.sha256_file(package),
+                "patched_image_sha256": PATCHED,
+                "xenia_module_fingerprint_algorithm": (
+                    "sha1_contiguous_loaded_executable_memory"
+                ),
+                "xenia_module_fingerprint": "1" * 40,
+            }
+        )
+        write_json(evidence, document)
+
+        return {
+            "xenia": xenia,
+            "game_path": game_path,
+            "analysis_image": analysis_image,
+            "content_root": content_root,
+            "storage_root": storage_root,
+            "output": output,
+            "evidence": evidence,
+            "title_update_directory": title_update_directory,
+        }
+
+    def test_iso_is_final_argument_and_patched_identity_remains_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            game_path = fixture["game_path"].resolve()
+            real_sha256_file = p4.sha256_file
+
+            def reject_game_media_hash(path: Path) -> str:
+                resolved = Path(path).resolve()
+                if resolved == game_path:
+                    raise AssertionError("complete game media must not be hashed")
+                return real_sha256_file(resolved)
+
+            with mock.patch.object(
+                p4, "sha256_file", side_effect=reject_game_media_hash
+            ):
+                result = p4.preflight(
+                    fixture["xenia"],
+                    fixture["game_path"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-media-test",
+                    "path with spaces regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+            arguments = result["arguments"]
+            self.assertEqual(str(game_path), arguments[-1])
+            self.assertEqual(str(game_path), result["launch_media"]["path"])
+            self.assertEqual(
+                "xbox_360_disc_image", result["launch_media"]["media_type"]
+            )
+            self.assertFalse(result["launch_media"]["sha256_calculated"])
+            self.assertNotIn(str(fixture["analysis_image"].resolve()), arguments)
+            self.assertIn(
+                f"--indirect_target_trace_image_sha256={PATCHED}", arguments
+            )
+            self.assertEqual(
+                PATCHED,
+                result["title_identity"]["expected_analysis_image_sha256"],
+            )
+            self.assertEqual("0x4D5307F1", result["title_identity"]["title_id"])
+            self.assertEqual("0x716F0A0D", result["title_identity"]["media_id"])
+            self.assertEqual("0.0.1.26", result["title_identity"]["version"])
+            self.assertIn(
+                f"--content_root={fixture['content_root'].resolve()}", arguments
+            )
+            self.assertIn("--apply_title_update=true", arguments)
+            self.assertEqual(
+                str(fixture["title_update_directory"].resolve()),
+                result["content"]["title_update_directory"],
+            )
+            self.assertEqual(
+                str(fixture["storage_root"].resolve()), result["storage_root"]
+            )
+            self.assertTrue(
+                result["powershell_command"].endswith(
+                    p4.powershell_quote(str(game_path))
+                )
+            )
+
+    def test_loose_xex_is_rejected_as_gameplay_launch_media(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            with self.assertRaisesRegex(p4.Phase4Error, "standalone XEX/ELF"):
+                p4.preflight(
+                    fixture["xenia"],
+                    fixture["analysis_image"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-loose-xex-test",
+                    "unsafe loose XEX regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+    def test_missing_title_update_directory_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            shutil.rmtree(fixture["title_update_directory"])
+            with self.assertRaisesRegex(
+                p4.Phase4Error, "title-update content directory does not exist"
+            ):
+                p4.preflight(
+                    fixture["xenia"],
+                    fixture["game_path"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-missing-tu-test",
+                    "missing TU directory regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+    def test_wrapper_defaults_to_iso_and_has_no_title_path_parameter(self) -> None:
+        wrapper = (TOOLS / "Invoke-Fable2XeniaIndirectTrace.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            '[string]$GamePath = "D:\\Fable2-Recomp\\disc\\Fable II - '
+            'Game of the Year Edition.iso"',
+            wrapper,
+        )
+        self.assertIn(
+            '[string]$AnalysisImagePath = "D:\\Fable2-Recomp\\tu1\\default.xex"',
+            wrapper,
+        )
+        self.assertNotIn("$TitlePath", wrapper)
+        self.assertIn('"--game-path"', wrapper)
+        self.assertIn('"--analysis-image-path"', wrapper)
 
 
 class RawTraceTests(unittest.TestCase):

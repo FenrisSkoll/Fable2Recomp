@@ -71,6 +71,13 @@ STATIC_XDK_COVERAGE_SCHEMA_PATH = (
 STATIC_XDK_COVERAGE_REPORT_PATH = DOC_ROOT / "13-static-xdk-seam-coverage.md"
 STATIC_XDK_COVERAGE_COMPLETION_PATH = DOC_ROOT / "g1.6b-completion.md"
 
+G16A_ACCEPTED_COMMIT = "9af33118bcfbf00f8b446f05e90d18de193410c1"
+G16A_ACCEPTED_TREE = "fd91d6931e81108d4a619d3875c28b4d66e05187"
+G16B_ACCEPTED_COMMIT = "cd440652451e558b88ba50402721e4cbe82b9a90"
+G16B_ACCEPTED_TREE = "6a87058d1ef47473e8fa80e9e2882d6cde6b8a7b"
+RETIRED_G2A_COMMIT = "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51"
+RETIRED_G2A_TREE = "910e80108c2d9e7d8474866506f1c9e23ede601c"
+
 REQUIRED_DOCUMENTS = (
     "README.md",
     "00-scope-and-pins.md",
@@ -186,6 +193,77 @@ def git_text(repo: Path, *args: str) -> str | None:
     if result.returncode != 0:
         return None
     return result.stdout.rstrip("\r\n")
+
+
+def checkout_description(repo: Path, head: str = "HEAD") -> str:
+    if head != "HEAD":
+        return f"ref {head!r}"
+    branch = git_text(repo, "branch", "--show-current")
+    return f"branch {branch!r}" if branch else "detached HEAD"
+
+
+def validate_required_milestone(
+    repo: Path,
+    head: str,
+    required_commit: str,
+    required_tree: str,
+    label: str,
+    validation: Validation,
+) -> bool:
+    """Require an immutable accepted milestone in the selected history."""
+    if run_git(repo, "cat-file", "-e", f"{required_commit}^{{commit}}").returncode != 0:
+        validation.error(
+            f"{label} required accepted milestone commit is unavailable: "
+            f"{required_commit}"
+        )
+        return False
+
+    actual_tree = git_text(repo, "rev-parse", f"{required_commit}^{{tree}}")
+    if actual_tree != required_tree:
+        validation.error(
+            f"{label} accepted milestone tree mismatch: expected "
+            f"{required_tree!r}, actual {actual_tree!r}"
+        )
+        return False
+
+    head_commit = git_text(repo, "rev-parse", f"{head}^{{commit}}")
+    if head_commit is None:
+        validation.error(f"{label} validation ref is unavailable: {head!r}")
+        return False
+
+    if run_git(
+        repo, "merge-base", "--is-ancestor", required_commit, head_commit
+    ).returncode != 0:
+        validation.error(
+            f"{label} required accepted milestone {required_commit} is not an "
+            f"ancestor of {head_commit} ({checkout_description(repo, head)})"
+        )
+        return False
+    return True
+
+
+def reject_forbidden_ancestor(
+    repo: Path,
+    head: str,
+    forbidden_commit: str,
+    label: str,
+    validation: Validation,
+) -> None:
+    """Reject a retired commit when locally available, without requiring its object."""
+    if run_git(repo, "cat-file", "-e", f"{forbidden_commit}^{{commit}}").returncode != 0:
+        return
+
+    result = run_git(repo, "merge-base", "--is-ancestor", forbidden_commit, head)
+    if result.returncode == 0:
+        validation.error(
+            f"{label} retired checkpoint {forbidden_commit} is an ancestor of "
+            f"{head} ({checkout_description(repo, head)})"
+        )
+    elif result.returncode != 1:
+        validation.error(
+            f"{label} unable to test retired-checkpoint ancestry for {head}: "
+            f"{result.stderr.strip()}"
+        )
 
 
 def sha256(path: Path) -> str:
@@ -1358,11 +1436,6 @@ def validate_g15d_evidence(
             relevance.get("pins", {}).get("g1", {}),
             "G1.5D G1 pin",
         ),
-        (
-            ROOT,
-            relevance.get("pins", {}).get("paused_g2a", {}),
-            "G1.5D paused G2A pin",
-        ),
     )
     for repo, pin, label in pin_checks:
         commit = pin.get("commit")
@@ -1378,6 +1451,35 @@ def validate_g15d_evidence(
                 f"{label} tree mismatch: recorded {pin.get('tree')!r}, "
                 f"actual {actual_tree!r}"
             )
+
+    paused_g2a_pin = relevance.get("pins", {}).get("paused_g2a", {})
+    expected_paused_g2a = {
+        "branch": "fable2-native-renderer-g2a-forwarding-proof",
+        "commit": RETIRED_G2A_COMMIT,
+        "tree": RETIRED_G2A_TREE,
+    }
+    for field, expected in expected_paused_g2a.items():
+        if paused_g2a_pin.get(field) != expected:
+            validation.error(
+                f"G1.5D paused G2A pin mismatch {field}: recorded "
+                f"{paused_g2a_pin.get(field)!r}, expected {expected!r}"
+            )
+    if run_git(
+        ROOT, "cat-file", "-e", f"{RETIRED_G2A_COMMIT}^{{commit}}"
+    ).returncode == 0:
+        actual_tree = git_text(ROOT, "rev-parse", f"{RETIRED_G2A_COMMIT}^{{tree}}")
+        if actual_tree != RETIRED_G2A_TREE:
+            validation.error(
+                "G1.5D retired G2A object tree mismatch: "
+                f"expected {RETIRED_G2A_TREE!r}, actual {actual_tree!r}"
+            )
+    reject_forbidden_ancestor(
+        ROOT,
+        "HEAD",
+        RETIRED_G2A_COMMIT,
+        "G1.5D",
+        validation,
+    )
 
 
 def validate_g16a_evidence(
@@ -1498,8 +1600,8 @@ def validate_g16a_evidence(
         (
             "paused_g2a",
             "commit",
-        ): "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51",
-        ("paused_g2a", "tree"): "910e80108c2d9e7d8474866506f1c9e23ede601c",
+        ): RETIRED_G2A_COMMIT,
+        ("paused_g2a", "tree"): RETIRED_G2A_TREE,
         ("tu1", "loaded_image_sha256"): expected_loaded_image,
         ("tu1", "loaded_image_base"): "0x82000000",
         ("tu1", "loaded_image_size"): "0x01620000",
@@ -1533,10 +1635,8 @@ def validate_g16a_evidence(
 
     fable_start = expected_pin_fields[("fable_start", "commit")]
     g1_base = expected_pin_fields[("g1_accepted_base", "commit")]
-    paused_g2a = expected_pin_fields[("paused_g2a", "commit")]
     git_checks = (
         (fable_start, expected_pin_fields[("fable_start", "tree")], "G1.6A start"),
-        (paused_g2a, expected_pin_fields[("paused_g2a", "tree")], "paused G2A"),
     )
     for commit, expected_tree, label in git_checks:
         if run_git(ROOT, "cat-file", "-e", f"{commit}^{{commit}}").returncode != 0:
@@ -1552,48 +1652,28 @@ def validate_g16a_evidence(
         validation.error("G1 accepted base is not an ancestor of the G1.6A start")
     if run_git(ROOT, "merge-base", "--is-ancestor", fable_start, "HEAD").returncode != 0:
         validation.error("G1.6A HEAD does not descend from the required start")
-    if run_git(ROOT, "merge-base", "--is-ancestor", paused_g2a, "HEAD").returncode == 0:
-        validation.error("paused G2A is an ancestor of G1.6A HEAD")
-    current_branch = git_text(ROOT, "branch", "--show-current")
-    expected_branch = expected_pin_fields[("fable_start", "working_branch")]
-    g16b_branch = "fable2-native-renderer-g1.6b-static-seam-coverage"
-    g16a_tip = "9af33118bcfbf00f8b446f05e90d18de193410c1"
-    g16a_tip_tree = "fd91d6931e81108d4a619d3875c28b4d66e05187"
-    if current_branch == expected_branch:
-        phase_tip = "HEAD"
-        include_worktree_status = True
-    elif current_branch == g16b_branch:
-        phase_tip = g16a_tip
-        include_worktree_status = False
-        if git_text(ROOT, "rev-parse", f"{g16a_tip}^{{tree}}") != g16a_tip_tree:
-            validation.error("G1.6A accepted tip tree is unavailable or changed")
-        if run_git(ROOT, "merge-base", "--is-ancestor", g16a_tip, "HEAD").returncode != 0:
-            validation.error("G1.6B HEAD does not descend from the accepted G1.6A tip")
-    else:
-        phase_tip = "HEAD"
-        include_worktree_status = True
-        validation.error(
-            f"G1.6A validation branch mismatch: expected {expected_branch!r} "
-            f"or descendant phase {g16b_branch!r}, actual {current_branch!r}"
-        )
+    validate_required_milestone(
+        ROOT,
+        "HEAD",
+        G16A_ACCEPTED_COMMIT,
+        G16A_ACCEPTED_TREE,
+        "G1.6A",
+        validation,
+    )
+    reject_forbidden_ancestor(
+        ROOT,
+        "HEAD",
+        RETIRED_G2A_COMMIT,
+        "G1.6A",
+        validation,
+    )
 
     changed_paths: set[str] = set()
     changed_text = git_text(
-        ROOT, "diff", "--name-only", fable_start, phase_tip, "--"
+        ROOT, "diff", "--name-only", fable_start, G16A_ACCEPTED_COMMIT, "--"
     )
     if changed_text is not None:
         changed_paths.update(line.replace("\\", "/") for line in changed_text.splitlines())
-    if include_worktree_status:
-        status = run_git(
-            ROOT, "status", "--porcelain=v1", "--untracked-files=all"
-        ).stdout
-        for line in status.splitlines():
-            if len(line) < 4:
-                continue
-            path = line[3:]
-            if " -> " in path:
-                path = path.split(" -> ", 1)[1]
-            changed_paths.add(path.replace("\\", "/"))
     exact_allowed_paths = {
         "tools/Verify-Fable2GpuReference.py",
         "tools/schemas/fable2-gpu-static-xdk-method-inventory-v1.schema.json",
@@ -2053,10 +2133,10 @@ def validate_g16b_evidence(
     expected_loaded_image = (
         "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00"
     )
-    expected_start = "9af33118bcfbf00f8b446f05e90d18de193410c1"
-    expected_start_tree = "fd91d6931e81108d4a619d3875c28b4d66e05187"
+    expected_start = G16A_ACCEPTED_COMMIT
+    expected_start_tree = G16A_ACCEPTED_TREE
     expected_branch = "fable2-native-renderer-g1.6b-static-seam-coverage"
-    paused_g2a = "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51"
+    paused_g2a = RETIRED_G2A_COMMIT
 
     if coverage.get("primary_result") != "STATIC COVERAGE NARROW":
         validation.error("G1.6B primary result must be STATIC COVERAGE NARROW")
@@ -2112,27 +2192,28 @@ def validate_g16b_evidence(
         validation.error("G1.6B required start commit/tree is unavailable or changed")
     if run_git(ROOT, "merge-base", "--is-ancestor", expected_start, "HEAD").returncode != 0:
         validation.error("G1.6B HEAD does not descend from the required G1.6A commit")
-    if run_git(ROOT, "merge-base", "--is-ancestor", paused_g2a, "HEAD").returncode == 0:
-        validation.error("paused G2A is an ancestor of G1.6B HEAD")
-    current_branch = git_text(ROOT, "branch", "--show-current")
-    if current_branch != expected_branch:
-        validation.error(
-            f"G1.6B branch mismatch: expected {expected_branch!r}, "
-            f"actual {current_branch!r}"
-        )
+    validate_required_milestone(
+        ROOT,
+        "HEAD",
+        G16B_ACCEPTED_COMMIT,
+        G16B_ACCEPTED_TREE,
+        "G1.6B",
+        validation,
+    )
+    reject_forbidden_ancestor(
+        ROOT,
+        "HEAD",
+        RETIRED_G2A_COMMIT,
+        "G1.6B",
+        validation,
+    )
 
     changed_paths: set[str] = set()
-    changed_text = git_text(ROOT, "diff", "--name-only", expected_start, "HEAD", "--")
+    changed_text = git_text(
+        ROOT, "diff", "--name-only", expected_start, G16B_ACCEPTED_COMMIT, "--"
+    )
     if changed_text:
         changed_paths.update(line.replace("\\", "/") for line in changed_text.splitlines())
-    status = run_git(ROOT, "status", "--porcelain=v1", "--untracked-files=all").stdout
-    for line in status.splitlines():
-        if len(line) < 4:
-            continue
-        path = line[3:]
-        if " -> " in path:
-            path = path.split(" -> ", 1)[1]
-        changed_paths.add(path.replace("\\", "/"))
     exact_allowed_paths = {
         "tools/Verify-Fable2GpuReference.py",
         "tools/schemas/fable2-gpu-static-xdk-seam-coverage-v1.schema.json",

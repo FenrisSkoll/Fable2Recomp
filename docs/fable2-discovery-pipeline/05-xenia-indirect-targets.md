@@ -597,7 +597,7 @@ Exact results:
 
 | Validation | Result |
 | --- | --- |
-| Fable Python discovery/Phase 4 suite | 31/31 tests PASS in 0.152 s on final run |
+| Fable Python discovery/Phase 4 suite | 31/31 tests PASS in 0.152 s; final staged-content regression also passed in 0.194 s |
 | raw JSON schema | 40/40 committed JSONL records PASS |
 | summary/plan schemas | both production fixture artifacts PASS |
 | closure verifier | schema 3; 35,626 candidates; 55 strong; 180 probable; all mandatory fixtures PASS |

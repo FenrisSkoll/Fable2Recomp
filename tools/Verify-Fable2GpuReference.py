@@ -77,6 +77,12 @@ G16B_ACCEPTED_COMMIT = "cd440652451e558b88ba50402721e4cbe82b9a90"
 G16B_ACCEPTED_TREE = "6a87058d1ef47473e8fa80e9e2882d6cde6b8a7b"
 RETIRED_G2A_COMMIT = "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51"
 RETIRED_G2A_TREE = "910e80108c2d9e7d8474866506f1c9e23ede601c"
+ENTRYPOINT_PROVENANCE_PATH = "tools/fable2-entrypoint-closure-evidence.json"
+ENTRYPOINT_PROVENANCE_BLOB = "e08bca60d9de302fd08c1c6b258b9e29371ab7b7"
+ENTRYPOINT_PROVENANCE_SIZE = 4658
+ENTRYPOINT_PROVENANCE_SHA256 = (
+    "9CF914280FACC388E94D01CFD971F6F75FA2BF10AD509F18F59E3DC220E22F05"
+)
 
 REQUIRED_DOCUMENTS = (
     "README.md",
@@ -263,6 +269,70 @@ def reject_forbidden_ancestor(
         validation.error(
             f"{label} unable to test retired-checkpoint ancestry for {head}: "
             f"{result.stderr.strip()}"
+        )
+
+
+def validate_committed_entrypoint_provenance(
+    repo: Path, validation: Validation
+) -> None:
+    """Validate the tracked provenance blob without depending on checkout EOLs."""
+    revisions = (
+        (G16A_ACCEPTED_COMMIT, "G1.6A accepted milestone"),
+        (G16B_ACCEPTED_COMMIT, "G1.6B accepted milestone"),
+        ("HEAD", "current committed evidence"),
+    )
+    for revision, label in revisions:
+        actual_object = git_text(
+            repo, "rev-parse", f"{revision}:{ENTRYPOINT_PROVENANCE_PATH}"
+        )
+        if actual_object != ENTRYPOINT_PROVENANCE_BLOB:
+            validation.error(
+                f"{label} entrypoint-provenance blob mismatch: expected "
+                f"{ENTRYPOINT_PROVENANCE_BLOB!r}, actual {actual_object!r}"
+            )
+
+    blob = subprocess.run(
+        [
+            "git",
+            "-C",
+            str(repo),
+            "cat-file",
+            "blob",
+            ENTRYPOINT_PROVENANCE_BLOB,
+        ],
+        check=False,
+        capture_output=True,
+    )
+    if blob.returncode != 0:
+        validation.error(
+            "committed entrypoint-provenance blob is unavailable: "
+            f"{ENTRYPOINT_PROVENANCE_BLOB}"
+        )
+    else:
+        actual_size = len(blob.stdout)
+        actual_hash = hashlib.sha256(blob.stdout).hexdigest().upper()
+        if actual_size != ENTRYPOINT_PROVENANCE_SIZE:
+            validation.error(
+                "committed entrypoint-provenance size mismatch: expected "
+                f"{ENTRYPOINT_PROVENANCE_SIZE}, actual {actual_size}"
+            )
+        if actual_hash != ENTRYPOINT_PROVENANCE_SHA256:
+            validation.error(
+                "committed entrypoint-provenance hash mismatch: expected "
+                f"{ENTRYPOINT_PROVENANCE_SHA256}, actual {actual_hash}"
+            )
+
+    worktree_object = git_text(
+        repo,
+        "hash-object",
+        f"--path={ENTRYPOINT_PROVENANCE_PATH}",
+        ENTRYPOINT_PROVENANCE_PATH,
+    )
+    if worktree_object != ENTRYPOINT_PROVENANCE_BLOB:
+        validation.error(
+            "entrypoint-provenance worktree content differs from HEAD after Git "
+            f"clean filtering: expected {ENTRYPOINT_PROVENANCE_BLOB!r}, "
+            f"actual {worktree_object!r}"
         )
 
 
@@ -2024,7 +2094,7 @@ def validate_g16a_evidence(
         if str(expected_size) not in provenance or expected_hash not in provenance:
             validation.error(f"G1.6A analysis input provenance changed for {input_id}")
         path = ROOT / relative
-        must_verify = input_id == "INPUT-PROVENANCE" or verify_artifacts
+        must_verify = verify_artifacts and input_id != "INPUT-PROVENANCE"
         if must_verify:
             if not path.is_file():
                 validation.error(f"G1.6A analysis input is unavailable: {path}")
@@ -2578,7 +2648,7 @@ def validate_g16b_evidence(
         if str(expected_size) not in provenance or expected_hash not in provenance:
             validation.error(f"G1.6B input provenance changed for {input_id}")
         path = ROOT / relative
-        must_hash = input_id == "INPUT-PROVENANCE" or verify_static_artifacts
+        must_hash = verify_static_artifacts and input_id != "INPUT-PROVENANCE"
         if must_hash:
             if not path.is_file():
                 validation.error(f"G1.6B static input is unavailable: {path}")
@@ -2694,6 +2764,7 @@ def main() -> int:
     static_xdk_coverage_schema = load_json(
         STATIC_XDK_COVERAGE_SCHEMA_PATH, validation
     )
+    validate_committed_entrypoint_provenance(ROOT, validation)
     if inventory and inventory_schema:
         validate_with_schema(inventory, inventory_schema, "source inventory", validation)
     if subsystem_map and map_schema:

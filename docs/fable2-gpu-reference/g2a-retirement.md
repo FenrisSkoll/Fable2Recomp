@@ -235,9 +235,23 @@ after all of the following are rechecked:
 - local-branch and remote-tracking-ref inventories are recorded;
 - no remote deletion or other destructive maintenance is involved.
 
-**Deletion result: PENDING FINAL GUARDRAIL CHECK.** The post-deletion result is
-recorded in a follow-up documentation commit only after the exact local ref is
-deleted and all immediate verification passes.
+**Deletion result: COMPLETED.** After the first retirement commit
+`9eed7edae7c48d4cf609edec7ebb7ad39dbfd7d8`, tree
+`cf0c5da16503e4420beb4acd76140d4e63b63b02`, every guardrail above was
+rechecked. The explicit local branch
+`fable2-native-renderer-g2a-forwarding-proof` was deleted while it still named
+the expected checkpoint. Immediate verification confirmed:
+
+- the obsolete local branch no longer resolves;
+- all nine other local branches recorded before deletion still exist at their
+  exact prior commits;
+- all 11 remote-tracking refs, the tag set, remote configuration and worktree
+  inventory are unchanged;
+- the cleanup branch and worktree remained unchanged and clean at the first
+  retirement commit/tree;
+- the checkpoint commit and tree remained readable by their full hashes.
+
+No remote ref was changed.
 
 The full checkpoint hash is recorded, and the commit object must remain
 immediately readable after deletion. Once the only local ref is gone, the
@@ -247,11 +261,13 @@ an unreachable object. No tag, archive, bundle, replacement branch or hidden
 backup is created, and no garbage collection, prune or reflog expiration is
 run.
 
-## Repository and behavior boundary
+## Final repository and behavior boundary
 
-Before the local-ref deletion, the cleanup branch contains documentation only.
-Fable runtime source, build behavior, tests, fixtures, schemas, generated
-source, manifest, packages, assets, executables and GPU DLLs are unchanged.
+The final cleanup branch contains documentation only. Its exact ending commit
+and tree are reported in the session handoff because a commit cannot record
+its own identity. Fable runtime source, build behavior, tests, fixtures,
+schemas, generated source, manifest, packages, assets, executables and GPU
+DLLs are unchanged.
 ReXGlue remains at commit/tree
 `956c6a8b5da4c54b9899a2593e9c67c26de30194` /
 `b78b06b8ac650467372236a3a262864e069a9382` with only its previously audited

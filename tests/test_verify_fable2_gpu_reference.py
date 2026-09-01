@@ -203,6 +203,11 @@ class MilestoneLineageTests(unittest.TestCase):
         )
         self.assertEqual(validation.errors, [])
 
+    def test_committed_provenance_uses_git_blob_and_clean_filters(self) -> None:
+        validation = VERIFY.Validation()
+        VERIFY.validate_committed_entrypoint_provenance(REPO_ROOT, validation)
+        self.assertEqual(validation.errors, [])
+
 
 if __name__ == "__main__":
     unittest.main()

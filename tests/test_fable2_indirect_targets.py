@@ -4,6 +4,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import re
 import shutil
 import sys
 import tempfile
@@ -31,6 +32,75 @@ FINGERPRINT = "D" * 64
 TEXT_HASH = "E" * 64
 
 
+def schema_errors(
+    instance: object,
+    schema: dict,
+    root_schema: dict | None = None,
+    location: str = "$",
+) -> list[str]:
+    """Validate the JSON-Schema subset used by the Phase 4 raw schemas."""
+    root_schema = root_schema or schema
+    if "$ref" in schema:
+        resolved: object = root_schema
+        for part in schema["$ref"].removeprefix("#/").split("/"):
+            resolved = resolved[part]  # type: ignore[index]
+        return schema_errors(instance, resolved, root_schema, location)  # type: ignore[arg-type]
+
+    errors: list[str] = []
+    if "oneOf" in schema:
+        matches = [
+            not schema_errors(instance, candidate, root_schema, location)
+            for candidate in schema["oneOf"]
+        ]
+        if sum(matches) != 1:
+            errors.append(f"{location}: expected exactly one oneOf match")
+        return errors
+    for candidate in schema.get("allOf", []):
+        errors.extend(schema_errors(instance, candidate, root_schema, location))
+
+    expected_type = schema.get("type")
+    type_matches = {
+        "object": isinstance(instance, dict),
+        "string": isinstance(instance, str),
+        "integer": isinstance(instance, int) and not isinstance(instance, bool),
+        "boolean": isinstance(instance, bool),
+    }
+    if expected_type and not type_matches.get(expected_type, False):
+        return [f"{location}: expected {expected_type}"]
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{location}: expected constant {schema['const']!r}")
+    if "enum" in schema and instance not in schema["enum"]:
+        errors.append(f"{location}: value is not in enum")
+    if isinstance(instance, str):
+        if len(instance) < schema.get("minLength", 0):
+            errors.append(f"{location}: string is too short")
+        if "pattern" in schema and re.fullmatch(schema["pattern"], instance) is None:
+            errors.append(f"{location}: string does not match pattern")
+    if isinstance(instance, int) and not isinstance(instance, bool):
+        if instance < schema.get("minimum", instance):
+            errors.append(f"{location}: integer is below minimum")
+        if instance > schema.get("maximum", instance):
+            errors.append(f"{location}: integer is above maximum")
+    if isinstance(instance, dict):
+        for name in schema.get("required", []):
+            if name not in instance:
+                errors.append(f"{location}: missing required property {name}")
+        properties = schema.get("properties", {})
+        for name, value in instance.items():
+            if name in properties:
+                errors.extend(
+                    schema_errors(
+                        value,
+                        properties[name],
+                        root_schema,
+                        f"{location}.{name}",
+                    )
+                )
+            elif schema.get("additionalProperties") is False:
+                errors.append(f"{location}: unexpected property {name}")
+    return errors
+
+
 def range_value(start: int, end: int) -> dict[str, str]:
     return {
         "start": f"0x{start:08X}",
@@ -41,7 +111,7 @@ def range_value(start: int, end: int) -> dict[str, str]:
 
 def contract() -> dict:
     return {
-        "schema_version": 4,
+        "schema_version": 5,
         "expected_image_identity": {
             "base_xex_sha256": BASE,
             "title_update_sha256": UPDATE,
@@ -67,14 +137,22 @@ def contract() -> dict:
             ],
         },
         "runtime_indirect_evidence": {
-            "schema_version": 1,
+            "schema_version": 2,
             "observations": [
                 {
                     "target": "0x82174734",
                     "owner_address": "0x821746A8",
                     "classification": "known_jump_table_case",
+                    "acceptance_expected_owner_address": "0x821746A8",
+                    "acceptance_expected_classification": (
+                        "known_jump_table_case"
+                    ),
                     "evidence_level": "CONFIRMED",
-                    "source_sites": ["0x823DCAD8", "0x82403720"],
+                    "historical_corroborating_source_sites": [
+                        "0x823DCAD8",
+                        "0x82403720",
+                    ],
+                    "acceptance_runtime_dispatch_sites": ["0x821746BC"],
                     "branch_kinds": ["bctr"],
                     "manifest_policy": (
                         "forbidden_unless_independent_callable_evidence"
@@ -444,6 +522,30 @@ class PreflightTests(unittest.TestCase):
             self.assertIn(
                 f"--indirect_target_trace_image_sha256={PATCHED}", arguments
             )
+            self.assertIn(
+                "--indirect_target_trace_buffer_pairs=4096", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_dirty_pairs=3072", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_flush_interval_ms=300000", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_max_unique_aggregates=1000000",
+                arguments,
+            )
+            self.assertEqual(
+                result["collector_persistence"],
+                {
+                    "raw_schema_version": 2,
+                    "pair_count_semantics": "delta_since_previous_persistence",
+                    "buffer_pairs": 4096,
+                    "dirty_pair_limit": 3072,
+                    "flush_interval_ms": 300000,
+                    "max_unique_aggregates": 1000000,
+                },
+            )
             self.assertEqual(
                 PATCHED,
                 result["title_identity"]["expected_analysis_image_sha256"],
@@ -522,6 +624,33 @@ class PreflightTests(unittest.TestCase):
 
 
 class RawTraceTests(unittest.TestCase):
+    def test_committed_raw_records_validate_against_versioned_schemas(self) -> None:
+        schema_root = TOOLS / "schemas"
+        fixtures_by_version = {
+            1: [
+                FIXTURES / "synthetic-run-a.raw.jsonl",
+                FIXTURES / "synthetic-run-b.raw.jsonl",
+                FIXTURES / "canonical-acceptance.raw.jsonl",
+            ],
+            2: [FIXTURES / "synthetic-run-v2.raw.jsonl"],
+        }
+        for version, paths in fixtures_by_version.items():
+            schema = json.loads(
+                (schema_root / f"xenia-indirect-targets-raw-v{version}.schema.json")
+                .read_text(encoding="utf-8")
+            )
+            for path in paths:
+                for line_number, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), 1
+                ):
+                    errors = schema_errors(json.loads(line), schema)
+                    self.assertEqual(
+                        errors,
+                        [],
+                        f"{path.name}:{line_number}: "
+                        + "; ".join(errors),
+                    )
+
     def test_canonical_acceptance_fixture_matches_phase4_identity(self) -> None:
         expected = p4.load_expected_identity(p4.DEFAULT_EVIDENCE)
         summary = p4.aggregate_raw_runs(
@@ -530,7 +659,7 @@ class RawTraceTests(unittest.TestCase):
             expected,
         )
         self.assertEqual(1, summary["counts"]["accepted_runs"])
-        self.assertEqual(5, summary["counts"]["unique_pairs"])
+        self.assertEqual(4, summary["counts"]["unique_pairs"])
         assessment = summary["runs"][0]["identity_assessment"]
         self.assertTrue(assessment["module_fingerprint_match"])
         self.assertEqual([], summary["quarantine"])
@@ -543,7 +672,7 @@ class RawTraceTests(unittest.TestCase):
         summary = p4.aggregate_raw_runs(runs, PATCHED)
         self.assertEqual(summary["counts"]["accepted_runs"], 2)
         self.assertEqual(summary["counts"]["quarantined_runs"], 0)
-        self.assertEqual(summary["counts"]["unique_pairs"], 17)
+        self.assertEqual(summary["counts"]["unique_pairs"], 16)
         self.assertEqual(summary["counts"]["total_hits"], 146)
         self.assertEqual(summary["counts"]["dropped_hits"], 2)
         self.assertEqual(summary["counts"]["io_errors"], 1)
@@ -554,7 +683,7 @@ class RawTraceTests(unittest.TestCase):
         pair = next(
             item
             for item in summary["pairs"]
-            if item["source"] == "0x82180000"
+            if item["source"] == "0x829641C4"
             and item["target"] == "0x829647F0"
         )
         self.assertEqual(pair["hit_count"], 6)
@@ -567,6 +696,92 @@ class RawTraceTests(unittest.TestCase):
                 ("synthetic-run-b", "guest:00000001"),
             },
         )
+
+    def test_schema2_committed_deltas_and_clean_footer_reconcile(self) -> None:
+        parsed = p4.parse_raw_trace(FIXTURES / "synthetic-run-v2.raw.jsonl")
+        self.assertEqual(parsed["raw_schema_version"], 2)
+        self.assertEqual(parsed["flush_status"], "normal")
+        self.assertEqual(parsed["uncommitted_pair_records"], 0)
+        self.assertEqual(parsed["record_counts"]["pair"], 2)
+        self.assertEqual(parsed["record_counts"]["checkpoint"], 2)
+        self.assertEqual(len(parsed["pairs"]), 1)
+        self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_307)
+        self.assertEqual(parsed["pairs"][0]["first_thread_sequence"], 1)
+        self.assertEqual(parsed["pairs"][0]["last_thread_sequence"], 2)
+        self.assertEqual(parsed["counters"]["total_hits"], 4_294_967_307)
+        self.assertEqual(parsed["integrity_warnings"], [])
+
+    def test_schema2_footerless_and_uncommitted_tail_recovery(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lines = (FIXTURES / "synthetic-run-v2.raw.jsonl").read_bytes().splitlines()
+
+            complete_footerless = root / "complete-footerless.raw.jsonl"
+            complete_footerless.write_bytes(b"\n".join(lines[:-1]) + b"\n")
+            parsed = p4.parse_raw_trace(complete_footerless)
+            self.assertEqual(parsed["flush_status"], "abnormal_or_unknown_no_footer")
+            self.assertFalse(parsed["corrupt_tail"])
+            self.assertFalse(parsed["missing_final_newline"])
+            self.assertEqual(parsed["uncommitted_pair_records"], 0)
+            self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_307)
+            self.assertEqual(parsed["integrity_warnings"], [])
+
+            complete_footer_without_newline = root / "footer-no-newline.raw.jsonl"
+            complete_footer_without_newline.write_bytes(b"\n".join(lines))
+            parsed = p4.parse_raw_trace(complete_footer_without_newline)
+            self.assertEqual(parsed["flush_status"], "invalid_normal_footer")
+            self.assertTrue(parsed["missing_final_newline"])
+            self.assertIn(
+                "normal footer is not newline-terminated",
+                parsed["integrity_warnings"],
+            )
+
+            uncommitted = root / "uncommitted.raw.jsonl"
+            uncommitted.write_bytes(b"\n".join(lines[:5]) + b"\n")
+            parsed = p4.parse_raw_trace(uncommitted)
+            self.assertEqual(parsed["flush_status"], "abnormal_or_unknown_no_footer")
+            self.assertEqual(parsed["uncommitted_pair_records"], 1)
+            self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_300)
+            self.assertIn(
+                "schema-2 trailing pair batch has no checkpoint and was discarded",
+                parsed["integrity_warnings"],
+            )
+
+            corrupt_tail = root / "corrupt-tail.raw.jsonl"
+            corrupt_tail.write_bytes(b"\n".join(lines[:5]) + b"\n{\"record\":")
+            parsed = p4.parse_raw_trace(corrupt_tail)
+            self.assertEqual(parsed["flush_status"], "abnormal_truncated_tail")
+            self.assertTrue(parsed["corrupt_tail"])
+            self.assertTrue(parsed["missing_final_newline"])
+            self.assertEqual(parsed["uncommitted_pair_records"], 1)
+
+            wrong_checkpoint_records = [json.loads(line) for line in lines]
+            wrong_checkpoint_records[3]["batch_pair_records"] = 2
+            wrong_checkpoint = root / "wrong-checkpoint.raw.jsonl"
+            wrong_checkpoint.write_text(
+                "".join(
+                    json.dumps(item, separators=(",", ":")) + "\n"
+                    for item in wrong_checkpoint_records
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(p4.Phase4Error, "claims 2 pair records"):
+                p4.parse_raw_trace(wrong_checkpoint)
+
+            wrong_footer_records = [json.loads(line) for line in lines]
+            wrong_footer_records[-1]["batches"] = 3
+            wrong_footer = root / "wrong-footer.raw.jsonl"
+            wrong_footer.write_text(
+                "".join(
+                    json.dumps(item, separators=(",", ":")) + "\n"
+                    for item in wrong_footer_records
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                p4.Phase4Error, "batch/checkpoint counts do not reconcile"
+            ):
+                p4.parse_raw_trace(wrong_footer)
 
     def test_truncated_tail_is_usable_but_corrupt_middle_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -887,11 +1102,27 @@ class ImportPlannerTests(unittest.TestCase):
                 )
                 self.assertIsNone(by_target[target]["proposal"])
 
+            expected_positive_sources = {
+                "0x829647F0": ["0x829641C4"],
+                "0x82C03B28": ["0x821907A4"],
+                "0x829675E0": ["0x82966EE4"],
+            }
+            for target, sources in expected_positive_sources.items():
+                self.assertEqual(by_target[target]["runtime"]["source_sites"], sources)
+                self.assertFalse(bool(by_target[target]["proposal"]))
+
             case = by_target["0x82174734"]
             self.assertEqual(case["classification"], "known_jump_table_case")
             self.assertEqual(case["ownership"]["owner_address"], "0x821746A8")
+            self.assertEqual(case["runtime"]["source_sites"], ["0x821746BC"])
+            retained = next(
+                item
+                for item in case["evidence"]
+                if item["kind"] == "retained_runtime_manual_evidence"
+            )
             self.assertEqual(
-                case["runtime"]["source_sites"], ["0x823DCAD8", "0x82403720"]
+                retained["historical_corroborating_source_sites"],
+                ["0x823DCAD8", "0x82403720"],
             )
             self.assertIsNone(case["proposal"])
 
@@ -962,9 +1193,76 @@ class ImportPlannerTests(unittest.TestCase):
             )
             self.assertEqual(plan["counts"]["ignored_ordinary_returns"], 1)
             self.assertTrue(all(item["passed"] for item in plan["fixture_results"]))
+            jump_fixture = next(
+                item
+                for item in plan["fixture_results"]
+                if item["address"] == "0x82174734"
+            )
+            self.assertEqual(
+                jump_fixture["observed_runtime_dispatch_sites"], ["0x821746BC"]
+            )
+            self.assertEqual(
+                jump_fixture["retained_historical_corroborating_source_sites"],
+                ["0x823DCAD8", "0x82403720"],
+            )
             self.assertFalse(plan["safety"]["canonical_manifest_modified"])
             self.assertFalse(plan["safety"]["placeholder_implementations_supported"])
             self.assertFalse(plan["safety"]["runtime_observation_establishes_size"])
+
+    def test_jump_table_fixture_rejects_wrong_provenance_categories(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = PlannerFixture(Path(temporary))
+
+            def jump_result(plan: dict) -> dict:
+                return next(
+                    item
+                    for item in plan["fixture_results"]
+                    if item["address"] == "0x82174734"
+                )
+
+            wrong_source_summary = copy.deepcopy(fixture.summary)
+            for pair in wrong_source_summary["pairs"]:
+                if pair["target"] == "0x82174734":
+                    pair["source"] = "0x821746C0"
+            fixture.summary = wrong_source_summary
+            p4.atomic_write_json(fixture.summary_path, wrong_source_summary)
+            self.assertFalse(jump_result(fixture.plan())["passed"])
+
+            fixture = PlannerFixture(Path(temporary))
+            wrong_owner = contract()
+            observation = wrong_owner["runtime_indirect_evidence"]["observations"][0]
+            observation["owner_address"] = "0x821746AC"
+            write_json(fixture.evidence, wrong_owner)
+            self.assertFalse(jump_result(fixture.plan())["passed"])
+
+            wrong_classification = contract()
+            observation = wrong_classification["runtime_indirect_evidence"][
+                "observations"
+            ][0]
+            observation["classification"] = "ambiguous_target"
+            write_json(fixture.evidence, wrong_classification)
+            result = jump_result(fixture.plan())
+            self.assertFalse(result["passed"])
+
+            # Even high executed counts do not promote a recovered switch case.
+            fixture = PlannerFixture(Path(temporary))
+            for pair in fixture.summary["pairs"]:
+                if pair["target"] == "0x82174734":
+                    per_run_hits = 5_000_000_000
+                    pair["hit_count"] = per_run_hits * len(pair["observed_runs"])
+                    pair["run_hit_counts"] = {
+                        run_id: per_run_hits
+                        for run_id in pair["observed_runs"]
+                    }
+            p4.atomic_write_json(fixture.summary_path, fixture.summary)
+            plan = fixture.plan()
+            case = next(
+                item for item in plan["targets"] if item["target"] == "0x82174734"
+            )
+            self.assertEqual(case["classification"], "known_jump_table_case")
+            self.assertIsNone(case["proposal"])
+            self.assertFalse(case["automatic_application_permitted"])
+            self.assertTrue(jump_result(plan)["passed"])
 
     def test_plan_bytes_are_deterministic_and_integrity_guarded(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

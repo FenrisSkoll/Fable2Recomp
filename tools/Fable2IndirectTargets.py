@@ -32,12 +32,13 @@ DEFAULT_MANIFEST = REPO_ROOT / "fable2_manifest.toml"
 DEFAULT_GENERATED_INIT = REPO_ROOT / "generated" / "default" / "fable2_init.cpp"
 
 RAW_SCHEMA_NAME = "xenia_indirect_targets_raw"
-RAW_SCHEMA_VERSION = 1
+RAW_SCHEMA_VERSION = 2
+SUPPORTED_RAW_SCHEMA_VERSIONS = {1, 2}
 SUMMARY_SCHEMA_NAME = "fable2-xenia-indirect-target-summary"
 SUMMARY_SCHEMA_VERSION = 1
 PLAN_SCHEMA_NAME = "fable2-indirect-target-import-plan"
 PLAN_SCHEMA_VERSION = 1
-TOOL_VERSION = "1.1.0"
+TOOL_VERSION = "1.2.0"
 UINT64_MAX = (1 << 64) - 1
 
 COMPLETE_GAME_MEDIA_TYPES = {
@@ -46,6 +47,10 @@ COMPLETE_GAME_MEDIA_TYPES = {
     ".xcp": "xbox_content_package",
 }
 LOOSE_EXECUTABLE_SUFFIXES = {".xex", ".elf"}
+DEFAULT_COLLECTOR_BUFFER_PAIRS = 4096
+DEFAULT_COLLECTOR_DIRTY_PAIRS = 3072
+DEFAULT_COLLECTOR_FLUSH_INTERVAL_MS = 300_000
+DEFAULT_COLLECTOR_MAX_UNIQUE_AGGREGATES = 1_000_000
 
 CLASSIFICATIONS = {
     "existing_manifest_function",
@@ -269,6 +274,44 @@ def assess_run_identity(
     }
 
 
+def merge_raw_pair_record(
+    pair_aggregate: dict[tuple[Any, ...], dict[str, Any]],
+    record: dict[str, Any],
+) -> bool:
+    """Merge one committed delta record, returning whether its count saturated."""
+    source = address(record["source"], "pair.source")
+    target = address(record["target"], "pair.target")
+    pair_key = (
+        record["source_module"],
+        source,
+        record["target_module"],
+        target,
+        record["branch_kind"],
+        record["link"],
+        record["ordinary_return"],
+        record["thread_key"],
+        record["target_validity"],
+    )
+    aggregate = pair_aggregate.get(pair_key)
+    if aggregate is None:
+        aggregate = dict(record)
+        aggregate["source"] = address_text(source)
+        aggregate["target"] = address_text(target)
+        pair_aggregate[pair_key] = aggregate
+        return False
+
+    aggregate["hit_count"], overflow = saturating_add(
+        aggregate["hit_count"], record["hit_count"]
+    )
+    aggregate["first_thread_sequence"] = min(
+        aggregate["first_thread_sequence"], record["first_thread_sequence"]
+    )
+    aggregate["last_thread_sequence"] = max(
+        aggregate["last_thread_sequence"], record["last_thread_sequence"]
+    )
+    return overflow
+
+
 def parse_raw_trace(path: Path) -> dict[str, Any]:
     digest = hashlib.sha256()
     header: dict[str, Any] | None = None
@@ -280,6 +323,13 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
     corrupt_tail = False
     missing_final_newline = False
     parser_count_overflows = 0
+    raw_schema_version: int | None = None
+    pending_batch_id: int | None = None
+    pending_pairs: list[dict[str, Any]] = []
+    committed_pair_records = 0
+    committed_hits = 0
+    last_checkpoint_sequence = 0
+    parser_integrity_warnings: list[str] = []
 
     try:
         stream = path.open("rb")
@@ -321,10 +371,14 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                         f"raw trace '{path}' schema is {record.get('schema')!r}, "
                         f"expected {RAW_SCHEMA_NAME!r}"
                     )
-                if record.get("schema_version") != RAW_SCHEMA_VERSION:
+                raw_schema_version = require_counter(
+                    record.get("schema_version"), "header.schema_version"
+                )
+                if raw_schema_version not in SUPPORTED_RAW_SCHEMA_VERSIONS:
                     raise Phase4Error(
                         f"raw trace '{path}' schema version is "
-                        f"{record.get('schema_version')!r}, expected {RAW_SCHEMA_VERSION}"
+                        f"{raw_schema_version!r}; supported versions are "
+                        f"{sorted(SUPPORTED_RAW_SCHEMA_VERSIONS)}"
                     )
                 require_string(record.get("run_id"), "header.run_id")
                 require_string(record.get("xenia_commit"), "header.xenia_commit")
@@ -342,8 +396,28 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                 for key in ("include_returns", "all_modules"):
                     if not isinstance(settings.get(key), bool):
                         raise Phase4Error(f"header.settings.{key} must be boolean")
-                for key in ("buffer_pairs", "flush_hits"):
-                    require_counter(settings.get(key), f"header.settings.{key}")
+                if raw_schema_version == 1:
+                    for key in ("buffer_pairs", "flush_hits"):
+                        require_counter(settings.get(key), f"header.settings.{key}")
+                else:
+                    for key in (
+                        "buffer_pairs",
+                        "dirty_pair_limit",
+                        "flush_interval_ms",
+                        "max_unique_aggregates",
+                    ):
+                        require_counter(settings.get(key), f"header.settings.{key}")
+                    if settings["dirty_pair_limit"] > settings["buffer_pairs"]:
+                        raise Phase4Error(
+                            "header.settings.dirty_pair_limit exceeds buffer_pairs"
+                        )
+                    if settings.get("pair_count_semantics") != (
+                        "delta_since_previous_persistence"
+                    ):
+                        raise Phase4Error(
+                            "schema-2 pair_count_semantics must be "
+                            "delta_since_previous_persistence"
+                        )
             elif kind == "module":
                 if header is None:
                     raise Phase4Error(
@@ -390,6 +464,7 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                     raise Phase4Error(f"raw trace '{path}' contains a pair before its header")
                 if record.get("run_id") != header["run_id"]:
                     raise Phase4Error(f"raw trace '{path}' pair run ID disagrees with header")
+                batch_id = require_counter(record.get("batch_id"), "pair.batch_id")
                 address(record.get("source"), "pair.source")
                 address(record.get("target"), "pair.target")
                 branch_kind = require_string(record.get("branch_kind"), "pair.branch_kind")
@@ -433,41 +508,34 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                 validity = require_string(
                     record.get("target_validity"), "pair.target_validity"
                 )
-                source = address(record["source"], "pair.source")
-                target = address(record["target"], "pair.target")
-                pair_key = (
-                    record["source_module"],
-                    source,
-                    record["target_module"],
-                    target,
-                    branch_kind,
-                    record["link"],
-                    ordinary_return,
-                    thread_key,
-                    validity,
-                )
-                aggregate = pair_aggregate.get(pair_key)
-                if aggregate is None:
-                    aggregate = dict(record)
-                    aggregate["source"] = address_text(source)
-                    aggregate["target"] = address_text(target)
-                    pair_aggregate[pair_key] = aggregate
+                if raw_schema_version == 2:
+                    if record.get("count_semantics") != (
+                        "delta_since_previous_persistence"
+                    ):
+                        raise Phase4Error(
+                            "schema-2 pair.count_semantics must be "
+                            "delta_since_previous_persistence"
+                        )
+                    if pending_batch_id is None:
+                        pending_batch_id = batch_id
+                    elif batch_id != pending_batch_id:
+                        raise Phase4Error(
+                            f"raw trace '{path}' starts batch {batch_id} before "
+                            f"checkpointing batch {pending_batch_id}"
+                        )
+                    pending_pairs.append(record)
                 else:
-                    aggregate["hit_count"], overflow = saturating_add(
-                        aggregate["hit_count"], hit_count
-                    )
-                    parser_count_overflows += int(overflow)
-                    aggregate["first_thread_sequence"] = min(
-                        aggregate["first_thread_sequence"], first_sequence
-                    )
-                    aggregate["last_thread_sequence"] = max(
-                        aggregate["last_thread_sequence"], last_sequence
+                    parser_count_overflows += int(
+                        merge_raw_pair_record(pair_aggregate, record)
                     )
             elif kind == "checkpoint":
                 if header is None or record.get("run_id") != header["run_id"]:
                     raise Phase4Error(
                         f"raw trace '{path}' checkpoint run ID disagrees with header"
                     )
+                checkpoint_batch_id = require_counter(
+                    record.get("batch_id"), "checkpoint.batch_id"
+                )
                 for key in (
                     "total_hits",
                     "total_pair_records",
@@ -476,6 +544,76 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                     "count_overflows",
                 ):
                     require_counter(record.get(key), f"checkpoint.{key}")
+                if raw_schema_version == 2:
+                    checkpoint_sequence = require_counter(
+                        record.get("checkpoint_sequence"),
+                        "checkpoint.checkpoint_sequence",
+                    )
+                    if checkpoint_sequence != checkpoint_batch_id:
+                        raise Phase4Error(
+                            "schema-2 checkpoint sequence must equal its batch ID"
+                        )
+                    if checkpoint_sequence != last_checkpoint_sequence + 1:
+                        raise Phase4Error(
+                            f"schema-2 checkpoint sequence {checkpoint_sequence} is "
+                            f"not consecutive after {last_checkpoint_sequence}"
+                        )
+                    require_counter(
+                        record.get("collector_version"),
+                        "checkpoint.collector_version",
+                    )
+                    if record["collector_version"] != header["collector_version"]:
+                        raise Phase4Error(
+                            "schema-2 checkpoint collector version disagrees with header"
+                        )
+                    require_string(
+                        record.get("flush_reason"), "checkpoint.flush_reason"
+                    )
+                    batch_pair_records = require_counter(
+                        record.get("batch_pair_records"),
+                        "checkpoint.batch_pair_records",
+                    )
+                    require_counter(
+                        record.get("persisted_aggregate_count"),
+                        "checkpoint.persisted_aggregate_count",
+                    )
+                    require_counter(
+                        record.get("aggregate_limit_exceeded"),
+                        "checkpoint.aggregate_limit_exceeded",
+                    )
+                    if pending_batch_id != checkpoint_batch_id:
+                        raise Phase4Error(
+                            f"schema-2 checkpoint {checkpoint_batch_id} does not "
+                            f"commit pending batch {pending_batch_id}"
+                        )
+                    if batch_pair_records != len(pending_pairs):
+                        raise Phase4Error(
+                            f"schema-2 checkpoint {checkpoint_batch_id} claims "
+                            f"{batch_pair_records} pair records but {len(pending_pairs)} "
+                            "precede it"
+                        )
+                    for pending_pair in pending_pairs:
+                        parser_count_overflows += int(
+                            merge_raw_pair_record(pair_aggregate, pending_pair)
+                        )
+                        committed_hits, overflow = saturating_add(
+                            committed_hits, pending_pair["hit_count"]
+                        )
+                        parser_count_overflows += int(overflow)
+                    committed_pair_records += len(pending_pairs)
+                    if record["total_pair_records"] != committed_pair_records:
+                        raise Phase4Error(
+                            f"schema-2 checkpoint {checkpoint_batch_id} total pair "
+                            "record count does not reconcile"
+                        )
+                    if record["total_hits"] != committed_hits:
+                        raise Phase4Error(
+                            f"schema-2 checkpoint {checkpoint_batch_id} total hit "
+                            "count does not reconcile"
+                        )
+                    pending_pairs.clear()
+                    pending_batch_id = None
+                    last_checkpoint_sequence = checkpoint_sequence
                 checkpoint = record
             elif kind == "footer":
                 if header is None or record.get("run_id") != header["run_id"]:
@@ -491,12 +629,79 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
                     "count_overflows",
                 ):
                     require_counter(record.get(key), f"footer.{key}")
+                if raw_schema_version == 2:
+                    if pending_pairs:
+                        raise Phase4Error(
+                            "schema-2 footer follows an uncheckpointed pair batch"
+                        )
+                    if require_counter(
+                        record.get("raw_schema_version"),
+                        "footer.raw_schema_version",
+                    ) != 2:
+                        raise Phase4Error("schema-2 footer raw schema version disagrees")
+                    require_counter(
+                        record.get("collector_version"),
+                        "footer.collector_version",
+                    )
+                    if record["collector_version"] != header["collector_version"]:
+                        raise Phase4Error(
+                            "schema-2 footer collector version disagrees with header"
+                        )
+                    require_string(record.get("flush_reason"), "footer.flush_reason")
+                    batches = require_counter(record.get("batches"), "footer.batches")
+                    footer_sequence = require_counter(
+                        record.get("checkpoint_sequence"),
+                        "footer.checkpoint_sequence",
+                    )
+                    checkpoint_records = require_counter(
+                        record.get("checkpoint_records"),
+                        "footer.checkpoint_records",
+                    )
+                    if footer_sequence != last_checkpoint_sequence:
+                        raise Phase4Error(
+                            "schema-2 footer checkpoint sequence does not reconcile"
+                        )
+                    if checkpoint_records != record_counts["checkpoint"]:
+                        raise Phase4Error(
+                            "schema-2 footer checkpoint record count does not reconcile"
+                        )
+                    if batches != footer_sequence or batches != checkpoint_records:
+                        raise Phase4Error(
+                            "schema-2 footer batch/checkpoint counts do not reconcile"
+                        )
+                    for key in (
+                        "final_unique_aggregates",
+                        "final_sequence",
+                        "aggregate_limit_exceeded",
+                    ):
+                        require_counter(record.get(key), f"footer.{key}")
+                    if not isinstance(
+                        record.get("unique_aggregate_count_complete"), bool
+                    ):
+                        raise Phase4Error(
+                            "footer.unique_aggregate_count_complete must be boolean"
+                        )
+                    if record.get("sequence_scope") != (
+                        "maximum_per_thread_sequence"
+                    ):
+                        raise Phase4Error("unsupported schema-2 footer sequence scope")
+                    if record.get("pair_count_semantics") != (
+                        "delta_since_previous_persistence"
+                    ):
+                        raise Phase4Error("unsupported schema-2 footer count semantics")
                 footer = record
             else:
                 raise Phase4Error(f"raw trace '{path}' has unknown record kind {kind!r}")
 
     if header is None:
         raise Phase4Error(f"raw trace '{path}' has no complete header")
+
+    uncommitted_pair_records = 0
+    if raw_schema_version == 2 and pending_pairs:
+        uncommitted_pair_records = len(pending_pairs)
+        parser_integrity_warnings.append(
+            "schema-2 trailing pair batch has no checkpoint and was discarded"
+        )
 
     final_counters = footer or checkpoint or {}
     counters = {
@@ -507,6 +712,7 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
             "dropped_hits",
             "io_errors",
             "count_overflows",
+            "aggregate_limit_exceeded",
         )
     }
     counters["count_overflows"], _ = saturating_add(
@@ -520,9 +726,16 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
             pair["target_validity"],
         ),
     )
-    integrity_warnings: list[str] = []
+    integrity_warnings = list(parser_integrity_warnings)
+    if footer and footer.get("shutdown_status") == "normal" and missing_final_newline:
+        integrity_warnings.append("normal footer is not newline-terminated")
     if footer and footer.get("shutdown_status") == "normal" and not corrupt_tail:
-        if footer.get("total_pair_records") != record_counts["pair"]:
+        durable_pair_records = (
+            committed_pair_records
+            if raw_schema_version == 2
+            else record_counts["pair"]
+        )
+        if footer.get("total_pair_records") != durable_pair_records:
             integrity_warnings.append(
                 "normal footer total_pair_records disagrees with parsed pair records"
             )
@@ -533,6 +746,34 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
             integrity_warnings.append(
                 "normal footer total_hits disagrees with parsed pair hit counts"
             )
+        if raw_schema_version == 2:
+            parsed_aggregate_keys = {
+                (
+                    pair["thread_key"],
+                    pair["source"],
+                    pair["target"],
+                    pair["branch_kind"],
+                    pair["link"],
+                )
+                for pair in pairs
+            }
+            if (
+                footer.get("unique_aggregate_count_complete")
+                and footer.get("final_unique_aggregates")
+                != len(parsed_aggregate_keys)
+            ):
+                integrity_warnings.append(
+                    "normal footer final_unique_aggregates disagrees with parsed "
+                    "pair/thread aggregates"
+                )
+            parsed_final_sequence = max(
+                (pair["last_thread_sequence"] for pair in pairs), default=0
+            )
+            if footer.get("final_sequence") != parsed_final_sequence:
+                integrity_warnings.append(
+                    "normal footer final_sequence disagrees with parsed thread "
+                    "sequences"
+                )
     normal_footer = bool(
         footer
         and footer.get("shutdown_status") == "normal"
@@ -560,6 +801,8 @@ def parse_raw_trace(path: Path) -> dict[str, Any]:
         "pairs": pairs,
         "counters": counters,
         "record_counts": dict(sorted(record_counts.items())),
+        "raw_schema_version": raw_schema_version,
+        "uncommitted_pair_records": uncommitted_pair_records,
         "flush_status": flush_status,
         "corrupt_tail": corrupt_tail,
         "missing_final_newline": missing_final_newline,
@@ -601,6 +844,7 @@ def aggregate_raw_runs(
             "raw_sha256": run["sha256"],
             "xenia_commit": run["header"]["xenia_commit"],
             "collector_version": run["header"].get("collector_version"),
+            "raw_schema_version": run["raw_schema_version"],
             "configured_expected_image_sha256": configured_identity,
             "observed_image_sha256": None,
             "identity_match": identity_match,
@@ -610,6 +854,7 @@ def aggregate_raw_runs(
             "missing_final_newline": run["missing_final_newline"],
             "integrity_warnings": run["integrity_warnings"],
             "record_counts": run["record_counts"],
+            "uncommitted_pair_records": run["uncommitted_pair_records"],
             "counters": run["counters"],
             "modules": sorted(
                 run["modules"],
@@ -705,6 +950,7 @@ def aggregate_raw_runs(
     total_hits = 0
     dropped_hits = 0
     io_errors = 0
+    aggregate_limit_exceeded = 0
     count_overflows = overflow_count
     for run in run_records:
         if not run["identity_match"]:
@@ -716,6 +962,11 @@ def aggregate_raw_runs(
         )
         count_overflows += int(overflow)
         io_errors, overflow = saturating_add(io_errors, run["counters"]["io_errors"])
+        count_overflows += int(overflow)
+        aggregate_limit_exceeded, overflow = saturating_add(
+            aggregate_limit_exceeded,
+            run["counters"]["aggregate_limit_exceeded"],
+        )
         count_overflows += int(overflow)
         count_overflows, _ = saturating_add(
             count_overflows, run["counters"]["count_overflows"]
@@ -754,6 +1005,7 @@ def aggregate_raw_runs(
             "dropped_hits": dropped_hits,
             "io_errors": io_errors,
             "count_overflows": count_overflows,
+            "aggregate_limit_exceeded": aggregate_limit_exceeded,
             "abnormal_or_truncated_runs": sum(
                 run["flush_status"] != "normal"
                 for run in run_records
@@ -876,6 +1128,7 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
     total_hits = 0
     dropped_hits = 0
     io_errors = 0
+    aggregate_limit_exceeded = 0
     count_overflows = overflow_count
     for run in runs:
         if not run["identity_match"]:
@@ -887,6 +1140,11 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
         )
         count_overflows += int(overflow)
         io_errors, overflow = saturating_add(io_errors, run["counters"]["io_errors"])
+        count_overflows += int(overflow)
+        aggregate_limit_exceeded, overflow = saturating_add(
+            aggregate_limit_exceeded,
+            run["counters"].get("aggregate_limit_exceeded", 0),
+        )
         count_overflows += int(overflow)
         count_overflows, _ = saturating_add(
             count_overflows, run["counters"]["count_overflows"]
@@ -904,6 +1162,7 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
             "dropped_hits": dropped_hits,
             "io_errors": io_errors,
             "count_overflows": count_overflows,
+            "aggregate_limit_exceeded": aggregate_limit_exceeded,
             "abnormal_or_truncated_runs": sum(
                 run["flush_status"] != "normal"
                 for run in runs
@@ -1725,24 +1984,72 @@ def build_plan(
         )
     for target, evidence_item in sorted(runtime_known.items()):
         result = by_target.get(address_text(target))
-        expected_sources = sorted(evidence_item.get("source_sites", []))
-        observed_sources = result["runtime"]["source_sites"] if result else []
+        expected_owner = evidence_item.get(
+            "acceptance_expected_owner_address", evidence_item["owner_address"]
+        )
+        expected_classification = evidence_item.get(
+            "acceptance_expected_classification",
+            evidence_item["classification"],
+        )
+        expected_runtime_sources = sorted(
+            evidence_item.get(
+                "acceptance_runtime_dispatch_sites",
+                # Schema-1 contracts used source_sites for both concepts. Keep
+                # them readable, while schema 2 makes the provenance explicit.
+                evidence_item.get("source_sites", []),
+            )
+        )
+        historical_sources = sorted(
+            evidence_item.get(
+                "historical_corroborating_source_sites",
+                evidence_item.get("source_sites", []),
+            )
+        )
+        observed_runtime_sources = (
+            result["runtime"]["source_sites"] if result else []
+        )
+        retained_record = next(
+            (
+                item
+                for item in (result or {}).get("evidence", [])
+                if item.get("kind") == "retained_runtime_manual_evidence"
+            ),
+            {},
+        )
+        retained_historical_sources = sorted(
+            retained_record.get(
+                "historical_corroborating_source_sites",
+                retained_record.get("source_sites", []),
+            )
+        )
         fixture_results.append(
             {
                 "address": address_text(target),
-                "expected_owner": evidence_item["owner_address"],
-                "expected_sources": expected_sources,
-                "observed_sources": observed_sources,
-                "expected_classification": evidence_item["classification"],
+                "expected_owner": expected_owner,
+                "expected_runtime_dispatch_sites": expected_runtime_sources,
+                "observed_runtime_dispatch_sites": observed_runtime_sources,
+                "expected_historical_corroborating_source_sites": (
+                    historical_sources
+                ),
+                "retained_historical_corroborating_source_sites": (
+                    retained_historical_sources
+                ),
+                "expected_classification": expected_classification,
                 "actual_classification": result["classification"] if result else None,
                 "manifest_change": bool(result and result["proposal"]),
                 "passed": bool(
                     result
-                    and result["classification"] == evidence_item["classification"]
+                    and evidence_item["classification"]
+                    == expected_classification
+                    and evidence_item["owner_address"] == expected_owner
+                    and result["classification"] == expected_classification
                     and result["ownership"]
                     and result["ownership"]["owner_address"]
-                    == evidence_item["owner_address"]
-                    and set(expected_sources).issubset(observed_sources)
+                    == expected_owner
+                    and set(expected_runtime_sources).issubset(
+                        observed_runtime_sources
+                    )
+                    and retained_historical_sources == historical_sources
                     and not result["proposal"]
                 ),
             }
@@ -2176,6 +2483,12 @@ def preflight(
     ]
     arguments.extend(
         [
+            f"--indirect_target_trace_buffer_pairs={DEFAULT_COLLECTOR_BUFFER_PAIRS}",
+            f"--indirect_target_trace_dirty_pairs={DEFAULT_COLLECTOR_DIRTY_PAIRS}",
+            "--indirect_target_trace_flush_interval_ms="
+            f"{DEFAULT_COLLECTOR_FLUSH_INTERVAL_MS}",
+            "--indirect_target_trace_max_unique_aggregates="
+            f"{DEFAULT_COLLECTOR_MAX_UNIQUE_AGGREGATES}",
             f"--content_root={content_root}",
             "--apply_title_update=true",
             f"--storage_root={storage_root}",
@@ -2223,6 +2536,14 @@ def preflight(
         },
         "content": content_record,
         "storage_root": str(storage_root),
+        "collector_persistence": {
+            "raw_schema_version": RAW_SCHEMA_VERSION,
+            "pair_count_semantics": "delta_since_previous_persistence",
+            "buffer_pairs": DEFAULT_COLLECTOR_BUFFER_PAIRS,
+            "dirty_pair_limit": DEFAULT_COLLECTOR_DIRTY_PAIRS,
+            "flush_interval_ms": DEFAULT_COLLECTOR_FLUSH_INTERVAL_MS,
+            "max_unique_aggregates": DEFAULT_COLLECTOR_MAX_UNIQUE_AGGREGATES,
+        },
         "arguments": arguments,
         "powershell_command": command,
         "warning": (

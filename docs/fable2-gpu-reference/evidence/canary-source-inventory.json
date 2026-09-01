@@ -1,0 +1,598 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-canary-source-inventory-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5B",
+  "generated_on": "2026-09-01",
+  "fable_repository": {
+    "path": "C:\\Dev\\Fable2Recomp",
+    "remote": "https://github.com/FenrisSkoll/Fable2Recomp.git",
+    "branch": "fable2-native-renderer-g1.5-reference",
+    "commit": "a0d663fc600f74df8e7e87dcf7f18776e23339c9",
+    "tree": "a622e93e586be117a9be0ba9b6554ef3a099636c",
+    "status": "clean at G1.5B start"
+  },
+  "canary_repository": {
+    "path": "C:\\Dev\\Fable2NativeRendererResearch\\xenia-canary",
+    "remote": "https://github.com/xenia-canary/xenia-canary.git",
+    "branch": "canary_experimental",
+    "upstream": "origin/canary_experimental",
+    "ahead": 0,
+    "behind": 0,
+    "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+    "tree": "c343b0a5796590fadc3b78c993bfada51e7e9148",
+    "parent": "22708301ba76d10aae6f7d7caac8b1cac9e4a8e6",
+    "author_date": "2026-08-28T20:19:01-07:00",
+    "committer_date": "2026-08-31T22:07:04+02:00",
+    "subject": "[GPU] Replace AC6 ground hack with scalar approximation rounding",
+    "status": "clean; HEAD equals the pin; upstream ahead 0, behind 0",
+    "license": "BSD-3-Clause",
+    "license_sha256": "3D58F25C15634B6EC01D1F133EF798209AE06626AB8D2227B6223D5A9F5113F4",
+    "is_shallow": true,
+    "available_commit_count": 200,
+    "shallow_boundary": "049a55f03679b204379b17996bd032ce54bff156"
+  },
+  "source_scopes": [
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu",
+      "git_object_sha1": "76ca8c5b5f2c2116a60b102f7e79e8d0594907ca",
+      "file_count": 297,
+      "role": "shared GPU model, command processor, translators, and backend implementations"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12",
+      "git_object_sha1": "f8396b8d7c59d5d499110eaecc92c5ec4a7b9058",
+      "file_count": 23,
+      "role": "D3D12 backend"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan",
+      "git_object_sha1": "926c1106702a731d6f85dd5bfdb470977f0714c8",
+      "file_count": 23,
+      "role": "Vulkan backend"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shaders",
+      "git_object_sha1": "4bec8b510982873a78ef53095f65ce606b5d6cf7",
+      "file_count": 161,
+      "role": "host shader sources and generated shader artifacts tracked by Canary"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui",
+      "git_object_sha1": "24b00567de885301c57962ed0735eb1b87248cd8",
+      "file_count": 149,
+      "role": "graphics provider, presenter, and completion timeline abstractions"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/d3d12",
+      "git_object_sha1": "e7c397deb8c30d27c34347cacd848c51ae6eafe9",
+      "file_count": 19,
+      "role": "D3D12 provider and presenter"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/vulkan",
+      "git_object_sha1": "6c396cfd723f4bcd045dea5ba9eaf0ac395160ad",
+      "file_count": 42,
+      "role": "Vulkan device, provider, presenter, and synchronization"
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/kernel/xboxkrnl",
+      "git_object_sha1": "4c1bba71afcc07b76f4b6572fb54bc554fd8b518",
+      "file_count": 38,
+      "role": "Xbox kernel video exports that feed the GPU"
+    }
+  ],
+  "key_files": [
+    {
+      "repository": "canary",
+      "path": "LICENSE",
+      "blob_sha1": "bc759869a1975823a4e1b1c78cb4e5356cadb7bf",
+      "size": 1481,
+      "role": "repository licence",
+      "symbols": ["Redistribution and use"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/app/xenia_main.cc",
+      "blob_sha1": "ab94373301c8c4798c97ffcf2f047669fa28b82f",
+      "size": 29240,
+      "role": "graphics backend selection",
+      "symbols": ["EmulatorApp::CreateGraphicsSystem"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/emulator.cc",
+      "blob_sha1": "cf1856972979fcd247881e983790556f1539ce67",
+      "size": 63922,
+      "role": "emulator ownership and setup order",
+      "symbols": ["Emulator::Setup", "InitializeShaderStorage"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/graphics_system.h",
+      "blob_sha1": "0c616dd7f461c95ed7f827ecbe362255f93a11d9",
+      "size": 4369,
+      "role": "GPU system ownership contract",
+      "symbols": ["class GraphicsSystem", "RegisterFile* register_file_"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/graphics_system.cc",
+      "blob_sha1": "851513945b680eebfaa6b3892de039e7ad263751",
+      "size": 16003,
+      "role": "GPU setup, MMIO, interrupt, limiter, and shutdown",
+      "symbols": ["GraphicsSystem::Setup", "GraphicsSystem::Shutdown"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/kernel/xboxkrnl/xboxkrnl_video.cc",
+      "blob_sha1": "12835232b76318264acbdf1d77e069b88b896a12",
+      "size": 23752,
+      "role": "guest video exports and swap packet construction",
+      "symbols": ["VdInitializeRingBuffer", "VdSwap_entry"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/command_processor.h",
+      "blob_sha1": "95be5ec553adedf36d20f34bf5f87de24c878283",
+      "size": 20347,
+      "role": "shared command processor state and interface",
+      "symbols": ["class CommandProcessor"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/command_processor.cc",
+      "blob_sha1": "5865d9036af6e548d2832e55ec91adc4bd02c93a",
+      "size": 54193,
+      "role": "command worker, ring pointers, waits, interrupts, and common register effects",
+      "symbols": ["CommandProcessor::WorkerThreadMain", "CommandProcessor::InitializeRingBuffer"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/pm4_command_processor_declare.h",
+      "blob_sha1": "93a9aaf6020e9a71bbc031e6e681aa0232030304",
+      "size": 3961,
+      "role": "PM4 handler declarations",
+      "symbols": ["ExecutePacketType3Draw", "ExecutePacketType3_XE_SWAP"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+      "blob_sha1": "e2560f9c19574ef98c5cb4fb3227124ddb13d188",
+      "size": 54081,
+      "role": "PM4 packet decoding and operation dispatch",
+      "symbols": ["COMMAND_PROCESSOR::ExecutePacket", "COMMAND_PROCESSOR::ExecutePacketType3Draw"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/register_file.h",
+      "blob_sha1": "8128bdcc93480d160628cc325c54d84772d1000f",
+      "size": 2700,
+      "role": "Xenos register file definition",
+      "symbols": ["class RegisterFile", "kRegisterCount"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/register_file.cc",
+      "blob_sha1": "c697852e4775c1982c18a7e17a6d24bbc827a0e1",
+      "size": 4941,
+      "role": "register metadata and reset defaults",
+      "symbols": ["RegisterFile::RegisterFile", "RegisterFile::GetRegisterInfo"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/register_table.inc",
+      "blob_sha1": "0b70f329d53ec49eee8d79ffff90faada8d5dcc8",
+      "size": 196019,
+      "role": "generated register metadata table",
+      "symbols": ["XE_GPU_REGISTER"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/primitive_processor.h",
+      "blob_sha1": "b644510168ced905df5c4d3552e4cd701a846e62",
+      "size": 42417,
+      "role": "primitive and index conversion state",
+      "symbols": ["class PrimitiveProcessor", "ProcessingResult"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/primitive_processor.cc",
+      "blob_sha1": "129b5a16aa12360a6ecd01fcce197d75192d8673",
+      "size": 81814,
+      "role": "primitive processing implementation",
+      "symbols": ["PrimitiveProcessor::Process", "PrimitiveProcessor::IsResetUsed"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/draw_util.cc",
+      "blob_sha1": "ec8c417c430f9ed1ba4b765e04d081b67111785a",
+      "size": 68871,
+      "role": "draw and resolve state decoding",
+      "symbols": ["GetResolveInfo", "ResolveInfo::GetCopyShader"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/draw_extent_estimator.cc",
+      "blob_sha1": "7162a322fb260744d7e4fbfe25ea6519d51a4406",
+      "size": 14835,
+      "role": "draw extent estimation",
+      "symbols": ["DrawExtentEstimator::EstimateVertexMaxY", "DrawExtentEstimator::Estimate"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shader.h",
+      "blob_sha1": "fa3141d908b1b445ca5455794d8a20fd5f4db8d0",
+      "size": 45235,
+      "role": "Xenos shader analysis and translation model",
+      "symbols": ["class Shader", "class ShaderTranslator"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shader.cc",
+      "blob_sha1": "b34a8a83b605c081e372fd7f9c8decc87447087c",
+      "size": 5870,
+      "role": "shader ownership and binding metadata",
+      "symbols": ["Shader::Shader", "Shader::GetOrCreateTranslation"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shader_translator.cc",
+      "blob_sha1": "24213af8778db9bece016d31523ef95804c043ec",
+      "size": 61904,
+      "role": "Xenos ucode analysis and shared translation",
+      "symbols": ["Shader::AnalyzeUcode", "ShaderTranslator::TranslateAnalyzedShader"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/dxbc_shader_translator.cc",
+      "blob_sha1": "5eee7f8df33b57b9e440b5a68236a2e4b5ab7747",
+      "size": 164889,
+      "role": "DXBC host shader generation",
+      "symbols": ["DxbcShaderTranslator::StartTranslation", "DxbcShaderTranslator::CompleteTranslation"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/spirv_shader_translator.cc",
+      "blob_sha1": "690b881cd287176d9a638ef73a4288b5b894e92a",
+      "size": 184185,
+      "role": "SPIR-V host shader generation",
+      "symbols": ["SpirvShaderTranslator::StartTranslation", "SpirvShaderTranslator::CompleteTranslation"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/texture_cache.h",
+      "blob_sha1": "c52cc41f996822c8acaf7946733f476fb9ae3af6",
+      "size": 32785,
+      "role": "shared texture keys, bindings, watches, and residency",
+      "symbols": ["class TextureCache", "BindingInfoFromFetchConstant"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/texture_cache.cc",
+      "blob_sha1": "09930746d88bcf5deca90affd5328fc72a90409a",
+      "size": 47595,
+      "role": "shared texture lookup, invalidation, and eviction",
+      "symbols": ["TextureCache::BindingInfoFromFetchConstant", "TextureCache::FindOrCreateTexture"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/texture_info.cc",
+      "blob_sha1": "7a617af9b4e3e0dde861652fd790e6899700e956",
+      "size": 7143,
+      "role": "texture identity and layout",
+      "symbols": ["TextureInfo::Prepare", "TextureInfo::PrepareResolve"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/texture_util.cc",
+      "blob_sha1": "5e3a6e2f9f191b1c1ff43d51c8576c6b51fd9bac",
+      "size": 23627,
+      "role": "guest texture tiling and layout utilities",
+      "symbols": ["GetGuestTextureLayout"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/sampler_info.cc",
+      "blob_sha1": "54e2564edf36240913e1ca68f8a5a311f71cc7aa",
+      "size": 2041,
+      "role": "sampler state interpretation",
+      "symbols": ["SamplerInfo::Prepare"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/render_target_cache.h",
+      "blob_sha1": "232b4f2261617cfa6873e6d3f720ccaca40bc447",
+      "size": 37102,
+      "role": "shared EDRAM ownership and render-target contract",
+      "symbols": ["class RenderTargetCache", "enum class Path"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/render_target_cache.cc",
+      "blob_sha1": "8d5bc939fb4700c52895b2df13c4733725697ee8",
+      "size": 79845,
+      "role": "shared render-target update and ownership transfer",
+      "symbols": ["RenderTargetCache::Update", "RenderTargetCache::ChangeOwnership"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shared_memory.h",
+      "blob_sha1": "2b56757891710cda92d468cb0d54240f86a6ff3f",
+      "size": 13479,
+      "role": "guest shared-memory mirror and coherency contract",
+      "symbols": ["class SharedMemory", "kBufferSize"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/shared_memory.cc",
+      "blob_sha1": "3afb391205e83432232671e82c6b3dd3b0753254",
+      "size": 28542,
+      "role": "shared-memory requests, invalidation, watches, and GPU writes",
+      "symbols": ["SharedMemory::RequestRange", "SharedMemory::RangeWrittenByGpu"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/d3d12_graphics_system.cc",
+      "blob_sha1": "3e851ef26f8f66d5291a43975d1fd7b56e7b3313",
+      "size": 1973,
+      "role": "D3D12 provider and command processor creation",
+      "symbols": ["D3D12GraphicsSystem::Setup", "CreateCommandProcessor"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+      "blob_sha1": "3fa30255695485333b961d4ef4b64da59b807c6d",
+      "size": 257848,
+      "role": "D3D12 draw, copy, queue, constants, descriptors, and submission",
+      "symbols": ["D3D12CommandProcessor::IssueDraw", "D3D12CommandProcessor::IssueSwap"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+      "blob_sha1": "b0ec9ae7247e32289f23c25f8c3e6323e1c4ef14",
+      "size": 151716,
+      "role": "D3D12 translation and pipeline caching",
+      "symbols": ["PipelineCache::ConfigurePipeline", "PipelineCache::LoadShader"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/d3d12_texture_cache.cc",
+      "blob_sha1": "1cc5ac10945857bed4a5a8215123824c5c081b81",
+      "size": 95540,
+      "role": "D3D12 texture loading and binding",
+      "symbols": ["D3D12TextureCache::RequestTextures", "D3D12TextureCache::LoadTextureData"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/d3d12_render_target_cache.cc",
+      "blob_sha1": "72c92a5a97a802b7a00f7c26385e44fcb1e177e4",
+      "size": 314055,
+      "role": "D3D12 EDRAM, resolve, and transfer implementation",
+      "symbols": ["D3D12RenderTargetCache::Resolve", "D3D12RenderTargetCache::Update"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/d3d12/d3d12_shared_memory.cc",
+      "blob_sha1": "4a10c3e62e6fed790e40e5f14d1d812db25793eb",
+      "size": 15008,
+      "role": "D3D12 shared-memory allocation, upload, and barriers",
+      "symbols": ["D3D12SharedMemory::UploadRanges", "D3D12SharedMemory::CommitUAVWritesAndTransitionBuffer"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_graphics_system.cc",
+      "blob_sha1": "3c80d766a0f6d3146e283ef6583f9375b1264424",
+      "size": 1791,
+      "role": "Vulkan provider and command processor creation",
+      "symbols": ["VulkanGraphicsSystem::Setup", "CreateCommandProcessor"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_command_processor.cc",
+      "blob_sha1": "81765527c7fd562f84238ec6ecd4b6c335ce28e1",
+      "size": 271325,
+      "role": "Vulkan draw, copy, queue, descriptors, and submission",
+      "symbols": ["VulkanCommandProcessor::IssueDraw", "VulkanCommandProcessor::IssueSwap"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_pipeline_cache.cc",
+      "blob_sha1": "a1d1c37c781bad9cd7dbd2ec679fe3c2dec9eec5",
+      "size": 159543,
+      "role": "Vulkan translation and pipeline caching",
+      "symbols": ["VulkanPipelineCache::ConfigurePipeline", "VulkanPipelineCache::LoadShader"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_texture_cache.cc",
+      "blob_sha1": "f01d7d409878decab91081eeb709f6ea12dc6186",
+      "size": 169723,
+      "role": "Vulkan texture loading, barriers, and binding",
+      "symbols": ["VulkanTextureCache::RequestTextures", "VulkanTextureCache::LoadTextureData"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_render_target_cache.cc",
+      "blob_sha1": "2a7c4229b8db6a0a8e4123e607f96b3716d7d699",
+      "size": 309243,
+      "role": "Vulkan EDRAM, resolve, and transfer implementation",
+      "symbols": ["VulkanRenderTargetCache::Resolve", "VulkanRenderTargetCache::Update"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/gpu/vulkan/vulkan_shared_memory.cc",
+      "blob_sha1": "fe8dc6487b6ad12e8d7ed8acd9f60a614e1435ff",
+      "size": 21790,
+      "role": "Vulkan shared-memory allocation, upload, and barriers",
+      "symbols": ["VulkanSharedMemory::UploadRanges", "VulkanSharedMemory::Use"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/graphics_provider.h",
+      "blob_sha1": "10480a72217cc1623fc5dd48c5c706dd7be03589",
+      "size": 1907,
+      "role": "host graphics provider abstraction",
+      "symbols": ["class GraphicsProvider"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/presenter.h",
+      "blob_sha1": "b1d38224ee3f651d86b689fb9d6baa1dd2f8cbc4",
+      "size": 48786,
+      "role": "shared presentation state and guest-output mailbox",
+      "symbols": ["class Presenter", "GuestOutputRefreshContext"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/presenter.cc",
+      "blob_sha1": "d53a081206cca81b37a4ace42c85f1459cf50fdb",
+      "size": 63132,
+      "role": "shared guest-output refresh, UI composition, and presentation scheduling",
+      "symbols": ["Presenter::RefreshGuestOutput", "Presenter::PaintAndPresent"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/gpu_completion_timeline.h",
+      "blob_sha1": "aa784bf34c55cb4aa5fda3bc9342336d73c2f7eb",
+      "size": 3698,
+      "role": "cross-backend completion abstraction",
+      "symbols": ["class GPUCompletionTimeline"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/d3d12/d3d12_provider.cc",
+      "blob_sha1": "52954dd414b8edb2d285bd3030af1bb6bf1eddb4",
+      "size": 22889,
+      "role": "D3D12 device and queue creation",
+      "symbols": ["D3D12Provider::Create", "D3D12Provider::Initialize"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/d3d12/d3d12_presenter.cc",
+      "blob_sha1": "554e90183e3a3dedc796a3879f6d4dd79b5bf393",
+      "size": 68295,
+      "role": "D3D12 swap chain and presentation",
+      "symbols": ["D3D12Presenter::PaintAndPresentImpl", "D3D12Presenter::ConnectOrReconnectPaintingToSurfaceFromUIThread"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/d3d12/d3d12_gpu_completion_timeline.cc",
+      "blob_sha1": "b4c77d0312195d39fe3cf5de10a11c5f44bfd686",
+      "size": 2262,
+      "role": "D3D12 fence completion",
+      "symbols": ["D3D12GPUCompletionTimeline::SignalAndAdvance", "D3D12GPUCompletionTimeline::AwaitSubmissionImpl"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/vulkan/vulkan_provider.cc",
+      "blob_sha1": "41fa12fb82ef49b95f6d0d611c4285b9d201b88d",
+      "size": 4087,
+      "role": "Vulkan provider creation",
+      "symbols": ["VulkanProvider::Create"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/vulkan/vulkan_device.cc",
+      "blob_sha1": "451cd16cb3c9ea71395fba6bc31335cdbef9448f",
+      "size": 37581,
+      "role": "Vulkan physical and logical device capability selection",
+      "symbols": ["VulkanDevice::CreateIfSupported"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/vulkan/vulkan_presenter.cc",
+      "blob_sha1": "68b97e78855682574f5e594d83b7c13349710f13",
+      "size": 123147,
+      "role": "Vulkan swapchain, acquire, submit, and present",
+      "symbols": ["VulkanPresenter::PaintAndPresentImpl", "VulkanPresenter::ConnectOrReconnectPaintingToSurfaceFromUIThread"]
+    },
+    {
+      "repository": "canary",
+      "path": "src/xenia/ui/vulkan/vulkan_gpu_completion_timeline.cc",
+      "blob_sha1": "a7d11c333c3c578cec009eab16b23b4a5258ffc9",
+      "size": 6773,
+      "role": "Vulkan fence completion",
+      "symbols": ["VulkanGPUCompletionTimeline::AcquireFenceAndSubmit", "VulkanGPUCompletionTimeline::AwaitSubmissionImpl"]
+    }
+  ],
+  "history_evidence": [
+    {
+      "commit": "fbd620c22b44638b66a70bba80d6f30d55a10924",
+      "date": "2026-05-01T21:09:16Z",
+      "subject": "[GPU] Implement ZPD occlusion queries",
+      "rationale_status": "CONFIRMED",
+      "supports": "query report lifecycle, split segments, backend query versus ROV/FSI counters, and selectable accuracy modes"
+    },
+    {
+      "commit": "9781a75a22ba789124d7f34c6bdb4a85c78b2532",
+      "date": "2026-06-29T08:41:47+01:00",
+      "subject": "[GPU] Avoid stale texture state after invalidation",
+      "rationale_status": "CONFIRMED",
+      "supports": "texture validity is rechecked before establishing a memory watch"
+    },
+    {
+      "commit": "d119505289d540f61ae3d4ba6168f1145625277a",
+      "date": "2026-06-30T20:40:19-07:00",
+      "subject": "[GPU] Texture integer scaling fetches; 8_8_8_8_GAMMA resolve",
+      "rationale_status": "CONFIRMED",
+      "supports": "CPU-computed fixed-format scale and piecewise-linear gamma presentation path"
+    },
+    {
+      "commit": "a635ac64f5ca37c0b789e8b4166b53dc673b213f",
+      "date": "2026-07-06T20:12:52-07:00",
+      "subject": "[GPU] Scaled resolve readback through downscale CS",
+      "rationale_status": "CONFIRMED",
+      "supports": "scaled-resolve downsampling before guest-memory readback"
+    },
+    {
+      "commit": "aed81ca93a1f3e8dd043107babd33438379f379d",
+      "date": "2026-08-01T14:30:00-07:00",
+      "subject": "[Memory] Rework guest access resolution and unwatched invalidation",
+      "rationale_status": "CONFIRMED",
+      "supports": "memory invalidation behavior"
+    },
+    {
+      "commit": "437a7280cf95310d518a2f68087aab61403956ac",
+      "date": "2026-08-07T03:46:04Z",
+      "subject": "[GPU] Use EDRAM layout with a single sample addressing scheme",
+      "rationale_status": "CONFIRMED",
+      "supports": "a single EDRAM sample-addressing convention across paths"
+    },
+    {
+      "commit": "3eab2b8b39442e32537610c955fbb8db0c2a6561",
+      "date": "2026-08-08T09:43:00-07:00",
+      "subject": "[GPU] Handle tessellated triangle strip and fan draws",
+      "rationale_status": "CONFIRMED",
+      "supports": "normalizing tessellated strip and fan topology to triangle lists"
+    },
+    {
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "date": "2026-08-28T20:19:01-07:00",
+      "subject": "[GPU] Replace AC6 ground hack with scalar approximation rounding",
+      "rationale_status": "CONFIRMED",
+      "supports": "replacement of a title-specific workaround by a scalar approximation rounding model; exact hardware precision remains explicitly unconfirmed"
+    }
+  ],
+  "static_counts": {
+    "source_scope_counts_are_independent_and_overlap": true,
+    "gpu_tree_files": 297,
+    "d3d12_backend_files": 23,
+    "vulkan_backend_files": 23,
+    "gpu_shader_tree_files": 161,
+    "ui_tree_files": 149,
+    "d3d12_ui_files": 19,
+    "vulkan_ui_files": 42,
+    "xboxkrnl_tree_files": 38,
+    "key_files": 54,
+    "history_commits": 8,
+    "available_history_commits": 200
+  }
+}

@@ -13,6 +13,12 @@ into the active DLL.
 It does not modify or execute G2A, add instrumentation, compare behavior with
 Canary, play the title, or change any runtime/build/package behavior.
 
+G1.5B independently reconstructs the exact pinned Canary GPU implementation,
+including its common Xenos model, D3D12 and Vulkan backends, presenter, primary
+history available in the clone, configuration, incomplete behavior and static
+unknowns. It does not compare with ReXGlue, infer Fable II use, run a title, or
+change any reference/runtime/build/package behavior.
+
 ## Repository relationship
 
 | Role | Branch | Commit | Tree | State at audit start |
@@ -125,12 +131,39 @@ The SDK build cache has `REXGLUE_USE_D3D12=ON` and
 plugin loaded and a Direct3D 12 device was created on
 `NVIDIA GeForce RTX 5080`; G1.5A did not start a new title run.
 
-## Later comparison pin
+## Xenia Canary reference pin
 
-Xenia Canary is pinned, not analysed, at repository
+G1.5A pinned Xenia Canary at repository
 `https://github.com/xenia-canary/xenia-canary.git`, branch
 `canary_experimental`, commit
 `3a44f20c7bc66db1da583e8a6f0ab740e31908e9`, tree
 `c343b0a5796590fadc3b78c993bfada51e7e9148`, dated
-`2026-08-28T20:19:01-07:00`. The local reference clone was clean. This identity
-is reserved for G1.5B-D; no behavior is imported or preferred here.
+`2026-08-28T20:19:01-07:00`. G1.5B verified rather than advanced that pin.
+
+| Identity | Verified value |
+|---|---|
+| Local clone | `C:\Dev\Fable2NativeRendererResearch\xenia-canary` |
+| Remote | `https://github.com/xenia-canary/xenia-canary.git` |
+| Branch/upstream | `canary_experimental` / `origin/canary_experimental`; ahead `0`, behind `0` |
+| Commit / tree | `3a44f20c7bc66db1da583e8a6f0ab740e31908e9` / `c343b0a5796590fadc3b78c993bfada51e7e9148` |
+| Parent | `22708301ba76d10aae6f7d7caac8b1cac9e4a8e6` |
+| Author / committer date | `2026-08-28T20:19:01-07:00` / `2026-08-31T22:07:04+02:00` |
+| Subject | `[GPU] Replace AC6 ground hack with scalar approximation rounding` |
+| State | clean; HEAD exactly equals the pin |
+| Licence | BSD-3-Clause; `LICENSE` SHA-256 `3D58F25C15634B6EC01D1F133EF798209AE06626AB8D2227B6223D5A9F5113F4` |
+| History availability | shallow clone, 200 commits; boundary `049a55f03679b204379b17996bd032ce54bff156` |
+
+The reference clone has no applicable `AGENTS.md`. No fetch, reset, checkout,
+source edit, build, or execution was performed. The shallow boundary limits
+older historical rationale; it does not weaken the exact source identity at
+the pin.
+
+## G1.5B starting repository state
+
+G1.5B started on `fable2-native-renderer-g1.5-reference` at accepted G1.5A
+ending commit `a0d663fc600f74df8e7e87dcf7f18776e23339c9`, tree
+`a622e93e586be117a9be0ba9b6554ef3a099636c`, with a clean worktree. The
+ReXGlue SDK remained at
+`956c6a8b5da4c54b9899a2593e9c67c26de30194`; its pre-existing
+`thirdparty/libmspack` materialization was preserved. Paused G2A remained only
+read context at `47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51`.

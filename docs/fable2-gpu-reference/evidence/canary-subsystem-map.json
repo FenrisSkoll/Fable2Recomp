@@ -1,0 +1,1065 @@
+{
+  "$schema": "../../../tools/schemas/fable2-gpu-canary-subsystem-map-v1.schema.json",
+  "schema_version": "1.0.0",
+  "corpus": "Fable II Native Renderer G1.5B",
+  "pinned_canary_commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+  "confidence_vocabulary": [
+    "CONFIRMED",
+    "PROBABLE",
+    "UNKNOWN",
+    "NOT APPLICABLE"
+  ],
+  "subsystems": [
+    {
+      "id": "initialization",
+      "title": "GPU initialization, ownership, memory, interrupts, and shutdown",
+      "coverage": "FULL",
+      "inputs": [
+        "gpu backend cvar",
+        "Emulator-owned Memory, Processor, and KernelState",
+        "host window and graphics-provider capabilities"
+      ],
+      "persistent_state": [
+        "GraphicsSystem owns GraphicsProvider, Presenter, RegisterFile, CommandProcessor, interrupt callback state, and vblank thread",
+        "Emulator owns GraphicsSystem and the other top-level systems"
+      ],
+      "outputs": [
+        "selected D3D12, Vulkan, or null GraphicsSystem",
+        "GPU MMIO mapping",
+        "running command and frame-limiter threads"
+      ],
+      "xenos_model": "The register file, command processor, ring MMIO, and interrupt callback model the console GPU-facing contract.",
+      "host_compensation": "Provider selection, presenter creation, host device capability checks, and the host frame-limiter thread adapt that contract to host APIs.",
+      "shared_vs_backend": "GraphicsSystem owns shared lifecycle; D3D12GraphicsSystem and VulkanGraphicsSystem create the provider and backend command processor.",
+      "configuration": [
+        "gpu selects any, d3d12, vulkan, or null",
+        "any tries D3D12 before Vulkan on Windows",
+        "provider capability checks may reject a backend"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/app/xenia_main.cc",
+          "type": "function",
+          "symbol": "EmulatorApp::CreateGraphicsSystem",
+          "confidence": "CONFIRMED",
+          "role": "selects and constructs the graphics implementation"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/emulator.cc",
+          "type": "function",
+          "symbol": "Emulator::Setup",
+          "confidence": "CONFIRMED",
+          "role": "establishes system setup and shader-storage initialization"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/graphics_system.cc",
+          "type": "function",
+          "symbol": "GraphicsSystem::Setup",
+          "confidence": "CONFIRMED",
+          "role": "creates presenter, command processor, MMIO mapping, and limiter"
+        }
+      ],
+      "unresolved": [
+        "Static inspection cannot prove which backend or adapter a particular execution selects."
+      ]
+    },
+    {
+      "id": "command_processor",
+      "title": "Ring buffer, PM4 packets, waits, events, interrupts, and swaps",
+      "coverage": "FULL",
+      "inputs": [
+        "guest ring write pointer updates",
+        "primary and indirect physical ring buffers",
+        "type 0, 1, 2, and 3 PM4 packets"
+      ],
+      "persistent_state": [
+        "ring base, size, read and write pointers",
+        "GPU command XHostThread and queued host callbacks",
+        "bin mask/select predication state and active shaders"
+      ],
+      "outputs": [
+        "register writes",
+        "draw, copy, resolve, query, interrupt, coherency, and swap operations",
+        "ring read-pointer writeback"
+      ],
+      "xenos_model": "Packet parsing, ring and indirect-buffer traversal, waits, events, interrupts, and PM4 operation dispatch model the guest command stream.",
+      "host_compensation": "The worker event loop, host sleeps while waiting, queued host functions, and backend Issue methods provide executable host scheduling.",
+      "shared_vs_backend": "PM4 decoding is template-shared; IssueDraw, IssueCopy, IssueSwap, LoadShader, and synchronization are backend implementations.",
+      "configuration": [
+        "vsync influences wait sleeping",
+        "gpu_allow_invalid_fetch_constants changes invalid fetch handling",
+        "predicated swaps are deliberately skipped"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/kernel/xboxkrnl/xboxkrnl_video.cc",
+          "type": "function",
+          "symbol": "VdSwap_entry",
+          "confidence": "CONFIRMED",
+          "role": "constructs the XE_SWAP packet in the guest ring"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/command_processor.cc",
+          "type": "function",
+          "symbol": "CommandProcessor::WorkerThreadMain",
+          "confidence": "CONFIRMED",
+          "role": "runs the command worker and drains the ring"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+          "type": "function",
+          "symbol": "COMMAND_PROCESSOR::ExecutePacket",
+          "confidence": "CONFIRMED",
+          "role": "decodes PM4 packet types and dispatches type 3 opcodes"
+        }
+      ],
+      "unresolved": [
+        "Static source cannot establish the packet mix or wait conditions produced by any title.",
+        "INVALIDATE_STATE has no implemented cache action at this revision."
+      ]
+    },
+    {
+      "id": "register_state",
+      "title": "Register definitions, writes, dirty state, coherency, and triggers",
+      "coverage": "FULL",
+      "inputs": [
+        "type 0 and type 1 packet writes",
+        "type 3 SET_* register packets",
+        "kernel-created fetch and swap state"
+      ],
+      "persistent_state": [
+        "0x5003-dword RegisterFile with generated metadata and reset defaults",
+        "backend constant-buffer and texture-fetch binding validity"
+      ],
+      "outputs": [
+        "draw-time Xenos state",
+        "scratch writebacks and interrupts",
+        "backend binding invalidation"
+      ],
+      "xenos_model": "Register storage, reset values, scratch behavior, gamma writes, and COHER status represent guest-visible GPU state.",
+      "host_compensation": "Backend-specific WriteRegister paths invalidate host-side constant and texture bindings so lazily assembled host state is refreshed.",
+      "shared_vs_backend": "Common storage and side effects are shared; D3D12 and Vulkan add different binding invalidation.",
+      "configuration": [
+        "no global universal dirty bit exists",
+        "COHER_STATUS_HOST clears status and calls MakeCoherent"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/register_file.cc",
+          "type": "function",
+          "symbol": "RegisterFile::RegisterFile",
+          "confidence": "CONFIRMED",
+          "role": "initializes the register file and defaults"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/command_processor.cc",
+          "type": "function",
+          "symbol": "CommandProcessor::WriteRegister",
+          "confidence": "CONFIRMED",
+          "role": "applies common write side effects"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/command_processor.cc",
+          "type": "function",
+          "symbol": "CommandProcessor::MakeCoherent",
+          "confidence": "CONFIRMED",
+          "role": "handles the guest coherency trigger"
+        }
+      ],
+      "unresolved": [
+        "MakeCoherent contains a TODO to notify resource caches, so full hardware coherency semantics are not implemented."
+      ]
+    },
+    {
+      "id": "draw_queries",
+      "title": "Draw initiation, primitive processing, predication, and queries",
+      "coverage": "FULL",
+      "inputs": [
+        "DRAW_INDX and DRAW_INDX_2 packet payloads",
+        "register file and active vertex/pixel shaders",
+        "guest index data and query packets"
+      ],
+      "persistent_state": [
+        "primitive-conversion cache and memory watches",
+        "draw extent estimator state",
+        "query report lifecycle and backend query objects"
+      ],
+      "outputs": [
+        "copy/resolve operation or host draw",
+        "converted indices and normalized topology",
+        "occlusion report data"
+      ],
+      "xenos_model": "Initiator fields, primitive restart, index endian, tessellation cases, report events, and query semantics decode guest behavior.",
+      "host_compensation": "Unsupported host topologies are converted; point and rectangle cases can be expanded in shaders; host queries or shader counters approximate visibility.",
+      "shared_vs_backend": "PM4 draw parsing, primitive processing, draw extents, and ZPD lifecycle are shared; host draw and query mechanisms are backend-specific.",
+      "configuration": [
+        "occlusion_query selects fake, fast, fast-alt, or strict behavior",
+        "draw extent estimation may CPU-interpret the vertex shader and otherwise falls back",
+        "VIZ_QUERY returns a fake visible result and is not full host conditional rendering"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+          "type": "function",
+          "symbol": "COMMAND_PROCESSOR::ExecutePacketType3Draw",
+          "confidence": "CONFIRMED",
+          "role": "decodes draw packet payloads and invokes IssueDraw"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/primitive_processor.cc",
+          "type": "function",
+          "symbol": "PrimitiveProcessor::Process",
+          "confidence": "CONFIRMED",
+          "role": "selects and performs primitive/index conversion"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/draw_extent_estimator.cc",
+          "type": "function",
+          "symbol": "DrawExtentEstimator::Estimate",
+          "confidence": "CONFIRMED",
+          "role": "estimates the affected draw extent"
+        }
+      ],
+      "unresolved": [
+        "The exact accuracy of every occlusion mode is configuration- and workload-dependent."
+      ]
+    },
+    {
+      "id": "vertex_fetch",
+      "title": "Vertex fetch, index formats, endian, and primitive conversion",
+      "coverage": "FULL",
+      "inputs": [
+        "vertex fetch instructions and fetch constants",
+        "index buffer address, size, format, endian, and reset state",
+        "primitive and tessellation mode"
+      ],
+      "persistent_state": [
+        "shader vertex-binding metadata",
+        "primitive conversion and converted-index cache entries"
+      ],
+      "outputs": [
+        "shared-memory vertex and index ranges",
+        "host-shader fetch operations",
+        "converted host topology and index buffer"
+      ],
+      "xenos_model": "Fetch formats, endian transforms, primitive reset, 24-bit index behavior, and tessellation input are decoded from guest state.",
+      "host_compensation": "Translated shaders perform vertex fetches from shared memory, and the primitive processor converts unsupported host topologies.",
+      "shared_vs_backend": "Analysis and conversion policy are shared; translated DXBC/SPIR-V and backend buffer binding execute the fetch.",
+      "configuration": [
+        "primitive conversion is selected by topology and backend features",
+        "converted index data is invalidated by guest-memory writes"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/shader_translator.cc",
+          "type": "function",
+          "symbol": "Shader::AnalyzeUcode",
+          "confidence": "CONFIRMED",
+          "role": "discovers vertex fetch bindings"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/primitive_processor.h",
+          "type": "type",
+          "symbol": "struct ProcessingResult",
+          "confidence": "CONFIRMED",
+          "role": "carries normalized host primitive and index results"
+        }
+      ],
+      "unresolved": [
+        "Static inspection does not determine which conversion paths are exercised by a workload."
+      ]
+    },
+    {
+      "id": "textures_samplers",
+      "title": "Textures, fetch constants, formats, tiling, cache, and samplers",
+      "coverage": "FULL",
+      "inputs": [
+        "texture fetch constants and shader fetch instructions",
+        "guest tiled texture and mip data",
+        "sampler overrides and host capability limits"
+      ],
+      "persistent_state": [
+        "TextureKey-indexed texture map, MRU lists, watches, and signed/unsigned variants",
+        "backend image/resource state and sampler caches"
+      ],
+      "outputs": [
+        "uploaded and converted host textures",
+        "descriptor/image bindings",
+        "normalized backend sampler state"
+      ],
+      "xenos_model": "Fetch constant dimensions, pitches, tiled addresses, formats, endian, swizzles, signs, mips, and sampler fields are interpreted as guest state.",
+      "host_compensation": "Compute/copy upload paths untile and convert formats, residency budgets evict host resources, and capability-dependent sampler normalization maps to host APIs.",
+      "shared_vs_backend": "Texture identity, layout, watch logic, and sampler preparation are shared; uploads, views, barriers, descriptors, and concrete samplers are backend-specific.",
+      "configuration": [
+        "texture_cache_memory_limit_soft and texture_cache_memory_limit_hard drive eviction",
+        "anisotropic filtering override changes sampler behavior",
+        "3D-as-2D and invalid-fetch options are compatibility branches",
+        "draw resolution scale changes texture scaling relationships"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/texture_cache.cc",
+          "type": "function",
+          "symbol": "TextureCache::BindingInfoFromFetchConstant",
+          "confidence": "CONFIRMED",
+          "role": "forms binding identity from guest fetch state"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/texture_util.cc",
+          "type": "function",
+          "symbol": "GetGuestTextureLayout",
+          "confidence": "CONFIRMED",
+          "role": "calculates guest texture layout"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/sampler_info.cc",
+          "type": "function",
+          "symbol": "SamplerInfo::Prepare",
+          "confidence": "CONFIRMED",
+          "role": "combines fetch and instruction sampler state"
+        }
+      ],
+      "unresolved": [
+        "Actual residency pressure, alias frequency, and capability-selected upload paths require runtime evidence."
+      ]
+    },
+    {
+      "id": "render_targets",
+      "title": "Render targets, EDRAM, MSAA, resolves, copies, clears, and aliasing",
+      "coverage": "FULL",
+      "inputs": [
+        "RB_MODECONTROL copy or color/depth state",
+        "EDRAM base, pitch, format, MSAA, depth/stencil, and ownership ranges",
+        "resolve destination layout and clear requests"
+      ],
+      "persistent_state": [
+        "EDRAM buffer or host render-target resources",
+        "EDRAM range ownership map and transfer state",
+        "scaled-resolve storage and readback state"
+      ],
+      "outputs": [
+        "host render-target bindings or shader-interlock EDRAM access",
+        "resolved guest texture data",
+        "cleared or transferred EDRAM ranges"
+      ],
+      "xenos_model": "EDRAM sample addressing, MSAA, color/depth formats, blending, depth/stencil, resolve, copy, clear, and range aliasing represent Xenos behavior.",
+      "host_compensation": "Host-render-target mode approximates fixed-function output merging; ROV or fragment-shader-interlock paths implement manual EDRAM operations; compute paths convert and downscale resolves.",
+      "shared_vs_backend": "draw_util and RenderTargetCache share resolve/state/ownership policy; D3D12 and Vulkan implement resources, render passes, shaders, transfers, and barriers.",
+      "configuration": [
+        "render_target_path_d3d12 selects host RTV or ROV with capability fallback",
+        "render_target_path_vulkan selects FBO or fragment shader interlock with capability fallback",
+        "readback_resolve governs guest-memory visibility",
+        "draw resolution scale selects scaled EDRAM and resolve storage"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/draw_util.cc",
+          "type": "function",
+          "symbol": "GetResolveInfo",
+          "confidence": "CONFIRMED",
+          "role": "decodes copy/resolve state"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/render_target_cache.cc",
+          "type": "function",
+          "symbol": "RenderTargetCache::Update",
+          "confidence": "CONFIRMED",
+          "role": "assembles targets and ownership for a draw"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/render_target_cache.cc",
+          "type": "function",
+          "symbol": "RenderTargetCache::ChangeOwnership",
+          "confidence": "CONFIRMED",
+          "role": "transfers aliased EDRAM ranges"
+        }
+      ],
+      "unresolved": [
+        "The host-render-target path is explicitly approximate for cases that host fixed-function output merging cannot express exactly.",
+        "Runtime capability selection is unknown without a host device."
+      ]
+    },
+    {
+      "id": "shader_translation",
+      "title": "Xenos shader loading, analysis, translation, and host compilation",
+      "coverage": "FULL",
+      "inputs": [
+        "guest shader physical address and dword count",
+        "Xenos control-flow, ALU, vertex-fetch, texture-fetch, and memory-export instructions",
+        "translation modification and backend feature options"
+      ],
+      "persistent_state": [
+        "XXH3-keyed Shader objects containing copied ucode",
+        "per-modification Translation objects",
+        "backend shader storage and translated binary"
+      ],
+      "outputs": [
+        "analyzed resource and constant bindings",
+        "DXBC or SPIR-V host shader",
+        "translation errors and diagnostic disassembly"
+      ],
+      "xenos_model": "Control flow, constants, fetches, kills, exports, and memory export are decoded from Xenos ucode.",
+      "host_compensation": "Backend translators generate DXBC or SPIR-V with resource-layout, output-merger, feature, and host precision modifications.",
+      "shared_vs_backend": "Shader ownership and ucode analysis are shared; DxbcShaderTranslator and SpirvShaderTranslator emit backend-specific binaries.",
+      "configuration": [
+        "d3d12_bindless and render-target path alter bindings and shader modifications",
+        "Vulkan capabilities alter SPIR-V version, float controls, interlock, and demote use",
+        "shader dump and error cvars affect diagnostics, not guest semantics"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/shader_translator.cc",
+          "type": "function",
+          "symbol": "Shader::AnalyzeUcode",
+          "confidence": "CONFIRMED",
+          "role": "builds the shared analysis"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/dxbc_shader_translator.cc",
+          "type": "function",
+          "symbol": "DxbcShaderTranslator::StartTranslation",
+          "confidence": "CONFIRMED",
+          "role": "emits DXBC"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/spirv_shader_translator.cc",
+          "type": "function",
+          "symbol": "SpirvShaderTranslator::StartTranslation",
+          "confidence": "CONFIRMED",
+          "role": "emits SPIR-V"
+        }
+      ],
+      "unresolved": [
+        "Several analyzer comments deliberately over-approximate effects; static inspection cannot establish hardware equivalence for every opcode and precision case."
+      ]
+    },
+    {
+      "id": "pipelines_caches",
+      "title": "Pipeline/state assembly, bindings, caches, specialization, and asynchronous compilation",
+      "coverage": "FULL",
+      "inputs": [
+        "translated shaders and primitive-processing result",
+        "register-derived rasterization, depth/stencil, blend, and render-target state",
+        "backend capabilities and persistent storage"
+      ],
+      "persistent_state": [
+        "shader hash maps and translation variants",
+        "pipeline-description caches and persistent storage",
+        "descriptor/root-signature layouts and asynchronous creation queues"
+      ],
+      "outputs": [
+        "bound host pipeline and descriptors",
+        "queued or compiled host pipeline",
+        "persistent shader and pipeline cache records"
+      ],
+      "xenos_model": "Pipeline keys derive from Xenos draw state and shader behavior.",
+      "host_compensation": "Root signatures or Vulkan descriptor layouts, host render-pass compatibility, specialization, persistent cache formats, and asynchronous compilation satisfy host API constraints.",
+      "shared_vs_backend": "Shader analysis and draw-derived inputs are shared; pipeline keys, layouts, compiler output, and native caches are backend-specific.",
+      "configuration": [
+        "async_shader_compilation and creation-thread counts change scheduling",
+        "bindless versus bindful D3D12 changes root-signature and descriptor layouts",
+        "backend render-target paths specialize shaders and pipelines",
+        "persistent cache validity includes title and relevant configuration identity"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/d3d12/pipeline_cache.cc",
+          "type": "function",
+          "symbol": "PipelineCache::ConfigurePipeline",
+          "confidence": "CONFIRMED",
+          "role": "looks up or creates D3D12 pipeline state"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/vulkan/vulkan_pipeline_cache.cc",
+          "type": "function",
+          "symbol": "VulkanPipelineCache::ConfigurePipeline",
+          "confidence": "CONFIRMED",
+          "role": "looks up or creates Vulkan pipeline state"
+        }
+      ],
+      "unresolved": [
+        "Runtime cache hit rates and driver compilation behavior cannot be established statically.",
+        "A startup source comment says draws may be skipped before shader storage is ready; exact occurrence requires runtime evidence."
+      ]
+    },
+    {
+      "id": "memory_sync",
+      "title": "Guest/shared memory, watches, barriers, queues, fences, and frame synchronization",
+      "coverage": "FULL",
+      "inputs": [
+        "guest physical memory reads and writes",
+        "draw, texture, resolve, memexport, and index-range requests",
+        "backend submission and completion events"
+      ],
+      "persistent_state": [
+        "512 MiB shared-memory mirror with per-page validity and GPU-written bitmaps",
+        "global and range memory watches",
+        "backend sparse mappings, resource states, submissions, fences, and retired resources"
+      ],
+      "outputs": [
+        "uploaded guest ranges",
+        "invalidated caches and CPU-visible GPU-written data",
+        "ordered host queue submissions and completed-lifetime retirement"
+      ],
+      "xenos_model": "Physical-address ranges, guest invalidation, GPU writes, and coherency signals model shared guest memory.",
+      "host_compensation": "Sparse or committed host buffers, explicit D3D12 transitions, Vulkan barriers/layouts, fences, semaphores, and retirement queues satisfy host APIs.",
+      "shared_vs_backend": "Validity/watch policy is shared; allocation, upload/download, barriers, queue submission, and completion primitives are backend-specific.",
+      "configuration": [
+        "tiled_shared_memory and vulkan_sparse_shared_memory select sparse mapping when supported",
+        "readback_memexport and readback_resolve alter CPU visibility",
+        "frames-in-flight and presenter ownership affect retirement timing"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/shared_memory.cc",
+          "type": "function",
+          "symbol": "SharedMemory::RequestRange",
+          "confidence": "CONFIRMED",
+          "role": "ensures requested guest pages are present in the host mirror"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/shared_memory.cc",
+          "type": "function",
+          "symbol": "SharedMemory::RangeWrittenByGpu",
+          "confidence": "CONFIRMED",
+          "role": "records GPU ownership and fires watches"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/ui/gpu_completion_timeline.h",
+          "type": "type",
+          "symbol": "GPUCompletionTimeline",
+          "confidence": "CONFIRMED",
+          "role": "defines host completion semantics"
+        }
+      ],
+      "unresolved": [
+        "The common MakeCoherent resource-cache notification is incomplete.",
+        "Static inspection cannot measure synchronization stalls or establish device-specific barrier behavior."
+      ]
+    },
+    {
+      "id": "backend_split",
+      "title": "Shared architecture and D3D12/Vulkan backend boundary",
+      "coverage": "FULL",
+      "inputs": [
+        "shared PM4 operations and analyzed state",
+        "host graphics provider and device capabilities"
+      ],
+      "persistent_state": [
+        "backend command processor, pipeline, texture, render-target, and shared-memory objects",
+        "backend provider, presenter, descriptor pools/heaps, queues, and completion state"
+      ],
+      "outputs": [
+        "D3D12 command lists and direct-queue work",
+        "Vulkan command buffers and queue submissions"
+      ],
+      "xenos_model": "Shared command decoding, register interpretation, shader analysis, texture layout, primitive processing, and render-target policy retain the guest-facing model.",
+      "host_compensation": "Each backend maps that model into its API's resources, descriptors, render passes, barriers, pipelines, queues, and presentation objects.",
+      "shared_vs_backend": "The boundary is explicit at GraphicsSystem and CommandProcessor subclasses plus backend cache implementations; Presenter and GraphicsProvider also have shared bases.",
+      "configuration": [
+        "D3D12 is Windows-only in the factory selection shown",
+        "Vulkan feature and extension availability controls sparse memory, interlock, float controls, and presentation",
+        "null is a command-processing fallback with no host rendering"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+          "type": "function",
+          "symbol": "D3D12CommandProcessor::IssueDraw",
+          "confidence": "CONFIRMED",
+          "role": "D3D12 backend draw boundary"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/vulkan/vulkan_command_processor.cc",
+          "type": "function",
+          "symbol": "VulkanCommandProcessor::IssueDraw",
+          "confidence": "CONFIRMED",
+          "role": "Vulkan backend draw boundary"
+        }
+      ],
+      "unresolved": [
+        "Static inspection cannot determine backend equivalence on any specific driver or device."
+      ]
+    },
+    {
+      "id": "presentation",
+      "title": "Swap, guest output, presentation, pacing, resize, capture, and shutdown",
+      "coverage": "FULL",
+      "inputs": [
+        "XE_SWAP packet and front-buffer fetch constant",
+        "backend swap texture and gamma state",
+        "host window resize and surface status"
+      ],
+      "persistent_state": [
+        "Presenter three-entry guest-output mailbox",
+        "D3D12 or Vulkan swapchain images",
+        "backend semaphores/fences and UI composition state"
+      ],
+      "outputs": [
+        "refreshed guest-output image",
+        "composited and presented host image",
+        "optional architecturally relevant capture readback"
+      ],
+      "xenos_model": "VdSwap builds the guest GPU swap command and front-buffer fetch state.",
+      "host_compensation": "Gamma/post-processing, low-latency mailbox replacement, UI composition, swapchain acquire/resize/present, tearing or present-mode choices, and capture readback are host services.",
+      "shared_vs_backend": "Presenter schedules and composes shared UI work; backends refresh guest output and own swapchain mechanics.",
+      "configuration": [
+        "D3D12 uses a three-buffer flip-discard chain and optional tearing",
+        "Vulkan chooses immediate, mailbox, FIFO relaxed, then FIFO by availability/configuration",
+        "GPU-thread versus UI-thread paint depends on presenter state",
+        "frame limiting and vblank emulation are separate from host Present"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/ui/presenter.cc",
+          "type": "function",
+          "symbol": "Presenter::RefreshGuestOutput",
+          "confidence": "CONFIRMED",
+          "role": "refreshes and publishes a guest output"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/ui/d3d12/d3d12_presenter.cc",
+          "type": "function",
+          "symbol": "D3D12Presenter::PaintAndPresentImpl",
+          "confidence": "CONFIRMED",
+          "role": "records and presents D3D12 output"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/ui/vulkan/vulkan_presenter.cc",
+          "type": "function",
+          "symbol": "VulkanPresenter::PaintAndPresentImpl",
+          "confidence": "CONFIRMED",
+          "role": "acquires, records, submits, and presents Vulkan output"
+        }
+      ],
+      "unresolved": [
+        "Runtime pacing, resize races, surface mode, and present latency are device/window-system dependent."
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "title": "Diagnostics, unsupported behavior, fallbacks, device loss, and TODOs",
+      "coverage": "FULL",
+      "inputs": [
+        "invalid or unsupported guest packets and state",
+        "translation and pipeline failures",
+        "host capability and device-loss results"
+      ],
+      "persistent_state": [
+        "trace and dump configuration",
+        "failure flags and backend capability selections"
+      ],
+      "outputs": [
+        "assertions, warnings, logs, dumps, fallback paths, skipped work, or fatal termination"
+      ],
+      "xenos_model": "Validation identifies malformed guest packets, unsupported modes, and unimplemented hardware behavior.",
+      "host_compensation": "Capability fallback, diagnostic dumps, permissive invalid-fetch options, and fatal host device-loss handling govern host survivability.",
+      "shared_vs_backend": "Packet validation and many debug controls are shared; capability fallback and device-loss reporting are backend-specific.",
+      "configuration": [
+        "invalid fetch constants may be allowed",
+        "invalid upload ranges are rejected by default but may be allowed",
+        "shader, register, command, and texture logging/dumping are diagnostics",
+        "device loss is fatal; recreation is a TODO"
+      ],
+      "symbols": [
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/graphics_system.cc",
+          "type": "function",
+          "symbol": "GraphicsSystem::OnHostGpuLoss",
+          "confidence": "CONFIRMED",
+          "role": "handles host GPU loss as fatal"
+        },
+        {
+          "repository": "canary",
+          "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+          "path": "src/xenia/gpu/pm4_command_processor_implement.h",
+          "type": "function",
+          "symbol": "COMMAND_PROCESSOR::ExecutePacketType3_INVALIDATE_STATE",
+          "confidence": "CONFIRMED",
+          "role": "records the currently unimplemented state-invalidation packet"
+        }
+      ],
+      "unresolved": [
+        "A static audit cannot enumerate all driver-specific failures or demonstrate fallback correctness.",
+        "Unsupported and TODO-marked behavior is documented but not experimentally classified."
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "initialization",
+      "to": "command_processor",
+      "kind": "constructs and starts",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "Emulator::Setup",
+        "GraphicsSystem::Setup",
+        "D3D12GraphicsSystem::CreateCommandProcessor or VulkanGraphicsSystem::CreateCommandProcessor",
+        "CommandProcessor::Initialize",
+        "CommandProcessor::WorkerThreadMain"
+      ]
+    },
+    {
+      "from": "command_processor",
+      "to": "register_state",
+      "kind": "packet writes",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "COMMAND_PROCESSOR::ExecutePacket",
+        "COMMAND_PROCESSOR::ExecutePacketType0 or ExecutePacketType1 or SET_*",
+        "CommandProcessor::WriteRegister"
+      ]
+    },
+    {
+      "from": "command_processor",
+      "to": "draw_queries",
+      "kind": "draw dispatch",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "COMMAND_PROCESSOR::ExecutePacket",
+        "COMMAND_PROCESSOR::ExecutePacketType3Draw",
+        "D3D12CommandProcessor::IssueDraw or VulkanCommandProcessor::IssueDraw"
+      ]
+    },
+    {
+      "from": "draw_queries",
+      "to": "vertex_fetch",
+      "kind": "primitive and index preparation",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "D3D12CommandProcessor::IssueDraw or VulkanCommandProcessor::IssueDraw",
+        "PrimitiveProcessor::Process",
+        "PrimitiveProcessor::GetConversionResult"
+      ]
+    },
+    {
+      "from": "draw_queries",
+      "to": "shader_translation",
+      "kind": "active shader analysis and translation",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "IM_LOAD or IM_LOAD_IMMEDIATE",
+        "PipelineCache::LoadShader or VulkanPipelineCache::LoadShader",
+        "Shader::AnalyzeUcode",
+        "ShaderTranslator::TranslateAnalyzedShader using DxbcShaderTranslator or SpirvShaderTranslator"
+      ]
+    },
+    {
+      "from": "draw_queries",
+      "to": "render_targets",
+      "kind": "render-target or copy preparation",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "D3D12CommandProcessor::IssueDraw or VulkanCommandProcessor::IssueDraw",
+        "IssueCopy when RB_MODECONTROL is copy",
+        "GetResolveInfo and backend Resolve; otherwise RenderTargetCache::Update"
+      ]
+    },
+    {
+      "from": "shader_translation",
+      "to": "textures_samplers",
+      "kind": "resource binding requirements",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "Shader::AnalyzeUcode",
+        "Shader::texture_bindings and vertex_bindings",
+        "D3D12TextureCache::RequestTextures or VulkanTextureCache::RequestTextures"
+      ]
+    },
+    {
+      "from": "shader_translation",
+      "to": "pipelines_caches",
+      "kind": "translated shader input",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "Shader translation",
+        "PipelineCache::ConfigurePipeline or VulkanPipelineCache::ConfigurePipeline",
+        "host pipeline creation"
+      ]
+    },
+    {
+      "from": "register_state",
+      "to": "pipelines_caches",
+      "kind": "draw-time state assembly",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "CommandProcessor::WriteRegister",
+        "backend IssueDraw",
+        "backend ConfigurePipeline",
+        "backend constant and descriptor updates"
+      ]
+    },
+    {
+      "from": "textures_samplers",
+      "to": "memory_sync",
+      "kind": "guest range upload and invalidation",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "TextureCache request",
+        "SharedMemory::RequestRange",
+        "D3D12SharedMemory::UploadRanges or VulkanSharedMemory::UploadRanges",
+        "Memory watch invalidation"
+      ]
+    },
+    {
+      "from": "render_targets",
+      "to": "memory_sync",
+      "kind": "EDRAM transfer, resolve, and readback ordering",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "backend RenderTargetCache::Resolve",
+        "SharedMemory::RangeWrittenByGpu",
+        "backend barriers and submission completion"
+      ]
+    },
+    {
+      "from": "pipelines_caches",
+      "to": "backend_split",
+      "kind": "host API execution",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "backend ConfigurePipeline",
+        "backend descriptor and resource binding",
+        "DrawInstanced or DrawIndexedInstanced; CmdVkDraw or CmdVkDrawIndexed"
+      ]
+    },
+    {
+      "from": "command_processor",
+      "to": "presentation",
+      "kind": "swap dispatch",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "VdSwap_entry",
+        "COMMAND_PROCESSOR::ExecutePacketType3_XE_SWAP",
+        "backend IssueSwap",
+        "backend TextureCache::RequestSwapTexture",
+        "Presenter::RefreshGuestOutput",
+        "Presenter::PaintAndPresent",
+        "backend PaintAndPresentImpl"
+      ]
+    },
+    {
+      "from": "memory_sync",
+      "to": "presentation",
+      "kind": "submission completion and guest-output ownership",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "backend IssueSwap",
+        "backend EndSubmission(true)",
+        "GPUCompletionTimeline",
+        "swapchain acquire, submit, and present"
+      ]
+    },
+    {
+      "from": "backend_split",
+      "to": "diagnostics",
+      "kind": "capability fallback and device failure",
+      "confidence": "CONFIRMED",
+      "call_chain": [
+        "provider/device capability selection",
+        "backend fallback or failure",
+        "GraphicsSystem::OnHostGpuLoss"
+      ]
+    }
+  ],
+  "configuration_branches": [
+    {
+      "name": "gpu",
+      "classification": "backend selection",
+      "values": ["any", "d3d12", "vulkan", "null"],
+      "path": "src/xenia/app/xenia_main.cc",
+      "symbol": "EmulatorApp::CreateGraphicsSystem"
+    },
+    {
+      "name": "render_target_path_d3d12",
+      "classification": "accuracy and capability",
+      "values": ["any", "rtv", "rov"],
+      "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+      "symbol": "D3D12CommandProcessor::SetupContext"
+    },
+    {
+      "name": "render_target_path_vulkan",
+      "classification": "accuracy and capability",
+      "values": ["any", "fbo", "fsi"],
+      "path": "src/xenia/gpu/vulkan/vulkan_command_processor.cc",
+      "symbol": "VulkanCommandProcessor::SetupContext"
+    },
+    {
+      "name": "occlusion_query",
+      "classification": "accuracy and performance",
+      "values": ["fake", "fast", "fast-alt", "strict"],
+      "path": "src/xenia/gpu/command_processor.cc",
+      "symbol": "GetZPDMode"
+    },
+    {
+      "name": "async_shader_compilation",
+      "classification": "performance and scheduling",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/gpu_flags.cc",
+      "symbol": "async_shader_compilation"
+    },
+    {
+      "name": "d3d12_bindless",
+      "classification": "capability and binding architecture",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/d3d12/d3d12_command_processor.cc",
+      "symbol": "d3d12_bindless"
+    },
+    {
+      "name": "tiled_shared_memory",
+      "classification": "resource strategy",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/d3d12/d3d12_shared_memory.cc",
+      "symbol": "tiled_shared_memory"
+    },
+    {
+      "name": "vulkan_sparse_shared_memory",
+      "classification": "resource strategy and capability",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/vulkan/vulkan_shared_memory.cc",
+      "symbol": "vulkan_sparse_shared_memory"
+    },
+    {
+      "name": "readback_resolve",
+      "classification": "accuracy and performance",
+      "values": ["none", "fast", "full"],
+      "path": "src/xenia/gpu/command_processor.cc",
+      "symbol": "readback_resolve"
+    },
+    {
+      "name": "readback_memexport",
+      "classification": "accuracy and performance",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/command_processor.cc",
+      "symbol": "readback_memexport"
+    },
+    {
+      "name": "draw_resolution_scale_x_y",
+      "classification": "enhancement and resource strategy",
+      "values": ["1 or higher integer scale"],
+      "path": "src/xenia/gpu/render_target_cache.cc",
+      "symbol": "draw_resolution_scale_x"
+    },
+    {
+      "name": "gpu_allow_invalid_fetch_constants",
+      "classification": "compatibility and validation",
+      "values": ["false", "true"],
+      "path": "src/xenia/gpu/texture_cache.cc",
+      "symbol": "gpu_allow_invalid_fetch_constants"
+    },
+    {
+      "name": "vsync_and_framerate_limit",
+      "classification": "pacing",
+      "values": ["disabled", "enabled or limited"],
+      "path": "src/xenia/gpu/graphics_system.cc",
+      "symbol": "framerate_limit"
+    },
+    {
+      "name": "present_modes",
+      "classification": "host presentation",
+      "values": ["tearing or synchronized D3D12", "immediate, mailbox, FIFO relaxed, or FIFO Vulkan"],
+      "path": "src/xenia/ui/vulkan/vulkan_presenter.cc",
+      "symbol": "VkPresentModeKHR"
+    }
+  ],
+  "unresolved_questions": [
+    {
+      "id": "runtime_backend",
+      "confidence": "UNKNOWN",
+      "question": "Which backend, adapter, capabilities, and configuration branches are selected in a concrete run?"
+    },
+    {
+      "id": "title_usage",
+      "confidence": "NOT APPLICABLE",
+      "question": "Which paths are used by Fable II is intentionally outside G1.5B."
+    },
+    {
+      "id": "hardware_equivalence",
+      "confidence": "UNKNOWN",
+      "question": "Which approximation, precision, query, resolve, and host-render-target behaviors exactly match Xenos hardware?"
+    },
+    {
+      "id": "history_before_shallow_boundary",
+      "confidence": "UNKNOWN",
+      "question": "Rationale predating 049a55f03679b204379b17996bd032ce54bff156 is unavailable in the pinned shallow clone."
+    },
+    {
+      "id": "external_pr_issue_provenance",
+      "confidence": "UNKNOWN",
+      "question": "No immutable PR or issue identity was accepted without primary linkage available from the pinned repository."
+    },
+    {
+      "id": "device_specific_behavior",
+      "confidence": "UNKNOWN",
+      "question": "Driver compilation, cache performance, synchronization cost, surface behavior, and device-loss paths need runtime evidence."
+    }
+  ]
+}

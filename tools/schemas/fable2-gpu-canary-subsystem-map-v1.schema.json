@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-canary-subsystem-map-v1.schema.json",
+  "title": "Fable II G1.5B pinned Xenia Canary subsystem map",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "pinned_canary_commit",
+    "confidence_vocabulary",
+    "subsystems",
+    "relationships",
+    "configuration_branches",
+    "unresolved_questions"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.5B" },
+    "pinned_canary_commit": { "pattern": "^[0-9a-f]{40}$" },
+    "confidence_vocabulary": {
+      "type": "array",
+      "const": ["CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE"]
+    },
+    "subsystems": {
+      "type": "array",
+      "minItems": 13,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "coverage",
+          "inputs",
+          "persistent_state",
+          "outputs",
+          "xenos_model",
+          "host_compensation",
+          "shared_vs_backend",
+          "configuration",
+          "symbols",
+          "unresolved"
+        ],
+        "properties": {
+          "coverage": { "enum": ["FULL", "PARTIAL", "NOT DOCUMENTED"] },
+          "symbols": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["repository", "commit", "path", "type", "symbol", "confidence", "role"],
+              "properties": {
+                "repository": { "const": "canary" },
+                "commit": { "pattern": "^[0-9a-f]{40}$" },
+                "confidence": {
+                  "enum": ["CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "minItems": 12,
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "kind", "confidence", "call_chain"],
+        "properties": {
+          "confidence": {
+            "enum": ["CONFIRMED", "PROBABLE", "UNKNOWN", "NOT APPLICABLE"]
+          },
+          "call_chain": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        }
+      }
+    },
+    "configuration_branches": { "type": "array", "minItems": 10 },
+    "unresolved_questions": { "type": "array" }
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.example/schemas/fable2-gpu-canary-source-inventory-v1.schema.json",
+  "title": "Fable II G1.5B pinned Xenia Canary source inventory",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "corpus",
+    "generated_on",
+    "fable_repository",
+    "canary_repository",
+    "source_scopes",
+    "key_files",
+    "history_evidence",
+    "static_counts"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "corpus": { "const": "Fable II Native Renderer G1.5B" },
+    "generated_on": { "type": "string", "format": "date" },
+    "fable_repository": { "$ref": "#/$defs/repository" },
+    "canary_repository": {
+      "allOf": [{ "$ref": "#/$defs/repository" }],
+      "required": [
+        "path",
+        "remote",
+        "branch",
+        "upstream",
+        "ahead",
+        "behind",
+        "commit",
+        "tree",
+        "parent",
+        "author_date",
+        "committer_date",
+        "status",
+        "license",
+        "license_sha256",
+        "is_shallow",
+        "available_commit_count"
+      ]
+    },
+    "source_scopes": {
+      "type": "array",
+      "minItems": 8,
+      "items": {
+        "type": "object",
+        "required": ["repository", "path", "git_object_sha1", "file_count", "role"]
+      }
+    },
+    "key_files": {
+      "type": "array",
+      "minItems": 40,
+      "items": {
+        "type": "object",
+        "required": ["repository", "path", "blob_sha1", "size", "role", "symbols"],
+        "properties": {
+          "repository": { "const": "canary" },
+          "path": { "type": "string" },
+          "blob_sha1": { "pattern": "^[0-9a-f]{40}$" },
+          "size": { "type": "integer" },
+          "role": { "type": "string" },
+          "symbols": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "history_evidence": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["commit", "date", "subject", "rationale_status", "supports"],
+        "properties": {
+          "commit": { "pattern": "^[0-9a-f]{40}$" },
+          "rationale_status": { "enum": ["CONFIRMED", "PROBABLE", "UNKNOWN"] }
+        }
+      }
+    },
+    "static_counts": { "type": "object" }
+  },
+  "$defs": {
+    "repository": {
+      "type": "object",
+      "required": ["path", "branch", "commit", "tree", "status"],
+      "properties": {
+        "commit": { "pattern": "^[0-9a-f]{40}$" },
+        "tree": { "pattern": "^[0-9a-f]{40}$" }
+      }
+    }
+  }
+}

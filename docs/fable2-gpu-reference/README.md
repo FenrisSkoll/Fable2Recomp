@@ -1,9 +1,9 @@
 # Fable II GPU reference corpus
 
-This is the permanent G1.5A source reference for the ReXGlue Xenos GPU path
-currently staged beside Fable II. It documents the implementation as found;
-it is not a proposal for a new renderer and contains no capture or runtime
-changes.
+This is the permanent G1.5A/G1.5B source reference for the ReXGlue and pinned
+Xenia Canary Xenos GPU architectures. Each implementation is documented first
+on its own terms. The corpus is not a renderer proposal and contains no
+capture or runtime changes.
 
 The source baseline is ReXGlue
 `956c6a8b5da4c54b9899a2593e9c67c26de30194`. The active Release artifact is
@@ -11,6 +11,9 @@ The source baseline is ReXGlue
 `8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99`.
 The Fable branch was created directly from accepted G1 commit
 `c44e8c16f4422f9a828caf30899ac989170b8a8c`; paused G2A source was not merged.
+The independent Canary baseline is
+`3a44f20c7bc66db1da583e8a6f0ab740e31908e9`, tree
+`c343b0a5796590fadc3b78c993bfada51e7e9148`.
 
 ## Reading order
 
@@ -25,6 +28,16 @@ The Fable branch was created directly from accepted G1 commit
 9. [Resources, memory and synchronization](rexglue/07-resources-memory-and-synchronization.md)
 10. [Presentation, backends, system UI and errors](rexglue/08-presentation-backends-and-errors.md)
 11. [G1.5A completion and handoff](g1.5a-completion.md)
+12. [End-to-end pinned Xenia Canary overview](02-xenia-canary-overview.md)
+13. [Canary initialization and command processor](xenia-canary/01-initialization-and-command-processor.md)
+14. [Canary register state and draw](xenia-canary/02-register-state-and-draw.md)
+15. [Canary shader pipeline](xenia-canary/03-shader-pipeline.md)
+16. [Canary textures, vertex fetch and samplers](xenia-canary/04-textures-vertex-fetch-and-samplers.md)
+17. [Canary render targets, EDRAM and resolves](xenia-canary/05-render-targets-edram-resolves.md)
+18. [Canary pipeline backends and caches](xenia-canary/06-pipeline-backends-and-caches.md)
+19. [Canary resources, memory and synchronization](xenia-canary/07-resources-memory-and-synchronization.md)
+20. [Canary presentation, errors and configuration](xenia-canary/08-presentation-errors-and-configuration.md)
+21. [G1.5B completion and handoff](g1.5b-completion.md)
 
 Machine-readable provenance is in
 [the source inventory](evidence/rexglue-source-inventory.json) and
@@ -32,16 +45,24 @@ Machine-readable provenance is in
 [source-inventory v1](../../tools/schemas/fable2-gpu-source-inventory-v1.schema.json)
 and [subsystem-map v1](../../tools/schemas/fable2-gpu-subsystem-map-v1.schema.json).
 
+The Canary indexes are
+[the Canary source inventory](evidence/canary-source-inventory.json) and
+[the Canary subsystem map](evidence/canary-subsystem-map.json), validated by
+[Canary source-inventory v1](../../tools/schemas/fable2-gpu-canary-source-inventory-v1.schema.json)
+and [Canary subsystem-map v1](../../tools/schemas/fable2-gpu-canary-subsystem-map-v1.schema.json).
+
 Validate the corpus from the repository root with:
 
 ```powershell
 python .\tools\Verify-Fable2GpuReference.py `
     --sdk-root C:\Dev\rexglue-sdk-v0.10 `
+    --canary-root C:\Dev\Fable2NativeRendererResearch\xenia-canary `
     --verify-artifacts
 ```
 
 Omit `--verify-artifacts` on a machine without the ignored local build and SDK
-package. Source, symbol, JSON-schema and link checks still run.
+package. Source, symbol, JSON-schema, history, pin, cleanliness and link checks
+still run. Omit `--canary-root` to use the path recorded in the evidence.
 
 ## Evidence language
 

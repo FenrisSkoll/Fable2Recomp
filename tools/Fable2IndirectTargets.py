@@ -13,6 +13,7 @@ import bisect
 import csv
 import gc
 import hashlib
+import io
 import json
 import os
 import re
@@ -38,7 +39,7 @@ SUMMARY_SCHEMA_NAME = "fable2-xenia-indirect-target-summary"
 SUMMARY_SCHEMA_VERSION = 1
 PLAN_SCHEMA_NAME = "fable2-indirect-target-import-plan"
 PLAN_SCHEMA_VERSION = 1
-TOOL_VERSION = "1.2.0"
+TOOL_VERSION = "1.3.0"
 UINT64_MAX = (1 << 64) - 1
 
 COMPLETE_GAME_MEDIA_TYPES = {
@@ -144,6 +145,38 @@ def require_counter(value: Any, location: str) -> int:
     if not isinstance(value, int) or isinstance(value, bool) or value < 0:
         raise Phase4Error(f"{location} must be a non-negative integer")
     return min(value, UINT64_MAX)
+
+
+def require_uint64(value: Any, location: str) -> int:
+    if (
+        not isinstance(value, int)
+        or isinstance(value, bool)
+        or value < 0
+        or value > UINT64_MAX
+    ):
+        raise Phase4Error(f"{location} must be an unsigned 64-bit integer")
+    return value
+
+
+def require_boolean(value: Any, location: str) -> bool:
+    if not isinstance(value, bool):
+        raise Phase4Error(f"{location} must be boolean")
+    return value
+
+
+def require_string_list(value: Any, location: str) -> list[str]:
+    if not isinstance(value, list):
+        raise Phase4Error(f"{location} must be an array")
+    for index, item in enumerate(value):
+        require_string(item, f"{location}[{index}]")
+    return value
+
+
+def require_sha256(value: Any, location: str) -> str:
+    result = require_string(value, location)
+    if not re.fullmatch(r"[0-9A-F]{64}", result):
+        raise Phase4Error(f"{location} must be an uppercase SHA-256")
+    return result
 
 
 def stable_pair_key(pair: dict[str, Any]) -> tuple[Any, ...]:
@@ -1029,34 +1062,545 @@ def aggregate_raw_runs(
     }
 
 
-def validate_summary(document: dict[str, Any]) -> dict[str, Any]:
+def validate_summary_module(
+    value: Any, location: str, expected_run_id: str
+) -> dict[str, Any]:
+    module = require_object(value, location)
+    if module.get("record") != "module":
+        raise Phase4Error(f"{location}.record must be 'module'")
+    if module.get("run_id") != expected_run_id:
+        raise Phase4Error(f"{location}.run_id disagrees with its run")
+    require_string(module.get("name"), f"{location}.name")
+    image_base = address(module.get("image_base"), f"{location}.image_base")
+    executable_start = address(
+        module.get("executable_start"), f"{location}.executable_start"
+    )
+    executable_end = address(
+        module.get("executable_end"), f"{location}.executable_end"
+    )
+    if executable_end < executable_start:
+        raise Phase4Error(f"{location} executable range is inverted")
+    executable = require_boolean(module.get("executable"), f"{location}.executable")
+    title_module = require_boolean(
+        module.get("title_module"), f"{location}.title_module"
+    )
+    if title_module and executable_end == executable_start:
+        raise Phase4Error(f"{location} title-module range must be non-empty")
+    if executable_end == executable_start and executable_start != 0:
+        raise Phase4Error(f"{location} empty range must use the zero sentinel")
+    if image_base and executable_start and image_base > executable_start:
+        raise Phase4Error(f"{location} image base is above its executable start")
+    fingerprint = require_object(module.get("fingerprint"), f"{location}.fingerprint")
+    if not isinstance(fingerprint.get("algorithm"), str) or not isinstance(
+        fingerprint.get("value"), str
+    ):
+        raise Phase4Error(
+            f"{location}.fingerprint algorithm and value must be strings"
+        )
+    if title_module and not executable:
+        raise Phase4Error(f"{location} title module must be executable")
+    return module
+
+
+def validate_summary(
+    document: dict[str, Any],
+    expected_identity: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate a compact summary without opening any referenced raw trace."""
     schema = require_object(document.get("schema"), "summary.schema")
     if schema != {"name": SUMMARY_SCHEMA_NAME, "version": SUMMARY_SCHEMA_VERSION}:
         raise Phase4Error(f"unsupported summary schema: {schema!r}")
-    require_object(document.get("identity"), "summary.identity")
-    if not isinstance(document.get("runs"), list) or not isinstance(
-        document.get("pairs"), list
+
+    tool = require_object(document.get("tool"), "summary.tool")
+    if tool.get("name") != "Fable2IndirectTargets":
+        raise Phase4Error("summary.tool.name must be 'Fable2IndirectTargets'")
+    require_string(tool.get("version"), "summary.tool.version")
+
+    identity = require_object(document.get("identity"), "summary.identity")
+    expected_image_sha256 = require_sha256(
+        identity.get("expected_image_sha256"),
+        "summary.identity.expected_image_sha256",
+    )
+    require_string(identity.get("identity_strength"), "summary.identity.identity_strength")
+    identity_fields = {
+        "expected_title_id": "title_id",
+        "expected_media_id": "media_id",
+        "expected_version": "version",
+    }
+    for summary_key, contract_key in identity_fields.items():
+        value = identity.get(summary_key)
+        if value is not None and not isinstance(value, str):
+            raise Phase4Error(f"summary.identity.{summary_key} must be a string or null")
+        if expected_identity is not None:
+            expected_value = str(expected_identity.get(contract_key, ""))
+            if value != expected_value:
+                raise Phase4Error(
+                    f"summary identity {summary_key} mismatch: expected "
+                    f"{expected_value!r}, actual {value!r}"
+                )
+    if expected_identity is not None:
+        canonical_hash = require_sha256(
+            str(expected_identity.get("patched_image_sha256", "")).upper(),
+            "canonical patched image SHA-256",
+        )
+        if expected_image_sha256 != canonical_hash:
+            raise Phase4Error(
+                "summary image identity does not match canonical shared evidence"
+            )
+
+    counts = require_object(document.get("counts"), "summary.counts")
+    for key in (
+        "accepted_runs",
+        "quarantined_runs",
+        "unique_pairs",
+        "total_hits",
+        "dropped_hits",
+        "io_errors",
+        "count_overflows",
+        "abnormal_or_truncated_runs",
     ):
+        require_uint64(counts.get(key), f"summary.counts.{key}")
+    if "aggregate_limit_exceeded" in counts:
+        require_uint64(
+            counts["aggregate_limit_exceeded"],
+            "summary.counts.aggregate_limit_exceeded",
+        )
+
+    runs = document.get("runs")
+    pairs = document.get("pairs")
+    quarantine = document.get("quarantine")
+    if not isinstance(runs, list) or not isinstance(pairs, list):
         raise Phase4Error("summary runs and pairs must be arrays")
-    for index, pair in enumerate(document["pairs"]):
-        require_object(pair, f"summary.pairs[{index}]")
-        stable_pair_key(pair)
+    if not isinstance(quarantine, list):
+        raise Phase4Error("summary.quarantine must be an array")
+
+    run_ids: set[str] = set()
+    raw_hashes: set[str] = set()
+    accepted_run_ids: set[str] = set()
+    run_total_hits: dict[str, int] = {}
+    run_records: dict[str, dict[str, Any]] = {}
+    for index, value in enumerate(runs):
+        location = f"summary.runs[{index}]"
+        run = require_object(value, location)
+        run_id = require_string(run.get("run_id"), f"{location}.run_id")
+        raw_hash = require_sha256(run.get("raw_sha256"), f"{location}.raw_sha256")
+        if run_id in run_ids:
+            raise Phase4Error(f"summary contains duplicate run ID: {run_id}")
+        if raw_hash in raw_hashes:
+            raise Phase4Error(
+                f"summary contains duplicate recorded raw SHA-256: {raw_hash}"
+            )
+        run_ids.add(run_id)
+        raw_hashes.add(raw_hash)
+        run_records[run_id] = run
+
+        label = run.get("label")
+        if not isinstance(label, str):
+            raise Phase4Error(f"{location}.label must be a string")
+        require_string(run.get("raw_file_name"), f"{location}.raw_file_name")
+        require_string(run.get("xenia_commit"), f"{location}.xenia_commit")
+        require_uint64(run.get("collector_version"), f"{location}.collector_version")
+        raw_schema_version = run.get("raw_schema_version")
+        if raw_schema_version is not None:
+            raw_schema_version = require_uint64(
+                raw_schema_version, f"{location}.raw_schema_version"
+            )
+            if raw_schema_version not in SUPPORTED_RAW_SCHEMA_VERSIONS:
+                raise Phase4Error(
+                    f"{location}.raw_schema_version {raw_schema_version} is not "
+                    f"supported; supported versions are "
+                    f"{sorted(SUPPORTED_RAW_SCHEMA_VERSIONS)}"
+                )
+        configured_hash = require_sha256(
+            run.get("configured_expected_image_sha256"),
+            f"{location}.configured_expected_image_sha256",
+        )
+        observed_hash = run.get("observed_image_sha256")
+        if observed_hash is not None:
+            require_sha256(observed_hash, f"{location}.observed_image_sha256")
+        identity_match = require_boolean(
+            run.get("identity_match"), f"{location}.identity_match"
+        )
+        if identity_match:
+            accepted_run_ids.add(run_id)
+            if configured_hash != expected_image_sha256:
+                raise Phase4Error(
+                    f"accepted run {run_id} configured image SHA-256 disagrees "
+                    "with its summary"
+                )
+
+        assessment = require_object(
+            run.get("identity_assessment"), f"{location}.identity_assessment"
+        )
+        if "match" in assessment and require_boolean(
+            assessment["match"], f"{location}.identity_assessment.match"
+        ) != identity_match:
+            raise Phase4Error(f"{location} identity-match fields disagree")
+        assessment_reasons = require_string_list(
+            assessment.get("reasons", []),
+            f"{location}.identity_assessment.reasons",
+        )
+        require_string_list(
+            assessment.get("warnings", []),
+            f"{location}.identity_assessment.warnings",
+        )
+        if identity_match and assessment_reasons:
+            raise Phase4Error(f"accepted run {run_id} retains mismatch reasons")
+
+        flush_status = require_string(
+            run.get("flush_status"), f"{location}.flush_status"
+        )
+        require_boolean(run.get("corrupt_tail"), f"{location}.corrupt_tail")
+        require_boolean(
+            run.get("missing_final_newline"),
+            f"{location}.missing_final_newline",
+        )
+        require_string_list(
+            run.get("integrity_warnings"), f"{location}.integrity_warnings"
+        )
+        record_counts = require_object(
+            run.get("record_counts"), f"{location}.record_counts"
+        )
+        for key, count in record_counts.items():
+            require_uint64(count, f"{location}.record_counts.{key}")
+        footer_count = record_counts.get("footer", 0)
+        if footer_count > 1:
+            raise Phase4Error(f"{location} records more than one footer")
+        if flush_status == "normal" and footer_count != 1:
+            raise Phase4Error(f"normal run {run_id} must record exactly one footer")
+        uncommitted = run.get("uncommitted_pair_records")
+        if uncommitted is not None:
+            require_uint64(uncommitted, f"{location}.uncommitted_pair_records")
+
+        run_counters = require_object(run.get("counters"), f"{location}.counters")
+        for key in (
+            "total_hits",
+            "total_pair_records",
+            "dropped_hits",
+            "io_errors",
+            "count_overflows",
+        ):
+            require_uint64(run_counters.get(key), f"{location}.counters.{key}")
+        if "aggregate_limit_exceeded" in run_counters:
+            require_uint64(
+                run_counters["aggregate_limit_exceeded"],
+                f"{location}.counters.aggregate_limit_exceeded",
+            )
+        run_total_hits[run_id] = run_counters["total_hits"]
+
+        modules = run.get("modules")
+        if not isinstance(modules, list):
+            raise Phase4Error(f"{location}.modules must be an array")
+        for module_index, module in enumerate(modules):
+            validate_summary_module(
+                module, f"{location}.modules[{module_index}]", run_id
+            )
+
+        if expected_identity is not None:
+            reconstructed = {
+                "header": {
+                    "identity": {
+                        "expected_image_sha256": configured_hash,
+                        "title_id": identity.get("expected_title_id") or "",
+                        "media_id": identity.get("expected_media_id") or "",
+                        "version": identity.get("expected_version") or "",
+                    }
+                },
+                "modules": modules,
+            }
+            reassessed = assess_run_identity(
+                reconstructed, expected_image_sha256, expected_identity
+            )
+            if reassessed["match"] != identity_match:
+                raise Phase4Error(
+                    f"run {run_id} stored identity result disagrees with canonical "
+                    f"revalidation: {', '.join(reassessed['reasons']) or 'match'}"
+                )
+            stored_fingerprint_match = assessment.get("module_fingerprint_match")
+            if stored_fingerprint_match is not None and require_boolean(
+                stored_fingerprint_match,
+                f"{location}.identity_assessment.module_fingerprint_match",
+            ) != reassessed["module_fingerprint_match"]:
+                raise Phase4Error(
+                    f"run {run_id} stored module fingerprint result disagrees "
+                    "with canonical revalidation"
+                )
+
+    expected_run_order = sorted(
+        runs, key=lambda item: (item["run_id"], item["raw_sha256"])
+    )
+    if runs != expected_run_order:
+        raise Phase4Error("summary runs are not deterministically sorted")
+
+    quarantined_run_ids: set[str] = set()
+    for index, value in enumerate(quarantine):
+        location = f"summary.quarantine[{index}]"
+        item = require_object(value, location)
+        run_id = require_string(item.get("run_id"), f"{location}.run_id")
+        raw_hash = require_sha256(item.get("raw_sha256"), f"{location}.raw_sha256")
+        if run_id not in run_records:
+            raise Phase4Error(f"{location} references unknown run ID {run_id}")
+        if run_records[run_id]["raw_sha256"] != raw_hash:
+            raise Phase4Error(f"{location} raw SHA-256 disagrees with its run")
+        if run_records[run_id]["identity_match"]:
+            raise Phase4Error(f"{location} quarantines an accepted run")
+        if run_id in quarantined_run_ids:
+            raise Phase4Error(f"summary has duplicate quarantine for run {run_id}")
+        quarantined_run_ids.add(run_id)
+    if quarantined_run_ids != run_ids - accepted_run_ids:
+        raise Phase4Error(
+            "summary quarantine records do not exactly match rejected runs"
+        )
+
+    pair_keys: list[tuple[Any, ...]] = []
+    pair_hits_by_run: dict[str, int] = {run_id: 0 for run_id in accepted_run_ids}
+    total_pair_hits = 0
+    reconciliation_overflow = False
+    for index, value in enumerate(pairs):
+        location = f"summary.pairs[{index}]"
+        pair = require_object(value, location)
+        require_string(pair.get("source_module"), f"{location}.source_module")
+        require_string(pair.get("target_module"), f"{location}.target_module")
+        if pair.get("source") != address_text(
+            address(pair.get("source"), f"{location}.source")
+        ):
+            raise Phase4Error(f"{location}.source must use canonical guest-address text")
+        if pair.get("target") != address_text(
+            address(pair.get("target"), f"{location}.target")
+        ):
+            raise Phase4Error(f"{location}.target must use canonical guest-address text")
+        branch_kind = require_string(
+            pair.get("branch_kind"), f"{location}.branch_kind"
+        )
+        if branch_kind not in {"bctr", "bctrl", "bclr", "blr"}:
+            raise Phase4Error(f"{location} has unsupported branch kind {branch_kind!r}")
+        link = require_boolean(pair.get("link"), f"{location}.link")
+        key = stable_pair_key(pair)
+        pair_keys.append(key)
+        ordinary_return = require_boolean(
+            pair.get("ordinary_return"), f"{location}.ordinary_return"
+        )
+        if branch_kind == "bctrl" and not link:
+            raise Phase4Error(f"{location} bctrl must have link=true")
+        if branch_kind == "bctr" and link:
+            raise Phase4Error(f"{location} bctr must have link=false")
+        if branch_kind == "blr" and (link or not ordinary_return):
+            raise Phase4Error(
+                f"{location} blr must have link=false and ordinary_return=true"
+            )
+        if ordinary_return and branch_kind != "blr":
+            raise Phase4Error(
+                f"{location} ordinary_return is only valid for branch_kind=blr"
+            )
+
+        hit_count = require_uint64(pair.get("hit_count"), f"{location}.hit_count")
+        observed_runs = require_string_list(
+            pair.get("observed_runs"), f"{location}.observed_runs"
+        )
+        if observed_runs != sorted(set(observed_runs)) or not observed_runs:
+            raise Phase4Error(
+                f"{location}.observed_runs must be a non-empty sorted unique array"
+            )
+        if not set(observed_runs).issubset(accepted_run_ids):
+            raise Phase4Error(f"{location} references a non-accepted or unknown run")
+        run_hit_counts = require_object(
+            pair.get("run_hit_counts"), f"{location}.run_hit_counts"
+        )
+        if list(run_hit_counts) != sorted(run_hit_counts):
+            raise Phase4Error(f"{location}.run_hit_counts is not sorted")
+        if set(run_hit_counts) != set(observed_runs):
+            raise Phase4Error(
+                f"{location}.run_hit_counts keys disagree with observed_runs"
+            )
+        summed_pair_hits = 0
+        for run_id, run_hits in run_hit_counts.items():
+            run_hits = require_uint64(
+                run_hits, f"{location}.run_hit_counts.{run_id}"
+            )
+            summed_pair_hits, overflow = saturating_add(summed_pair_hits, run_hits)
+            reconciliation_overflow |= overflow
+            pair_hits_by_run[run_id], overflow = saturating_add(
+                pair_hits_by_run[run_id], run_hits
+            )
+            reconciliation_overflow |= overflow
+        if summed_pair_hits != hit_count:
+            raise Phase4Error(f"{location} hit_count disagrees with run_hit_counts")
+
+        thread_observations = pair.get("thread_observations")
+        if not isinstance(thread_observations, list) or not thread_observations:
+            raise Phase4Error(
+                f"{location}.thread_observations must be a non-empty array"
+            )
+        thread_keys: set[tuple[str, str]] = set()
+        thread_hits_by_run: dict[str, int] = defaultdict(int)
+        for thread_index, thread_value in enumerate(thread_observations):
+            thread_location = f"{location}.thread_observations[{thread_index}]"
+            thread = require_object(thread_value, thread_location)
+            run_id = require_string(thread.get("run_id"), f"{thread_location}.run_id")
+            thread_key = require_string(
+                thread.get("thread_key"), f"{thread_location}.thread_key"
+            )
+            qualified_key = (run_id, thread_key)
+            if qualified_key in thread_keys:
+                raise Phase4Error(
+                    f"{location} has duplicate run-qualified thread observation "
+                    f"{run_id}/{thread_key}"
+                )
+            thread_keys.add(qualified_key)
+            if run_id not in run_hit_counts:
+                raise Phase4Error(
+                    f"{thread_location} references a run absent from run_hit_counts"
+                )
+            first_sequence = require_uint64(
+                thread.get("first_sequence"), f"{thread_location}.first_sequence"
+            )
+            last_sequence = require_uint64(
+                thread.get("last_sequence"), f"{thread_location}.last_sequence"
+            )
+            thread_hits = require_uint64(
+                thread.get("hit_count"), f"{thread_location}.hit_count"
+            )
+            if thread_hits and last_sequence < first_sequence:
+                raise Phase4Error(
+                    f"{thread_location}.last_sequence is below first_sequence"
+                )
+            thread_hits_by_run[run_id], overflow = saturating_add(
+                thread_hits_by_run[run_id], thread_hits
+            )
+            reconciliation_overflow |= overflow
+        if thread_observations != sorted(
+            thread_observations,
+            key=lambda item: (item["run_id"], item["thread_key"]),
+        ):
+            raise Phase4Error(f"{location}.thread_observations is not sorted")
+        if dict(thread_hits_by_run) != dict(run_hit_counts):
+            raise Phase4Error(
+                f"{location} thread hit totals disagree with run_hit_counts"
+            )
+
+        target_validity = require_string_list(
+            pair.get("target_validity"), f"{location}.target_validity"
+        )
+        if target_validity != sorted(set(target_validity)) or not target_validity:
+            raise Phase4Error(
+                f"{location}.target_validity must be a non-empty sorted unique array"
+            )
+        total_pair_hits, overflow = saturating_add(total_pair_hits, hit_count)
+        reconciliation_overflow |= overflow
+
+    if len(pair_keys) != len(set(pair_keys)):
+        raise Phase4Error("summary contains duplicate aggregate keys")
+    if pair_keys != sorted(pair_keys):
+        raise Phase4Error("summary pairs are not deterministically sorted")
+    for run_id in accepted_run_ids:
+        if pair_hits_by_run[run_id] != run_total_hits[run_id]:
+            raise Phase4Error(
+                f"summary pair hits for {run_id} do not reconcile with run totals"
+            )
+    if total_pair_hits != counts["total_hits"]:
+        raise Phase4Error("summary pair hit total does not reconcile with counts")
+
+    if counts["accepted_runs"] != len(accepted_run_ids):
+        raise Phase4Error("summary accepted-run count does not reconcile")
+    if counts["quarantined_runs"] != len(quarantined_run_ids):
+        raise Phase4Error("summary quarantined-run count does not reconcile")
+    if counts["unique_pairs"] != len(pairs):
+        raise Phase4Error("summary unique-pair count does not reconcile")
+    expected_abnormal = sum(
+        run_records[run_id]["flush_status"] != "normal"
+        for run_id in accepted_run_ids
+    )
+    if counts["abnormal_or_truncated_runs"] != expected_abnormal:
+        raise Phase4Error("summary abnormal-run count does not reconcile")
+
+    for counter_key in ("total_hits", "dropped_hits", "io_errors"):
+        expected_total = 0
+        for run_id in sorted(accepted_run_ids):
+            expected_total, _ = saturating_add(
+                expected_total, run_records[run_id]["counters"][counter_key]
+            )
+        if counts[counter_key] != expected_total:
+            raise Phase4Error(f"summary {counter_key} does not reconcile with runs")
+    expected_aggregate_limit = 0
+    for run_id in sorted(accepted_run_ids):
+        expected_aggregate_limit, _ = saturating_add(
+            expected_aggregate_limit,
+            run_records[run_id]["counters"].get("aggregate_limit_exceeded", 0),
+        )
+    if counts.get("aggregate_limit_exceeded", 0) != expected_aggregate_limit:
+        raise Phase4Error(
+            "summary aggregate_limit_exceeded does not reconcile with runs"
+        )
+    input_overflows = 0
+    for run_id in sorted(accepted_run_ids):
+        input_overflows, _ = saturating_add(
+            input_overflows,
+            run_records[run_id]["counters"]["count_overflows"],
+        )
+    if counts["count_overflows"] < input_overflows:
+        raise Phase4Error("summary count_overflows understates detected overflows")
+    if reconciliation_overflow and counts["count_overflows"] == 0:
+        raise Phase4Error("summary reconciliation saturated without an overflow count")
+
+    determinism = require_object(document.get("determinism"), "summary.determinism")
+    expected_sort_key = [
+        "source_module",
+        "source",
+        "target_module",
+        "target",
+        "branch_kind",
+        "link",
+    ]
+    if determinism.get("sort_key") != expected_sort_key:
+        raise Phase4Error("summary determinism sort key is unsupported")
+    if determinism.get("volatile_metadata_omitted") is not True:
+        raise Phase4Error("summary must omit volatile metadata")
     return document
 
 
-def read_summary(path: Path) -> dict[str, Any]:
+def read_summary(
+    path: Path, expected_identity: dict[str, Any] | None = None
+) -> dict[str, Any]:
     try:
         with path.open("r", encoding="utf-8") as stream:
             document = json.load(stream)
     except (OSError, json.JSONDecodeError) as error:
         raise Phase4Error(f"could not read summary '{path}': {error}") from error
-    return validate_summary(require_object(document, "summary"))
+    return validate_summary(require_object(document, "summary"), expected_identity)
 
 
-def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
-    if not documents:
-        raise Phase4Error("no summaries were supplied")
+def merge_summaries(
+    documents: list[dict[str, Any]],
+    expected_identity: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    if len(documents) < 2:
+        raise Phase4Error("summary merge requires at least two input summaries")
+    for document in documents:
+        validate_summary(document, expected_identity)
     expected = documents[0]["identity"]["expected_image_sha256"]
+    identity_keys = (
+        "expected_image_sha256",
+        "expected_title_id",
+        "expected_media_id",
+        "expected_version",
+    )
+    identity_baseline = {
+        key: documents[0]["identity"].get(key) for key in identity_keys
+    }
+    if expected_identity is not None:
+        expected_identity_record = {
+            "expected_image_sha256": expected,
+            "identity_strength": (
+                "configured_sha256_metadata_ranges_and_pinned_observed_module_fingerprint"
+                if expected_identity.get("xenia_module_fingerprint")
+                else "configured_sha256_metadata_and_module_ranges"
+            ),
+            "expected_title_id": str(expected_identity.get("title_id", "")),
+            "expected_media_id": str(expected_identity.get("media_id", "")),
+            "expected_version": str(expected_identity.get("version", "")),
+        }
+    else:
+        expected_identity_record = json.loads(json.dumps(documents[0]["identity"]))
     seen_run_ids: set[str] = set()
     seen_raw_hashes: set[str] = set()
     runs: list[dict[str, Any]] = []
@@ -1065,8 +1609,11 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
     overflow_count = 0
 
     for document in documents:
-        if document["identity"]["expected_image_sha256"] != expected:
-            raise Phase4Error("summary image identities disagree")
+        actual_identity = {
+            key: document["identity"].get(key) for key in identity_keys
+        }
+        if actual_identity != identity_baseline:
+            raise Phase4Error("summary identity metadata disagree")
         for run in document["runs"]:
             run_id = run["run_id"]
             raw_hash = run["raw_sha256"]
@@ -1076,8 +1623,8 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
                 raise Phase4Error(f"duplicate raw trace while merging summaries: {raw_hash}")
             seen_run_ids.add(run_id)
             seen_raw_hashes.add(raw_hash)
-            runs.append(run)
-        quarantine.extend(document.get("quarantine", []))
+            runs.append(json.loads(json.dumps(run)))
+        quarantine.extend(json.loads(json.dumps(document.get("quarantine", []))))
         for pair in document["pairs"]:
             key = stable_pair_key(pair)
             if key not in aggregate:
@@ -1122,7 +1669,20 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
                 set(item["target_validity"]) | set(pair["target_validity"])
             )
 
-    pairs = sorted(aggregate.values(), key=stable_pair_key)
+    pairs: list[dict[str, Any]] = []
+    for item in aggregate.values():
+        item["observed_runs"] = sorted(item["observed_runs"])
+        item["run_hit_counts"] = dict(sorted(item["run_hit_counts"].items()))
+        item["thread_observations"] = sorted(
+            item["thread_observations"],
+            key=lambda observation: (
+                observation["run_id"],
+                observation["thread_key"],
+            ),
+        )
+        item["target_validity"] = sorted(item["target_validity"])
+        pairs.append(item)
+    pairs.sort(key=stable_pair_key)
     runs.sort(key=lambda item: (item["run_id"], item["raw_sha256"]))
     quarantine.sort(key=lambda item: (item.get("kind", ""), item.get("run_id", "")))
     total_hits = 0
@@ -1150,10 +1710,10 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
             count_overflows, run["counters"]["count_overflows"]
         )
 
-    return {
+    result = {
         "schema": {"name": SUMMARY_SCHEMA_NAME, "version": SUMMARY_SCHEMA_VERSION},
         "tool": {"name": "Fable2IndirectTargets", "version": TOOL_VERSION},
-        "identity": documents[0]["identity"],
+        "identity": json.loads(json.dumps(expected_identity_record)),
         "counts": {
             "accepted_runs": sum(run["identity_match"] for run in runs),
             "quarantined_runs": len(quarantine),
@@ -1172,11 +1732,24 @@ def merge_summaries(documents: list[dict[str, Any]]) -> dict[str, Any]:
         "runs": runs,
         "quarantine": quarantine,
         "pairs": pairs,
-        "determinism": documents[0]["determinism"],
+        "determinism": {
+            "volatile_metadata_omitted": True,
+            "sort_key": [
+                "source_module",
+                "source",
+                "target_module",
+                "target",
+                "branch_kind",
+                "link",
+            ],
+            "sequence_scope": "independent_per_run_guest_thread",
+            "termination_scope": "per_run",
+        },
     }
+    return validate_summary(result, expected_identity)
 
 
-def write_summary_csv(path: Path, summary: dict[str, Any]) -> None:
+def summary_csv_bytes(summary: dict[str, Any]) -> bytes:
     rows: list[list[str]] = []
     for pair in summary["pairs"]:
         rows.append(
@@ -1197,33 +1770,29 @@ def write_summary_csv(path: Path, summary: dict[str, Any]) -> None:
                 ";".join(pair["target_validity"]),
             ]
         )
-    temporary = path.with_name(path.name + f".tmp-{os.getpid()}")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        with temporary.open("w", encoding="utf-8", newline="") as stream:
-            writer = csv.writer(stream, lineterminator="\n")
-            writer.writerow(
-                [
-                    "source_module",
-                    "source",
-                    "target_module",
-                    "target",
-                    "branch_kind",
-                    "link",
-                    "ordinary_return",
-                    "hit_count",
-                    "observed_runs",
-                    "thread_keys",
-                    "target_validity",
-                ]
-            )
-            writer.writerows(rows)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(temporary, path)
-    finally:
-        if temporary.exists():
-            temporary.unlink()
+    stream = io.StringIO(newline="")
+    writer = csv.writer(stream, lineterminator="\n")
+    writer.writerow(
+        [
+            "source_module",
+            "source",
+            "target_module",
+            "target",
+            "branch_kind",
+            "link",
+            "ordinary_return",
+            "hit_count",
+            "observed_runs",
+            "thread_keys",
+            "target_validity",
+        ]
+    )
+    writer.writerows(rows)
+    return stream.getvalue().encode("utf-8")
+
+
+def write_summary_csv(path: Path, summary: dict[str, Any]) -> None:
+    atomic_write_bytes(path, summary_csv_bytes(summary))
 
 
 def executable_ranges(contract: dict[str, Any]) -> list[tuple[int, int, str]]:
@@ -2585,20 +3154,87 @@ def command_summarize(args: argparse.Namespace) -> int:
     return 0
 
 
+def resolve_summary_paths(paths: list[Path]) -> list[Path]:
+    if len(paths) < 2:
+        raise Phase4Error("summary merge requires at least two --summary inputs")
+    resolved: list[Path] = []
+    seen: set[str] = set()
+    for path in paths:
+        try:
+            candidate = path.resolve(strict=True)
+        except OSError as error:
+            raise Phase4Error(f"could not resolve summary '{path}': {error}") from error
+        if not candidate.is_file():
+            raise Phase4Error(f"summary input is not a file: {candidate}")
+        key = os.path.normcase(str(candidate))
+        if key in seen:
+            raise Phase4Error(f"duplicate summary input path: {candidate}")
+        seen.add(key)
+        resolved.append(candidate)
+    return sorted(resolved, key=lambda path: os.path.normcase(str(path)))
+
+
 def command_merge(args: argparse.Namespace) -> int:
-    summary = merge_summaries([read_summary(path) for path in args.summary])
-    atomic_write_json(args.output, summary)
-    if args.csv:
-        write_summary_csv(args.csv, summary)
+    input_paths = resolve_summary_paths(args.summary)
+    expected_identity = load_expected_identity(args.evidence)
+    documents = [
+        read_summary(path, expected_identity) for path in input_paths
+    ]
+    summary = merge_summaries(documents, expected_identity)
+
+    if args.output_directory is not None:
+        if args.csv is not None:
+            raise Phase4Error(
+                "--csv is only valid with legacy --output; --output-directory "
+                "always writes the conventional CSV name"
+            )
+        output_directory = args.output_directory.resolve()
+        summary_path = output_directory / "xenia-indirect-targets.summary.json"
+        csv_path: Path | None = (
+            output_directory / "xenia-indirect-targets.summary.csv"
+        )
+    else:
+        summary_path = args.output.resolve()
+        csv_path = args.csv.resolve() if args.csv is not None else None
+
+    input_keys = {os.path.normcase(str(path)) for path in input_paths}
+    output_paths = [summary_path] + ([csv_path] if csv_path is not None else [])
+    output_keys = [os.path.normcase(str(path.resolve())) for path in output_paths]
+    if len(output_keys) != len(set(output_keys)):
+        raise Phase4Error("merged summary JSON and CSV output paths must differ")
+    if any(key in input_keys for key in output_keys):
+        raise Phase4Error("merged output must not overwrite an input summary")
+
+    # Render both authoritative views before replacing either destination. Each
+    # file is then fsync'd and atomically replaced by atomic_write_bytes.
+    summary_bytes = canonical_json_bytes(summary)
+    csv_bytes = summary_csv_bytes(summary) if csv_path is not None else None
+    atomic_write_bytes(summary_path, summary_bytes)
+    if csv_path is not None and csv_bytes is not None:
+        atomic_write_bytes(csv_path, csv_bytes)
+
     print(
-        f"PASS: runs={summary['counts']['accepted_runs']} "
-        f"pairs={summary['counts']['unique_pairs']} output={args.output}"
+        json.dumps(
+            {
+                "status": "summary_merge_complete",
+                "input_summaries": len(input_paths),
+                "accepted_runs": summary["counts"]["accepted_runs"],
+                "quarantined_runs": summary["counts"]["quarantined_runs"],
+                "unique_pairs": summary["counts"]["unique_pairs"],
+                "summary": str(summary_path),
+                "summary_csv": str(csv_path) if csv_path is not None else None,
+                "manifest_modified": False,
+            },
+            indent=2,
+            sort_keys=True,
+        )
     )
     return 0
 
 
 def command_plan(args: argparse.Namespace) -> int:
-    summary = read_summary(args.summary)
+    expected_identity = load_expected_identity(args.evidence)
+    summary = read_summary(args.summary, expected_identity)
     plan = build_plan(
         summary,
         args.summary,
@@ -2733,11 +3369,39 @@ def build_argument_parser() -> argparse.ArgumentParser:
     summarize.set_defaults(handler=command_summarize)
 
     merge = subparsers.add_parser(
-        "merge", help="deterministically merge summaries without double counting"
+        "merge",
+        help=(
+            "validate and deterministically merge two or more compact summaries; "
+            "raw traces are not accessed"
+        ),
     )
-    merge.add_argument("--summary", type=Path, action="append", required=True)
-    merge.add_argument("--output", type=Path, required=True)
-    merge.add_argument("--csv", type=Path)
+    merge.add_argument(
+        "--summary",
+        type=Path,
+        action="append",
+        required=True,
+        help="compact summary JSON input; repeat at least twice",
+    )
+    merge_output = merge.add_mutually_exclusive_group(required=True)
+    merge_output.add_argument(
+        "--output-directory",
+        type=Path,
+        help=(
+            "write xenia-indirect-targets.summary.json and .csv using the "
+            "standard artifact names"
+        ),
+    )
+    merge_output.add_argument(
+        "--output",
+        type=Path,
+        help="legacy explicit merged JSON path",
+    )
+    merge.add_argument(
+        "--csv",
+        type=Path,
+        help="legacy explicit CSV path; valid only together with --output",
+    )
+    add_evidence_arguments(merge)
     merge.set_defaults(handler=command_merge)
 
     plan = subparsers.add_parser(

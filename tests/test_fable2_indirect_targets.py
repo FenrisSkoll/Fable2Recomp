@@ -3,12 +3,14 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import io
 import json
 import re
 import shutil
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from unittest import mock
 
@@ -60,6 +62,7 @@ def schema_errors(
 
     expected_type = schema.get("type")
     type_matches = {
+        "array": isinstance(instance, list),
         "object": isinstance(instance, dict),
         "string": isinstance(instance, str),
         "integer": isinstance(instance, int) and not isinstance(instance, bool),
@@ -98,6 +101,25 @@ def schema_errors(
                 )
             elif schema.get("additionalProperties") is False:
                 errors.append(f"{location}: unexpected property {name}")
+            elif isinstance(schema.get("additionalProperties"), dict):
+                errors.extend(
+                    schema_errors(
+                        value,
+                        schema["additionalProperties"],
+                        root_schema,
+                        f"{location}.{name}",
+                    )
+                )
+    if isinstance(instance, list) and isinstance(schema.get("items"), dict):
+        for index, value in enumerate(instance):
+            errors.extend(
+                schema_errors(
+                    value,
+                    schema["items"],
+                    root_schema,
+                    f"{location}[{index}]",
+                )
+            )
     return errors
 
 
@@ -424,6 +446,69 @@ def manifest_text(newline: str = "\n") -> str:
 
 def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def synthetic_individual_summaries(
+    expected_identity: dict | None = None,
+) -> tuple[dict, dict]:
+    expected_identity = expected_identity or contract()["expected_image_identity"]
+    parsed_runs = [
+        p4.parse_raw_trace(FIXTURES / "synthetic-run-a.raw.jsonl"),
+        p4.parse_raw_trace(FIXTURES / "synthetic-run-b.raw.jsonl"),
+    ]
+    expected_fingerprint = expected_identity.get("xenia_module_fingerprint")
+    if expected_fingerprint:
+        algorithm = expected_identity["xenia_module_fingerprint_algorithm"]
+        for parsed in parsed_runs:
+            title_module = next(
+                module for module in parsed["modules"] if module["title_module"]
+            )
+            title_module["fingerprint"] = {
+                "algorithm": algorithm,
+                "value": expected_fingerprint,
+            }
+    return tuple(
+        p4.aggregate_raw_runs([parsed], PATCHED, expected_identity)
+        for parsed in parsed_runs
+    )  # type: ignore[return-value]
+
+
+def set_pair_run_hits(summary: dict, source: str, target: str, hit_count: int) -> None:
+    pair = next(
+        item
+        for item in summary["pairs"]
+        if item["source"] == source and item["target"] == target
+    )
+    if len(pair["observed_runs"]) != 1:
+        raise AssertionError("test helper requires an individual-run summary")
+    run_id = pair["observed_runs"][0]
+    previous = pair["run_hit_counts"][run_id]
+    pair["hit_count"] = hit_count
+    pair["run_hit_counts"][run_id] = hit_count
+    observations = [
+        item for item in pair["thread_observations"] if item["run_id"] == run_id
+    ]
+    for observation in observations:
+        observation["hit_count"] = 0
+    observations[0]["hit_count"] = hit_count
+    difference = hit_count - previous
+    run = next(item for item in summary["runs"] if item["run_id"] == run_id)
+    run["counters"]["total_hits"] += difference
+    summary["counts"]["total_hits"] += difference
+
+
+def rename_summary_run(summary: dict, run_id: str) -> None:
+    if len(summary["runs"]) != 1:
+        raise AssertionError("test helper requires an individual-run summary")
+    previous = summary["runs"][0]["run_id"]
+    summary["runs"][0]["run_id"] = run_id
+    for module in summary["runs"][0]["modules"]:
+        module["run_id"] = run_id
+    for pair in summary["pairs"]:
+        pair["observed_runs"] = [run_id]
+        pair["run_hit_counts"] = {run_id: pair["run_hit_counts"].pop(previous)}
+        for observation in pair["thread_observations"]:
+            observation["run_id"] = run_id
 
 
 class PreflightTests(unittest.TestCase):
@@ -1039,8 +1124,223 @@ class RawTraceTests(unittest.TestCase):
             p4.merge_summaries([first, first])
         changed = copy.deepcopy(second)
         changed["identity"]["expected_image_sha256"] = "F" * 64
-        with self.assertRaisesRegex(p4.Phase4Error, "identities disagree"):
+        with self.assertRaisesRegex(p4.Phase4Error, "image|identit"):
             p4.merge_summaries([first, changed])
+
+
+class SummaryMergeTests(unittest.TestCase):
+    def test_output_directory_merge_is_deterministic_and_run_qualified(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            expected = contract()["expected_image_identity"]
+            first, second = synthetic_individual_summaries(expected)
+
+            # Exercise exact integers above UINT32_MAX and deliberately
+            # unrelated sequence domains for the same aggregate.
+            shared_source = "0x829641C4"
+            shared_target = "0x829647F0"
+            first_hits = (1 << 32) + 5
+            second_hits = 19
+            set_pair_run_hits(first, shared_source, shared_target, first_hits)
+            set_pair_run_hits(second, shared_source, shared_target, second_hits)
+            first_pair = next(
+                pair for pair in first["pairs"] if pair["target"] == shared_target
+            )
+            second_pair = next(
+                pair for pair in second["pairs"] if pair["target"] == shared_target
+            )
+            first_pair["thread_observations"][0]["first_sequence"] = 9_000_000_000
+            first_pair["thread_observations"][0]["last_sequence"] = 9_000_000_100
+            second_pair["thread_observations"][0]["first_sequence"] = 1
+            second_pair["thread_observations"][0]["last_sequence"] = 2
+            second["pairs"][0]["source"] = "0x82FFF000"
+            second["pairs"].sort(key=p4.stable_pair_key)
+
+            # Emulate the preserved schema-1-era summary: the raw file is
+            # unavailable, raw_schema_version was not retained, and its run
+            # remains truthfully footerless.
+            first["tool"]["version"] = "1.1.0"
+            first_run = first["runs"][0]
+            first_run["raw_file_name"] = "deleted-manual-001.raw.jsonl"
+            first_run["raw_schema_version"] = None
+            first_run["uncommitted_pair_records"] = None
+            first_run["flush_status"] = "abnormal_or_unknown_no_footer"
+            first_run["record_counts"].pop("footer")
+            first["counts"]["abnormal_or_truncated_runs"] = 1
+            first["counts"].pop("aggregate_limit_exceeded", None)
+            first_run["counters"].pop("aggregate_limit_exceeded", None)
+            second["runs"][0]["raw_file_name"] = "unavailable-run-002.raw.jsonl"
+
+            first_path = root / "first.summary.json"
+            second_path = root / "second.summary.json"
+            evidence_path = root / "evidence.json"
+            write_json(first_path, first)
+            write_json(second_path, second)
+            write_json(evidence_path, contract())
+
+            first_keys = {p4.stable_pair_key(pair) for pair in first["pairs"]}
+            second_keys = {p4.stable_pair_key(pair) for pair in second["pairs"]}
+            output_ab = root / "merged-ab"
+            output_ba = root / "merged-ba"
+
+            def run_merge(paths: list[Path], output: Path) -> None:
+                arguments = ["merge"]
+                for path in paths:
+                    arguments.extend(("--summary", str(path)))
+                arguments.extend(
+                    (
+                        "--output-directory",
+                        str(output),
+                        "--evidence",
+                        str(evidence_path),
+                    )
+                )
+                parsed = p4.build_argument_parser().parse_args(arguments)
+                with mock.patch.object(
+                    p4,
+                    "parse_raw_trace",
+                    side_effect=AssertionError("merge must not read raw traces"),
+                ), redirect_stdout(io.StringIO()):
+                    self.assertEqual(0, parsed.handler(parsed))
+
+            run_merge([first_path, second_path], output_ab)
+            json_path = output_ab / "xenia-indirect-targets.summary.json"
+            csv_path = output_ab / "xenia-indirect-targets.summary.csv"
+            first_json_bytes = json_path.read_bytes()
+            first_csv_bytes = csv_path.read_bytes()
+
+            # Replacing the same outputs is idempotent, and argument order does
+            # not alter either authoritative stable view.
+            run_merge([first_path, second_path], output_ab)
+            self.assertEqual(first_json_bytes, json_path.read_bytes())
+            self.assertEqual(first_csv_bytes, csv_path.read_bytes())
+            run_merge([second_path, first_path], output_ba)
+            self.assertEqual(
+                first_json_bytes,
+                (output_ba / "xenia-indirect-targets.summary.json").read_bytes(),
+            )
+            self.assertEqual(
+                first_csv_bytes,
+                (output_ba / "xenia-indirect-targets.summary.csv").read_bytes(),
+            )
+
+            merged = p4.read_summary(json_path, expected)
+            summary_schema = json.loads(
+                (TOOLS / "schemas" / "fable2-indirect-target-summary-v1.schema.json")
+                .read_text(encoding="utf-8")
+            )
+            self.assertEqual([], schema_errors(merged, summary_schema))
+            self.assertEqual(2, merged["counts"]["accepted_runs"])
+            self.assertEqual(1, merged["counts"]["abnormal_or_truncated_runs"])
+            self.assertEqual(len(first_keys | second_keys), len(merged["pairs"]))
+            self.assertTrue(first_keys - second_keys)
+            self.assertTrue(second_keys - first_keys)
+            self.assertTrue(first_keys & second_keys)
+            self.assertEqual(
+                "independent_per_run_guest_thread",
+                merged["determinism"]["sequence_scope"],
+            )
+
+            shared = next(
+                pair
+                for pair in merged["pairs"]
+                if pair["source"] == shared_source
+                and pair["target"] == shared_target
+            )
+            self.assertEqual(first_hits + second_hits, shared["hit_count"])
+            self.assertGreater(shared["hit_count"], (1 << 32) - 1)
+            self.assertEqual(
+                {
+                    "synthetic-run-a": first_hits,
+                    "synthetic-run-b": second_hits,
+                },
+                shared["run_hit_counts"],
+            )
+            by_run = {
+                observation["run_id"]: observation
+                for observation in shared["thread_observations"]
+                if observation["hit_count"]
+            }
+            self.assertEqual(9_000_000_000, by_run["synthetic-run-a"]["first_sequence"])
+            self.assertEqual(1, by_run["synthetic-run-b"]["first_sequence"])
+            self.assertEqual(
+                "abnormal_or_unknown_no_footer",
+                merged["runs"][0]["flush_status"],
+            )
+            self.assertEqual("normal", merged["runs"][1]["flush_status"])
+
+    def test_duplicate_and_identity_guards_use_summary_metadata_only(self) -> None:
+        expected = contract()["expected_image_identity"]
+        first, second = synthetic_individual_summaries(expected)
+        with self.assertRaisesRegex(p4.Phase4Error, "at least two"):
+            p4.merge_summaries([first], expected)
+        with self.assertRaisesRegex(p4.Phase4Error, "duplicate run ID"):
+            p4.merge_summaries([first, copy.deepcopy(first)], expected)
+
+        duplicate_hash = copy.deepcopy(second)
+        duplicate_hash["runs"][0]["raw_sha256"] = first["runs"][0]["raw_sha256"]
+        duplicate_hash["runs"][0]["raw_file_name"] = "missing.raw.jsonl"
+        with mock.patch.object(
+            p4,
+            "parse_raw_trace",
+            side_effect=AssertionError("raw trace must not be opened"),
+        ), self.assertRaisesRegex(p4.Phase4Error, "duplicate raw trace"):
+            p4.merge_summaries([first, duplicate_hash], expected)
+
+        wrong_image = copy.deepcopy(second)
+        wrong_image["identity"]["expected_image_sha256"] = "F" * 64
+        with self.assertRaisesRegex(p4.Phase4Error, "image identity"):
+            p4.merge_summaries([first, wrong_image], expected)
+
+        pinned = copy.deepcopy(expected)
+        pinned["xenia_module_fingerprint_algorithm"] = (
+            "sha1_contiguous_loaded_executable_memory"
+        )
+        pinned["xenia_module_fingerprint"] = "A" * 40
+        pinned_first, pinned_second = synthetic_individual_summaries(pinned)
+        wrong_fingerprint = copy.deepcopy(pinned_second)
+        title_module = next(
+            module
+            for module in wrong_fingerprint["runs"][0]["modules"]
+            if module["title_module"]
+        )
+        title_module["fingerprint"]["value"] = "B" * 40
+        with self.assertRaisesRegex(p4.Phase4Error, "canonical revalidation"):
+            p4.merge_summaries([pinned_first, wrong_fingerprint], pinned)
+
+        wrong_range = copy.deepcopy(pinned_second)
+        title_module = next(
+            module
+            for module in wrong_range["runs"][0]["modules"]
+            if module["title_module"]
+        )
+        title_module["executable_end"] = "0x82180000"
+        with self.assertRaisesRegex(p4.Phase4Error, "canonical revalidation"):
+            p4.merge_summaries([pinned_first, wrong_range], pinned)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "summary.json"
+            write_json(path, first)
+            with self.assertRaisesRegex(p4.Phase4Error, "duplicate summary input path"):
+                p4.resolve_summary_paths([path, path.parent / "." / path.name])
+
+    def test_legacy_summary_schema_one_remains_readable(self) -> None:
+        expected = contract()["expected_image_identity"]
+        legacy, second = synthetic_individual_summaries(expected)
+        legacy["tool"]["version"] = "1.1.0"
+        run = legacy["runs"][0]
+        run["raw_schema_version"] = None
+        run["uncommitted_pair_records"] = None
+        run["flush_status"] = "abnormal_or_unknown_no_footer"
+        run["record_counts"].pop("footer")
+        run["raw_file_name"] = "intentionally-deleted.raw.jsonl"
+        run["counters"].pop("aggregate_limit_exceeded", None)
+        legacy["counts"].pop("aggregate_limit_exceeded", None)
+        legacy["counts"]["abnormal_or_truncated_runs"] = 1
+        self.assertIs(p4.validate_summary(legacy, expected), legacy)
+        merged = p4.merge_summaries([legacy, second], expected)
+        self.assertIsNone(merged["runs"][0]["raw_schema_version"])
+        self.assertEqual(1, merged["counts"]["abnormal_or_truncated_runs"])
 
 
 class PlannerFixture:
@@ -1088,6 +1388,33 @@ class PlannerFixture:
 
 
 class ImportPlannerTests(unittest.TestCase):
+    def test_merged_summary_plans_without_manifest_mutation_or_stubs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = PlannerFixture(Path(temporary))
+            expected = contract()["expected_image_identity"]
+            first, second = synthetic_individual_summaries(expected)
+            fixture.summary = p4.merge_summaries([first, second], expected)
+            p4.atomic_write_json(fixture.summary_path, fixture.summary)
+            manifest_before = fixture.manifest.read_bytes()
+
+            plan = fixture.plan()
+            self.assertEqual(manifest_before, fixture.manifest.read_bytes())
+            self.assertFalse(plan["safety"]["canonical_manifest_modified"])
+            self.assertFalse(plan["safety"]["placeholder_implementations_supported"])
+            self.assertNotIn("RETURN_R3_ZERO", json.dumps(plan))
+            by_target = {item["target"]: item for item in plan["targets"]}
+            for target in ("0x829647F0", "0x82C03B28", "0x829675E0"):
+                self.assertEqual(
+                    "existing_manifest_function",
+                    by_target[target]["classification"],
+                )
+                self.assertIsNone(by_target[target]["proposal"])
+            case = by_target["0x82174734"]
+            self.assertEqual("known_jump_table_case", case["classification"])
+            self.assertEqual("0x821746A8", case["ownership"]["owner_address"])
+            self.assertEqual(["0x821746BC"], case["runtime"]["source_sites"])
+            self.assertIsNone(case["proposal"])
+
     def test_all_classifications_evidence_and_mandatory_fixtures(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixture = PlannerFixture(Path(temporary))
@@ -1246,14 +1573,29 @@ class ImportPlannerTests(unittest.TestCase):
 
             # Even high executed counts do not promote a recovered switch case.
             fixture = PlannerFixture(Path(temporary))
-            for pair in fixture.summary["pairs"]:
-                if pair["target"] == "0x82174734":
-                    per_run_hits = 5_000_000_000
-                    pair["hit_count"] = per_run_hits * len(pair["observed_runs"])
-                    pair["run_hit_counts"] = {
-                        run_id: per_run_hits
-                        for run_id in pair["observed_runs"]
-                    }
+            per_run_hits = 5_000_000_000
+            for run_id in ("synthetic-run-a", "synthetic-run-b"):
+                run_summary = p4.aggregate_raw_runs(
+                    [
+                        p4.parse_raw_trace(
+                            FIXTURES / f"{run_id}.raw.jsonl"
+                        )
+                    ],
+                    PATCHED,
+                )
+                set_pair_run_hits(
+                    run_summary,
+                    "0x821746BC",
+                    "0x82174734",
+                    per_run_hits,
+                )
+                if run_id == "synthetic-run-a":
+                    first_summary = run_summary
+                else:
+                    second_summary = run_summary
+            fixture.summary = p4.merge_summaries(
+                [first_summary, second_summary]
+            )
             p4.atomic_write_json(fixture.summary_path, fixture.summary)
             plan = fixture.plan()
             case = next(

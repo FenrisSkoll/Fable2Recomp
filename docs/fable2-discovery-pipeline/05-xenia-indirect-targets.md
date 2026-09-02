@@ -18,28 +18,30 @@ The repaired collector:
   corroboration;
 - leaves manifest planning dry-run-only by default.
 
-No post-repair manual gameplay capture was performed during this repair. The
-user will perform that final validation. The collector has been exercised
-through actual minimal PPC under Xenia's x64 JIT, high-volume concurrent
-synthetic workloads, explicit and concurrent shutdown, periodic persistence,
-failure injection and the full Xenia CPU test suite.
+The collector repair itself performed no gameplay. The user subsequently
+created `fable2-tu1-manual-002`, and the compact summary confirms a normal
+schema-2 run with one footer and zero drops, I/O errors, count overflows or
+aggregate-limit failures. The summary schema does not retain the footer's
+`flush_reason`, so `window_close` is not inferred from compact evidence alone.
+The September 2026 summary-merge work also launched no Xenia process.
 
-The earlier private run `fable2-tu1-manual-001` remains accepted evidence. The
-user confirmed that gameplay reached Bowerstone Market. Its stored label
-remains verbatim:
+The earlier private run `fable2-tu1-manual-001` remains accepted evidence. Its
+stored label remains verbatim:
 
 ```text
 Fable II GOTY TU1 manual gameplay through first successful save
 ```
 
-The old artifact is not rewritten to claim different metadata. Its compact
-summary and import plan remain usable, but the old collector generated about
-90.9 GiB of raw JSONL and Xenia's normal window close produced no footer.
-Those two defects are the reason for this repair.
+The old artifact is not rewritten to claim different metadata. User-confirmed
+coverage is recorded separately below. Its compact summary and import plan
+remain usable, but the old collector generated about 90.9 GiB of raw JSONL and
+Xenia's normal window close produced no footer. The raw file was intentionally
+deleted only after the compact evidence was preserved.
 
-The canonical `fable2_manifest.toml` was not changed. The repaired dry-run plan
-contains 15,576 observed non-return targets, no range proposals, no ambiguous
-or conflicting targets and no automatically applicable candidates.
+The canonical `fable2_manifest.toml` was not changed. The merged dry-run plan
+for manual-001 and manual-002 contains 16,143 observed non-return targets, no
+range proposals, no ambiguous or conflicting targets and no automatically
+applicable candidates.
 
 ## Repair baseline and repository state
 
@@ -361,6 +363,57 @@ use a same-directory temporary file, flush/fsync and atomic replace. Duplicate
 run IDs and duplicate raw hashes are rejected. Image/module mismatches are
 quarantined and do not contribute evidence.
 
+## Summary-to-summary merging
+
+Raw aggregation already supported multiple simultaneous raw inputs, and an
+internal summary merger existed, but the old command was not a complete
+preserved-evidence workflow. It accepted one input, exposed only generic
+`--output`/`--csv` paths, did not reject duplicate canonical input paths and
+did not revalidate each compact run against the current shared TU1 identity.
+There was consequently no documented safe way to combine independently
+post-processed captures after a raw trace had been deleted.
+
+Tool version 1.3.0 provides the production interface:
+
+```powershell
+python .\tools\Fable2IndirectTargets.py merge `
+    --summary .\out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.json `
+    --summary .\out\indirect-targets\fable2-tu1-manual-002\review\xenia-indirect-targets.summary.json `
+    --output-directory .\out\indirect-targets\fable2-tu1-manual-001-002-merged
+```
+
+`--summary` must occur at least twice. `--output-directory` atomically writes
+the conventional `xenia-indirect-targets.summary.json` and
+`xenia-indirect-targets.summary.csv` names. The previous explicit `--output`
+and optional `--csv` form remains available for compatibility. Neither form
+opens, searches for or requires a referenced raw trace.
+
+Before aggregation, the command validates summary schema and internal
+accounting, then revalidates every run against
+`tools/fable2-entrypoint-closure-evidence.json`. This includes patched image,
+title/media/version, image base, executable coverage and the pinned loaded
+module fingerprint. Accepted/quarantined counts, run counters, pair totals,
+run hit counts and thread hit counts must reconcile. Duplicate canonical input
+paths, run IDs, recorded raw hashes and aggregate keys fail before output is
+written. Summary-level identity mismatch is rejected; already quarantined run
+records remain quarantined and retain their reasons.
+
+Summary schema 1 already models multiple runs correctly, so it remains at
+version 1. Aggregate identity is unchanged: source module/address, target
+module/address, branch kind and link state. `run_hit_counts`, `observed_runs`
+and `(run_id, thread_key)` observations preserve per-run provenance. Sequence
+numbers remain independent per-run, per-guest-thread domains; the merger never
+takes a minimum or maximum across different runs. Run termination is likewise
+per-run. `abnormal_or_truncated_runs=1` alongside two accepted runs means a
+mixed collection, not that both runs are abnormal or both are clean.
+
+The schema documentation was clarified without changing its version or
+rewriting existing summaries. Legacy schema-1 summaries, including a null
+`raw_schema_version` from tool 1.1.0, remain readable. Information absent from
+an old compact summary is not invented: in particular, a recorded footer count
+can prove presence, while a missing `flush_reason` cannot prove
+`window_close`.
+
 ## Import planning and evidence integration
 
 The planner continues to compare every non-return target with:
@@ -438,45 +491,107 @@ required to execute in every new capture.
 The schema-2 fixture also proves two deltas merge to 4,294,967,307 hits, above
 `UINT32_MAX`, with exact first/last sequences and no overflow.
 
-## Accepted private capture evidence
+## Preserved private capture evidence and real merge
 
-The accepted run is:
-
-```text
-run ID:      fable2-tu1-manual-001
-directory:   C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001
-review:      C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001\review
-```
-
-The repair did not reread, copy, delete or rehash the approximately 95 GB raw
-file. Its recorded raw SHA-256 remains:
+The two accepted run summaries are under their original `review` directories.
+Their embedded labels remain unchanged. User-confirmed coverage is recorded
+separately:
 
 ```text
-05E6344E2992089A9F7B7F509D8099D7E8851D130F2769BE9B9A8F72F20E03D0
+fable2-tu1-manual-001
+  New game, childhood progression and creation of the first save.
+
+fable2-tu1-manual-002
+  Loading the manual-001 save, continuing gameplay, visiting shops and
+  performing another save.
 ```
 
-Compact artifacts used for the repair audit are:
+The approximately 95 GB manual-001 raw JSONL was intentionally deleted after
+its compact evidence was preserved. This merge did not look for, open, copy,
+reconstruct or rehash it. The manual-001 summary retains the recorded raw hash
+`05E6344E2992089A9F7B7F509D8099D7E8851D130F2769BE9B9A8F72F20E03D0`;
+this value was confirmed from the summary and was not recomputed.
+
+Input summary identities are:
+
+| Run | Summary bytes | Summary SHA-256 | Recorded raw SHA-256 |
+| --- | ---: | --- | --- |
+| manual-001 | 19,725,922 | `F943DA466653278DED408B3AD7CD462392E74E50FC9521BF4F75FE0F95543BA4` | `05E6344E2992089A9F7B7F509D8099D7E8851D130F2769BE9B9A8F72F20E03D0` |
+| manual-002 | 16,906,107 | `09A7CA95CC804CCC088A793DE6131D680D6C05184F656F15DDA80F2CF4382B97` | `83DAA210412E6941AC0EE44D69EAED19C244FACC3D3637E93F4647132E67BD4D` |
+
+Both runs revalidated against patched SHA-256
+`BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00`,
+title `0x4D5307F1`, media `0x716F0A0D`, version `0.0.1.26`, image base
+`0x82000000`, executable coverage `0x82170000`-`0x832D0000` and loaded
+fingerprint `341151E9932EC14CB4F520AA9DE35BCF7169BFE1`.
+
+Termination remains per-run:
+
+| Run | Collector / raw schema | Status | Footer count | Errors |
+| --- | --- | --- | ---: | --- |
+| manual-001 | collector 1; preserved `raw_schema_version=null` from tool 1.1.0 | `abnormal_or_unknown_no_footer` | 0 | no corrupt tail, missing newline, integrity warning, drop, I/O error or overflow |
+| manual-002 | collector 2; raw schema 2 | `normal` | 1 | no corrupt tail, missing newline, integrity warning, drop, I/O error, overflow or aggregate-limit failure |
+
+The manual-002 summary proves exactly one accepted clean footer. Summary schema
+1 does not retain the footer reason, so the expected `window_close` reason
+cannot be independently verified without the raw file and is not claimed here.
+Manual-001 is not relabelled as clean.
+
+The real merged artifacts are:
+
+```text
+C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001-002-merged\xenia-indirect-targets.summary.json
+C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001-002-merged\xenia-indirect-targets.summary.csv
+C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-001-002-merged\fable2-indirect-targets.import-plan.json
+```
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
-| summary JSON | 19,725,922 | `F943DA466653278DED408B3AD7CD462392E74E50FC9521BF4F75FE0F95543BA4` |
-| summary CSV | 3,950,518 | `32667F9D5DB00C3362EC5F939BFD03DBE6AF72A1AF737F9450C5F0CF46A053A7` |
-| original retained import plan | 47,504,616 | `8A3BDC97ABBC37AA436A543BF2E552151AD9233C26B82B32695A74CE7617DF9D` |
-| repaired dry-run plan | 47,504,755 | `BB797A09D5B2CD9DCCDE1C0A4D1DA4339BD118809AB3213E9B320511228B3994` |
+| merged summary JSON | 27,377,874 | `AE4670BAFDF6FC8AB719F81CCE14C5BD63FDD4EAA8262D0CDAB79B0E39F83A29` |
+| merged summary CSV | 5,534,648 | `39D4600C006C84465612D70043E84B09DA8DE0075389AEFBBF28D8803CBC3D82` |
+| merged dry-run plan | 58,501,469 | `82C262178A386CB4F519B9CF72D71C946948EB6AF06454349E060C41830AB6F6` |
 
-The repaired plan was regenerated from the compact summary only. It reports:
+Aggregate-key and target coverage are deliberately reported separately:
+
+| Metric | Count |
+| --- | ---: |
+| input aggregate records | 49,746 |
+| merged unique aggregate keys | 27,785 |
+| aggregate keys only in manual-001 / only in manual-002 / in both | 4,671 / 1,153 / 21,961 |
+| manual-001 / manual-002 / combined hits | 24,555,201,598 / 19,275,373,582 / 43,830,575,180 |
+| non-return targets in manual-001 / manual-002 / merged | 15,576 / 14,050 / 16,143 |
+| targets only in manual-001 / only in manual-002 / in both | 2,093 / 567 / 13,483 |
+
+Manual-002 added 567 targets to combined coverage: 411 existing effective
+registrations, 42 existing-function internal entries and 114 known jump-table
+cases. It introduced no proposal and changed no classification for a target
+already present in manual-001.
+
+The merged dry-run classifications are:
 
 | Classification | Targets |
 | --- | ---: |
-| existing effective registrations (`existing_manifest_function`) | 12,676 |
-| existing function internal entries | 1,444 |
-| known jump-table cases | 1,447 |
+| existing effective registrations (`existing_manifest_function`) | 13,087 |
+| existing function internal entries | 1,486 |
+| known jump-table cases | 1,561 |
 | known import/kernel targets | 9 |
-| total non-return targets | 15,576 |
+| invalid/non-executable | 0 |
 | ambiguous / conflicting | 0 / 0 |
+| total non-return targets | 16,143 |
 | range proposals / automatically applicable | 0 / 0 |
 
-The manifest was byte-identical before and after planning.
+Known-positive merged observations remain no-ops:
+
+| Target | manual-001 | manual-002 | Combined | Result |
+| --- | --- | --- | ---: | --- |
+| `0x829647F0`, size `0x10` | `0x829641C4` `bctrl`, 2,849 | `0x829641C4` `bctrl`, 1,903 | 4,752 | `existing_manifest_function`; no proposal |
+| `0x82C03B28`, size `0x1C` | `0x821907A4` `bctrl`, 13 | `0x821907A4` `bctrl`, 4 | 17 | `existing_manifest_function`; no proposal |
+| `0x829675E0`, size `0x10` | `0x82966EE4` `bctrl`, 3,257 | `0x82966EE4` `bctrl`, 2,358 | 5,615 | `existing_manifest_function`; no proposal |
+| `0x82174734` | `0x821746BC` `bctr`, 16,635 | `0x821746BC` `bctr`, 85,787 | 102,422 | `known_jump_table_case`, owner `0x821746A8`; no proposal |
+
+The jump-table plan also retains historical corroboration at `0x823DCAD8` and
+`0x82403720`; neither address is falsely required to execute in both captures.
+Every acceptance fixture passed and `canonical_manifest_modified=false`.
 
 ## Automated validation
 
@@ -535,6 +650,38 @@ event stress run.
 
 No manual game session was launched or claimed during the repair.
 
+The later preserved-summary merge validation used:
+
+```powershell
+python -m unittest tests.test_fable2_indirect_targets
+python -m unittest tests.test_fable2_indirect_targets tests.test_fable2_function_map
+python -m unittest discover -s tests -p "test_*.py"
+python -m compileall -q tools tests
+python .\tools\Fable2IndirectTargets.py --help
+python .\tools\Fable2IndirectTargets.py merge --help
+
+python .\tools\Fable2IndirectTargets.py merge `
+    --summary .\out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.json `
+    --summary .\out\indirect-targets\fable2-tu1-manual-002\review\xenia-indirect-targets.summary.json `
+    --output-directory .\out\indirect-targets\fable2-tu1-manual-001-002-merged
+
+python .\tools\Fable2IndirectTargets.py plan `
+    --summary .\out\indirect-targets\fable2-tu1-manual-001-002-merged\xenia-indirect-targets.summary.json `
+    --output .\out\indirect-targets\fable2-tu1-manual-001-002-merged\fable2-indirect-targets.import-plan.json
+```
+
+Focused tests cover compatible and run-unique aggregates, counts above
+`UINT32_MAX`, run-qualified sequences, mixed termination, duplicate path/run/
+raw-hash rejection, canonical image/fingerprint/range rejection, input-order
+determinism, idempotent atomic JSON/CSV replacement, legacy summary reading,
+merged planning, manifest non-mutation and the no-stub invariant. The real
+merge and plan results are recorded above. Xenia was not launched.
+
+Final results for this summary-merge change were 25/25 Phase 4 tests in 0.406
+seconds, 35/35 Phase 4 plus function-map tests in 0.405 seconds and 53/53 full
+repository Python tests in 2.887 seconds. Python `compileall`, top-level help
+and merge help also passed.
+
 ## Performance and output-size projection
 
 ### Collector hot path
@@ -555,8 +702,8 @@ transfers through the real x64 JIT.
 The 50.1% enabled ratio is a synthetic worst-shaped microbenchmark in which
 nearly all useful work is an indirect transfer and collector callback.
 Disabled collection still removes the callback, buffer and file entirely.
-This is not a gameplay frame-time claim. A post-repair gameplay overhead
-sample remains pending user execution.
+This is not a gameplay frame-time claim. No gameplay-overhead timing was
+retained with manual-002, and it cannot be derived from the compact summary.
 
 ### High-volume stress
 
@@ -601,6 +748,28 @@ retained all 2,020,000 hits and 20,004 pairs.
 Planning the real 15,576-target compact summary took about 7.9 seconds in the
 recorded validation command and produced the repaired plan above.
 
+### Preserved-summary merge performance
+
+The manual-001/manual-002 merge excludes the deleted 95 GB raw trace. A normal
+unprofiled in-memory measurement separated the compact workflow as follows:
+
+| Stage | Time |
+| --- | ---: |
+| load and canonical validation of both summaries | 0.503788 s |
+| merge and reconciliation | 0.945327 s |
+| deterministic JSON generation | 0.134434 s |
+| deterministic CSV generation | 0.082207 s |
+| total in-memory work | 1.665756 s |
+
+The complete atomic CLI took 1.960820 seconds. Repeating it with reversed input
+order took 1.922074 seconds and produced byte-identical JSON and CSV. The
+merged dry-run plan took 5.288126 seconds.
+
+An allocation-instrumented `tracemalloc` pass reported a 219,170,061-byte peak.
+Instrumentation increased the same in-memory workflow to 44.560792 seconds, so
+its timing is not comparable to the unprofiled result; it is retained only as
+a Python allocation-peak measurement.
+
 ### Conservative old-capture projection
 
 The old compact summary contains 31,448 distinct pair/thread observations and
@@ -625,7 +794,8 @@ dirty live threads per interval rather than the old 6,142,998 checkpoints.
 
 ## Future user gameplay workflow
 
-Use a new run ID. Do not reuse or overwrite `fable2-tu1-manual-001`.
+Use a new run ID. Do not reuse or overwrite `fable2-tu1-manual-001` or
+`fable2-tu1-manual-002`.
 
 ### Preflight only
 
@@ -634,8 +804,8 @@ Set-Location C:\Dev\Fable2Recomp
 
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Preflight `
-    -RunId fable2-tu1-manual-002 `
-    -Label 'Fable II GOTY TU1 post-repair manual gameplay coverage' `
+    -RunId fable2-tu1-manual-003 `
+    -Label 'Fable II GOTY TU1 additional manual gameplay coverage' `
     -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
     -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
     -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
@@ -658,8 +828,8 @@ Preflight must print and verify:
 ```powershell
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action Launch `
-    -RunId fable2-tu1-manual-002 `
-    -Label 'Fable II GOTY TU1 post-repair manual gameplay coverage' `
+    -RunId fable2-tu1-manual-003 `
+    -Label 'Fable II GOTY TU1 additional manual gameplay coverage' `
     -GamePath 'D:\Fable2-Recomp\disc\Fable II - Game of the Year Edition.iso' `
     -AnalysisImagePath 'D:\Fable2-Recomp\tu1\default.xex' `
     -ContentRoot 'C:\Dev\Fable2Phase4Xenia\content' `
@@ -692,7 +862,7 @@ Close Xenia through the ordinary window-close path.
 ### Confirm the footer before PostRun
 
 ```powershell
-$rawPath = 'C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-002\xenia-indirect-targets.raw.jsonl'
+$rawPath = 'C:\Dev\Fable2Recomp\out\indirect-targets\fable2-tu1-manual-003\xenia-indirect-targets.raw.jsonl'
 $footer = Get-Content -LiteralPath $rawPath -Tail 1 | ConvertFrom-Json
 
 $footer | Select-Object `
@@ -703,7 +873,7 @@ $footer | Select-Object `
     count_overflows, aggregate_limit_exceeded
 ```
 
-Expected values include `record=footer`, `run_id=fable2-tu1-manual-002`,
+Expected values include `record=footer`, `run_id=fable2-tu1-manual-003`,
 `raw_schema_version=2`, `collector_version=2`,
 `shutdown_status=normal` and `flush_reason=window_close`. The file must end in
 a newline. If the footer is absent, preserve the raw file and Xenia log; do not
@@ -715,7 +885,7 @@ marked incomplete.
 ```powershell
 .\tools\Invoke-Fable2XeniaIndirectTrace.ps1 `
     -Action PostRun `
-    -RunId fable2-tu1-manual-002
+    -RunId fable2-tu1-manual-003
 ```
 
 PostRun summarizes, validates identity and emits a dry-run plan. It never
@@ -745,6 +915,19 @@ be removed. This repair does not delete it automatically.
 
 ## Troubleshooting
 
+- Summary merge asks for at least two inputs: repeat `--summary`; do not pass a
+  deleted raw JSONL path. The command consumes compact summary JSON only.
+- Duplicate input path, run ID or recorded raw SHA-256: stop and identify the
+  duplicated evidence. A missing underlying raw file does not weaken this
+  guard because the preserved hash is authoritative for duplicate detection.
+- Canonical identity rejection: inspect the summary's patched hash,
+  title/media/version, selected title-module range and loaded fingerprint. Do
+  not edit the compact artifact to force acceptance.
+- A schema-1 summary may preserve `raw_schema_version=null`; this is compatible
+  legacy metadata, not evidence that the raw file is required. Unsupported
+  non-null versions are rejected.
+- A normal run with one footer but no retained footer reason may be described
+  as clean, but its reason must remain unknown. Do not infer `window_close`.
 - Missing footer with complete newline/checkpoints: treat as
   `abnormal_or_unknown_no_footer`, retain the Xenia log and check whether the
   build identifies itself as `6b6715b02`. An older build still has the
@@ -765,11 +948,11 @@ be removed. This repair does not delete it automatically.
 
 ## Remaining limitations and boundary
 
-- A real post-repair private-TU1 gameplay capture and real-game overhead sample
-  remain pending user action.
-- Synthetic tests prove the explicit lifecycle call and footer ordering, but a
-  future normal GUI close against the private title is the final end-to-end
-  confirmation.
+- Manual-002 is a real post-repair private-TU1 capture and its summary proves
+  one clean footer. The schema-1 summary did not retain the footer reason, so
+  `window_close` cannot be revalidated from compact evidence alone.
+- No real-game collector-overhead sample was retained; performance numbers in
+  this document remain synthetic or offline-tool measurements.
 - The old accepted capture is evidence from real gameplay but used collector
   schema 1 and cannot validate schema-2 volume or footer behavior.
 - The current real evidence has no proposed, ambiguous or conflicting target,
@@ -783,8 +966,10 @@ be removed. This repair does not delete it automatically.
   GPU/skinned-material or texture issue. Saving in that run remains untested,
   not failed.
 
-The safest next action is Preflight, then the user-run Launch, ordinary window
-close, footer check and PostRun sequence above.
+The safest next action is to review and preserve the merged compact artifacts,
+then use their 567 manual-002-only targets to prioritize unresolved static
+ownership work. Another capture is optional and should use manual-003 or a new
+unique run ID; it is not required to validate this merge workflow.
 
 ## Commit and publication policy
 
@@ -794,6 +979,7 @@ Local repair commits:
 Xenia Canary     6b6715b029d442ff6ed5a89773f119400b1c19b5
 Fable2Recomp     9c46998a993ea2046b1e9a873d7d9521eb2f44ad
 documentation    commit containing this file
+summary merge    commit containing tool version 1.3.0
 ```
 
 The ReXGlue SDK was not modified by this repair, and its expected local

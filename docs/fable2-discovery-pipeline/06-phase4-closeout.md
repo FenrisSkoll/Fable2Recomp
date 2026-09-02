@@ -132,6 +132,25 @@ artifacts and three deterministic ZIP packages. ZIPs are constructed from
 explicit member allowlists, inspected for path traversal/unexpected content,
 extracted into fresh temporary directories and rehashed before publication.
 
+`tools/Archive-Fable2Phase4.py` creates this structure after the final feature,
+`main` and Xenia collector commits are clean and available as local refs:
+
+```powershell
+python .\tools\Archive-Fable2Phase4.py `
+    --archive-root C:\Dev\Fable2Phase4Archive\2026-09-02-phase4-closeout `
+    --xenia-repository C:\Dev\Fable2Phase4Xenia\xenia-canary `
+    --validation-results .\out\indirect-targets\fable2-tu1-manual-001-002-merged\phase4-closeout-validation.json `
+    --created-utc <explicit-ISO-8601-UTC-timestamp>
+```
+
+The tool refuses a dirty repository or any pre-existing archive target, checks
+the canonical manifest and exact compact identities/counts, verifies the
+567-target queue, creates deterministic ZIP timestamps/order/permissions,
+rejects absolute/traversing/hidden/private-runtime member names, extracts and
+rehashes every member, creates both Git bundles and runs `git bundle verify`.
+It then generates `SHA256SUMS.txt` for every durable file except the checksum
+file and its byte-identical release copy (the unavoidable self-hash exclusion).
+
 The evidence publication uses:
 
 ```text

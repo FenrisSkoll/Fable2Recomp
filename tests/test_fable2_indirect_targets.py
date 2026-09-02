@@ -63,6 +63,7 @@ def schema_errors(
     expected_type = schema.get("type")
     type_matches = {
         "array": isinstance(instance, list),
+        "null": instance is None,
         "object": isinstance(instance, dict),
         "string": isinstance(instance, str),
         "integer": isinstance(instance, int) and not isinstance(instance, bool),
@@ -509,6 +510,250 @@ def rename_summary_run(summary: dict, run_id: str) -> None:
         pair["run_hit_counts"] = {run_id: pair["run_hit_counts"].pop(previous)}
         for observation in pair["thread_observations"]:
             observation["run_id"] = run_id
+
+
+def replace_summary_pairs(
+    summary: dict,
+    targets: list[tuple[int, str]],
+    *,
+    legacy_metadata: bool,
+) -> None:
+    run = summary["runs"][0]
+    run_id = run["run_id"]
+    template = copy.deepcopy(summary["pairs"][0])
+    pairs = []
+    total_hits = 0
+    for index, (target, classification) in enumerate(targets, start=1):
+        pair = copy.deepcopy(template)
+        branch_kind, link = {
+            "existing_manifest_function": ("bctrl", True),
+            "existing_function_internal_entry": ("bclr", False),
+            "known_jump_table_case": ("bctr", False),
+        }[classification]
+        hits = index
+        source = 0x82E00000 + index * 4
+        pair.update(
+            {
+                "source_module": "default",
+                "source": p4.address_text(source),
+                "target_module": "default",
+                "target": p4.address_text(target),
+                "branch_kind": branch_kind,
+                "link": link,
+                "ordinary_return": False,
+                "hit_count": hits,
+                "observed_runs": [run_id],
+                "run_hit_counts": {run_id: hits},
+                "target_validity": ["known_executable_module"],
+                "thread_observations": [
+                    {
+                        "run_id": run_id,
+                        "thread_key": "guest:00000007",
+                        "first_sequence": index,
+                        "last_sequence": index,
+                        "hit_count": hits,
+                    }
+                ],
+            }
+        )
+        pairs.append(pair)
+        total_hits += hits
+    pairs.sort(key=p4.stable_pair_key)
+    summary["pairs"] = pairs
+    summary["counts"]["unique_pairs"] = len(pairs)
+    summary["counts"]["total_hits"] = total_hits
+    run["counters"]["total_hits"] = total_hits
+    run["counters"]["total_pair_records"] = len(pairs)
+    if legacy_metadata:
+        summary["tool"]["version"] = "1.1.0"
+        run["collector_version"] = 1
+        run.pop("raw_schema_version", None)
+        run.pop("uncommitted_pair_records", None)
+        run.pop("flush_reason", None)
+        run["flush_status"] = "abnormal_or_unknown_no_footer"
+        run["record_counts"].pop("footer", None)
+        run["counters"].pop("aggregate_limit_exceeded", None)
+        summary["counts"].pop("aggregate_limit_exceeded", None)
+        summary["counts"]["abnormal_or_truncated_runs"] = 1
+    else:
+        summary["tool"]["version"] = "1.2.0"
+        run["collector_version"] = 2
+        run["raw_schema_version"] = 2
+        run.pop("flush_reason", None)
+        run["flush_status"] = "normal"
+        run["record_counts"]["footer"] = 1
+        run["counters"]["aggregate_limit_exceeded"] = 0
+        summary["counts"]["aggregate_limit_exceeded"] = 0
+        summary["counts"]["abnormal_or_truncated_runs"] = 0
+
+
+def synthetic_follow_up_inputs() -> tuple[dict, dict, dict, dict, dict, list[dict]]:
+    baseline, contributing = synthetic_individual_summaries()
+    baseline_targets = [(0x82170000, "existing_manifest_function")]
+    classifications = (
+        ["existing_function_internal_entry"] * 42
+        + ["known_jump_table_case"] * 114
+        + ["existing_manifest_function"] * 411
+    )
+    contributing_targets = [
+        (0x82180000 + index * 0x20, classification)
+        for index, classification in enumerate(classifications)
+    ]
+    replace_summary_pairs(baseline, baseline_targets, legacy_metadata=True)
+    replace_summary_pairs(
+        contributing, contributing_targets, legacy_metadata=False
+    )
+    merged = p4.merge_summaries([baseline, contributing])
+
+    closure = {
+        "ranges": {},
+        "starts": [],
+        "schema_version": 3,
+        "analyzer_version": "synthetic",
+        "image_identity": merged["identity"],
+    }
+    plan_targets = []
+    merged_by_target, _ = p4.group_target_observations(merged)
+    classification_by_target = dict(baseline_targets + contributing_targets)
+    for target in sorted(merged_by_target):
+        classification = classification_by_target[target]
+        pair = copy.deepcopy(merged_by_target[target][0])
+        evidence = [
+            {
+                "kind": "xenia_runtime_indirect_target",
+                "source_sites": [pair["source"]],
+            }
+        ]
+        ownership = None
+        rejection_reasons = []
+        if classification == "existing_manifest_function":
+            evidence.append(
+                {
+                    "kind": "existing_effective_registration",
+                    "canonical_manifest_override": False,
+                    "current_generated_registration": True,
+                    "generated_symbol": f"sub_{target:08X}",
+                    "manifest": None,
+                }
+            )
+            owner_address = target
+            rejection_reasons.append("already_registered_no_manifest_change")
+        elif classification == "existing_function_internal_entry":
+            owner_address = target - 4
+            ownership = {
+                "kind": "known_function_range_internal_entry",
+                "owner_address": p4.address_text(owner_address),
+            }
+            evidence.append(
+                {
+                    "kind": "known_function_ownership",
+                    "owner_range": {
+                        "start": p4.address_text(owner_address),
+                        "end": p4.address_text(target + 4),
+                        "authority": "synthetic",
+                        "trusted": True,
+                    },
+                }
+            )
+            rejection_reasons.append("target_is_inside_an_existing_function")
+        else:
+            owner_address = target - 8
+            ownership = {
+                "kind": "recovered_jump_table_case",
+                "owner_address": p4.address_text(owner_address),
+            }
+            evidence.append(
+                {
+                    "kind": "phase3_jump_table_ownership",
+                    "records": [
+                        {
+                            "owner_address": p4.address_text(owner_address),
+                            "dispatch": pair["source"],
+                            "table_address": p4.address_text(target - 0x10),
+                            "table_kind": "synthetic_absolute_pointer",
+                            "origin": "synthetic",
+                            "confidence": "confirmed",
+                            "independently_callable": False,
+                        }
+                    ],
+                }
+            )
+            rejection_reasons.append("owned_switch_case_not_a_standalone_function")
+        closure["ranges"][owner_address] = {
+            "start": owner_address,
+            "end": target + 4,
+            "size": target + 4 - owner_address,
+            "authority": "synthetic",
+            "trusted": True,
+        }
+        plan_targets.append(
+            {
+                "target": p4.address_text(target),
+                "classification": classification,
+                "confidence": "CONFIRMED",
+                "runtime": {
+                    "source_sites": [pair["source"]],
+                    "branch_kinds": [pair["branch_kind"]],
+                    "observed_runs": pair["observed_runs"],
+                    "hit_count": pair["hit_count"],
+                    "observations": [pair],
+                },
+                "ownership": ownership,
+                "evidence": evidence,
+                "conflicts": [],
+                "rejection_reasons": rejection_reasons,
+                "proposal": None,
+                "automatic_application_permitted": False,
+                "candidate_id": p4.candidate_identifier(
+                    target, classification, None
+                ),
+            }
+        )
+    closure["starts"] = sorted(closure["ranges"])
+
+    merged_hash = "C" * 64
+    plan = {
+        "schema": {"name": p4.PLAN_SCHEMA_NAME, "version": 1},
+        "tool": {"name": "Fable2IndirectTargets", "version": p4.TOOL_VERSION},
+        "mode": "dry_run",
+        "inputs": {
+            "summary": {
+                "sha256": merged_hash,
+                "run_ids": sorted(
+                    run["run_id"] for run in merged["runs"]
+                ),
+                "raw_trace_sha256": sorted(
+                    run["raw_sha256"] for run in merged["runs"]
+                ),
+            }
+        },
+        "targets": plan_targets,
+        "proposals": [],
+        "safety": {
+            "canonical_manifest_modified": False,
+            "placeholder_implementations_supported": False,
+        },
+    }
+    plan["plan_id"] = (
+        "P4PLAN-" + p4.sha256_bytes(p4.canonical_json_bytes(plan))[:20]
+    )
+    input_records = [
+        {
+            "role": role,
+            "file_name": f"{role}.json",
+            "sha256": sha,
+            "schema": schema,
+            **({"plan_id": plan["plan_id"]} if role == "import_plan" else {}),
+        }
+        for role, sha, schema in (
+            ("baseline_summary", "A" * 64, baseline["schema"]),
+            ("contributing_summary", "B" * 64, contributing["schema"]),
+            ("entrypoint_closure", "D" * 64, {"name": "closure", "version": 3}),
+            ("import_plan", "E" * 64, plan["schema"]),
+            ("merged_summary", merged_hash, merged["schema"]),
+        )
+    ]
+    return baseline, contributing, merged, plan, closure, input_records
 
 
 class PreflightTests(unittest.TestCase):
@@ -1341,6 +1586,143 @@ class SummaryMergeTests(unittest.TestCase):
         merged = p4.merge_summaries([legacy, second], expected)
         self.assertIsNone(merged["runs"][0]["raw_schema_version"])
         self.assertEqual(1, merged["counts"]["abnormal_or_truncated_runs"])
+
+
+class StaticOwnershipFollowUpTests(unittest.TestCase):
+    def test_optional_run_metadata_is_normalized_without_inference(self) -> None:
+        baseline, contributing, _, _, _, _ = synthetic_follow_up_inputs()
+        baseline_run = baseline["runs"][0]
+        contributing_run = contributing["runs"][0]
+        self.assertNotIn("raw_schema_version", baseline_run)
+        self.assertNotIn("flush_reason", baseline_run)
+        self.assertEqual(2, contributing_run["raw_schema_version"])
+        self.assertNotIn("flush_reason", contributing_run)
+
+        legacy = p4.normalize_summary_run_metadata(baseline_run, "legacy")
+        current = p4.normalize_summary_run_metadata(contributing_run, "current")
+        self.assertIsNone(legacy["raw_schema_version"])
+        self.assertEqual(
+            "unavailable_in_legacy_summary",
+            legacy["raw_schema_version_status"],
+        )
+        self.assertEqual(2, current["raw_schema_version"])
+        self.assertEqual("recorded", current["raw_schema_version_status"])
+        self.assertIsNone(legacy["flush_reason"])
+        self.assertIsNone(current["flush_reason"])
+        self.assertEqual(
+            "unavailable_in_compact_summary", legacy["flush_reason_status"]
+        )
+        self.assertEqual(
+            "unavailable_in_compact_summary", current["flush_reason_status"]
+        )
+
+    def test_exact_deferred_queue_is_deterministic_and_report_only(self) -> None:
+        baseline, contributing, merged, plan, closure, inputs = (
+            synthetic_follow_up_inputs()
+        )
+        manifest = b"[entrypoint.functions]\n# unchanged\n"
+        report = p4.build_static_ownership_follow_up(
+            baseline, contributing, merged, plan, closure, inputs
+        )
+        second = p4.build_static_ownership_follow_up(
+            baseline, contributing, merged, plan, closure, inputs
+        )
+        self.assertEqual(manifest, b"[entrypoint.functions]\n# unchanged\n")
+        self.assertEqual(
+            p4.canonical_json_bytes(report), p4.canonical_json_bytes(second)
+        )
+        self.assertEqual(
+            p4.static_ownership_follow_up_csv_bytes(report),
+            p4.static_ownership_follow_up_csv_bytes(second),
+        )
+        self.assertEqual(
+            p4.static_ownership_follow_up_markdown_bytes(report),
+            p4.static_ownership_follow_up_markdown_bytes(second),
+        )
+
+        self.assertEqual(567, report["counts"]["targets"])
+        self.assertEqual(
+            {
+                "existing_function_internal_entry": 42,
+                "existing_manifest_function": 411,
+                "known_jump_table_case": 114,
+            },
+            report["counts"]["by_classification"],
+        )
+        baseline_targets, _ = p4.group_target_observations(baseline)
+        contributing_targets, _ = p4.group_target_observations(contributing)
+        reported_targets = {
+            p4.address(item["target"], "reported target")
+            for item in report["targets"]
+        }
+        self.assertEqual(
+            set(contributing_targets) - set(baseline_targets), reported_targets
+        )
+        self.assertTrue(
+            all(item["absent_from_baseline_run"] for item in report["targets"])
+        )
+        self.assertTrue(
+            all(
+                item["no_manifest_proposal"]["proposal"] is None
+                for item in report["targets"]
+            )
+        )
+        self.assertTrue(
+            all(
+                item["no_manifest_proposal"]["automatic_application_permitted"]
+                is False
+                for item in report["targets"]
+            )
+        )
+        internal = [
+            item
+            for item in report["targets"]
+            if item["classification"] == "existing_function_internal_entry"
+        ]
+        jump_cases = [
+            item
+            for item in report["targets"]
+            if item["classification"] == "known_jump_table_case"
+        ]
+        self.assertTrue(all(item["owner"]["address"] for item in internal))
+        self.assertTrue(all(item["owner"]["address"] for item in jump_cases))
+        self.assertTrue(all(item["owning_jump_tables"] for item in jump_cases))
+        self.assertFalse(report["safety"]["canonical_manifest_modified"])
+        self.assertEqual(0, report["counts"]["range_proposals"])
+        self.assertEqual(0, report["counts"]["automatically_applicable"])
+        self.assertFalse(report["safety"]["automatic_function_split_or_promotion"])
+        self.assertFalse(
+            report["safety"][
+                "jump_table_cases_promoted_without_callable_evidence"
+            ]
+        )
+        self.assertFalse(
+            report["safety"]["placeholder_or_stub_generation_supported"]
+        )
+        self.assertNotIn("RETURN_R3_ZERO", json.dumps(report))
+
+        provenance = {item["role"]: item for item in report["run_provenance"]}
+        self.assertIsNone(provenance["baseline"]["raw_schema_version"])
+        self.assertEqual(
+            "unavailable_in_legacy_summary",
+            provenance["baseline"]["raw_schema_version_status"],
+        )
+        self.assertEqual(2, provenance["contributing"]["raw_schema_version"])
+        self.assertEqual(
+            "recorded",
+            provenance["contributing"]["raw_schema_version_status"],
+        )
+        self.assertIsNone(provenance["baseline"]["flush_reason"])
+        self.assertIsNone(provenance["contributing"]["flush_reason"])
+
+        follow_up_schema = json.loads(
+            (
+                TOOLS
+                / "schemas"
+                / "fable2-phase4-static-ownership-follow-up-v1.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual([], schema_errors(report, follow_up_schema))
 
 
 class PlannerFixture:

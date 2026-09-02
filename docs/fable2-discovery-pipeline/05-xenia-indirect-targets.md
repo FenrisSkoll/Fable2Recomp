@@ -43,6 +43,12 @@ for manual-001 and manual-002 contains 16,143 observed non-return targets, no
 range proposals, no ambiguous or conflicting targets and no automatically
 applicable candidates.
 
+Closeout also materializes a deterministic, report-only static-ownership queue
+for the 567 targets contributed only by manual-002. The queue contains 42
+existing-function internal entries, 114 known jump-table cases and 411
+existing effective registrations. It is deferred evidence, not a manifest
+proposal; native save-write parity remains the next active development phase.
+
 ## Repair baseline and repository state
 
 The repair began in the canonical worktree `C:\Dev\Fable2Recomp`, not the
@@ -593,6 +599,74 @@ The jump-table plan also retains historical corroboration at `0x823DCAD8` and
 `0x82403720`; neither address is falsely required to execute in both captures.
 Every acceptance fixture passed and `canonical_manifest_modified=false`.
 
+## Deferred static-ownership follow-up
+
+`ownership-follow-up` turns the real compact summaries and merged dry-run plan
+into a deterministic review queue without opening either raw trace:
+
+```powershell
+python .\tools\Fable2IndirectTargets.py ownership-follow-up `
+    --baseline-summary .\out\indirect-targets\fable2-tu1-manual-001\review\xenia-indirect-targets.summary.json `
+    --contributing-summary .\out\indirect-targets\fable2-tu1-manual-002\review\xenia-indirect-targets.summary.json `
+    --merged-summary .\out\indirect-targets\fable2-tu1-manual-001-002-merged\xenia-indirect-targets.summary.json `
+    --plan .\out\indirect-targets\fable2-tu1-manual-001-002-merged\fable2-indirect-targets.import-plan.json `
+    --output-directory .\out\indirect-targets\fable2-tu1-manual-001-002-merged `
+    --expect-targets 567 `
+    --expect-existing-registrations 411 `
+    --expect-internal-entries 42 `
+    --expect-jump-table-cases 114
+```
+
+The authoritative JSON follows
+`tools/schemas/fable2-phase4-static-ownership-follow-up-v1.schema.json`.
+It records exact input hashes, identity, per-run termination provenance,
+priority, target, source/kind/hits, current owner and range, effective
+registration or jump-table provenance, conflicts, static corroboration and the
+reason no manifest proposal exists. CSV is an address-review view and Markdown
+is a concise handoff. All three omit generation timestamps and use canonical
+sorting, so regeneration from identical compact inputs is byte-identical.
+
+Run metadata is normalized once for validation and report generation. Missing
+legacy fields remain missing evidence rather than guessed facts:
+
+- manual-001 has collector schema 1, `raw_schema_version=null` with status
+  `unavailable_in_legacy_summary`, no footer and
+  `abnormal_or_unknown_no_footer`;
+- manual-002 has collector schema 2 and explicit `raw_schema_version=2`, with
+  one normal footer;
+- neither compact summary records `flush_reason`, so both queue records use
+  `flush_reason=null` with status `unavailable_in_compact_summary`;
+- in particular, the queue does not invent `window_close` for manual-001 or
+  infer a raw schema from its collector version.
+
+The closeout outputs are:
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `phase4-static-ownership-follow-up.json` | 1,197,339 | `9DF543E67C4E0EE121BDAD9142E57138C3D5823B2FE72D25E02B17CB19C2C987` |
+| `phase4-static-ownership-follow-up.csv` | 217,426 | `DFCABBF4E36DF9ED3E962E946011A1C9E2489C0C2F9A9542D2C7DA062BC414EE` |
+| `phase4-static-ownership-follow-up.md` | 75,498 | `713A73C703B847504AC79BC214F13B2CE8321FBC2EEA1D652D36E30E3E70A016` |
+
+The JSON report ID is `P4OWN-64AD322EA200BCB401C0`. Its exact split is:
+
+| Priority | Classification | Targets | Required future review |
+| --- | --- | ---: | --- |
+| 1 | existing function internal entry | 42 | Distinguish ordinary basic blocks, callable mid-function entries, exception landings, incorrect boundaries and unresolved cases. |
+| 2 | known jump-table case | 114 | Confirm owner, dispatch/table identity, recovered target set, CFG ownership and manual-annotation equivalence. |
+| 3 | existing effective registration | 411 | Treat as runtime corroboration unless static ownership or registration provenance disagrees. |
+
+Every item is present in manual-002 and absent from manual-001. The report has
+zero range proposals, zero manifest proposals and zero automatically applicable
+items. It cannot split/promote a function, turn a switch case into a function,
+apply a manifest edit or generate a placeholder implementation. Regeneration
+left `fable2_manifest.toml` at SHA-256
+`E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0`.
+
+The JSON, CSV and Markdown are stored beside the merged compact evidence in the
+ignored output tree, copied into the Phase 4 local archive and included in the
+allowlisted merged evidence ZIP. They are intentionally not added as bulk data
+to normal Git history.
+
 ## Automated validation
 
 Commands used for this repair include:
@@ -966,10 +1040,11 @@ be removed. This repair does not delete it automatically.
   GPU/skinned-material or texture issue. Saving in that run remains untested,
   not failed.
 
-The safest next action is to review and preserve the merged compact artifacts,
-then use their 567 manual-002-only targets to prioritize unresolved static
-ownership work. Another capture is optional and should use manual-003 or a new
-unique run ID; it is not required to validate this merge workflow.
+Phase 4 closeout preserves the merged compact artifacts and the deterministic
+567-target queue. Static ownership review is deferred backlog, not discarded
+work and not a prerequisite for beginning native save-write parity. Another
+capture is optional and should use manual-003 or another unique run ID; it is
+not required for ownership analysis or Phase 4 completion.
 
 ## Commit and publication policy
 
@@ -985,6 +1060,11 @@ summary merge    commit containing tool version 1.3.0
 The ReXGlue SDK was not modified by this repair, and its expected local
 `thirdparty/libmspack` state was preserved.
 
-No push, merge, history rewrite, tag, pull request, release, asset publication
-or external upload occurred. No private XEX, ISO, XEXP, STFS package, save,
-memory dump, raw gameplay trace or compiled binary was staged or committed.
+The earlier implementation and repair commits were local when their validation
+sections were written. The authorized closeout publishes the full feature
+history, an explicit `main` merge boundary, the separate Xenia collector branch
+and an allowlisted compact-evidence release. Publication details and archive
+identities are recorded in `06-phase4-closeout.md` and the archive manifest.
+No private XEX, ISO, XEXP, STFS package, save, memory dump, raw gameplay trace,
+content/storage/cache state, credential or compiled binary belongs in a commit
+or evidence asset.

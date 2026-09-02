@@ -39,8 +39,16 @@ SUMMARY_SCHEMA_NAME = "fable2-xenia-indirect-target-summary"
 SUMMARY_SCHEMA_VERSION = 1
 PLAN_SCHEMA_NAME = "fable2-indirect-target-import-plan"
 PLAN_SCHEMA_VERSION = 1
+FOLLOW_UP_SCHEMA_NAME = "fable2-phase4-static-ownership-follow-up"
+FOLLOW_UP_SCHEMA_VERSION = 1
 TOOL_VERSION = "1.3.0"
 UINT64_MAX = (1 << 64) - 1
+
+FOLLOW_UP_PRIORITIES = {
+    "existing_function_internal_entry": (1, "P1_internal_entry"),
+    "known_jump_table_case": (2, "P2_jump_table_case"),
+    "existing_manifest_function": (3, "P3_effective_registration"),
+}
 
 COMPLETE_GAME_MEDIA_TYPES = {
     ".iso": "xbox_360_disc_image",
@@ -1102,6 +1110,55 @@ def validate_summary_module(
     return module
 
 
+def normalize_summary_run_metadata(
+    run: dict[str, Any], location: str
+) -> dict[str, Any]:
+    """Expose version-dependent compact-run fields without inventing evidence."""
+    if "raw_schema_version" not in run:
+        raw_schema_version = None
+        raw_schema_version_status = "unavailable_in_legacy_summary"
+    elif run["raw_schema_version"] is None:
+        raw_schema_version = None
+        raw_schema_version_status = "explicit_null"
+    else:
+        raw_schema_version = require_uint64(
+            run["raw_schema_version"], f"{location}.raw_schema_version"
+        )
+        raw_schema_version_status = "recorded"
+
+    if "flush_reason" not in run:
+        flush_reason = None
+        flush_reason_status = "unavailable_in_compact_summary"
+    elif run["flush_reason"] is None:
+        flush_reason = None
+        flush_reason_status = "explicit_null"
+    else:
+        flush_reason = require_string(
+            run["flush_reason"], f"{location}.flush_reason"
+        )
+        flush_reason_status = "recorded"
+
+    record_counts = require_object(
+        run.get("record_counts"), f"{location}.record_counts"
+    )
+    footer_records = require_uint64(
+        record_counts.get("footer", 0), f"{location}.record_counts.footer"
+    )
+    uncommitted_pair_records = run.get("uncommitted_pair_records")
+    if uncommitted_pair_records is not None:
+        uncommitted_pair_records = require_uint64(
+            uncommitted_pair_records, f"{location}.uncommitted_pair_records"
+        )
+    return {
+        "raw_schema_version": raw_schema_version,
+        "raw_schema_version_status": raw_schema_version_status,
+        "flush_reason": flush_reason,
+        "flush_reason_status": flush_reason_status,
+        "footer_records": footer_records,
+        "uncommitted_pair_records": uncommitted_pair_records,
+    }
+
+
 def validate_summary(
     document: dict[str, Any],
     expected_identity: dict[str, Any] | None = None,
@@ -1200,11 +1257,9 @@ def validate_summary(
         require_string(run.get("raw_file_name"), f"{location}.raw_file_name")
         require_string(run.get("xenia_commit"), f"{location}.xenia_commit")
         require_uint64(run.get("collector_version"), f"{location}.collector_version")
-        raw_schema_version = run.get("raw_schema_version")
+        normalized_metadata = normalize_summary_run_metadata(run, location)
+        raw_schema_version = normalized_metadata["raw_schema_version"]
         if raw_schema_version is not None:
-            raw_schema_version = require_uint64(
-                raw_schema_version, f"{location}.raw_schema_version"
-            )
             if raw_schema_version not in SUPPORTED_RAW_SCHEMA_VERSIONS:
                 raise Phase4Error(
                     f"{location}.raw_schema_version {raw_schema_version} is not "
@@ -1263,14 +1318,11 @@ def validate_summary(
         )
         for key, count in record_counts.items():
             require_uint64(count, f"{location}.record_counts.{key}")
-        footer_count = record_counts.get("footer", 0)
+        footer_count = normalized_metadata["footer_records"]
         if footer_count > 1:
             raise Phase4Error(f"{location} records more than one footer")
         if flush_status == "normal" and footer_count != 1:
             raise Phase4Error(f"normal run {run_id} must record exactly one footer")
-        uncommitted = run.get("uncommitted_pair_records")
-        if uncommitted is not None:
-            require_uint64(uncommitted, f"{location}.uncommitted_pair_records")
 
         run_counters = require_object(run.get("counters"), f"{location}.counters")
         for key in (
@@ -2768,6 +2820,839 @@ def read_plan(path: Path) -> dict[str, Any]:
     return validate_plan(require_object(document, "plan"))
 
 
+def accepted_run_records(summary: dict[str, Any], location: str) -> list[dict[str, Any]]:
+    runs = [run for run in summary["runs"] if run["identity_match"]]
+    if len(runs) != 1:
+        raise Phase4Error(
+            f"{location} must contain exactly one accepted run; found {len(runs)}"
+        )
+    return runs
+
+
+def follow_up_input_record(
+    role: str, path: Path, document: dict[str, Any]
+) -> dict[str, Any]:
+    schema = require_object(document.get("schema"), f"{role}.schema")
+    record: dict[str, Any] = {
+        "role": role,
+        "file_name": path.name,
+        "sha256": sha256_file(path),
+        "schema": json.loads(json.dumps(schema)),
+    }
+    if role.endswith("summary"):
+        record["run_ids"] = sorted(run["run_id"] for run in document["runs"])
+    elif role == "import_plan":
+        record["plan_id"] = document["plan_id"]
+    return record
+
+
+def follow_up_run_provenance(run: dict[str, Any], role: str) -> dict[str, Any]:
+    counters = run["counters"]
+    metadata = normalize_summary_run_metadata(
+        run, f"follow_up.run_provenance.{role}"
+    )
+    return {
+        "role": role,
+        "run_id": run["run_id"],
+        "label": run["label"],
+        "collector_version": run["collector_version"],
+        "raw_schema_version": metadata["raw_schema_version"],
+        "raw_schema_version_status": metadata["raw_schema_version_status"],
+        "recorded_raw_sha256": run["raw_sha256"],
+        "raw_hash_provenance": "preserved_compact_summary_metadata_not_recomputed",
+        "flush_status": run["flush_status"],
+        "flush_reason": metadata["flush_reason"],
+        "flush_reason_status": metadata["flush_reason_status"],
+        "footer_records": metadata["footer_records"],
+        "corrupt_tail": run["corrupt_tail"],
+        "missing_final_newline": run["missing_final_newline"],
+        "integrity_warnings": list(run["integrity_warnings"]),
+        "counters": {
+            "total_hits": counters["total_hits"],
+            "dropped_hits": counters["dropped_hits"],
+            "io_errors": counters["io_errors"],
+            "count_overflows": counters["count_overflows"],
+            "aggregate_limit_exceeded": counters.get(
+                "aggregate_limit_exceeded", 0
+            ),
+        },
+    }
+
+
+def follow_up_owner_range(
+    target_record: dict[str, Any],
+    closure: dict[str, Any],
+) -> tuple[str | None, dict[str, Any] | None]:
+    classification = target_record["classification"]
+    ownership = target_record.get("ownership") or {}
+    owner_address = ownership.get("owner_address")
+    if classification == "existing_manifest_function":
+        owner_address = target_record["target"]
+
+    owner_range: dict[str, Any] | None = None
+    for evidence in target_record.get("evidence", []):
+        if evidence.get("kind") == "known_function_ownership":
+            value = evidence.get("owner_range")
+            if isinstance(value, dict):
+                owner_range = json.loads(json.dumps(value))
+                break
+        if evidence.get("kind") == "existing_effective_registration":
+            manifest = evidence.get("manifest")
+            if isinstance(manifest, dict) and isinstance(manifest.get("range"), dict):
+                owner_range = json.loads(json.dumps(manifest["range"]))
+                break
+
+    if owner_address is not None:
+        owner_value = address(owner_address, "follow-up owner address")
+        closure_range = closure["ranges"].get(owner_value)
+        if owner_range is None and closure_range is not None:
+            owner_range = {
+                "start": address_text(closure_range["start"]),
+                "end": address_text(closure_range["end"]),
+                "size": address_text(closure_range["size"]),
+                "authority": closure_range["authority"],
+                "trusted": closure_range["trusted"],
+            }
+        owner_address = address_text(owner_value)
+    return owner_address, owner_range
+
+
+def follow_up_jump_tables(target_record: dict[str, Any]) -> list[dict[str, Any]]:
+    records: dict[bytes, dict[str, Any]] = {}
+    for evidence in target_record.get("evidence", []):
+        if evidence.get("kind") != "phase3_jump_table_ownership":
+            continue
+        for value in evidence.get("records", []):
+            record = {
+                key: value.get(key)
+                for key in (
+                    "owner_address",
+                    "dispatch",
+                    "table_address",
+                    "table_kind",
+                    "origin",
+                    "confidence",
+                    "independently_callable",
+                )
+            }
+            records[canonical_json_bytes(record)] = record
+    return sorted(
+        records.values(),
+        key=lambda item: (
+            address(item["owner_address"], "jump-table owner")
+            if item["owner_address"] is not None
+            else UINT64_MAX,
+            address(item["dispatch"], "jump-table dispatch")
+            if item["dispatch"] is not None
+            else UINT64_MAX,
+            address(item["table_address"], "jump-table storage")
+            if item["table_address"] is not None
+            else UINT64_MAX,
+            str(item["table_kind"]),
+        ),
+    )
+
+
+def follow_up_sources(
+    observations: list[dict[str, Any]], contributing_run_id: str
+) -> tuple[list[dict[str, Any]], int]:
+    sources: list[dict[str, Any]] = []
+    hit_count = 0
+    for pair in observations:
+        run_hits = pair["run_hit_counts"].get(contributing_run_id)
+        if run_hits is None:
+            raise Phase4Error(
+                f"target {pair['target']} lacks accounting for {contributing_run_id}"
+            )
+        hit_count, overflow = saturating_add(hit_count, run_hits)
+        if overflow:
+            raise Phase4Error(
+                f"target {pair['target']} contributing hit count exceeds UINT64_MAX"
+            )
+        sources.append(
+            {
+                "source": pair["source"],
+                "branch_kind": pair["branch_kind"],
+                "link": pair["link"],
+                "source_module": pair["source_module"],
+                "target_module": pair["target_module"],
+                "hit_count": run_hits,
+                "target_validity": list(pair["target_validity"]),
+            }
+        )
+    sources.sort(
+        key=lambda item: (
+            address(item["source"], "follow-up source"),
+            item["branch_kind"],
+            item["source_module"],
+            item["target_module"],
+            item["link"],
+        )
+    )
+    return sources, hit_count
+
+
+def follow_up_recommendation(classification: str) -> tuple[str, str]:
+    if classification == "existing_function_internal_entry":
+        return (
+            "owner_recorded_entry_semantics_unresolved",
+            "Determine whether this target is a basic-block landing point, callable "
+            "mid-function entry, exception landing pad, incorrect boundary, or "
+            "unresolved; do not split or promote it from runtime evidence alone.",
+        )
+    if classification == "known_jump_table_case":
+        return (
+            "jump_table_ownership_recorded",
+            "Confirm the owning function, dispatch/table identity, recovered target "
+            "set, CFG ownership, and equivalence with any manual annotation; keep "
+            "the case non-callable absent independent evidence.",
+        )
+    if classification == "existing_manifest_function":
+        return (
+            "effective_registration_corroborated",
+            "No action unless static ownership or registration provenance disagrees; "
+            "the runtime observation corroborates an existing effective registration.",
+        )
+    raise Phase4Error(
+        f"manual follow-up target has unsupported classification {classification!r}"
+    )
+
+
+def build_static_ownership_follow_up(
+    baseline_summary: dict[str, Any],
+    contributing_summary: dict[str, Any],
+    merged_summary: dict[str, Any],
+    plan: dict[str, Any],
+    closure: dict[str, Any],
+    input_records: list[dict[str, Any]],
+    expected_identity: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    validate_summary(baseline_summary, expected_identity)
+    validate_summary(contributing_summary, expected_identity)
+    validate_summary(merged_summary, expected_identity)
+    validate_plan(plan)
+
+    baseline_run = accepted_run_records(
+        baseline_summary, "baseline summary"
+    )[0]
+    contributing_run = accepted_run_records(
+        contributing_summary, "contributing summary"
+    )[0]
+    baseline_run_id = baseline_run["run_id"]
+    contributing_run_id = contributing_run["run_id"]
+    if baseline_run_id == contributing_run_id:
+        raise Phase4Error("baseline and contributing summaries use the same run ID")
+    if baseline_run["raw_sha256"] == contributing_run["raw_sha256"]:
+        raise Phase4Error("baseline and contributing summaries use the same raw hash")
+
+    expected_merged = merge_summaries(
+        [baseline_summary, contributing_summary], expected_identity
+    )
+    if canonical_json_bytes(expected_merged) != canonical_json_bytes(merged_summary):
+        raise Phase4Error(
+            "merged summary is not the deterministic merge of the two inputs"
+        )
+
+    plan_summary = require_object(
+        require_object(plan.get("inputs"), "plan.inputs").get("summary"),
+        "plan.inputs.summary",
+    )
+    merged_input = next(
+        (
+            item
+            for item in input_records
+            if item.get("role") == "merged_summary"
+        ),
+        None,
+    )
+    if merged_input is None:
+        raise Phase4Error("follow-up inputs omit merged_summary metadata")
+    if plan_summary.get("sha256") != merged_input["sha256"]:
+        raise Phase4Error("import plan does not describe the merged summary input")
+    expected_run_ids = sorted((baseline_run_id, contributing_run_id))
+    if plan_summary.get("run_ids") != expected_run_ids:
+        raise Phase4Error("import plan run IDs disagree with the compact summaries")
+    if sorted(plan_summary.get("raw_trace_sha256", [])) != sorted(
+        (baseline_run["raw_sha256"], contributing_run["raw_sha256"])
+    ):
+        raise Phase4Error("import plan raw-hash provenance disagrees with summaries")
+    safety = require_object(plan.get("safety"), "plan.safety")
+    if safety.get("canonical_manifest_modified") is not False:
+        raise Phase4Error("follow-up requires a non-mutating dry-run plan")
+    if safety.get("placeholder_implementations_supported") is not False:
+        raise Phase4Error("follow-up refuses plans that support placeholder stubs")
+    if plan.get("proposals"):
+        raise Phase4Error("follow-up requires a plan with no manifest proposals")
+
+    baseline_targets, _ = group_target_observations(baseline_summary)
+    contributing_targets, _ = group_target_observations(contributing_summary)
+    merged_targets, _ = group_target_observations(merged_summary)
+    new_targets = sorted(set(contributing_targets) - set(baseline_targets))
+    if set(merged_targets) != set(baseline_targets) | set(contributing_targets):
+        raise Phase4Error("merged target coverage does not equal the input union")
+
+    plan_targets: dict[int, dict[str, Any]] = {}
+    for index, value in enumerate(plan.get("targets", [])):
+        target_record = require_object(value, f"plan.targets[{index}]")
+        target = address(target_record.get("target"), f"plan.targets[{index}].target")
+        if target in plan_targets:
+            raise Phase4Error(
+                f"import plan contains duplicate target {address_text(target)}"
+            )
+        plan_targets[target] = target_record
+    if set(plan_targets) != set(merged_targets):
+        raise Phase4Error("import plan target coverage disagrees with merged summary")
+
+    targets: list[dict[str, Any]] = []
+    for target in new_targets:
+        target_record = plan_targets[target]
+        classification = target_record["classification"]
+        priority = FOLLOW_UP_PRIORITIES.get(classification)
+        if priority is None:
+            raise Phase4Error(
+                f"manual-only target {address_text(target)} has out-of-scope "
+                f"classification {classification}"
+            )
+        if target_record.get("proposal") is not None:
+            raise Phase4Error(
+                f"manual-only target {address_text(target)} unexpectedly has a proposal"
+            )
+        if target_record.get("automatic_application_permitted") is not False:
+            raise Phase4Error(
+                f"manual-only target {address_text(target)} permits automatic apply"
+            )
+
+        sources, hit_count = follow_up_sources(
+            contributing_targets[target], contributing_run_id
+        )
+        if any(
+            baseline_run_id in pair["run_hit_counts"]
+            for pair in contributing_targets[target]
+        ):
+            raise Phase4Error(
+                f"manual-only target {address_text(target)} contains baseline hits"
+            )
+        plan_run_hits = sum(
+            observation["run_hit_counts"].get(contributing_run_id, 0)
+            for observation in target_record["runtime"]["observations"]
+        )
+        if plan_run_hits != hit_count:
+            raise Phase4Error(
+                f"manual-only target {address_text(target)} hit counts disagree "
+                "between summary and plan"
+            )
+
+        owner_address, owner_range = follow_up_owner_range(target_record, closure)
+        jump_tables = follow_up_jump_tables(target_record)
+        evidence_kinds = sorted(
+            {
+                evidence["kind"]
+                for evidence in target_record.get("evidence", [])
+                if isinstance(evidence, dict) and isinstance(evidence.get("kind"), str)
+            }
+        )
+        static_status, recommended_action = follow_up_recommendation(classification)
+        effective_provenance = [
+            json.loads(json.dumps(evidence))
+            for evidence in target_record.get("evidence", [])
+            if evidence.get("kind") == "existing_effective_registration"
+        ]
+        record = {
+            "priority": {"rank": priority[0], "class": priority[1]},
+            "target": address_text(target),
+            "contributing_run_id": contributing_run_id,
+            "contributing_run_hit_count": hit_count,
+            "absent_from_baseline_run": True,
+            "baseline_run_id": baseline_run_id,
+            "observed_sources": sources,
+            "classification": classification,
+            "confidence": target_record["confidence"],
+            "candidate_id": target_record["candidate_id"],
+            "owner": {
+                "address": owner_address,
+                "range": owner_range,
+                "kind": (target_record.get("ownership") or {}).get("kind"),
+            },
+            "effective_registration_provenance": effective_provenance,
+            "owning_jump_tables": jump_tables,
+            "evidence_kinds": evidence_kinds,
+            "static_corroboration": {
+                "status": static_status,
+                "evidence_kinds": [
+                    kind
+                    for kind in evidence_kinds
+                    if kind != "xenia_runtime_indirect_target"
+                ],
+            },
+            "conflicts": sorted(set(target_record.get("conflicts", []))),
+            "no_manifest_proposal": {
+                "proposal": None,
+                "automatic_application_permitted": False,
+                "reasons": sorted(set(target_record.get("rejection_reasons", []))),
+            },
+            "recommended_future_action": recommended_action,
+        }
+        targets.append(record)
+
+    targets.sort(
+        key=lambda item: (
+            item["priority"]["rank"],
+            address(item["target"], "follow-up target"),
+        )
+    )
+    classification_counts = Counter(item["classification"] for item in targets)
+    priority_counts = Counter(item["priority"]["class"] for item in targets)
+    report = {
+        "schema": {
+            "name": FOLLOW_UP_SCHEMA_NAME,
+            "version": FOLLOW_UP_SCHEMA_VERSION,
+        },
+        "tool": {"name": "Fable2IndirectTargets", "version": TOOL_VERSION},
+        "identity": json.loads(json.dumps(merged_summary["identity"])),
+        "inputs": sorted(input_records, key=lambda item: item["role"]),
+        "scope": {
+            "selection": "targets_observed_in_contributing_run_and_absent_from_baseline_run",
+            "baseline_run_id": baseline_run_id,
+            "contributing_run_id": contributing_run_id,
+            "sequence_domains": "independent_per_run_guest_thread",
+        },
+        "run_provenance": [
+            follow_up_run_provenance(baseline_run, "baseline"),
+            follow_up_run_provenance(contributing_run, "contributing"),
+        ],
+        "counts": {
+            "targets": len(targets),
+            "by_classification": dict(sorted(classification_counts.items())),
+            "by_priority": dict(sorted(priority_counts.items())),
+            "range_proposals": 0,
+            "manifest_proposals": 0,
+            "automatically_applicable": 0,
+        },
+        "targets": targets,
+        "safety": {
+            "report_only": True,
+            "raw_traces_accessed": False,
+            "canonical_manifest_modified": False,
+            "runtime_observation_establishes_function_boundary": False,
+            "automatic_function_split_or_promotion": False,
+            "jump_table_cases_promoted_without_callable_evidence": False,
+            "placeholder_or_stub_generation_supported": False,
+        },
+        "determinism": {
+            "volatile_metadata_omitted": True,
+            "target_sort_key": ["priority_rank", "target_guest_address"],
+            "source_sort_key": [
+                "source_guest_address",
+                "branch_kind",
+                "source_module",
+                "target_module",
+                "link",
+            ],
+        },
+    }
+    report["report_id"] = (
+        "P4OWN-" + sha256_bytes(canonical_json_bytes(report))[:20]
+    )
+    return validate_static_ownership_follow_up(report)
+
+
+def validate_static_ownership_follow_up(
+    document: dict[str, Any],
+) -> dict[str, Any]:
+    schema = require_object(document.get("schema"), "follow_up.schema")
+    if schema != {
+        "name": FOLLOW_UP_SCHEMA_NAME,
+        "version": FOLLOW_UP_SCHEMA_VERSION,
+    }:
+        raise Phase4Error(f"unsupported ownership follow-up schema: {schema!r}")
+    tool = require_object(document.get("tool"), "follow_up.tool")
+    if tool.get("name") != "Fable2IndirectTargets":
+        raise Phase4Error("follow_up.tool.name must be Fable2IndirectTargets")
+    require_string(tool.get("version"), "follow_up.tool.version")
+
+    supplied_report_id = require_string(
+        document.get("report_id"), "follow_up.report_id"
+    )
+    unsigned = dict(document)
+    del unsigned["report_id"]
+    expected_report_id = (
+        "P4OWN-" + sha256_bytes(canonical_json_bytes(unsigned))[:20]
+    )
+    if supplied_report_id != expected_report_id:
+        raise Phase4Error(
+            f"ownership follow-up integrity check failed: {supplied_report_id!r} "
+            f"does not match {expected_report_id!r}"
+        )
+
+    inputs = document.get("inputs")
+    if not isinstance(inputs, list):
+        raise Phase4Error("follow_up.inputs must be an array")
+    roles: list[str] = []
+    for index, value in enumerate(inputs):
+        location = f"follow_up.inputs[{index}]"
+        item = require_object(value, location)
+        roles.append(require_string(item.get("role"), f"{location}.role"))
+        require_string(item.get("file_name"), f"{location}.file_name")
+        require_sha256(item.get("sha256"), f"{location}.sha256")
+        require_object(item.get("schema"), f"{location}.schema")
+    if roles != sorted(set(roles)):
+        raise Phase4Error("follow_up input roles must be sorted and unique")
+    required_roles = {
+        "baseline_summary",
+        "contributing_summary",
+        "entrypoint_closure",
+        "import_plan",
+        "merged_summary",
+    }
+    if set(roles) != required_roles:
+        raise Phase4Error(
+            "follow_up inputs must contain baseline/contributing/merged summaries, "
+            "the import plan, and entrypoint closure"
+        )
+
+    scope = require_object(document.get("scope"), "follow_up.scope")
+    baseline_run_id = require_string(
+        scope.get("baseline_run_id"), "follow_up.scope.baseline_run_id"
+    )
+    contributing_run_id = require_string(
+        scope.get("contributing_run_id"),
+        "follow_up.scope.contributing_run_id",
+    )
+    if baseline_run_id == contributing_run_id:
+        raise Phase4Error("follow_up run roles must be distinct")
+
+    run_provenance = document.get("run_provenance")
+    if not isinstance(run_provenance, list) or len(run_provenance) != 2:
+        raise Phase4Error("follow_up.run_provenance must contain exactly two runs")
+    expected_run_roles = [
+        ("baseline", baseline_run_id),
+        ("contributing", contributing_run_id),
+    ]
+    for index, (role, run_id) in enumerate(expected_run_roles):
+        run = require_object(
+            run_provenance[index], f"follow_up.run_provenance[{index}]"
+        )
+        if run.get("role") != role or run.get("run_id") != run_id:
+            raise Phase4Error("follow_up run provenance order or identity is invalid")
+        raw_schema_version = run.get("raw_schema_version")
+        if raw_schema_version is not None:
+            require_uint64(
+                raw_schema_version,
+                f"follow_up.run_provenance[{index}].raw_schema_version",
+            )
+        raw_schema_status = require_string(
+            run.get("raw_schema_version_status"),
+            f"follow_up.run_provenance[{index}].raw_schema_version_status",
+        )
+        if raw_schema_version is None and raw_schema_status not in {
+            "unavailable_in_legacy_summary",
+            "explicit_null",
+        }:
+            raise Phase4Error("null raw schema must retain its availability status")
+        if raw_schema_version is not None and raw_schema_status != "recorded":
+            raise Phase4Error("recorded raw schema must retain recorded status")
+        require_sha256(
+            run.get("recorded_raw_sha256"),
+            f"follow_up.run_provenance[{index}].recorded_raw_sha256",
+        )
+        if run.get("raw_hash_provenance") != (
+            "preserved_compact_summary_metadata_not_recomputed"
+        ):
+            raise Phase4Error("follow_up raw hashes must be identified as preserved")
+        flush_reason = run.get("flush_reason")
+        if flush_reason is not None:
+            require_string(
+                flush_reason,
+                f"follow_up.run_provenance[{index}].flush_reason",
+            )
+        flush_reason_status = require_string(
+            run.get("flush_reason_status"),
+            f"follow_up.run_provenance[{index}].flush_reason_status",
+        )
+        if flush_reason is None and flush_reason_status not in {
+            "unavailable_in_compact_summary",
+            "explicit_null",
+        }:
+            raise Phase4Error("null flush reason must retain its availability status")
+        if flush_reason is not None and flush_reason_status != "recorded":
+            raise Phase4Error("recorded flush reason must retain recorded status")
+
+    targets = document.get("targets")
+    if not isinstance(targets, list):
+        raise Phase4Error("follow_up.targets must be an array")
+    observed_target_values: set[int] = set()
+    target_keys: list[tuple[int, int]] = []
+    classification_counts: Counter[str] = Counter()
+    priority_counts: Counter[str] = Counter()
+    for index, value in enumerate(targets):
+        location = f"follow_up.targets[{index}]"
+        item = require_object(value, location)
+        target = address(item.get("target"), f"{location}.target")
+        if item["target"] != address_text(target):
+            raise Phase4Error(f"{location}.target is not canonical")
+        if target in observed_target_values:
+            raise Phase4Error(f"follow_up contains duplicate target {item['target']}")
+        observed_target_values.add(target)
+        classification = require_string(
+            item.get("classification"), f"{location}.classification"
+        )
+        priority = FOLLOW_UP_PRIORITIES.get(classification)
+        if priority is None:
+            raise Phase4Error(f"{location} has unsupported classification")
+        priority_record = require_object(item.get("priority"), f"{location}.priority")
+        if priority_record != {"rank": priority[0], "class": priority[1]}:
+            raise Phase4Error(f"{location} priority disagrees with classification")
+        target_keys.append((priority[0], target))
+        classification_counts[classification] += 1
+        priority_counts[priority[1]] += 1
+
+        if item.get("contributing_run_id") != contributing_run_id:
+            raise Phase4Error(f"{location} contributing run ID is invalid")
+        if item.get("baseline_run_id") != baseline_run_id:
+            raise Phase4Error(f"{location} baseline run ID is invalid")
+        if item.get("absent_from_baseline_run") is not True:
+            raise Phase4Error(f"{location} is not marked baseline-absent")
+        hit_count = require_uint64(
+            item.get("contributing_run_hit_count"),
+            f"{location}.contributing_run_hit_count",
+        )
+        sources = item.get("observed_sources")
+        if not isinstance(sources, list) or not sources:
+            raise Phase4Error(f"{location}.observed_sources must be non-empty")
+        source_keys: list[tuple[Any, ...]] = []
+        source_hits = 0
+        for source_index, source_value in enumerate(sources):
+            source_location = f"{location}.observed_sources[{source_index}]"
+            source = require_object(source_value, source_location)
+            source_address = address(
+                source.get("source"), f"{source_location}.source"
+            )
+            branch_kind = require_string(
+                source.get("branch_kind"), f"{source_location}.branch_kind"
+            )
+            if branch_kind not in {"bctr", "bctrl", "bclr"}:
+                raise Phase4Error(f"{source_location} has unsupported branch kind")
+            source_keys.append(
+                (
+                    source_address,
+                    branch_kind,
+                    source.get("source_module"),
+                    source.get("target_module"),
+                    source.get("link"),
+                )
+            )
+            source_hits, overflow = saturating_add(
+                source_hits,
+                require_uint64(source.get("hit_count"), f"{source_location}.hit_count"),
+            )
+            if overflow:
+                raise Phase4Error(f"{location} source hit count exceeds UINT64_MAX")
+        if source_keys != sorted(source_keys):
+            raise Phase4Error(f"{location}.observed_sources is not sorted")
+        if source_hits != hit_count:
+            raise Phase4Error(f"{location} source hits do not reconcile")
+
+        owner = require_object(item.get("owner"), f"{location}.owner")
+        if classification in {
+            "existing_function_internal_entry",
+            "known_jump_table_case",
+            "existing_manifest_function",
+        } and owner.get("address") is None:
+            raise Phase4Error(f"{location} does not retain its known owner")
+        if classification == "existing_manifest_function" and not item.get(
+            "effective_registration_provenance"
+        ):
+            raise Phase4Error(f"{location} omits registration provenance")
+        if classification == "known_jump_table_case" and not item.get(
+            "owning_jump_tables"
+        ):
+            raise Phase4Error(f"{location} omits jump-table ownership")
+
+        evidence_kinds = require_string_list(
+            item.get("evidence_kinds"), f"{location}.evidence_kinds"
+        )
+        if evidence_kinds != sorted(set(evidence_kinds)):
+            raise Phase4Error(f"{location}.evidence_kinds must be sorted and unique")
+        no_proposal = require_object(
+            item.get("no_manifest_proposal"), f"{location}.no_manifest_proposal"
+        )
+        if no_proposal.get("proposal") is not None:
+            raise Phase4Error(f"{location} unexpectedly contains a proposal")
+        if no_proposal.get("automatic_application_permitted") is not False:
+            raise Phase4Error(f"{location} unexpectedly permits automatic apply")
+        require_string(
+            item.get("recommended_future_action"),
+            f"{location}.recommended_future_action",
+        )
+
+    if target_keys != sorted(target_keys):
+        raise Phase4Error("follow_up targets are not deterministically sorted")
+    counts = require_object(document.get("counts"), "follow_up.counts")
+    if counts.get("targets") != len(targets):
+        raise Phase4Error("follow_up target count does not reconcile")
+    if counts.get("by_classification") != dict(sorted(classification_counts.items())):
+        raise Phase4Error("follow_up classification counts do not reconcile")
+    if counts.get("by_priority") != dict(sorted(priority_counts.items())):
+        raise Phase4Error("follow_up priority counts do not reconcile")
+    if (
+        counts.get("range_proposals") != 0
+        or counts.get("manifest_proposals") != 0
+        or counts.get("automatically_applicable") != 0
+    ):
+        raise Phase4Error("follow_up must not contain applicable manifest work")
+
+    safety = require_object(document.get("safety"), "follow_up.safety")
+    required_false = (
+        "raw_traces_accessed",
+        "canonical_manifest_modified",
+        "runtime_observation_establishes_function_boundary",
+        "automatic_function_split_or_promotion",
+        "jump_table_cases_promoted_without_callable_evidence",
+        "placeholder_or_stub_generation_supported",
+    )
+    if safety.get("report_only") is not True or any(
+        safety.get(key) is not False for key in required_false
+    ):
+        raise Phase4Error("follow_up safety invariants are invalid")
+    forbidden_stub = ("RETURN" + "_R3_ZERO").encode("ascii")
+    if forbidden_stub in canonical_json_bytes(document):
+        raise Phase4Error("follow_up contains forbidden stub text")
+    return document
+
+
+def static_ownership_follow_up_csv_bytes(report: dict[str, Any]) -> bytes:
+    validate_static_ownership_follow_up(report)
+    stream = io.StringIO(newline="")
+    writer = csv.writer(stream, lineterminator="\n")
+    writer.writerow(
+        [
+            "priority",
+            "target",
+            "classification",
+            "contributing_run_hits",
+            "observed_sources",
+            "owner",
+            "owner_range",
+            "jump_tables",
+            "evidence_kinds",
+            "conflicts",
+            "no_proposal_reasons",
+            "recommended_future_action",
+        ]
+    )
+    for item in report["targets"]:
+        sources = ";".join(
+            f'{source["source"]}:{source["branch_kind"]}:{source["hit_count"]}'
+            for source in item["observed_sources"]
+        )
+        jump_tables = ";".join(
+            f'{value.get("dispatch") or "unknown"}@'
+            f'{value.get("table_address") or "unknown"}'
+            for value in item["owning_jump_tables"]
+        )
+        owner_range = item["owner"]["range"]
+        rendered_range = (
+            f'{owner_range.get("start")}..{owner_range.get("end")}'
+            if owner_range
+            else ""
+        )
+        writer.writerow(
+            [
+                item["priority"]["class"],
+                item["target"],
+                item["classification"],
+                item["contributing_run_hit_count"],
+                sources,
+                item["owner"]["address"] or "",
+                rendered_range,
+                jump_tables,
+                ";".join(item["evidence_kinds"]),
+                ";".join(item["conflicts"]),
+                ";".join(item["no_manifest_proposal"]["reasons"]),
+                item["recommended_future_action"],
+            ]
+        )
+    return stream.getvalue().encode("utf-8")
+
+
+def static_ownership_follow_up_markdown_bytes(report: dict[str, Any]) -> bytes:
+    validate_static_ownership_follow_up(report)
+    counts = report["counts"]
+    lines = [
+        "# Phase 4 deferred static-ownership follow-up",
+        "",
+        f"Report ID: `{report['report_id']}`",
+        "",
+        "This report is a deterministic, report-only queue. Runtime execution does ",
+        "not establish a function boundary, and no item is a manifest proposal.",
+        "",
+        "## Scope",
+        "",
+        f"- Baseline run: `{report['scope']['baseline_run_id']}`",
+        f"- Contributing run: `{report['scope']['contributing_run_id']}`",
+        f"- Contributing-only targets: {counts['targets']}",
+        "- Range proposals: 0",
+        "- Manifest proposals: 0",
+        "- Automatic applications: 0",
+        "",
+        "| Priority | Classification | Count |",
+        "| --- | --- | ---: |",
+    ]
+    for classification, (rank, priority_class) in sorted(
+        FOLLOW_UP_PRIORITIES.items(), key=lambda item: item[1][0]
+    ):
+        lines.append(
+            f"| {rank}: `{priority_class}` | `{classification}` | "
+            f"{counts['by_classification'].get(classification, 0)} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Inputs",
+            "",
+            "| Role | File | SHA-256 | Schema |",
+            "| --- | --- | --- | --- |",
+        ]
+    )
+    for item in report["inputs"]:
+        schema = item["schema"]
+        schema_name = schema.get("name", "entrypoint-closure")
+        schema_version = schema.get("version", schema.get("schema_version", "unknown"))
+        lines.append(
+            f"| `{item['role']}` | `{item['file_name']}` | `{item['sha256']}` | "
+            f"`{schema_name}` v{schema_version} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Queue",
+            "",
+            "| Priority | Target | Hits | Sources | Owner | Static status |",
+            "| --- | --- | ---: | --- | --- | --- |",
+        ]
+    )
+    for item in report["targets"]:
+        sources = ", ".join(
+            f'`{source["source"]}` {source["branch_kind"]} ({source["hit_count"]})'
+            for source in item["observed_sources"]
+        )
+        lines.append(
+            f"| `{item['priority']['class']}` | `{item['target']}` | "
+            f"{item['contributing_run_hit_count']} | {sources} | "
+            f"`{item['owner']['address'] or 'unknown'}` | "
+            f"`{item['static_corroboration']['status']}` |"
+        )
+    lines.extend(
+        [
+            "",
+            "Static ownership review is deferred. Another gameplay capture is optional; ",
+            "native save-write parity remains the next active development phase.",
+            "",
+        ]
+    )
+    return "\n".join(lines).encode("utf-8")
+
+
 def render_manifest_additions(selected: list[dict[str, Any]], newline: str) -> str:
     lines = []
     for item in sorted(selected, key=lambda value: value["target"]):
@@ -3254,6 +4139,150 @@ def command_plan(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_ownership_follow_up(args: argparse.Namespace) -> int:
+    input_paths = {
+        "baseline_summary": args.baseline_summary.resolve(strict=True),
+        "contributing_summary": args.contributing_summary.resolve(strict=True),
+        "merged_summary": args.merged_summary.resolve(strict=True),
+        "import_plan": args.plan.resolve(strict=True),
+        "entrypoint_closure": args.closure.resolve(strict=True),
+    }
+    canonical_paths = [os.path.normcase(str(path)) for path in input_paths.values()]
+    if len(canonical_paths) != len(set(canonical_paths)):
+        raise Phase4Error("ownership follow-up input paths must be distinct")
+    for role, path in input_paths.items():
+        if not path.is_file():
+            raise Phase4Error(f"{role} input is not a file: {path}")
+
+    expected_identity = load_expected_identity(args.evidence)
+    baseline_summary = read_summary(
+        input_paths["baseline_summary"], expected_identity
+    )
+    contributing_summary = read_summary(
+        input_paths["contributing_summary"], expected_identity
+    )
+    merged_summary = read_summary(
+        input_paths["merged_summary"], expected_identity
+    )
+    plan = read_plan(input_paths["import_plan"])
+    closure = load_closure_indices(input_paths["entrypoint_closure"])
+    expected_image = expected_identity["patched_image_sha256"].upper()
+    closure_image = str(
+        closure["image_identity"].get("patched_image_sha256", "")
+    ).upper()
+    if closure_image != expected_image:
+        raise Phase4Error("entrypoint closure image identity is not canonical TU1")
+
+    manifest_hash_before = sha256_file(args.manifest)
+    plan_inputs = require_object(plan.get("inputs"), "plan.inputs")
+    plan_manifest = require_object(plan_inputs.get("manifest"), "plan.inputs.manifest")
+    if plan_manifest.get("sha256") != manifest_hash_before:
+        raise Phase4Error("import plan manifest identity is stale")
+    plan_closure = require_object(plan_inputs.get("closure"), "plan.inputs.closure")
+    if plan_closure.get("sha256") != closure["sha256"]:
+        raise Phase4Error("import plan closure identity is stale")
+
+    input_records = [
+        follow_up_input_record(
+            "baseline_summary",
+            input_paths["baseline_summary"],
+            baseline_summary,
+        ),
+        follow_up_input_record(
+            "contributing_summary",
+            input_paths["contributing_summary"],
+            contributing_summary,
+        ),
+        follow_up_input_record(
+            "merged_summary", input_paths["merged_summary"], merged_summary
+        ),
+        follow_up_input_record(
+            "import_plan", input_paths["import_plan"], plan
+        ),
+        {
+            "role": "entrypoint_closure",
+            "file_name": input_paths["entrypoint_closure"].name,
+            "sha256": closure["sha256"],
+            "schema": {
+                "name": "fable2-entrypoint-closure",
+                "version": closure["schema_version"],
+            },
+            "analyzer_version": closure["analyzer_version"],
+        },
+    ]
+    report = build_static_ownership_follow_up(
+        baseline_summary,
+        contributing_summary,
+        merged_summary,
+        plan,
+        closure,
+        input_records,
+        expected_identity,
+    )
+
+    expected_counts = {
+        "existing_manifest_function": args.expect_existing_registrations,
+        "existing_function_internal_entry": args.expect_internal_entries,
+        "known_jump_table_case": args.expect_jump_table_cases,
+    }
+    if args.expect_targets is not None and report["counts"]["targets"] != (
+        args.expect_targets
+    ):
+        raise Phase4Error(
+            f"ownership follow-up target count mismatch: expected "
+            f"{args.expect_targets}, actual {report['counts']['targets']}"
+        )
+    for classification, expected_count in expected_counts.items():
+        if expected_count is None:
+            continue
+        actual_count = report["counts"]["by_classification"].get(
+            classification, 0
+        )
+        if actual_count != expected_count:
+            raise Phase4Error(
+                f"ownership follow-up {classification} count mismatch: expected "
+                f"{expected_count}, actual {actual_count}"
+            )
+
+    output_directory = args.output_directory.resolve()
+    json_path = output_directory / "phase4-static-ownership-follow-up.json"
+    csv_path = output_directory / "phase4-static-ownership-follow-up.csv"
+    markdown_path = output_directory / "phase4-static-ownership-follow-up.md"
+    output_paths = (json_path, csv_path, markdown_path)
+    if any(
+        os.path.normcase(str(path)) in canonical_paths for path in output_paths
+    ):
+        raise Phase4Error("ownership follow-up output must not overwrite an input")
+
+    json_bytes = canonical_json_bytes(report)
+    csv_bytes = static_ownership_follow_up_csv_bytes(report)
+    markdown_bytes = static_ownership_follow_up_markdown_bytes(report)
+    atomic_write_bytes(json_path, json_bytes)
+    atomic_write_bytes(csv_path, csv_bytes)
+    atomic_write_bytes(markdown_path, markdown_bytes)
+    if sha256_file(args.manifest) != manifest_hash_before:
+        raise Phase4Error("canonical manifest changed during report generation")
+
+    print(
+        json.dumps(
+            {
+                "status": "static_ownership_follow_up_complete",
+                "report_id": report["report_id"],
+                "targets": report["counts"]["targets"],
+                "by_classification": report["counts"]["by_classification"],
+                "json": str(json_path),
+                "csv": str(csv_path),
+                "markdown": str(markdown_path),
+                "manifest_modified": False,
+                "raw_traces_accessed": False,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def command_apply(args: argparse.Namespace) -> int:
     if not args.apply:
         raise Phase4Error("apply mode requires the explicit --apply flag")
@@ -3411,6 +4440,41 @@ def build_argument_parser() -> argparse.ArgumentParser:
     plan.add_argument("--output", type=Path, required=True)
     add_planner_arguments(plan)
     plan.set_defaults(handler=command_plan)
+
+    ownership_follow_up = subparsers.add_parser(
+        "ownership-follow-up",
+        help=(
+            "emit a deterministic report-only queue for targets unique to a "
+            "contributing compact summary"
+        ),
+    )
+    ownership_follow_up.add_argument(
+        "--baseline-summary", type=Path, required=True
+    )
+    ownership_follow_up.add_argument(
+        "--contributing-summary", type=Path, required=True
+    )
+    ownership_follow_up.add_argument(
+        "--merged-summary", type=Path, required=True
+    )
+    ownership_follow_up.add_argument("--plan", type=Path, required=True)
+    ownership_follow_up.add_argument(
+        "--output-directory", type=Path, required=True
+    )
+    ownership_follow_up.add_argument("--expect-targets", type=int)
+    ownership_follow_up.add_argument(
+        "--expect-existing-registrations", type=int
+    )
+    ownership_follow_up.add_argument("--expect-internal-entries", type=int)
+    ownership_follow_up.add_argument("--expect-jump-table-cases", type=int)
+    ownership_follow_up.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    ownership_follow_up.add_argument(
+        "--closure",
+        type=Path,
+        default=default_analysis_path("entrypoint-closure.json"),
+    )
+    add_evidence_arguments(ownership_follow_up)
+    ownership_follow_up.set_defaults(handler=command_ownership_follow_up)
 
     apply = subparsers.add_parser(
         "apply", help="atomically apply explicitly reviewed, guarded candidates"

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.invalid/schemas/fable2-save-diagnostic-report-v1.schema.json",
+  "title": "Fable II native-save diagnostic report v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "trace_event_schema_version",
+    "save_root",
+    "event_count",
+    "classifications",
+    "tree_comparison",
+    "save_snapshot"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "trace_event_schema_version": { "const": 1 },
+    "save_root": { "type": "string", "minLength": 1 },
+    "event_count": { "type": "integer", "minimum": 0 },
+    "classifications": { "type": "array", "minItems": 1 },
+    "tree_comparison": { "type": "object" },
+    "save_snapshot": { "type": "object" }
+  },
+  "additionalProperties": true
+}

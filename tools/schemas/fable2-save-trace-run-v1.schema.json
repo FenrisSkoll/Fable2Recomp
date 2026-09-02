@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.invalid/schemas/fable2-save-trace-run-v1.schema.json",
+  "title": "Fable II save trace run metadata v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "event_schema_version",
+    "started_utc",
+    "process_id",
+    "trace_directory",
+    "contains_payload_bytes"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "event_schema_version": { "const": 1 },
+    "started_utc": { "type": "string" },
+    "process_id": { "type": "integer", "minimum": 1 },
+    "trace_directory": { "type": "string", "minLength": 1 },
+    "contains_payload_bytes": { "const": false }
+  },
+  "additionalProperties": false
+}

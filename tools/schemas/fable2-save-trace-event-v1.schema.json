@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.invalid/schemas/fable2-save-trace-event-v1.schema.json",
+  "title": "Fable II payload-free save trace event v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "sequence",
+    "relative_ns",
+    "guest_thread_id",
+    "guest_lr",
+    "caller_guest_pc",
+    "caller_pc_basis",
+    "operation",
+    "phase"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "relative_ns": { "type": "integer", "minimum": 0 },
+    "guest_thread_id": { "type": "integer", "minimum": 0 },
+    "guest_lr": { "type": "integer", "minimum": 0 },
+    "caller_guest_pc": { "type": "integer", "minimum": 0 },
+    "caller_pc_basis": { "const": "lr_minus_4" },
+    "operation": { "type": "string", "minLength": 1 },
+    "phase": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": true
+}

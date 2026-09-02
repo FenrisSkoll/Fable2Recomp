@@ -78,10 +78,15 @@ G16B_ACCEPTED_TREE = "6a87058d1ef47473e8fa80e9e2882d6cde6b8a7b"
 RETIRED_G2A_COMMIT = "47c2ea2b7d9e14b09fd942c4b5f1bd11c46e2f51"
 RETIRED_G2A_TREE = "910e80108c2d9e7d8474866506f1c9e23ede601c"
 ENTRYPOINT_PROVENANCE_PATH = "tools/fable2-entrypoint-closure-evidence.json"
-ENTRYPOINT_PROVENANCE_BLOB = "e08bca60d9de302fd08c1c6b258b9e29371ab7b7"
-ENTRYPOINT_PROVENANCE_SIZE = 4658
-ENTRYPOINT_PROVENANCE_SHA256 = (
+G16_ENTRYPOINT_PROVENANCE_BLOB = "e08bca60d9de302fd08c1c6b258b9e29371ab7b7"
+G16_ENTRYPOINT_PROVENANCE_SIZE = 4658
+G16_ENTRYPOINT_PROVENANCE_SHA256 = (
     "9CF914280FACC388E94D01CFD971F6F75FA2BF10AD509F18F59E3DC220E22F05"
+)
+CURRENT_ENTRYPOINT_PROVENANCE_BLOB = "cd5b4eb924ca4a566ea231c284ab04a696dfc618"
+CURRENT_ENTRYPOINT_PROVENANCE_SIZE = 4894
+CURRENT_ENTRYPOINT_PROVENANCE_SHA256 = (
+    "0737E31730C5703BD2DB44F7BECDFA8EC8A85A71E2612BE0B462ED1AF2C9FB68"
 )
 
 REQUIRED_DOCUMENTS = (
@@ -277,49 +282,64 @@ def validate_committed_entrypoint_provenance(
 ) -> None:
     """Validate the tracked provenance blob without depending on checkout EOLs."""
     revisions = (
-        (G16A_ACCEPTED_COMMIT, "G1.6A accepted milestone"),
-        (G16B_ACCEPTED_COMMIT, "G1.6B accepted milestone"),
-        ("HEAD", "current committed evidence"),
+        (
+            G16A_ACCEPTED_COMMIT,
+            "G1.6A accepted milestone",
+            G16_ENTRYPOINT_PROVENANCE_BLOB,
+        ),
+        (
+            G16B_ACCEPTED_COMMIT,
+            "G1.6B accepted milestone",
+            G16_ENTRYPOINT_PROVENANCE_BLOB,
+        ),
+        ("HEAD", "current committed evidence", CURRENT_ENTRYPOINT_PROVENANCE_BLOB),
     )
-    for revision, label in revisions:
+    for revision, label, expected_object in revisions:
         actual_object = git_text(
             repo, "rev-parse", f"{revision}:{ENTRYPOINT_PROVENANCE_PATH}"
         )
-        if actual_object != ENTRYPOINT_PROVENANCE_BLOB:
+        if actual_object != expected_object:
             validation.error(
                 f"{label} entrypoint-provenance blob mismatch: expected "
-                f"{ENTRYPOINT_PROVENANCE_BLOB!r}, actual {actual_object!r}"
+                f"{expected_object!r}, actual {actual_object!r}"
             )
 
-    blob = subprocess.run(
-        [
-            "git",
-            "-C",
-            str(repo),
-            "cat-file",
-            "blob",
-            ENTRYPOINT_PROVENANCE_BLOB,
-        ],
-        check=False,
-        capture_output=True,
+    expected_blobs = (
+        (
+            "G1.6 accepted",
+            G16_ENTRYPOINT_PROVENANCE_BLOB,
+            G16_ENTRYPOINT_PROVENANCE_SIZE,
+            G16_ENTRYPOINT_PROVENANCE_SHA256,
+        ),
+        (
+            "current Phase 4",
+            CURRENT_ENTRYPOINT_PROVENANCE_BLOB,
+            CURRENT_ENTRYPOINT_PROVENANCE_SIZE,
+            CURRENT_ENTRYPOINT_PROVENANCE_SHA256,
+        ),
     )
-    if blob.returncode != 0:
-        validation.error(
-            "committed entrypoint-provenance blob is unavailable: "
-            f"{ENTRYPOINT_PROVENANCE_BLOB}"
+    for label, object_id, expected_size, expected_hash in expected_blobs:
+        blob = subprocess.run(
+            ["git", "-C", str(repo), "cat-file", "blob", object_id],
+            check=False,
+            capture_output=True,
         )
-    else:
+        if blob.returncode != 0:
+            validation.error(
+                f"{label} entrypoint-provenance blob is unavailable: {object_id}"
+            )
+            continue
         actual_size = len(blob.stdout)
         actual_hash = hashlib.sha256(blob.stdout).hexdigest().upper()
-        if actual_size != ENTRYPOINT_PROVENANCE_SIZE:
+        if actual_size != expected_size:
             validation.error(
-                "committed entrypoint-provenance size mismatch: expected "
-                f"{ENTRYPOINT_PROVENANCE_SIZE}, actual {actual_size}"
+                f"{label} entrypoint-provenance size mismatch: expected "
+                f"{expected_size}, actual {actual_size}"
             )
-        if actual_hash != ENTRYPOINT_PROVENANCE_SHA256:
+        if actual_hash != expected_hash:
             validation.error(
-                "committed entrypoint-provenance hash mismatch: expected "
-                f"{ENTRYPOINT_PROVENANCE_SHA256}, actual {actual_hash}"
+                f"{label} entrypoint-provenance hash mismatch: expected "
+                f"{expected_hash}, actual {actual_hash}"
             )
 
     worktree_object = git_text(
@@ -328,10 +348,10 @@ def validate_committed_entrypoint_provenance(
         f"--path={ENTRYPOINT_PROVENANCE_PATH}",
         ENTRYPOINT_PROVENANCE_PATH,
     )
-    if worktree_object != ENTRYPOINT_PROVENANCE_BLOB:
+    if worktree_object != CURRENT_ENTRYPOINT_PROVENANCE_BLOB:
         validation.error(
             "entrypoint-provenance worktree content differs from HEAD after Git "
-            f"clean filtering: expected {ENTRYPOINT_PROVENANCE_BLOB!r}, "
+            f"clean filtering: expected {CURRENT_ENTRYPOINT_PROVENANCE_BLOB!r}, "
             f"actual {worktree_object!r}"
         )
 

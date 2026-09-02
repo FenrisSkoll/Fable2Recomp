@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/FenrisSkoll/Fable2Recomp/tools/schemas/fable2-phase4-static-ownership-follow-up-v1.schema.json",
+  "title": "Fable II Phase 4 deferred static-ownership queue",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "tool",
+    "report_id",
+    "identity",
+    "inputs",
+    "scope",
+    "run_provenance",
+    "counts",
+    "targets",
+    "safety",
+    "determinism"
+  ],
+  "properties": {
+    "schema": {
+      "const": {
+        "name": "fable2-phase4-static-ownership-follow-up",
+        "version": 1
+      }
+    },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "Fable2IndirectTargets" },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "report_id": {
+      "type": "string",
+      "pattern": "^P4OWN-[0-9A-F]{20}$"
+    },
+    "identity": { "type": "object" },
+    "inputs": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["role", "file_name", "sha256", "schema"],
+        "properties": {
+          "role": {
+            "enum": [
+              "baseline_summary",
+              "contributing_summary",
+              "entrypoint_closure",
+              "import_plan",
+              "merged_summary"
+            ]
+          },
+          "file_name": { "type": "string", "minLength": 1 },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "schema": { "type": "object" },
+          "run_ids": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "plan_id": { "type": "string" },
+          "analyzer_version": { "type": "string" }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "selection",
+        "baseline_run_id",
+        "contributing_run_id",
+        "sequence_domains"
+      ],
+      "properties": {
+        "selection": {
+          "const": "targets_observed_in_contributing_run_and_absent_from_baseline_run"
+        },
+        "baseline_run_id": { "type": "string", "minLength": 1 },
+        "contributing_run_id": { "type": "string", "minLength": 1 },
+        "sequence_domains": {
+          "const": "independent_per_run_guest_thread"
+        }
+      }
+    },
+    "run_provenance": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "role",
+          "run_id",
+          "label",
+          "collector_version",
+          "raw_schema_version",
+          "raw_schema_version_status",
+          "recorded_raw_sha256",
+          "raw_hash_provenance",
+          "flush_status",
+          "flush_reason",
+          "flush_reason_status",
+          "footer_records",
+          "integrity_warnings",
+          "counters"
+        ],
+        "properties": {
+          "role": { "enum": ["baseline", "contributing"] },
+          "run_id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string" },
+          "collector_version": { "$ref": "#/$defs/uint64" },
+          "raw_schema_version": {
+            "oneOf": [
+              { "type": "null" },
+              { "$ref": "#/$defs/uint64" }
+            ]
+          },
+          "raw_schema_version_status": {
+            "enum": [
+              "recorded",
+              "explicit_null",
+              "unavailable_in_legacy_summary"
+            ]
+          },
+          "recorded_raw_sha256": { "$ref": "#/$defs/sha256" },
+          "raw_hash_provenance": {
+            "const": "preserved_compact_summary_metadata_not_recomputed"
+          },
+          "flush_status": { "type": "string", "minLength": 1 },
+          "flush_reason": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "string", "minLength": 1 }
+            ]
+          },
+          "flush_reason_status": {
+            "enum": [
+              "recorded",
+              "explicit_null",
+              "unavailable_in_compact_summary"
+            ]
+          },
+          "footer_records": { "$ref": "#/$defs/uint64" },
+          "corrupt_tail": { "type": "boolean" },
+          "missing_final_newline": { "type": "boolean" },
+          "integrity_warnings": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "counters": { "type": "object" }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": [
+        "targets",
+        "by_classification",
+        "by_priority",
+        "range_proposals",
+        "manifest_proposals",
+        "automatically_applicable"
+      ],
+      "properties": {
+        "targets": { "$ref": "#/$defs/uint64" },
+        "by_classification": { "type": "object" },
+        "by_priority": { "type": "object" },
+        "range_proposals": { "const": 0 },
+        "manifest_proposals": { "const": 0 },
+        "automatically_applicable": { "const": 0 }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/target" }
+    },
+    "safety": {
+      "type": "object",
+      "required": [
+        "report_only",
+        "raw_traces_accessed",
+        "canonical_manifest_modified",
+        "runtime_observation_establishes_function_boundary",
+        "automatic_function_split_or_promotion",
+        "jump_table_cases_promoted_without_callable_evidence",
+        "placeholder_or_stub_generation_supported"
+      ]
+    },
+    "determinism": { "type": "object" }
+  },
+  "$defs": {
+    "uint64": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{64}$"
+    },
+    "address": {
+      "type": "string",
+      "pattern": "^0x[0-9A-F]{8}$"
+    },
+    "target": {
+      "type": "object",
+      "required": [
+        "priority",
+        "target",
+        "contributing_run_id",
+        "contributing_run_hit_count",
+        "absent_from_baseline_run",
+        "baseline_run_id",
+        "observed_sources",
+        "classification",
+        "confidence",
+        "candidate_id",
+        "owner",
+        "effective_registration_provenance",
+        "owning_jump_tables",
+        "evidence_kinds",
+        "static_corroboration",
+        "conflicts",
+        "no_manifest_proposal",
+        "recommended_future_action"
+      ],
+      "properties": {
+        "priority": {
+          "type": "object",
+          "required": ["rank", "class"],
+          "properties": {
+            "rank": { "enum": [1, 2, 3] },
+            "class": {
+              "enum": [
+                "P1_internal_entry",
+                "P2_jump_table_case",
+                "P3_effective_registration"
+              ]
+            }
+          }
+        },
+        "target": { "$ref": "#/$defs/address" },
+        "contributing_run_id": { "type": "string" },
+        "contributing_run_hit_count": { "$ref": "#/$defs/uint64" },
+        "absent_from_baseline_run": { "const": true },
+        "baseline_run_id": { "type": "string" },
+        "observed_sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "branch_kind",
+              "link",
+              "source_module",
+              "target_module",
+              "hit_count",
+              "target_validity"
+            ],
+            "properties": {
+              "source": { "$ref": "#/$defs/address" },
+              "branch_kind": { "enum": ["bctr", "bctrl", "bclr"] },
+              "link": { "type": "boolean" },
+              "source_module": { "type": "string" },
+              "target_module": { "type": "string" },
+              "hit_count": { "$ref": "#/$defs/uint64" },
+              "target_validity": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "classification": {
+          "enum": [
+            "existing_manifest_function",
+            "existing_function_internal_entry",
+            "known_jump_table_case"
+          ]
+        },
+        "confidence": { "type": "string" },
+        "candidate_id": { "type": "string" },
+        "owner": { "type": "object" },
+        "effective_registration_provenance": { "type": "array" },
+        "owning_jump_tables": { "type": "array" },
+        "evidence_kinds": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "static_corroboration": { "type": "object" },
+        "conflicts": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "no_manifest_proposal": { "type": "object" },
+        "recommended_future_action": { "type": "string" }
+      }
+    }
+  }
+}

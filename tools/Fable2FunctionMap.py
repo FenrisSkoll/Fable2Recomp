@@ -402,7 +402,7 @@ def assess_identity(document: dict[str, Any], contract: dict[str, Any]) -> dict[
 
 def load_contract(path: Path) -> dict[str, Any]:
     contract = read_json(path)
-    if contract.get("schema_version") not in {1, 2, 3, 4}:
+    if contract.get("schema_version") not in {1, 2, 3, 4, 5}:
         raise MapValidationError(
             f"unsupported shared evidence contract schema {contract.get('schema_version')!r}"
         )

@@ -283,7 +283,7 @@ class ValidationTests(unittest.TestCase):
     def test_shared_evidence_contract_upgrades_remain_readable(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "evidence.json"
-            for schema_version in (1, 2, 3, 4):
+            for schema_version in (1, 2, 3, 4, 5):
                 value = contract()
                 value["schema_version"] = schema_version
                 path.write_text(json.dumps(value), encoding="utf-8")

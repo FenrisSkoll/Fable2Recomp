@@ -3,12 +3,16 @@ from __future__ import annotations
 import copy
 import hashlib
 import importlib.util
+import io
 import json
+import re
 import shutil
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +34,96 @@ FINGERPRINT = "D" * 64
 TEXT_HASH = "E" * 64
 
 
+def schema_errors(
+    instance: object,
+    schema: dict,
+    root_schema: dict | None = None,
+    location: str = "$",
+) -> list[str]:
+    """Validate the JSON-Schema subset used by the Phase 4 raw schemas."""
+    root_schema = root_schema or schema
+    if "$ref" in schema:
+        resolved: object = root_schema
+        for part in schema["$ref"].removeprefix("#/").split("/"):
+            resolved = resolved[part]  # type: ignore[index]
+        return schema_errors(instance, resolved, root_schema, location)  # type: ignore[arg-type]
+
+    errors: list[str] = []
+    if "oneOf" in schema:
+        matches = [
+            not schema_errors(instance, candidate, root_schema, location)
+            for candidate in schema["oneOf"]
+        ]
+        if sum(matches) != 1:
+            errors.append(f"{location}: expected exactly one oneOf match")
+        return errors
+    for candidate in schema.get("allOf", []):
+        errors.extend(schema_errors(instance, candidate, root_schema, location))
+
+    expected_type = schema.get("type")
+    type_matches = {
+        "array": isinstance(instance, list),
+        "null": instance is None,
+        "object": isinstance(instance, dict),
+        "string": isinstance(instance, str),
+        "integer": isinstance(instance, int) and not isinstance(instance, bool),
+        "boolean": isinstance(instance, bool),
+    }
+    if expected_type and not type_matches.get(expected_type, False):
+        return [f"{location}: expected {expected_type}"]
+    if "const" in schema and instance != schema["const"]:
+        errors.append(f"{location}: expected constant {schema['const']!r}")
+    if "enum" in schema and instance not in schema["enum"]:
+        errors.append(f"{location}: value is not in enum")
+    if isinstance(instance, str):
+        if len(instance) < schema.get("minLength", 0):
+            errors.append(f"{location}: string is too short")
+        if "pattern" in schema and re.fullmatch(schema["pattern"], instance) is None:
+            errors.append(f"{location}: string does not match pattern")
+    if isinstance(instance, int) and not isinstance(instance, bool):
+        if instance < schema.get("minimum", instance):
+            errors.append(f"{location}: integer is below minimum")
+        if instance > schema.get("maximum", instance):
+            errors.append(f"{location}: integer is above maximum")
+    if isinstance(instance, dict):
+        for name in schema.get("required", []):
+            if name not in instance:
+                errors.append(f"{location}: missing required property {name}")
+        properties = schema.get("properties", {})
+        for name, value in instance.items():
+            if name in properties:
+                errors.extend(
+                    schema_errors(
+                        value,
+                        properties[name],
+                        root_schema,
+                        f"{location}.{name}",
+                    )
+                )
+            elif schema.get("additionalProperties") is False:
+                errors.append(f"{location}: unexpected property {name}")
+            elif isinstance(schema.get("additionalProperties"), dict):
+                errors.extend(
+                    schema_errors(
+                        value,
+                        schema["additionalProperties"],
+                        root_schema,
+                        f"{location}.{name}",
+                    )
+                )
+    if isinstance(instance, list) and isinstance(schema.get("items"), dict):
+        for index, value in enumerate(instance):
+            errors.extend(
+                schema_errors(
+                    value,
+                    schema["items"],
+                    root_schema,
+                    f"{location}[{index}]",
+                )
+            )
+    return errors
+
+
 def range_value(start: int, end: int) -> dict[str, str]:
     return {
         "start": f"0x{start:08X}",
@@ -40,7 +134,7 @@ def range_value(start: int, end: int) -> dict[str, str]:
 
 def contract() -> dict:
     return {
-        "schema_version": 4,
+        "schema_version": 5,
         "expected_image_identity": {
             "base_xex_sha256": BASE,
             "title_update_sha256": UPDATE,
@@ -66,14 +160,22 @@ def contract() -> dict:
             ],
         },
         "runtime_indirect_evidence": {
-            "schema_version": 1,
+            "schema_version": 2,
             "observations": [
                 {
                     "target": "0x82174734",
                     "owner_address": "0x821746A8",
                     "classification": "known_jump_table_case",
+                    "acceptance_expected_owner_address": "0x821746A8",
+                    "acceptance_expected_classification": (
+                        "known_jump_table_case"
+                    ),
                     "evidence_level": "CONFIRMED",
-                    "source_sites": ["0x823DCAD8", "0x82403720"],
+                    "historical_corroborating_source_sites": [
+                        "0x823DCAD8",
+                        "0x82403720",
+                    ],
+                    "acceptance_runtime_dispatch_sites": ["0x821746BC"],
                     "branch_kinds": ["bctr"],
                     "manifest_policy": (
                         "forbidden_unless_independent_callable_evidence"
@@ -347,7 +449,538 @@ def write_json(path: Path, value: object) -> None:
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def synthetic_individual_summaries(
+    expected_identity: dict | None = None,
+) -> tuple[dict, dict]:
+    expected_identity = expected_identity or contract()["expected_image_identity"]
+    parsed_runs = [
+        p4.parse_raw_trace(FIXTURES / "synthetic-run-a.raw.jsonl"),
+        p4.parse_raw_trace(FIXTURES / "synthetic-run-b.raw.jsonl"),
+    ]
+    expected_fingerprint = expected_identity.get("xenia_module_fingerprint")
+    if expected_fingerprint:
+        algorithm = expected_identity["xenia_module_fingerprint_algorithm"]
+        for parsed in parsed_runs:
+            title_module = next(
+                module for module in parsed["modules"] if module["title_module"]
+            )
+            title_module["fingerprint"] = {
+                "algorithm": algorithm,
+                "value": expected_fingerprint,
+            }
+    return tuple(
+        p4.aggregate_raw_runs([parsed], PATCHED, expected_identity)
+        for parsed in parsed_runs
+    )  # type: ignore[return-value]
+
+
+def set_pair_run_hits(summary: dict, source: str, target: str, hit_count: int) -> None:
+    pair = next(
+        item
+        for item in summary["pairs"]
+        if item["source"] == source and item["target"] == target
+    )
+    if len(pair["observed_runs"]) != 1:
+        raise AssertionError("test helper requires an individual-run summary")
+    run_id = pair["observed_runs"][0]
+    previous = pair["run_hit_counts"][run_id]
+    pair["hit_count"] = hit_count
+    pair["run_hit_counts"][run_id] = hit_count
+    observations = [
+        item for item in pair["thread_observations"] if item["run_id"] == run_id
+    ]
+    for observation in observations:
+        observation["hit_count"] = 0
+    observations[0]["hit_count"] = hit_count
+    difference = hit_count - previous
+    run = next(item for item in summary["runs"] if item["run_id"] == run_id)
+    run["counters"]["total_hits"] += difference
+    summary["counts"]["total_hits"] += difference
+
+
+def rename_summary_run(summary: dict, run_id: str) -> None:
+    if len(summary["runs"]) != 1:
+        raise AssertionError("test helper requires an individual-run summary")
+    previous = summary["runs"][0]["run_id"]
+    summary["runs"][0]["run_id"] = run_id
+    for module in summary["runs"][0]["modules"]:
+        module["run_id"] = run_id
+    for pair in summary["pairs"]:
+        pair["observed_runs"] = [run_id]
+        pair["run_hit_counts"] = {run_id: pair["run_hit_counts"].pop(previous)}
+        for observation in pair["thread_observations"]:
+            observation["run_id"] = run_id
+
+
+def replace_summary_pairs(
+    summary: dict,
+    targets: list[tuple[int, str]],
+    *,
+    legacy_metadata: bool,
+) -> None:
+    run = summary["runs"][0]
+    run_id = run["run_id"]
+    template = copy.deepcopy(summary["pairs"][0])
+    pairs = []
+    total_hits = 0
+    for index, (target, classification) in enumerate(targets, start=1):
+        pair = copy.deepcopy(template)
+        branch_kind, link = {
+            "existing_manifest_function": ("bctrl", True),
+            "existing_function_internal_entry": ("bclr", False),
+            "known_jump_table_case": ("bctr", False),
+        }[classification]
+        hits = index
+        source = 0x82E00000 + index * 4
+        pair.update(
+            {
+                "source_module": "default",
+                "source": p4.address_text(source),
+                "target_module": "default",
+                "target": p4.address_text(target),
+                "branch_kind": branch_kind,
+                "link": link,
+                "ordinary_return": False,
+                "hit_count": hits,
+                "observed_runs": [run_id],
+                "run_hit_counts": {run_id: hits},
+                "target_validity": ["known_executable_module"],
+                "thread_observations": [
+                    {
+                        "run_id": run_id,
+                        "thread_key": "guest:00000007",
+                        "first_sequence": index,
+                        "last_sequence": index,
+                        "hit_count": hits,
+                    }
+                ],
+            }
+        )
+        pairs.append(pair)
+        total_hits += hits
+    pairs.sort(key=p4.stable_pair_key)
+    summary["pairs"] = pairs
+    summary["counts"]["unique_pairs"] = len(pairs)
+    summary["counts"]["total_hits"] = total_hits
+    run["counters"]["total_hits"] = total_hits
+    run["counters"]["total_pair_records"] = len(pairs)
+    if legacy_metadata:
+        summary["tool"]["version"] = "1.1.0"
+        run["collector_version"] = 1
+        run.pop("raw_schema_version", None)
+        run.pop("uncommitted_pair_records", None)
+        run.pop("flush_reason", None)
+        run["flush_status"] = "abnormal_or_unknown_no_footer"
+        run["record_counts"].pop("footer", None)
+        run["counters"].pop("aggregate_limit_exceeded", None)
+        summary["counts"].pop("aggregate_limit_exceeded", None)
+        summary["counts"]["abnormal_or_truncated_runs"] = 1
+    else:
+        summary["tool"]["version"] = "1.2.0"
+        run["collector_version"] = 2
+        run["raw_schema_version"] = 2
+        run.pop("flush_reason", None)
+        run["flush_status"] = "normal"
+        run["record_counts"]["footer"] = 1
+        run["counters"]["aggregate_limit_exceeded"] = 0
+        summary["counts"]["aggregate_limit_exceeded"] = 0
+        summary["counts"]["abnormal_or_truncated_runs"] = 0
+
+
+def synthetic_follow_up_inputs() -> tuple[dict, dict, dict, dict, dict, list[dict]]:
+    baseline, contributing = synthetic_individual_summaries()
+    baseline_targets = [(0x82170000, "existing_manifest_function")]
+    classifications = (
+        ["existing_function_internal_entry"] * 42
+        + ["known_jump_table_case"] * 114
+        + ["existing_manifest_function"] * 411
+    )
+    contributing_targets = [
+        (0x82180000 + index * 0x20, classification)
+        for index, classification in enumerate(classifications)
+    ]
+    replace_summary_pairs(baseline, baseline_targets, legacy_metadata=True)
+    replace_summary_pairs(
+        contributing, contributing_targets, legacy_metadata=False
+    )
+    merged = p4.merge_summaries([baseline, contributing])
+
+    closure = {
+        "ranges": {},
+        "starts": [],
+        "schema_version": 3,
+        "analyzer_version": "synthetic",
+        "image_identity": merged["identity"],
+    }
+    plan_targets = []
+    merged_by_target, _ = p4.group_target_observations(merged)
+    classification_by_target = dict(baseline_targets + contributing_targets)
+    for target in sorted(merged_by_target):
+        classification = classification_by_target[target]
+        pair = copy.deepcopy(merged_by_target[target][0])
+        evidence = [
+            {
+                "kind": "xenia_runtime_indirect_target",
+                "source_sites": [pair["source"]],
+            }
+        ]
+        ownership = None
+        rejection_reasons = []
+        if classification == "existing_manifest_function":
+            evidence.append(
+                {
+                    "kind": "existing_effective_registration",
+                    "canonical_manifest_override": False,
+                    "current_generated_registration": True,
+                    "generated_symbol": f"sub_{target:08X}",
+                    "manifest": None,
+                }
+            )
+            owner_address = target
+            rejection_reasons.append("already_registered_no_manifest_change")
+        elif classification == "existing_function_internal_entry":
+            owner_address = target - 4
+            ownership = {
+                "kind": "known_function_range_internal_entry",
+                "owner_address": p4.address_text(owner_address),
+            }
+            evidence.append(
+                {
+                    "kind": "known_function_ownership",
+                    "owner_range": {
+                        "start": p4.address_text(owner_address),
+                        "end": p4.address_text(target + 4),
+                        "authority": "synthetic",
+                        "trusted": True,
+                    },
+                }
+            )
+            rejection_reasons.append("target_is_inside_an_existing_function")
+        else:
+            owner_address = target - 8
+            ownership = {
+                "kind": "recovered_jump_table_case",
+                "owner_address": p4.address_text(owner_address),
+            }
+            evidence.append(
+                {
+                    "kind": "phase3_jump_table_ownership",
+                    "records": [
+                        {
+                            "owner_address": p4.address_text(owner_address),
+                            "dispatch": pair["source"],
+                            "table_address": p4.address_text(target - 0x10),
+                            "table_kind": "synthetic_absolute_pointer",
+                            "origin": "synthetic",
+                            "confidence": "confirmed",
+                            "independently_callable": False,
+                        }
+                    ],
+                }
+            )
+            rejection_reasons.append("owned_switch_case_not_a_standalone_function")
+        closure["ranges"][owner_address] = {
+            "start": owner_address,
+            "end": target + 4,
+            "size": target + 4 - owner_address,
+            "authority": "synthetic",
+            "trusted": True,
+        }
+        plan_targets.append(
+            {
+                "target": p4.address_text(target),
+                "classification": classification,
+                "confidence": "CONFIRMED",
+                "runtime": {
+                    "source_sites": [pair["source"]],
+                    "branch_kinds": [pair["branch_kind"]],
+                    "observed_runs": pair["observed_runs"],
+                    "hit_count": pair["hit_count"],
+                    "observations": [pair],
+                },
+                "ownership": ownership,
+                "evidence": evidence,
+                "conflicts": [],
+                "rejection_reasons": rejection_reasons,
+                "proposal": None,
+                "automatic_application_permitted": False,
+                "candidate_id": p4.candidate_identifier(
+                    target, classification, None
+                ),
+            }
+        )
+    closure["starts"] = sorted(closure["ranges"])
+
+    merged_hash = "C" * 64
+    plan = {
+        "schema": {"name": p4.PLAN_SCHEMA_NAME, "version": 1},
+        "tool": {"name": "Fable2IndirectTargets", "version": p4.TOOL_VERSION},
+        "mode": "dry_run",
+        "inputs": {
+            "summary": {
+                "sha256": merged_hash,
+                "run_ids": sorted(
+                    run["run_id"] for run in merged["runs"]
+                ),
+                "raw_trace_sha256": sorted(
+                    run["raw_sha256"] for run in merged["runs"]
+                ),
+            }
+        },
+        "targets": plan_targets,
+        "proposals": [],
+        "safety": {
+            "canonical_manifest_modified": False,
+            "placeholder_implementations_supported": False,
+        },
+    }
+    plan["plan_id"] = (
+        "P4PLAN-" + p4.sha256_bytes(p4.canonical_json_bytes(plan))[:20]
+    )
+    input_records = [
+        {
+            "role": role,
+            "file_name": f"{role}.json",
+            "sha256": sha,
+            "schema": schema,
+            **({"plan_id": plan["plan_id"]} if role == "import_plan" else {}),
+        }
+        for role, sha, schema in (
+            ("baseline_summary", "A" * 64, baseline["schema"]),
+            ("contributing_summary", "B" * 64, contributing["schema"]),
+            ("entrypoint_closure", "D" * 64, {"name": "closure", "version": 3}),
+            ("import_plan", "E" * 64, plan["schema"]),
+            ("merged_summary", merged_hash, merged["schema"]),
+        )
+    ]
+    return baseline, contributing, merged, plan, closure, input_records
+
+
+class PreflightTests(unittest.TestCase):
+    def make_fixture(self, root: Path) -> dict[str, Path]:
+        xenia = root / "Xenia Canary" / "xenia_canary.exe"
+        game_path = (
+            root / "disc media" / "Fable II - Game of the Year Edition.iso"
+        )
+        analysis_image = root / "analysis image" / "default.xex"
+        analysis_patch = analysis_image.with_suffix(".xexp")
+        content_root = root / "Xenia Content"
+        storage_root = root / "Xenia Storage"
+        output = root / "trace output" / "xenia-indirect-targets.raw.jsonl"
+        evidence = root / "evidence.json"
+
+        title_id = "4D5307F1"
+        package_name = "TU_SYNTHETIC_PHASE4"
+        title_update_directory = (
+            content_root / "0000000000000000" / title_id / "000B0000"
+        )
+        package = title_update_directory / package_name
+
+        for path, content in (
+            (xenia, b"synthetic Xenia executable"),
+            (game_path, b"synthetic complete game media"),
+            (analysis_image, b"synthetic base XEX"),
+            (analysis_patch, b"synthetic title update XEXP"),
+            (package, b"synthetic installed STFS package"),
+        ):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+        document = contract()
+        identity = document["expected_image_identity"]
+        identity.update(
+            {
+                "base_xex_sha256": p4.sha256_file(analysis_image),
+                "title_update_sha256": p4.sha256_file(analysis_patch),
+                "title_update_container_file": package_name,
+                "title_update_container_sha256": p4.sha256_file(package),
+                "patched_image_sha256": PATCHED,
+                "xenia_module_fingerprint_algorithm": (
+                    "sha1_contiguous_loaded_executable_memory"
+                ),
+                "xenia_module_fingerprint": "1" * 40,
+            }
+        )
+        write_json(evidence, document)
+
+        return {
+            "xenia": xenia,
+            "game_path": game_path,
+            "analysis_image": analysis_image,
+            "content_root": content_root,
+            "storage_root": storage_root,
+            "output": output,
+            "evidence": evidence,
+            "title_update_directory": title_update_directory,
+        }
+
+    def test_iso_is_final_argument_and_patched_identity_remains_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            game_path = fixture["game_path"].resolve()
+            real_sha256_file = p4.sha256_file
+
+            def reject_game_media_hash(path: Path) -> str:
+                resolved = Path(path).resolve()
+                if resolved == game_path:
+                    raise AssertionError("complete game media must not be hashed")
+                return real_sha256_file(resolved)
+
+            with mock.patch.object(
+                p4, "sha256_file", side_effect=reject_game_media_hash
+            ):
+                result = p4.preflight(
+                    fixture["xenia"],
+                    fixture["game_path"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-media-test",
+                    "path with spaces regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+            arguments = result["arguments"]
+            self.assertEqual(str(game_path), arguments[-1])
+            self.assertEqual(str(game_path), result["launch_media"]["path"])
+            self.assertEqual(
+                "xbox_360_disc_image", result["launch_media"]["media_type"]
+            )
+            self.assertFalse(result["launch_media"]["sha256_calculated"])
+            self.assertNotIn(str(fixture["analysis_image"].resolve()), arguments)
+            self.assertIn(
+                f"--indirect_target_trace_image_sha256={PATCHED}", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_buffer_pairs=4096", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_dirty_pairs=3072", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_flush_interval_ms=300000", arguments
+            )
+            self.assertIn(
+                "--indirect_target_trace_max_unique_aggregates=1000000",
+                arguments,
+            )
+            self.assertEqual(
+                result["collector_persistence"],
+                {
+                    "raw_schema_version": 2,
+                    "pair_count_semantics": "delta_since_previous_persistence",
+                    "buffer_pairs": 4096,
+                    "dirty_pair_limit": 3072,
+                    "flush_interval_ms": 300000,
+                    "max_unique_aggregates": 1000000,
+                },
+            )
+            self.assertEqual(
+                PATCHED,
+                result["title_identity"]["expected_analysis_image_sha256"],
+            )
+            self.assertEqual("0x4D5307F1", result["title_identity"]["title_id"])
+            self.assertEqual("0x716F0A0D", result["title_identity"]["media_id"])
+            self.assertEqual("0.0.1.26", result["title_identity"]["version"])
+            self.assertIn(
+                f"--content_root={fixture['content_root'].resolve()}", arguments
+            )
+            self.assertIn("--apply_title_update=true", arguments)
+            self.assertEqual(
+                str(fixture["title_update_directory"].resolve()),
+                result["content"]["title_update_directory"],
+            )
+            self.assertEqual(
+                str(fixture["storage_root"].resolve()), result["storage_root"]
+            )
+            self.assertTrue(
+                result["powershell_command"].endswith(
+                    p4.powershell_quote(str(game_path))
+                )
+            )
+
+    def test_loose_xex_is_rejected_as_gameplay_launch_media(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            with self.assertRaisesRegex(p4.Phase4Error, "standalone XEX/ELF"):
+                p4.preflight(
+                    fixture["xenia"],
+                    fixture["analysis_image"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-loose-xex-test",
+                    "unsafe loose XEX regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+    def test_missing_title_update_directory_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = self.make_fixture(Path(temporary))
+            shutil.rmtree(fixture["title_update_directory"])
+            with self.assertRaisesRegex(
+                p4.Phase4Error, "title-update content directory does not exist"
+            ):
+                p4.preflight(
+                    fixture["xenia"],
+                    fixture["game_path"],
+                    fixture["analysis_image"],
+                    fixture["output"],
+                    "phase4-missing-tu-test",
+                    "missing TU directory regression",
+                    fixture["evidence"],
+                    fixture["content_root"],
+                    fixture["storage_root"],
+                )
+
+    def test_wrapper_defaults_to_iso_and_has_no_title_path_parameter(self) -> None:
+        wrapper = (TOOLS / "Invoke-Fable2XeniaIndirectTrace.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(
+            '[string]$GamePath = "D:\\Fable2-Recomp\\disc\\Fable II - '
+            'Game of the Year Edition.iso"',
+            wrapper,
+        )
+        self.assertIn(
+            '[string]$AnalysisImagePath = "D:\\Fable2-Recomp\\tu1\\default.xex"',
+            wrapper,
+        )
+        self.assertNotIn("$TitlePath", wrapper)
+        self.assertIn('"--game-path"', wrapper)
+        self.assertIn('"--analysis-image-path"', wrapper)
+
+
 class RawTraceTests(unittest.TestCase):
+    def test_committed_raw_records_validate_against_versioned_schemas(self) -> None:
+        schema_root = TOOLS / "schemas"
+        fixtures_by_version = {
+            1: [
+                FIXTURES / "synthetic-run-a.raw.jsonl",
+                FIXTURES / "synthetic-run-b.raw.jsonl",
+                FIXTURES / "canonical-acceptance.raw.jsonl",
+            ],
+            2: [FIXTURES / "synthetic-run-v2.raw.jsonl"],
+        }
+        for version, paths in fixtures_by_version.items():
+            schema = json.loads(
+                (schema_root / f"xenia-indirect-targets-raw-v{version}.schema.json")
+                .read_text(encoding="utf-8")
+            )
+            for path in paths:
+                for line_number, line in enumerate(
+                    path.read_text(encoding="utf-8").splitlines(), 1
+                ):
+                    errors = schema_errors(json.loads(line), schema)
+                    self.assertEqual(
+                        errors,
+                        [],
+                        f"{path.name}:{line_number}: "
+                        + "; ".join(errors),
+                    )
+
     def test_canonical_acceptance_fixture_matches_phase4_identity(self) -> None:
         expected = p4.load_expected_identity(p4.DEFAULT_EVIDENCE)
         summary = p4.aggregate_raw_runs(
@@ -356,7 +989,7 @@ class RawTraceTests(unittest.TestCase):
             expected,
         )
         self.assertEqual(1, summary["counts"]["accepted_runs"])
-        self.assertEqual(5, summary["counts"]["unique_pairs"])
+        self.assertEqual(4, summary["counts"]["unique_pairs"])
         assessment = summary["runs"][0]["identity_assessment"]
         self.assertTrue(assessment["module_fingerprint_match"])
         self.assertEqual([], summary["quarantine"])
@@ -369,7 +1002,7 @@ class RawTraceTests(unittest.TestCase):
         summary = p4.aggregate_raw_runs(runs, PATCHED)
         self.assertEqual(summary["counts"]["accepted_runs"], 2)
         self.assertEqual(summary["counts"]["quarantined_runs"], 0)
-        self.assertEqual(summary["counts"]["unique_pairs"], 17)
+        self.assertEqual(summary["counts"]["unique_pairs"], 16)
         self.assertEqual(summary["counts"]["total_hits"], 146)
         self.assertEqual(summary["counts"]["dropped_hits"], 2)
         self.assertEqual(summary["counts"]["io_errors"], 1)
@@ -380,7 +1013,7 @@ class RawTraceTests(unittest.TestCase):
         pair = next(
             item
             for item in summary["pairs"]
-            if item["source"] == "0x82180000"
+            if item["source"] == "0x829641C4"
             and item["target"] == "0x829647F0"
         )
         self.assertEqual(pair["hit_count"], 6)
@@ -393,6 +1026,92 @@ class RawTraceTests(unittest.TestCase):
                 ("synthetic-run-b", "guest:00000001"),
             },
         )
+
+    def test_schema2_committed_deltas_and_clean_footer_reconcile(self) -> None:
+        parsed = p4.parse_raw_trace(FIXTURES / "synthetic-run-v2.raw.jsonl")
+        self.assertEqual(parsed["raw_schema_version"], 2)
+        self.assertEqual(parsed["flush_status"], "normal")
+        self.assertEqual(parsed["uncommitted_pair_records"], 0)
+        self.assertEqual(parsed["record_counts"]["pair"], 2)
+        self.assertEqual(parsed["record_counts"]["checkpoint"], 2)
+        self.assertEqual(len(parsed["pairs"]), 1)
+        self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_307)
+        self.assertEqual(parsed["pairs"][0]["first_thread_sequence"], 1)
+        self.assertEqual(parsed["pairs"][0]["last_thread_sequence"], 2)
+        self.assertEqual(parsed["counters"]["total_hits"], 4_294_967_307)
+        self.assertEqual(parsed["integrity_warnings"], [])
+
+    def test_schema2_footerless_and_uncommitted_tail_recovery(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lines = (FIXTURES / "synthetic-run-v2.raw.jsonl").read_bytes().splitlines()
+
+            complete_footerless = root / "complete-footerless.raw.jsonl"
+            complete_footerless.write_bytes(b"\n".join(lines[:-1]) + b"\n")
+            parsed = p4.parse_raw_trace(complete_footerless)
+            self.assertEqual(parsed["flush_status"], "abnormal_or_unknown_no_footer")
+            self.assertFalse(parsed["corrupt_tail"])
+            self.assertFalse(parsed["missing_final_newline"])
+            self.assertEqual(parsed["uncommitted_pair_records"], 0)
+            self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_307)
+            self.assertEqual(parsed["integrity_warnings"], [])
+
+            complete_footer_without_newline = root / "footer-no-newline.raw.jsonl"
+            complete_footer_without_newline.write_bytes(b"\n".join(lines))
+            parsed = p4.parse_raw_trace(complete_footer_without_newline)
+            self.assertEqual(parsed["flush_status"], "invalid_normal_footer")
+            self.assertTrue(parsed["missing_final_newline"])
+            self.assertIn(
+                "normal footer is not newline-terminated",
+                parsed["integrity_warnings"],
+            )
+
+            uncommitted = root / "uncommitted.raw.jsonl"
+            uncommitted.write_bytes(b"\n".join(lines[:5]) + b"\n")
+            parsed = p4.parse_raw_trace(uncommitted)
+            self.assertEqual(parsed["flush_status"], "abnormal_or_unknown_no_footer")
+            self.assertEqual(parsed["uncommitted_pair_records"], 1)
+            self.assertEqual(parsed["pairs"][0]["hit_count"], 4_294_967_300)
+            self.assertIn(
+                "schema-2 trailing pair batch has no checkpoint and was discarded",
+                parsed["integrity_warnings"],
+            )
+
+            corrupt_tail = root / "corrupt-tail.raw.jsonl"
+            corrupt_tail.write_bytes(b"\n".join(lines[:5]) + b"\n{\"record\":")
+            parsed = p4.parse_raw_trace(corrupt_tail)
+            self.assertEqual(parsed["flush_status"], "abnormal_truncated_tail")
+            self.assertTrue(parsed["corrupt_tail"])
+            self.assertTrue(parsed["missing_final_newline"])
+            self.assertEqual(parsed["uncommitted_pair_records"], 1)
+
+            wrong_checkpoint_records = [json.loads(line) for line in lines]
+            wrong_checkpoint_records[3]["batch_pair_records"] = 2
+            wrong_checkpoint = root / "wrong-checkpoint.raw.jsonl"
+            wrong_checkpoint.write_text(
+                "".join(
+                    json.dumps(item, separators=(",", ":")) + "\n"
+                    for item in wrong_checkpoint_records
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(p4.Phase4Error, "claims 2 pair records"):
+                p4.parse_raw_trace(wrong_checkpoint)
+
+            wrong_footer_records = [json.loads(line) for line in lines]
+            wrong_footer_records[-1]["batches"] = 3
+            wrong_footer = root / "wrong-footer.raw.jsonl"
+            wrong_footer.write_text(
+                "".join(
+                    json.dumps(item, separators=(",", ":")) + "\n"
+                    for item in wrong_footer_records
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                p4.Phase4Error, "batch/checkpoint counts do not reconcile"
+            ):
+                p4.parse_raw_trace(wrong_footer)
 
     def test_truncated_tail_is_usable_but_corrupt_middle_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -650,8 +1369,360 @@ class RawTraceTests(unittest.TestCase):
             p4.merge_summaries([first, first])
         changed = copy.deepcopy(second)
         changed["identity"]["expected_image_sha256"] = "F" * 64
-        with self.assertRaisesRegex(p4.Phase4Error, "identities disagree"):
+        with self.assertRaisesRegex(p4.Phase4Error, "image|identit"):
             p4.merge_summaries([first, changed])
+
+
+class SummaryMergeTests(unittest.TestCase):
+    def test_output_directory_merge_is_deterministic_and_run_qualified(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            expected = contract()["expected_image_identity"]
+            first, second = synthetic_individual_summaries(expected)
+
+            # Exercise exact integers above UINT32_MAX and deliberately
+            # unrelated sequence domains for the same aggregate.
+            shared_source = "0x829641C4"
+            shared_target = "0x829647F0"
+            first_hits = (1 << 32) + 5
+            second_hits = 19
+            set_pair_run_hits(first, shared_source, shared_target, first_hits)
+            set_pair_run_hits(second, shared_source, shared_target, second_hits)
+            first_pair = next(
+                pair for pair in first["pairs"] if pair["target"] == shared_target
+            )
+            second_pair = next(
+                pair for pair in second["pairs"] if pair["target"] == shared_target
+            )
+            first_pair["thread_observations"][0]["first_sequence"] = 9_000_000_000
+            first_pair["thread_observations"][0]["last_sequence"] = 9_000_000_100
+            second_pair["thread_observations"][0]["first_sequence"] = 1
+            second_pair["thread_observations"][0]["last_sequence"] = 2
+            second["pairs"][0]["source"] = "0x82FFF000"
+            second["pairs"].sort(key=p4.stable_pair_key)
+
+            # Emulate the preserved schema-1-era summary: the raw file is
+            # unavailable, raw_schema_version was not retained, and its run
+            # remains truthfully footerless.
+            first["tool"]["version"] = "1.1.0"
+            first_run = first["runs"][0]
+            first_run["raw_file_name"] = "deleted-manual-001.raw.jsonl"
+            first_run["raw_schema_version"] = None
+            first_run["uncommitted_pair_records"] = None
+            first_run["flush_status"] = "abnormal_or_unknown_no_footer"
+            first_run["record_counts"].pop("footer")
+            first["counts"]["abnormal_or_truncated_runs"] = 1
+            first["counts"].pop("aggregate_limit_exceeded", None)
+            first_run["counters"].pop("aggregate_limit_exceeded", None)
+            second["runs"][0]["raw_file_name"] = "unavailable-run-002.raw.jsonl"
+
+            first_path = root / "first.summary.json"
+            second_path = root / "second.summary.json"
+            evidence_path = root / "evidence.json"
+            write_json(first_path, first)
+            write_json(second_path, second)
+            write_json(evidence_path, contract())
+
+            first_keys = {p4.stable_pair_key(pair) for pair in first["pairs"]}
+            second_keys = {p4.stable_pair_key(pair) for pair in second["pairs"]}
+            output_ab = root / "merged-ab"
+            output_ba = root / "merged-ba"
+
+            def run_merge(paths: list[Path], output: Path) -> None:
+                arguments = ["merge"]
+                for path in paths:
+                    arguments.extend(("--summary", str(path)))
+                arguments.extend(
+                    (
+                        "--output-directory",
+                        str(output),
+                        "--evidence",
+                        str(evidence_path),
+                    )
+                )
+                parsed = p4.build_argument_parser().parse_args(arguments)
+                with mock.patch.object(
+                    p4,
+                    "parse_raw_trace",
+                    side_effect=AssertionError("merge must not read raw traces"),
+                ), redirect_stdout(io.StringIO()):
+                    self.assertEqual(0, parsed.handler(parsed))
+
+            run_merge([first_path, second_path], output_ab)
+            json_path = output_ab / "xenia-indirect-targets.summary.json"
+            csv_path = output_ab / "xenia-indirect-targets.summary.csv"
+            first_json_bytes = json_path.read_bytes()
+            first_csv_bytes = csv_path.read_bytes()
+
+            # Replacing the same outputs is idempotent, and argument order does
+            # not alter either authoritative stable view.
+            run_merge([first_path, second_path], output_ab)
+            self.assertEqual(first_json_bytes, json_path.read_bytes())
+            self.assertEqual(first_csv_bytes, csv_path.read_bytes())
+            run_merge([second_path, first_path], output_ba)
+            self.assertEqual(
+                first_json_bytes,
+                (output_ba / "xenia-indirect-targets.summary.json").read_bytes(),
+            )
+            self.assertEqual(
+                first_csv_bytes,
+                (output_ba / "xenia-indirect-targets.summary.csv").read_bytes(),
+            )
+
+            merged = p4.read_summary(json_path, expected)
+            summary_schema = json.loads(
+                (TOOLS / "schemas" / "fable2-indirect-target-summary-v1.schema.json")
+                .read_text(encoding="utf-8")
+            )
+            self.assertEqual([], schema_errors(merged, summary_schema))
+            self.assertEqual(2, merged["counts"]["accepted_runs"])
+            self.assertEqual(1, merged["counts"]["abnormal_or_truncated_runs"])
+            self.assertEqual(len(first_keys | second_keys), len(merged["pairs"]))
+            self.assertTrue(first_keys - second_keys)
+            self.assertTrue(second_keys - first_keys)
+            self.assertTrue(first_keys & second_keys)
+            self.assertEqual(
+                "independent_per_run_guest_thread",
+                merged["determinism"]["sequence_scope"],
+            )
+
+            shared = next(
+                pair
+                for pair in merged["pairs"]
+                if pair["source"] == shared_source
+                and pair["target"] == shared_target
+            )
+            self.assertEqual(first_hits + second_hits, shared["hit_count"])
+            self.assertGreater(shared["hit_count"], (1 << 32) - 1)
+            self.assertEqual(
+                {
+                    "synthetic-run-a": first_hits,
+                    "synthetic-run-b": second_hits,
+                },
+                shared["run_hit_counts"],
+            )
+            by_run = {
+                observation["run_id"]: observation
+                for observation in shared["thread_observations"]
+                if observation["hit_count"]
+            }
+            self.assertEqual(9_000_000_000, by_run["synthetic-run-a"]["first_sequence"])
+            self.assertEqual(1, by_run["synthetic-run-b"]["first_sequence"])
+            self.assertEqual(
+                "abnormal_or_unknown_no_footer",
+                merged["runs"][0]["flush_status"],
+            )
+            self.assertEqual("normal", merged["runs"][1]["flush_status"])
+
+    def test_duplicate_and_identity_guards_use_summary_metadata_only(self) -> None:
+        expected = contract()["expected_image_identity"]
+        first, second = synthetic_individual_summaries(expected)
+        with self.assertRaisesRegex(p4.Phase4Error, "at least two"):
+            p4.merge_summaries([first], expected)
+        with self.assertRaisesRegex(p4.Phase4Error, "duplicate run ID"):
+            p4.merge_summaries([first, copy.deepcopy(first)], expected)
+
+        duplicate_hash = copy.deepcopy(second)
+        duplicate_hash["runs"][0]["raw_sha256"] = first["runs"][0]["raw_sha256"]
+        duplicate_hash["runs"][0]["raw_file_name"] = "missing.raw.jsonl"
+        with mock.patch.object(
+            p4,
+            "parse_raw_trace",
+            side_effect=AssertionError("raw trace must not be opened"),
+        ), self.assertRaisesRegex(p4.Phase4Error, "duplicate raw trace"):
+            p4.merge_summaries([first, duplicate_hash], expected)
+
+        wrong_image = copy.deepcopy(second)
+        wrong_image["identity"]["expected_image_sha256"] = "F" * 64
+        with self.assertRaisesRegex(p4.Phase4Error, "image identity"):
+            p4.merge_summaries([first, wrong_image], expected)
+
+        pinned = copy.deepcopy(expected)
+        pinned["xenia_module_fingerprint_algorithm"] = (
+            "sha1_contiguous_loaded_executable_memory"
+        )
+        pinned["xenia_module_fingerprint"] = "A" * 40
+        pinned_first, pinned_second = synthetic_individual_summaries(pinned)
+        wrong_fingerprint = copy.deepcopy(pinned_second)
+        title_module = next(
+            module
+            for module in wrong_fingerprint["runs"][0]["modules"]
+            if module["title_module"]
+        )
+        title_module["fingerprint"]["value"] = "B" * 40
+        with self.assertRaisesRegex(p4.Phase4Error, "canonical revalidation"):
+            p4.merge_summaries([pinned_first, wrong_fingerprint], pinned)
+
+        wrong_range = copy.deepcopy(pinned_second)
+        title_module = next(
+            module
+            for module in wrong_range["runs"][0]["modules"]
+            if module["title_module"]
+        )
+        title_module["executable_end"] = "0x82180000"
+        with self.assertRaisesRegex(p4.Phase4Error, "canonical revalidation"):
+            p4.merge_summaries([pinned_first, wrong_range], pinned)
+
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "summary.json"
+            write_json(path, first)
+            with self.assertRaisesRegex(p4.Phase4Error, "duplicate summary input path"):
+                p4.resolve_summary_paths([path, path.parent / "." / path.name])
+
+    def test_legacy_summary_schema_one_remains_readable(self) -> None:
+        expected = contract()["expected_image_identity"]
+        legacy, second = synthetic_individual_summaries(expected)
+        legacy["tool"]["version"] = "1.1.0"
+        run = legacy["runs"][0]
+        run["raw_schema_version"] = None
+        run["uncommitted_pair_records"] = None
+        run["flush_status"] = "abnormal_or_unknown_no_footer"
+        run["record_counts"].pop("footer")
+        run["raw_file_name"] = "intentionally-deleted.raw.jsonl"
+        run["counters"].pop("aggregate_limit_exceeded", None)
+        legacy["counts"].pop("aggregate_limit_exceeded", None)
+        legacy["counts"]["abnormal_or_truncated_runs"] = 1
+        self.assertIs(p4.validate_summary(legacy, expected), legacy)
+        merged = p4.merge_summaries([legacy, second], expected)
+        self.assertIsNone(merged["runs"][0]["raw_schema_version"])
+        self.assertEqual(1, merged["counts"]["abnormal_or_truncated_runs"])
+
+
+class StaticOwnershipFollowUpTests(unittest.TestCase):
+    def test_optional_run_metadata_is_normalized_without_inference(self) -> None:
+        baseline, contributing, _, _, _, _ = synthetic_follow_up_inputs()
+        baseline_run = baseline["runs"][0]
+        contributing_run = contributing["runs"][0]
+        self.assertNotIn("raw_schema_version", baseline_run)
+        self.assertNotIn("flush_reason", baseline_run)
+        self.assertEqual(2, contributing_run["raw_schema_version"])
+        self.assertNotIn("flush_reason", contributing_run)
+
+        legacy = p4.normalize_summary_run_metadata(baseline_run, "legacy")
+        current = p4.normalize_summary_run_metadata(contributing_run, "current")
+        self.assertIsNone(legacy["raw_schema_version"])
+        self.assertEqual(
+            "unavailable_in_legacy_summary",
+            legacy["raw_schema_version_status"],
+        )
+        self.assertEqual(2, current["raw_schema_version"])
+        self.assertEqual("recorded", current["raw_schema_version_status"])
+        self.assertIsNone(legacy["flush_reason"])
+        self.assertIsNone(current["flush_reason"])
+        self.assertEqual(
+            "unavailable_in_compact_summary", legacy["flush_reason_status"]
+        )
+        self.assertEqual(
+            "unavailable_in_compact_summary", current["flush_reason_status"]
+        )
+
+    def test_exact_deferred_queue_is_deterministic_and_report_only(self) -> None:
+        baseline, contributing, merged, plan, closure, inputs = (
+            synthetic_follow_up_inputs()
+        )
+        manifest = b"[entrypoint.functions]\n# unchanged\n"
+        report = p4.build_static_ownership_follow_up(
+            baseline, contributing, merged, plan, closure, inputs
+        )
+        second = p4.build_static_ownership_follow_up(
+            baseline, contributing, merged, plan, closure, inputs
+        )
+        self.assertEqual(manifest, b"[entrypoint.functions]\n# unchanged\n")
+        self.assertEqual(
+            p4.canonical_json_bytes(report), p4.canonical_json_bytes(second)
+        )
+        self.assertEqual(
+            p4.static_ownership_follow_up_csv_bytes(report),
+            p4.static_ownership_follow_up_csv_bytes(second),
+        )
+        self.assertEqual(
+            p4.static_ownership_follow_up_markdown_bytes(report),
+            p4.static_ownership_follow_up_markdown_bytes(second),
+        )
+
+        self.assertEqual(567, report["counts"]["targets"])
+        self.assertEqual(
+            {
+                "existing_function_internal_entry": 42,
+                "existing_manifest_function": 411,
+                "known_jump_table_case": 114,
+            },
+            report["counts"]["by_classification"],
+        )
+        baseline_targets, _ = p4.group_target_observations(baseline)
+        contributing_targets, _ = p4.group_target_observations(contributing)
+        reported_targets = {
+            p4.address(item["target"], "reported target")
+            for item in report["targets"]
+        }
+        self.assertEqual(
+            set(contributing_targets) - set(baseline_targets), reported_targets
+        )
+        self.assertTrue(
+            all(item["absent_from_baseline_run"] for item in report["targets"])
+        )
+        self.assertTrue(
+            all(
+                item["no_manifest_proposal"]["proposal"] is None
+                for item in report["targets"]
+            )
+        )
+        self.assertTrue(
+            all(
+                item["no_manifest_proposal"]["automatic_application_permitted"]
+                is False
+                for item in report["targets"]
+            )
+        )
+        internal = [
+            item
+            for item in report["targets"]
+            if item["classification"] == "existing_function_internal_entry"
+        ]
+        jump_cases = [
+            item
+            for item in report["targets"]
+            if item["classification"] == "known_jump_table_case"
+        ]
+        self.assertTrue(all(item["owner"]["address"] for item in internal))
+        self.assertTrue(all(item["owner"]["address"] for item in jump_cases))
+        self.assertTrue(all(item["owning_jump_tables"] for item in jump_cases))
+        self.assertFalse(report["safety"]["canonical_manifest_modified"])
+        self.assertEqual(0, report["counts"]["range_proposals"])
+        self.assertEqual(0, report["counts"]["automatically_applicable"])
+        self.assertFalse(report["safety"]["automatic_function_split_or_promotion"])
+        self.assertFalse(
+            report["safety"][
+                "jump_table_cases_promoted_without_callable_evidence"
+            ]
+        )
+        self.assertFalse(
+            report["safety"]["placeholder_or_stub_generation_supported"]
+        )
+        self.assertNotIn("RETURN_R3_ZERO", json.dumps(report))
+
+        provenance = {item["role"]: item for item in report["run_provenance"]}
+        self.assertIsNone(provenance["baseline"]["raw_schema_version"])
+        self.assertEqual(
+            "unavailable_in_legacy_summary",
+            provenance["baseline"]["raw_schema_version_status"],
+        )
+        self.assertEqual(2, provenance["contributing"]["raw_schema_version"])
+        self.assertEqual(
+            "recorded",
+            provenance["contributing"]["raw_schema_version_status"],
+        )
+        self.assertIsNone(provenance["baseline"]["flush_reason"])
+        self.assertIsNone(provenance["contributing"]["flush_reason"])
+
+        follow_up_schema = json.loads(
+            (
+                TOOLS
+                / "schemas"
+                / "fable2-phase4-static-ownership-follow-up-v1.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual([], schema_errors(report, follow_up_schema))
 
 
 class PlannerFixture:
@@ -699,6 +1770,33 @@ class PlannerFixture:
 
 
 class ImportPlannerTests(unittest.TestCase):
+    def test_merged_summary_plans_without_manifest_mutation_or_stubs(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = PlannerFixture(Path(temporary))
+            expected = contract()["expected_image_identity"]
+            first, second = synthetic_individual_summaries(expected)
+            fixture.summary = p4.merge_summaries([first, second], expected)
+            p4.atomic_write_json(fixture.summary_path, fixture.summary)
+            manifest_before = fixture.manifest.read_bytes()
+
+            plan = fixture.plan()
+            self.assertEqual(manifest_before, fixture.manifest.read_bytes())
+            self.assertFalse(plan["safety"]["canonical_manifest_modified"])
+            self.assertFalse(plan["safety"]["placeholder_implementations_supported"])
+            self.assertNotIn("RETURN_R3_ZERO", json.dumps(plan))
+            by_target = {item["target"]: item for item in plan["targets"]}
+            for target in ("0x829647F0", "0x82C03B28", "0x829675E0"):
+                self.assertEqual(
+                    "existing_manifest_function",
+                    by_target[target]["classification"],
+                )
+                self.assertIsNone(by_target[target]["proposal"])
+            case = by_target["0x82174734"]
+            self.assertEqual("known_jump_table_case", case["classification"])
+            self.assertEqual("0x821746A8", case["ownership"]["owner_address"])
+            self.assertEqual(["0x821746BC"], case["runtime"]["source_sites"])
+            self.assertIsNone(case["proposal"])
+
     def test_all_classifications_evidence_and_mandatory_fixtures(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fixture = PlannerFixture(Path(temporary))
@@ -713,11 +1811,27 @@ class ImportPlannerTests(unittest.TestCase):
                 )
                 self.assertIsNone(by_target[target]["proposal"])
 
+            expected_positive_sources = {
+                "0x829647F0": ["0x829641C4"],
+                "0x82C03B28": ["0x821907A4"],
+                "0x829675E0": ["0x82966EE4"],
+            }
+            for target, sources in expected_positive_sources.items():
+                self.assertEqual(by_target[target]["runtime"]["source_sites"], sources)
+                self.assertFalse(bool(by_target[target]["proposal"]))
+
             case = by_target["0x82174734"]
             self.assertEqual(case["classification"], "known_jump_table_case")
             self.assertEqual(case["ownership"]["owner_address"], "0x821746A8")
+            self.assertEqual(case["runtime"]["source_sites"], ["0x821746BC"])
+            retained = next(
+                item
+                for item in case["evidence"]
+                if item["kind"] == "retained_runtime_manual_evidence"
+            )
             self.assertEqual(
-                case["runtime"]["source_sites"], ["0x823DCAD8", "0x82403720"]
+                retained["historical_corroborating_source_sites"],
+                ["0x823DCAD8", "0x82403720"],
             )
             self.assertIsNone(case["proposal"])
 
@@ -788,9 +1902,91 @@ class ImportPlannerTests(unittest.TestCase):
             )
             self.assertEqual(plan["counts"]["ignored_ordinary_returns"], 1)
             self.assertTrue(all(item["passed"] for item in plan["fixture_results"]))
+            jump_fixture = next(
+                item
+                for item in plan["fixture_results"]
+                if item["address"] == "0x82174734"
+            )
+            self.assertEqual(
+                jump_fixture["observed_runtime_dispatch_sites"], ["0x821746BC"]
+            )
+            self.assertEqual(
+                jump_fixture["retained_historical_corroborating_source_sites"],
+                ["0x823DCAD8", "0x82403720"],
+            )
             self.assertFalse(plan["safety"]["canonical_manifest_modified"])
             self.assertFalse(plan["safety"]["placeholder_implementations_supported"])
             self.assertFalse(plan["safety"]["runtime_observation_establishes_size"])
+
+    def test_jump_table_fixture_rejects_wrong_provenance_categories(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = PlannerFixture(Path(temporary))
+
+            def jump_result(plan: dict) -> dict:
+                return next(
+                    item
+                    for item in plan["fixture_results"]
+                    if item["address"] == "0x82174734"
+                )
+
+            wrong_source_summary = copy.deepcopy(fixture.summary)
+            for pair in wrong_source_summary["pairs"]:
+                if pair["target"] == "0x82174734":
+                    pair["source"] = "0x821746C0"
+            fixture.summary = wrong_source_summary
+            p4.atomic_write_json(fixture.summary_path, wrong_source_summary)
+            self.assertFalse(jump_result(fixture.plan())["passed"])
+
+            fixture = PlannerFixture(Path(temporary))
+            wrong_owner = contract()
+            observation = wrong_owner["runtime_indirect_evidence"]["observations"][0]
+            observation["owner_address"] = "0x821746AC"
+            write_json(fixture.evidence, wrong_owner)
+            self.assertFalse(jump_result(fixture.plan())["passed"])
+
+            wrong_classification = contract()
+            observation = wrong_classification["runtime_indirect_evidence"][
+                "observations"
+            ][0]
+            observation["classification"] = "ambiguous_target"
+            write_json(fixture.evidence, wrong_classification)
+            result = jump_result(fixture.plan())
+            self.assertFalse(result["passed"])
+
+            # Even high executed counts do not promote a recovered switch case.
+            fixture = PlannerFixture(Path(temporary))
+            per_run_hits = 5_000_000_000
+            for run_id in ("synthetic-run-a", "synthetic-run-b"):
+                run_summary = p4.aggregate_raw_runs(
+                    [
+                        p4.parse_raw_trace(
+                            FIXTURES / f"{run_id}.raw.jsonl"
+                        )
+                    ],
+                    PATCHED,
+                )
+                set_pair_run_hits(
+                    run_summary,
+                    "0x821746BC",
+                    "0x82174734",
+                    per_run_hits,
+                )
+                if run_id == "synthetic-run-a":
+                    first_summary = run_summary
+                else:
+                    second_summary = run_summary
+            fixture.summary = p4.merge_summaries(
+                [first_summary, second_summary]
+            )
+            p4.atomic_write_json(fixture.summary_path, fixture.summary)
+            plan = fixture.plan()
+            case = next(
+                item for item in plan["targets"] if item["target"] == "0x82174734"
+            )
+            self.assertEqual(case["classification"], "known_jump_table_case")
+            self.assertIsNone(case["proposal"])
+            self.assertFalse(case["automatic_application_permitted"])
+            self.assertTrue(jump_result(plan)["passed"])
 
     def test_plan_bytes_are_deterministic_and_integrity_guarded(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

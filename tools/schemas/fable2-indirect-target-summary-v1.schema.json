@@ -8,6 +8,7 @@
       "type": "object"
     },
     "determinism": {
+      "description": "Stable ordering metadata. Merged summaries qualify sequence numbers as independent per-run, per-guest-thread domains and termination as per-run state.",
       "type": "object"
     },
     "identity": {
@@ -40,6 +41,7 @@
             ]
           },
           "hit_count": {
+            "maximum": 18446744073709551615,
             "minimum": 0,
             "type": "integer"
           },
@@ -56,6 +58,12 @@
             "type": "boolean"
           },
           "run_hit_counts": {
+            "additionalProperties": {
+              "maximum": 18446744073709551615,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "description": "Run-ID-qualified hit totals; keys must equal observed_runs.",
             "type": "object"
           },
           "source": {
@@ -82,14 +90,19 @@
             "items": {
               "properties": {
                 "first_sequence": {
+                  "description": "Sequence in the named run and guest-thread domain; never globally comparable across runs.",
+                  "maximum": 18446744073709551615,
                   "minimum": 0,
                   "type": "integer"
                 },
                 "hit_count": {
+                  "maximum": 18446744073709551615,
                   "minimum": 0,
                   "type": "integer"
                 },
                 "last_sequence": {
+                  "description": "Sequence in the named run and guest-thread domain; never globally comparable across runs.",
+                  "maximum": 18446744073709551615,
                   "minimum": 0,
                   "type": "integer"
                 },
@@ -137,6 +150,7 @@
       "type": "array"
     },
     "runs": {
+      "description": "Independent run records retain labels, recorded raw hashes, identity assessment, counters, integrity warnings and per-run termination state. Referenced raw files need not still exist.",
       "items": {
         "type": "object"
       },

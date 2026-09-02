@@ -1,0 +1,253 @@
+{
+  "$id": "https://github.com/FenrisSkoll/Fable2Recomp/tools/schemas/xenia-indirect-targets-raw-v2.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Schema for each JSON object in an append-safe Xenia indirect-target schema-2 delta stream. Pair records become durable only when followed by their matching checkpoint.",
+  "oneOf": [
+    { "$ref": "#/$defs/header" },
+    { "$ref": "#/$defs/module" },
+    { "$ref": "#/$defs/pair" },
+    { "$ref": "#/$defs/checkpoint" },
+    { "$ref": "#/$defs/footer" }
+  ],
+  "title": "Xenia indirect-target raw JSONL record v2",
+  "$defs": {
+    "address": {
+      "pattern": "^0x[0-9A-F]{8}$",
+      "type": "string"
+    },
+    "counter": {
+      "maximum": 18446744073709551615,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "counters": {
+      "properties": {
+        "aggregate_limit_exceeded": { "$ref": "#/$defs/counter" },
+        "count_overflows": { "$ref": "#/$defs/counter" },
+        "dropped_hits": { "$ref": "#/$defs/counter" },
+        "io_errors": { "$ref": "#/$defs/counter" },
+        "total_hits": { "$ref": "#/$defs/counter" },
+        "total_pair_records": { "$ref": "#/$defs/counter" }
+      },
+      "required": [
+        "total_hits",
+        "total_pair_records",
+        "dropped_hits",
+        "io_errors",
+        "count_overflows",
+        "aggregate_limit_exceeded"
+      ],
+      "type": "object"
+    },
+    "header": {
+      "additionalProperties": false,
+      "properties": {
+        "collector_version": { "$ref": "#/$defs/counter" },
+        "identity": {
+          "additionalProperties": false,
+          "properties": {
+            "expected_image_sha256": {
+              "description": "Configured patched analysis-image identity, not an ISO hash or observed memory hash.",
+              "pattern": "^[0-9A-F]{64}$",
+              "type": "string"
+            },
+            "identity_strength": { "minLength": 1, "type": "string" },
+            "media_id": { "type": "string" },
+            "title_id": { "type": "string" },
+            "version": { "type": "string" }
+          },
+          "required": [
+            "expected_image_sha256",
+            "identity_strength",
+            "title_id",
+            "media_id",
+            "version"
+          ],
+          "type": "object"
+        },
+        "label": { "type": "string" },
+        "record": { "const": "header" },
+        "run_id": { "minLength": 1, "type": "string" },
+        "schema": { "const": "xenia_indirect_targets_raw" },
+        "schema_version": { "const": 2 },
+        "settings": {
+          "additionalProperties": false,
+          "properties": {
+            "all_modules": { "type": "boolean" },
+            "buffer_pairs": { "$ref": "#/$defs/counter" },
+            "dirty_pair_limit": { "$ref": "#/$defs/counter" },
+            "flush_interval_ms": { "$ref": "#/$defs/counter" },
+            "include_returns": { "type": "boolean" },
+            "max_unique_aggregates": { "$ref": "#/$defs/counter" },
+            "pair_count_semantics": {
+              "const": "delta_since_previous_persistence"
+            }
+          },
+          "required": [
+            "include_returns",
+            "all_modules",
+            "buffer_pairs",
+            "dirty_pair_limit",
+            "flush_interval_ms",
+            "max_unique_aggregates",
+            "pair_count_semantics"
+          ],
+          "type": "object"
+        },
+        "started_unix_ns": { "$ref": "#/$defs/counter" },
+        "xenia_commit": { "minLength": 1, "type": "string" }
+      },
+      "required": [
+        "record",
+        "schema",
+        "schema_version",
+        "collector_version",
+        "xenia_commit",
+        "run_id",
+        "label",
+        "started_unix_ns",
+        "identity",
+        "settings"
+      ],
+      "type": "object"
+    },
+    "module": {
+      "additionalProperties": false,
+      "properties": {
+        "executable": { "type": "boolean" },
+        "executable_end": { "$ref": "#/$defs/address" },
+        "executable_start": { "$ref": "#/$defs/address" },
+        "fingerprint": {
+          "additionalProperties": false,
+          "properties": {
+            "algorithm": { "type": "string" },
+            "value": { "type": "string" }
+          },
+          "required": ["algorithm", "value"],
+          "type": "object"
+        },
+        "image_base": { "$ref": "#/$defs/address" },
+        "name": { "minLength": 1, "type": "string" },
+        "record": { "const": "module" },
+        "run_id": { "minLength": 1, "type": "string" },
+        "title_module": { "type": "boolean" }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "name",
+        "image_base",
+        "executable_start",
+        "executable_end",
+        "executable",
+        "title_module",
+        "fingerprint"
+      ],
+      "type": "object"
+    },
+    "pair": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_id": { "$ref": "#/$defs/counter" },
+        "branch_kind": { "enum": ["bctr", "bctrl", "bclr", "blr"] },
+        "count_semantics": {
+          "const": "delta_since_previous_persistence"
+        },
+        "first_thread_sequence": { "$ref": "#/$defs/counter" },
+        "hit_count": { "$ref": "#/$defs/counter" },
+        "last_thread_sequence": { "$ref": "#/$defs/counter" },
+        "link": { "type": "boolean" },
+        "ordinary_return": { "type": "boolean" },
+        "record": { "const": "pair" },
+        "run_id": { "minLength": 1, "type": "string" },
+        "source": { "$ref": "#/$defs/address" },
+        "source_module": { "minLength": 1, "type": "string" },
+        "target": { "$ref": "#/$defs/address" },
+        "target_module": { "minLength": 1, "type": "string" },
+        "target_validity": { "minLength": 1, "type": "string" },
+        "thread_key": { "minLength": 1, "type": "string" }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "batch_id",
+        "thread_key",
+        "source",
+        "target",
+        "branch_kind",
+        "link",
+        "ordinary_return",
+        "source_module",
+        "target_module",
+        "hit_count",
+        "first_thread_sequence",
+        "last_thread_sequence",
+        "target_validity",
+        "count_semantics"
+      ],
+      "type": "object"
+    },
+    "checkpoint": {
+      "allOf": [{ "$ref": "#/$defs/counters" }],
+      "properties": {
+        "batch_id": { "$ref": "#/$defs/counter" },
+        "batch_pair_records": { "$ref": "#/$defs/counter" },
+        "checkpoint_sequence": { "$ref": "#/$defs/counter" },
+        "collector_version": { "$ref": "#/$defs/counter" },
+        "flush_reason": { "minLength": 1, "type": "string" },
+        "persisted_aggregate_count": { "$ref": "#/$defs/counter" },
+        "record": { "const": "checkpoint" },
+        "run_id": { "minLength": 1, "type": "string" }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "batch_id",
+        "checkpoint_sequence",
+        "collector_version",
+        "flush_reason",
+        "batch_pair_records",
+        "persisted_aggregate_count"
+      ],
+      "type": "object"
+    },
+    "footer": {
+      "allOf": [{ "$ref": "#/$defs/counters" }],
+      "properties": {
+        "batches": { "$ref": "#/$defs/counter" },
+        "checkpoint_records": { "$ref": "#/$defs/counter" },
+        "checkpoint_sequence": { "$ref": "#/$defs/counter" },
+        "collector_version": { "$ref": "#/$defs/counter" },
+        "final_sequence": { "$ref": "#/$defs/counter" },
+        "final_unique_aggregates": { "$ref": "#/$defs/counter" },
+        "flush_reason": { "minLength": 1, "type": "string" },
+        "pair_count_semantics": {
+          "const": "delta_since_previous_persistence"
+        },
+        "raw_schema_version": { "const": 2 },
+        "record": { "const": "footer" },
+        "run_id": { "minLength": 1, "type": "string" },
+        "sequence_scope": { "const": "maximum_per_thread_sequence" },
+        "shutdown_status": { "const": "normal" },
+        "unique_aggregate_count_complete": { "type": "boolean" }
+      },
+      "required": [
+        "record",
+        "run_id",
+        "raw_schema_version",
+        "collector_version",
+        "shutdown_status",
+        "flush_reason",
+        "batches",
+        "checkpoint_sequence",
+        "checkpoint_records",
+        "final_unique_aggregates",
+        "unique_aggregate_count_complete",
+        "final_sequence",
+        "sequence_scope",
+        "pair_count_semantics"
+      ],
+      "type": "object"
+    }
+  }
+}

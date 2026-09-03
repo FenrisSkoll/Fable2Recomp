@@ -226,6 +226,86 @@ class SaveTraceTest(unittest.TestCase):
             ["Fable2PubInfo.xml", "failquestsave.bin"],
         )
 
+    def test_reload_capture_reports_enumeration_and_payload_opens(self) -> None:
+        slot = self.save_root / NATIVE_XUID / TITLE_ID / "00000001" / SLOT
+        slot.mkdir(parents=True)
+        required = (
+            "chaptersave.bin",
+            "herosave.bin",
+            "mainsave.bin",
+            "saveuid.bin",
+            "texturemorphs.bin",
+        )
+        for name in required:
+            (slot / name).write_bytes(b"synthetic")
+        self.create_header()
+
+        events = [
+            event(1, "XamContentCreateEnumerator", "request"),
+            event(
+                2,
+                "XamContentCreateEnumerator",
+                "result",
+                request_sequence=1,
+                item_count=1,
+                result=0,
+            ),
+            event(
+                3,
+                "XamContentCreate",
+                "request",
+                profile_xuid=NATIVE_XUID,
+                device_id=1,
+                file_name=SLOT,
+                title_id=int(TITLE_ID, 16),
+                flags=3,
+            ),
+            event(
+                4,
+                "XamContentCreate",
+                "operation_result",
+                request_sequence=3,
+                result=0,
+            ),
+        ]
+        sequence = 5
+        for name in required:
+            events.extend(
+                [
+                    event(
+                        sequence,
+                        "NtCreateFile",
+                        "request",
+                        guest_path=f"Save:\\{name}",
+                        desired_access=0x80100080,
+                        creation_disposition=1,
+                    ),
+                    event(
+                        sequence + 1,
+                        "NtCreateFile",
+                        "result",
+                        request_sequence=sequence,
+                        guest_path=f"Save:\\{name}",
+                        file_action=1,
+                        result=0,
+                    ),
+                ]
+            )
+            sequence += 2
+        self.write_events(events)
+
+        report = build_report(
+            self.trace, self.metadata, self.save_root, self.baseline
+        )
+        observation = report["restart_observation"]
+        self.assertEqual(observation["enumerated_item_count_max"], 1)
+        self.assertTrue(observation["all_required_payload_opened"])
+        self.assertFalse(observation["nt_read_file_traced"])
+        notes = " ".join(report["notes"]).lower()
+        self.assertIn("enumeration succeeded", notes)
+        self.assertIn("ntreadfile is not traced", notes)
+        self.assertNotIn("restart enumeration/loading remains required", notes)
+
     def test_content_create_without_payload_attempt_is_classified(self) -> None:
         slot = self.save_root / NATIVE_XUID / TITLE_ID / "00000001" / SLOT
         slot.mkdir(parents=True)

@@ -248,12 +248,61 @@ def expected_header_path() -> str:
     return f"{NATIVE_XUID}/{TITLE_ID}/Headers/00000001/{SLOT}.header"
 
 
+def observe_restart(events: list[dict[str, Any]]) -> dict[str, Any]:
+    successful_enumerations = [
+        event
+        for event in events
+        if event["operation"] == "XamContentCreateEnumerator"
+        and event["phase"] == "result"
+        and event_result(event) == 0
+        and isinstance(event.get("item_count"), int)
+    ]
+    enumerated_item_count_max = max(
+        (int(event["item_count"]) for event in successful_enumerations),
+        default=0,
+    )
+
+    requests = {
+        event["sequence"]: event
+        for event in events
+        if event["operation"] == "NtCreateFile" and event["phase"] == "request"
+    }
+    opened_names: set[str] = set()
+    for event in events:
+        if (
+            event["operation"] != "NtCreateFile"
+            or event["phase"] != "result"
+            or event_result(event) != 0
+            or event.get("file_action") != 1
+        ):
+            continue
+        request = requests.get(event.get("request_sequence"))
+        if not request or int(request.get("desired_access", 0)) & 0x80000000 == 0:
+            continue
+        guest_path = str(request.get("guest_path", "")).replace("\\", "/")
+        opened_names.add(guest_path.rsplit("/", 1)[-1].casefold())
+
+    required_payload_opened = [
+        name for name in FRESH_REQUIRED_PAYLOAD if name.casefold() in opened_names
+    ]
+    return {
+        "enumerated_item_count_max": enumerated_item_count_max,
+        "required_payload_opened": required_payload_opened,
+        "all_required_payload_opened": len(required_payload_opened)
+        == len(FRESH_REQUIRED_PAYLOAD),
+        "nt_read_file_traced": any(
+            event["operation"] == "NtReadFile" for event in events
+        ),
+    }
+
+
 def classify_capture(
     events: list[dict[str, Any]], save_root: Path, snapshot: dict[str, Any]
-) -> tuple[list[str], dict[str, Any] | None, list[str]]:
+) -> tuple[list[str], dict[str, Any] | None, list[str], dict[str, Any]]:
     classifications: list[str] = []
     notes: list[str] = []
     first_anomaly: dict[str, Any] | None = None
+    restart_observation = observe_restart(events)
 
     def add(classification: str, event: dict[str, Any] | None, note: str) -> None:
         nonlocal first_anomaly
@@ -443,19 +492,41 @@ def classify_capture(
             "Conditional payload files not present (not a fresh-slot failure): "
             + ", ".join(missing_conditional)
         )
+    if restart_observation["enumerated_item_count_max"] > 0:
+        notes.append(
+            "Restart saved-game enumeration succeeded with maximum item_count "
+            f"{restart_observation['enumerated_item_count_max']}."
+        )
+    if restart_observation["all_required_payload_opened"]:
+        if restart_observation["nt_read_file_traced"]:
+            notes.append(
+                "All required fresh-slot payload files were opened with read access, "
+                "and NtReadFile activity was captured."
+            )
+        else:
+            notes.append(
+                "All required fresh-slot payload files were opened with read access; "
+                "NtReadFile is not traced in this capture, so byte-level reads and "
+                "meaningful in-game state require runtime observation."
+            )
 
     if not classifications:
         classifications.append("unknown")
-        if not missing_required:
+        if not missing_required and restart_observation["enumerated_item_count_max"] == 0:
             notes.append(
                 "The captured slot contains the required fresh-slot payload; restart "
                 "enumeration/loading remains required."
+            )
+        elif not missing_required:
+            notes.append(
+                "No save-path semantic mismatch was identified during restart "
+                "enumeration and payload open."
             )
         else:
             notes.append("No decisive semantic mismatch was identified from this capture.")
 
     classifications.sort(key=FAILURE_CLASSES.index)
-    return classifications, first_anomaly, notes
+    return classifications, first_anomaly, notes, restart_observation
 
 
 def build_report(
@@ -477,7 +548,9 @@ def build_report(
     if before and before.get("schema_version") != SNAPSHOT_SCHEMA_VERSION:
         raise CaptureError("unsupported baseline snapshot schema")
     comparison = compare_snapshots(before, after)
-    classifications, first_anomaly, notes = classify_capture(events, save_root, after)
+    classifications, first_anomaly, notes, restart_observation = classify_capture(
+        events, save_root, after
+    )
 
     operations = Counter(event["operation"] for event in events)
     phases = Counter(event["phase"] for event in events)
@@ -494,6 +567,7 @@ def build_report(
         "classifications": classifications,
         "first_anomaly": first_anomaly,
         "notes": notes,
+        "restart_observation": restart_observation,
         "tree_comparison": comparison,
         "payload_contract": {
             "required_fresh_slot": list(FRESH_REQUIRED_PAYLOAD),

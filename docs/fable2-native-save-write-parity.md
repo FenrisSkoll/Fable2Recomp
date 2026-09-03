@@ -2,13 +2,16 @@
 
 ## Status and stop boundary
 
-This checkpoint prepares a single isolated runtime capture that can answer the
-first outstanding question: after content creation, does the TU1 guest attempt
-to create or write the missing `Hero000` payload files?
+Capture 001 is preserved and explained. The TU1 guest created and wrote the
+required fresh-slot payload, all captured create/write/completion/close results
+succeeded, and the process exited cleanly. There is no failing or semantically
+divergent trace sequence in events `1..618`; the previously reported partial
+write did not reproduce with the diagnostic build.
 
-Native-save parity is **not** claimed. A fresh native slot has not yet been
-created, restarted, enumerated, loaded, or updated with this build. Interactive
-runtime validation stops at the user save trigger.
+Native-save parity is **not** claimed. The newly written slot has not yet been
+enumerated or loaded by a genuinely new process, and update-in-place has not
+been tested. Interactive runtime validation now stops immediately before the
+prepared `FreshNativeReload` capture.
 
 ## Exact provenance
 
@@ -25,6 +28,8 @@ runtime validation stops at the user save trigger.
   `ecc81424f9d8663b0ae0af98f14df60040bdc6b4`
 - Final ReXGlue SDK pin commit:
   `1d8bc00ba54900ece279957d6ae500b4fa6067ab`
+- Capture-001 parser and guarded-reload workflow commit:
+  `bbb47f42fd6d5656ba098fbf15e7a14e55f7cdb7`
 - The final checkpoint commit is the commit containing this document. Resolve
   it with `git rev-parse HEAD` after checkout.
 
@@ -103,7 +108,7 @@ Prepared states:
 | State | Exact root | Prepared contents | Intended future use |
 | --- | --- | --- | --- |
 | A | `...\A-empty` | 0 files, 0 directories | immutable empty baseline |
-| B | `...\B-fresh-native` | 0 files, 0 directories | tomorrow's fresh native attempt |
+| B | `...\B-fresh-native` | preserved capture-001 native slot and profile files | next-process enumeration/load attempt |
 | C | `...\C-xenia-copy` | isolated reference snapshot | Xenia-origin payload in confirmed native-loadable layout |
 | D | `...\D-xenia-update` | independent copy of C | later native update-in-place attempt |
 
@@ -118,6 +123,7 @@ The baseline and reference reports are ignored, payload-free inventories:
 
 ```text
 out\native-save-diagnostic\state-A-before.json
+out\native-save-diagnostic\state-B-after-write.json
 out\native-save-diagnostic\state-C-reference.json
 ```
 
@@ -307,7 +313,7 @@ was not assumed to prove behavioral parity.
 - The flush correction improves durability if the guest reaches finalisation,
   but is unlikely to create missing payload files that the guest never opened.
 
-### HYPOTHESES requiring the runtime trace
+### Hypotheses before capture 001
 
 1. `guest_never_attempted_payload_save`: the immediately preceding content or
    device state causes guest save logic to stop after `saveuid.bin`.
@@ -321,8 +327,9 @@ was not assumed to prove behavioral parity.
 5. `reload_enumeration_mismatch`: only relevant after a structurally complete
    slot exists and a new process fails to enumerate it.
 
-The current root-cause classification remains `unknown`. No hypothesis has
-been promoted without runtime evidence.
+Capture 001 rules out hypotheses 1 through 4 for the operations it contains;
+the detailed post-capture result below supersedes this pre-capture list.
+Restart enumeration remains untested.
 
 ## Diagnostic instrumentation
 
@@ -353,10 +360,11 @@ failed, incomplete, escaped-root, or structurally inconsistent operation using
 the requested classification vocabulary.
 
 `tools/Invoke-Fable2NativeSaveDiagnostic.ps1` validates all write destinations
-under the ignored diagnostic root, refuses nonempty fresh state and existing
+under the ignored diagnostic root, refuses an invalid source state and existing
 capture artifacts, and exposes `Status`, `Prepare`, `Launch`, and `Report`.
-`FreshNative` selects A/B/capture-001; `XeniaUpdate` selects C/D/capture-D-001.
-It contains no input automation.
+`FreshNative` selects A/B/capture-001; `FreshNativeReload` selects the preserved
+State B snapshot, State B, cache-002, and capture-002; `XeniaUpdate` selects
+C/D/cache-D-001/capture-D-001. It contains no input automation.
 
 ## Exact diagnostic build
 
@@ -411,6 +419,15 @@ Fable2Recomp commit `ecc81424...`:
 
 Commit `1d8bc00...` updates only the audited ReXGlue version pin. This document
 is the only additional file in the final checkpoint commit.
+
+Fable2Recomp capture-analysis commit `bbb47f42...`:
+
+- `tests/test_fable2_save_trace.py`
+- `tools/Fable2SaveTrace.py`
+- `tools/Invoke-Fable2NativeSaveDiagnostic.ps1`
+- `tools/schemas/fable2-save-diagnostic-report-v1.schema.json`
+
+The subsequent capture-analysis checkpoint commit updates only this document.
 
 ReXGlue commits `1f4bda8...`, `e2ffe70...`, and `39a35ab...`:
 
@@ -531,112 +548,314 @@ All three commands passed. No game or emulator smoke run was used.
 - No commit was pushed; no tag, remote branch, pull request, release, asset, or
   external upload was created or changed.
 
-## Tomorrow: one fresh native save-trigger capture
+## Capture-001 analysis checkpoint (2026-09-03)
 
-Before launch, State B must still be empty and `Capture already used` must be
-`False`:
+### Immutable capture and derived report
 
-```powershell
-Set-Location C:\Dev\Fable2Recomp
-.\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Status -State FreshNative
-```
+The four original artifacts were inspected in place and not rewritten:
 
-The exact launch command is:
+| Artifact under `out\native-save-diagnostic\capture-001` | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `fable2-native-save-001.log` | 4,020,079 | `4642F1F87324F0140FFC87E40144B643E3E76D89E4342C5AA9B347A95F57CCB5` |
+| `save-diagnostic-report-v1.json` | 5,647 | `3AF62D2A0094945EBF467D61958D2759D32920F4D169D27B022FF58F5F382FC8` |
+| `save-trace-events-v1.ndjson` | 316,052 | `9070A4EB8C7ACF589234F47437E976C048D05C1FCA09413938FECAFA77E72826` |
+| `save-trace-run-v1.json` | 242 | `C6197487727C98EAB3B39BA5F8360C6C5192266B8B8E2E09FAA8D510231C0FE1` |
 
-```powershell
-.\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Launch -State FreshNative
-```
-
-It expands to the diagnostic executable with these roots:
-
-```text
---game_data_root=C:\Dev\Fable2Recomp\assets\runtime
---update_data_root=C:\Dev\Fable2Recomp\assets\update
---user_data_root=C:\Dev\Fable2Recomp\out\native-save-diagnostic\B-fresh-native
---cache_root=C:\Dev\Fable2Recomp\out\native-save-diagnostic\cache-001
---gpu_plugin=xenos
---log_level=debug
---log_file=C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001\fable2-native-save-001.log
---save_trace_dir=C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001
-```
-
-Expected before the trigger: no files under State B and no trace/report files
-under `capture-001`.
-
-Use normal gameplay only. Select **New Game**, choose the normal saving/storage
-path rather than the previously documented **Continue Without Saving** path,
-and progress through childhood until the game's first normal save indicator
-completes. Fable II uses its normal save/autosave flow; no unverified manual-save
-menu is assumed.
-
-After the indicator completes, exit cleanly if possible. If the program hangs
-or crashes, record that fact and preserve the process result; do not retry and
-do not relaunch. The helper waits for the process and prints its exit code.
-
-Expected complete structural output after the trigger:
+The metadata identifies schema 1/event schema 1, PID `31164`, start time
+`2026-09-03T16:40:59Z`, and `contains_payload_bytes: false`. The original
+report is retained as evidence even though its old all-seven-files expectation
+is now known to be too strict. The corrected payload-free derived report is:
 
 ```text
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\chaptersave.bin
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\Fable2PubInfo.xml
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\failquestsave.bin
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\herosave.bin
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\mainsave.bin
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\saveuid.bin
-B13EBABEBABEBABE\4D5307F1\00000001\Hero000\texturemorphs.bin
-B13EBABEBABEBABE\4D5307F1\Headers\00000001\Hero000.header
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\analysis-capture-001\save-diagnostic-report-v1.json
+size:    6004 bytes
+SHA-256: 0DBCC541E1E924D419635EB230678DC01EF74B8F11C0405504450B30FFCCC8F0
 ```
 
-The known failure may instead leave only `saveuid.bin` and the header. Do not
-create or copy any missing file by hand.
+### Preserved State B tree
 
-Without relaunching anything, generate the report:
-
-```powershell
-.\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Report -State FreshNative
-```
-
-Capture outputs:
+`state-B-after-write.json` is a payload-free, immutable pre-reload inventory:
 
 ```text
-C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001\save-trace-events-v1.ndjson
-C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001\save-trace-run-v1.json
-C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001\fable2-native-save-001.log
-C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-001\save-diagnostic-report-v1.json
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\state-B-after-write.json
+size:    3514 bytes
+SHA-256: 3FA6858C6FA1986523492DEF1BFED6A817D74FAD206EA7A68809EAFAE2C0E498
 ```
 
-Do not perform the restart/enumeration test until the first capture has been
-inspected. A complete-looking directory is not proof of parity.
+The captured slot is:
+
+| Relative path below `B-fresh-native` | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/chaptersave.bin` | 550 | `2D8DF1EC261325A6B4DC0224A7878212940B00C153E389FD137DD8921166CF6D` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/Fable2PubInfo.xml` | 554 | `51DF9E516AA2D3FA35F4CA3C90760D5D0CB20F250EA3F4C6B80746EC1A9179DC` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/herosave.bin` | 1,521 | `610562CC3179C1F32108E539851987914D1C891378F9D0301E5D73A11C7FAA32` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/mainsave.bin` | 166,760 | `F31FE0EC07A58C1777CA127C6937F53625EDA82208BDCEF0710B675D021FF330` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/saveuid.bin` | 8 | `28DD9A921926D55D2360D4F3DC5C508DF96A7685D32CC16E7694E98E03398F32` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/texturemorphs.bin` | 29,479 | `F7F1595ED15202D462634B38A5220F787DC9EBBC20636D8887123C1F0D56F00D` |
+| `B13EBABEBABEBABE/4D5307F1/Headers/00000001/Hero000.header` | 328 | `9BE20BAE420598D3D42766ACDD8557FFD0F0C70D98A8085F03E0475E257B6EFE` |
+
+State B also contains the three native profile-setting files and the native
+achievements TOML recorded in the snapshot. No `failquestsave.bin` is present.
+
+That absence is not a fresh-slot failure. In the read-only pinned Xenia save,
+`saveuid.bin` was created at `2026-09-01 20:10:42 UTC`, the four core payloads
+at `20:10:48..20:10:49`, `Fable2PubInfo.xml` at `20:31:37`, and
+`failquestsave.bin` at `20:46:10`. Therefore the first Xenia save also existed
+without the latter two files. The fresh required payload is `saveuid.bin`,
+`mainsave.bin`, `herosave.bin`, `chaptersave.bin`, and `texturemorphs.bin`;
+`Fable2PubInfo.xml` and `failquestsave.bin` are conditional later-state files.
+
+### Earliest failure or semantic divergence
+
+There is **no such sequence in capture 001**. Events `1..618` are contiguous.
+The corrected report classification is `unknown`, meaning no category in the
+failure vocabulary was observed, and `first_anomaly` is `null`. There are zero
+non-success final operation results, zero short writes, zero missing overlapped
+completions, and zero host paths outside State B. `unknown` is not a parity
+claim; it preserves the remaining untested restart-enumeration/load question.
+
+Exact trace landmarks:
+
+| Sequences | Guest LR / caller PC | Operation and result |
+| --- | --- | --- |
+| `1..2` | `0x82443354` / `0x82443350` | initial saved-game enumeration; handle `0xF80001AC`, item count `0`, result `0` |
+| `3..6` | `0x82441D84` / `0x82441D80` | device selector for 8,617,984 bytes; overlapped `0x701BF9C0`; immediate `997`; device `1`; final `0`; event `0xF80001C0` signaled; no callback/APC |
+| `13..18` | `0x82CC4264` / `0x82CC4260` | create `Save`/`Hero000`, user `254`, device `1`, type `1`, title `0x4D5307F1`, XUID `B13EBABEBABEBABE`, flags `0x802`, size `8617984`, overlapped `0x701BF610`; immediate `997`; disposition `1`; final/extended `0`; length `1`; event `0xF80001F4` signaled |
+| `15..16` | worker thread `5` | wrote the 328-byte `Hero000.header`; actual `328`, result `0` |
+| `19..32` | see below | created, sized, wrote, flushed, and closed `saveuid.bin` successfully |
+| `33..35` | `0x82445330` / `0x8244532C` | initial content close; overlapped `0x701BF610`; operation/final/extended `0`; event `0xF80001F4` signaled |
+| `36..212` | create `0x82CC4264` / `0x82CC4260`; close `0x82449C3C` / `0x82449C38` | first payload cycle through `\Device\Content\2\`; flags `4`, immediate `997`, disposition `2`, final `0`, completed close |
+| `213..415` | same | second payload cycle through `\Device\Content\3\`; all captured operations completed |
+| `416..618` | same | final payload cycle through `\Device\Content\4\`; all captured operations completed |
+
+The `saveuid.bin` contract is exact: sequence `19` used root handle
+`0xFFFFFFFD`, access `0xC0100080`, attributes/share `0`, disposition `5`, and
+options `0x64`; sequence `20` returned synchronous file handle `0xF8000200`,
+action `2`, result `0`. Sequences `21/22`, `23/24`, and `27/28` applied
+information class `14`, length/information `8`, result `0`. Sequences `25/26`
+wrote at current position (`offset = UINT64_MAX`) with requested/actual `8`,
+immediate/operation/IOSB status `0`, IOSB information `8`, and no pending/event
+completion. Sequences `29/30` flushed with result `0`; `31/32` closed with
+result `0`. Their guest callsites are respectively `0x82CC35F4/0x82CC35F0`,
+`0x82CC7A54/0x82CC7A50`, `0x82CC7078/0x82CC7074`,
+`0x82CC7ABC/0x82CC7AB8`, and `0x82CC27D0/0x82CC27CC`.
+
+The final cycle opened each binary once for existing access and once for
+replacement/write. `mainsave.bin` used handles `0xF8000304` and `0xF8000308`
+at `420..423`; accesses were `0x80100080`/`0x40100080`, attributes `0x80`,
+share `3`, dispositions `5`/`1`, options `0x48`/`0x40`, actions `3`/`1`, and
+both handles were asynchronous. Writes `424..573` made 75 explicit-offset
+requests totaling 174,459 bytes and returned exactly 174,459 bytes; overlap in
+the guest offsets yields the final 166,760-byte file. Every result returned
+immediate `259` (`X_STATUS_PENDING`), operation result `0`, IOSB status `0`,
+IOSB information equal to the request, event `0xF800030C` signaled, no APC,
+and `returns_pending: true`. The exact request/result, offset, and byte triples
+are retained verbatim here:
+
+```text
+424/425:0+2048=2048, 426/427:2048+2048=2048, 428/429:4096+1642=1642,
+430/431:5738+2737=2737, 432/433:8192+2048=2048, 434/435:10240+2048=2048,
+436/437:12288+2048=2048, 438/439:14336+2048=2048, 440/441:16384+2048=2048,
+442/443:18432+2048=2048, 444/445:20480+2048=2048, 446/447:22528+2048=2048,
+448/449:24576+2048=2048, 450/451:26624+2048=2048, 452/453:28672+2048=2048,
+454/455:30720+2048=2048, 456/457:32768+2048=2048, 458/459:34816+2048=2048,
+460/461:36864+2048=2048, 462/463:38912+2048=2048, 464/465:40960+2048=2048,
+466/467:43008+2048=2048, 468/469:45056+2048=2048, 470/471:47104+2048=2048,
+472/473:49152+2048=2048, 474/475:51200+2048=2048, 476/477:53248+1936=1936,
+478/479:55184+8162=8162, 480/481:61440+1914=1914, 482/483:63354+8202=8202,
+484/485:69632+1932=1932, 486/487:71564+8122=8122, 488/489:77824+1870=1870,
+490/491:79694+6464=6464, 492/493:86016+2048=2048, 494/495:88064+2048=2048,
+496/497:90112+2048=2048, 498/499:92160+2048=2048, 500/501:94208+1827=1827,
+502/503:96035+2509=2509, 504/505:98304+544=544, 506/507:98304+2048=2048,
+508/509:100352+2048=2048, 510/511:102400+2048=2048,
+512/513:104448+2048=2048, 514/515:106496+2048=2048,
+516/517:108544+2048=2048, 518/519:110592+2048=2048,
+520/521:112640+2048=2048, 522/523:114688+2048=2048,
+524/525:116736+2048=2048, 526/527:118784+2048=2048,
+528/529:120832+2048=2048, 530/531:122880+2048=2048,
+532/533:124928+2048=2048, 534/535:126976+2048=2048,
+536/537:129024+2048=2048, 538/539:131072+2048=2048,
+540/541:133120+2048=2048, 542/543:135168+2048=2048,
+544/545:137216+1509=1509, 546/547:138725+2806=2806,
+548/549:141312+2048=2048, 550/551:143360+2048=2048,
+552/553:145408+1980=1980, 554/555:147388+2695=2695,
+556/557:149504+2048=2048, 558/559:151552+2048=2048,
+560/561:153600+2048=2048, 562/563:155648+2048=2048,
+564/565:157696+2048=2048, 566/567:159744+2048=2048,
+568/569:161792+2048=2048, 570/571:163840+2048=2048,
+572/573:165888+872=872
+```
+
+The remaining final-cycle writes used the same success semantics:
+
+| File | Create/write/close sequences | Write contract |
+| --- | --- | --- |
+| `Fable2PubInfo.xml` | `578..585`, handle `0xF8000304` | synchronous create access `0x40100080`, attrs `0x80`, share `0`, disposition `5`, options `0x60`, action `3`; current-position writes `580/581` = `2/2` and `582/583` = `552/552`; result/IOSB `0`, information exact |
+| `herosave.bin` | `586..595`, handles `0xF8000304`/`0xF8000308` | write `590/591`, offset `0`, requested/actual/IOSB information `1521`, pending `259`, final/IOSB `0`, event `0xF800030C` signaled |
+| `chaptersave.bin` | `596..605`, handles `0xF8000304`/`0xF8000308` | write `600/601`, offset `0`, requested/actual/IOSB information `550`, pending `259`, final/IOSB `0`, event signaled |
+| `texturemorphs.bin` | `606..615`, handles `0xF8000304`/`0xF8000308` | write `610/611`, offset `0`, requested/actual/IOSB information `29479`, pending `259`, final/IOSB `0`, event signaled |
+
+All binary open pairs use the same accesses, attributes, sharing,
+dispositions, options, actions, and async state as the `mainsave.bin` pair.
+Every file-handle close returned `0`. Finally, `XamContentClose` sequences
+`616..618` used guest LR `0x82449C3C`, caller PC `0x82449C38`, overlapped
+`0x701BF680`, and event `0xF8000300`; operation/final/extended error were `0`,
+length was `0`, the event was signaled, and no callback/APC was queued.
+
+All `NtCreateFile` events use guest LR/caller `0x82CC35F4/0x82CC35F0`;
+asynchronous `NtWriteFile` uses `0x82CC702C/0x82CC7028`; synchronous writes use
+`0x82CC7078/0x82CC7074`; `NtClose` uses
+`0x82CC27D0/0x82CC27CC`. Current generated owner ranges are respectively
+`sub_82CC3490 [0x82CC3490,0x82CC3684)`,
+`sub_82CC6FB8 [0x82CC6FB8,0x82CC70E0)`, and
+`sub_82CC27B0 [0x82CC27B0,0x82CC27F8)`. The content-create owner is
+`sub_82CC4138 [0x82CC4138,0x82CC427C)`; the final close owner is
+`sub_82449BD8 [0x82449BD8,0x82449C88)`.
+
+The runtime log independently records `Save:` registration/unregistration for
+devices 1, 2, 3, and 4 at lines `4821/4825`, `5763/5772`, `32717/32736`, and
+`34113/34130`. Lines `34312` and `34320` record clean window shutdown and
+`Title terminated; hard-exiting process.` No fatal, invalid/unregistered guest
+function, or native exception is present.
+
+### Pinned Canary comparison and conclusion
+
+The captured success path matches the broad contract in pinned Canary commit
+`32460b5d887dcde6622bb17983b70752fa5f13b3`: content create/open maps the same
+dispositions and completes overlapped work; `NtCreateFile` returns a handle and
+file action; nonsynchronous `NtWriteFile` performs the host operation, fills
+the IOSB, signals the event, and returns pending; close releases each handle
+and unmounts content. The compared implementations are ReXGlue
+`src/kernel/xam/xam_content.cpp:140`, `src/kernel/xboxkrnl/xboxkrnl_io.cpp:104`
+and `:430`, versus Canary `src/xenia/kernel/xam/xam_content.cc:281` and
+`src/xenia/kernel/xboxkrnl/xboxkrnl_io.cc:39` and `:304`.
+
+The known static differences (internal content-data shape, validation, header
+lifecycle, async failing-result translation, and Canary's stubbed flush) were
+not exercised as failures in this capture. ReXGlue's real
+`NtFlushBuffersFile` succeeded. Therefore no runtime correction is justified
+from capture 001. The original partial-write root cause is not statically
+established and did not reproduce; current classification remains `unknown`.
+
+### Focused reproduction and diagnostic correction
+
+Before changing the report contract, the new synthetic test
+`test_fresh_slot_does_not_require_later_conditional_payloads` reproduced the
+false positive. Its first run failed because the report still emitted
+`missing expected files` for `Fable2PubInfo.xml` and `failquestsave.bin`. After
+the Xenia timestamp evidence was applied, the same test passed. Commit
+`bbb47f42fd6d5656ba098fbf15e7a14e55f7cdb7` records:
+
+- separate required-fresh and conditional-later payload contracts in the
+  schema-1 report;
+- the focused synthetic regression;
+- a guarded `FreshNativeReload` state with separate `cache-002`, `capture-002`,
+  State B baseline, log, and report paths;
+- refusal to run reload from an empty State B or overwrite an existing capture;
+- no runtime/ReXGlue behavior change.
+
+The focused test initially failed as intended, then passed. The full Python
+suite passed `70/70`; `python -m compileall -q tools tests`, three-schema
+validation, PowerShell syntax parsing, corrected report generation, and guarded
+reload `Status` passed. The first reload `Prepare` wrote the ignored State B
+snapshot; a second invocation correctly failed with
+`Refusing to overwrite the preserved State B snapshot`. The four capture-001
+hashes were rechecked afterward and remained identical. Code generation and a
+native rebuild were unnecessary because only Python, PowerShell, schema, tests,
+and documentation changed; the diagnostic executable was re-hashed unchanged:
+
+```text
+C:\Dev\Fable2Recomp\out\build\win-amd64-native-save-diagnostic-release\fable2.exe
+size:    105042944 bytes
+SHA-256: E90F192FF212FC835CACB36E9B06E91CC2DC6C6843104CE983D0460A34E6ED0A
+```
+
+No Fable2Recomp, Xenia, or Xenia Canary process was launched during this
+continuation. No original or isolated save payload was written by the analysis;
+only ignored payload-free derived JSON/directories were created. No commit was
+pushed and nothing was uploaded.
+
+## Next user procedure: fresh-process enumeration and load
+
+Capture 001 is now preserved and explained, so the next permitted run is one
+new-process reload only. Do not use `FreshNative`; that capture is sealed.
+
+1. Open PowerShell and verify the guarded state:
+
+   ```powershell
+   Set-Location C:\Dev\Fable2Recomp
+   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Status -State FreshNativeReload
+   ```
+
+   Confirm selected save root `...\B-fresh-native`, trace directory
+   `...\capture-002`, baseline `...\state-B-after-write.json`, and
+   `Capture already used: False`.
+
+2. Launch the exact diagnostic executable through the helper:
+
+   ```powershell
+   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Launch -State FreshNativeReload
+   ```
+
+   This uses the unchanged diagnostic executable, State B as `--user_data_root`,
+   `cache-002`, `capture-002`, debug logging, and the Xenos plugin.
+
+3. At the normal title/profile flow, verify that `Hero000` is offered and choose
+   the existing-save/continue path. Do not select New Game, do not copy files,
+   and do not deliberately trigger a new save.
+
+4. Allow the existing native slot to load. Record whether enumeration succeeds,
+   whether loading reaches the expected saved state, and any visible error.
+
+5. Exit cleanly as soon as the persisted state is confirmed. If the program
+   hangs or crashes, preserve that fact and do not retry. If an unavoidable
+   autosave occurs, leave it untouched; the trace and before snapshot will show
+   it.
+
+6. Do not relaunch. Generate the payload-free comparison report:
+
+   ```powershell
+   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Report -State FreshNativeReload
+   ```
+
+7. Preserve these paths for the next inspection:
+
+   ```text
+   C:\Dev\Fable2Recomp\out\native-save-diagnostic\state-B-after-write.json
+   C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-002\save-trace-events-v1.ndjson
+   C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-002\save-trace-run-v1.json
+   C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-002\fable2-native-reload-002.log
+   C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-002\save-diagnostic-report-v1.json
+   ```
 
 ## Ready-to-paste continuation prompt
 
 ```text
 Continue the Fable II native-save write-parity investigation from
 docs/fable2-native-save-write-parity.md. Do not launch Fable2Recomp, Xenia, or
-Xenia Canary yet. First inspect the existing ignored State B save tree and all
-four capture-001 artifacts under
-C:\Dev\Fable2Recomp\out\native-save-diagnostic. Run the payload-free report if
-it has not already been generated. Identify the earliest trace sequence where
-native behavior fails, is missing, or differs semantically from the pinned
-Xenia Canary source. Preserve exact guest LR/caller PC, handles, paths, flags,
-offsets, byte counts, result codes, IOSB values, completion state, and log
-locations. Classify the failure using the documented vocabulary. Reproduce the
-contract with a focused synthetic test before changing code. Do not retry or
-perform restart/load/update validation until the first capture is preserved
-and explained. Keep both repositories on fable2-native-save-write-parity;
-preserve the pre-existing dirty ReXGlue thirdparty/libmspack submodule; do not
-push or upload anything.
+Xenia Canary. First inspect the preserved state-B-after-write.json and every
+capture-002 artifact under
+C:\Dev\Fable2Recomp\out\native-save-diagnostic. Compare the current State B
+tree to its pre-reload snapshot before changing or launching anything. Determine
+whether a new process enumerated Hero000 and loaded it, identify the earliest
+trace/log divergence if it did not, and preserve exact guest LR/caller PC,
+handles, paths, flags, offsets, byte counts, results, IOSB, completion state,
+and log lines. If reload changed any file, classify and explain that change
+before another run. Do not perform an update or retry until capture 002 is
+preserved and explained. Keep both repositories on
+fable2-native-save-write-parity, preserve ReXGlue's pre-existing dirty
+thirdparty/libmspack submodule, and do not push or upload anything.
 ```
 
-## Work blocked only on the save trigger
+## Remaining work blocked solely on runtime interaction
 
-- capture whether the guest attempts each missing payload file;
-- identify the first bad XAM/content/VFS/write/completion/finalisation result;
-- add a focused regression and the smallest evidence-backed correction if
-  needed;
-- create a complete fresh native slot;
-- terminate and start a genuinely new process;
-- enumerate and load that slot;
-- update the isolated existing-save copy in State D and verify no corruption;
-- repeat restart/load verification after update.
+- start a genuinely new native process and confirm `Hero000` enumeration;
+- load the fresh native slot and verify meaningful state persistence;
+- determine whether reload causes any automatic update and validate it against
+  the pre-reload State B snapshot;
+- update the isolated Xenia-origin State D and verify no corruption;
+- restart again after an update and prove enumeration/load durability;
+- retain tracing disabled by default and rerun interactive gameplay regression.
 
-No native-save parity claim is valid until those restart and update checks pass.
+No native-save parity claim is valid until the restart/load and safe-update
+checks pass.

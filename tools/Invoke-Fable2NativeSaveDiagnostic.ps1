@@ -3,7 +3,7 @@ param(
     [ValidateSet("Status", "Prepare", "Launch", "Report")]
     [string]$Action = "Status",
 
-    [ValidateSet("FreshNative", "XeniaUpdate")]
+    [ValidateSet("FreshNative", "FreshNativeReload", "XeniaUpdate")]
     [string]$State = "FreshNative",
 
     [string]$ReferenceSaveRoot = "C:\Users\Fenris\Documents\fable2"
@@ -21,29 +21,41 @@ $nativeSaveRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "B-fresh-nat
 $xeniaCopyRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "C-xenia-copy"))
 $xeniaUpdateRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "D-xenia-update"))
 $freshCaptureRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "capture-001"))
+$reloadCaptureRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "capture-002"))
 $updateCaptureRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "capture-D-001"))
-$cacheRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "cache-001"))
+$freshCacheRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "cache-001"))
+$reloadCacheRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "cache-002"))
+$updateCacheRoot = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "cache-D-001"))
 $baselinePath = [IO.Path]::GetFullPath((Join-Path $diagnosticRoot "state-A-before.json"))
+$nativeAfterWriteSnapshotPath = [IO.Path]::GetFullPath(
+    (Join-Path $diagnosticRoot "state-B-after-write.json")
+)
 $referenceSnapshotPath = [IO.Path]::GetFullPath(
     (Join-Path $diagnosticRoot "state-C-reference.json")
 )
-$selectedSaveRoot = if ($State -eq "FreshNative") {
-    $nativeSaveRoot
-}
-else {
-    $xeniaUpdateRoot
-}
-$selectedBaselinePath = if ($State -eq "FreshNative") {
-    $baselinePath
-}
-else {
-    $referenceSnapshotPath
-}
-$captureRoot = if ($State -eq "FreshNative") {
-    $freshCaptureRoot
-}
-else {
-    $updateCaptureRoot
+
+switch ($State) {
+    "FreshNative" {
+        $selectedSaveRoot = $nativeSaveRoot
+        $selectedBaselinePath = $baselinePath
+        $captureRoot = $freshCaptureRoot
+        $cacheRoot = $freshCacheRoot
+        $logName = "fable2-native-save-001.log"
+    }
+    "FreshNativeReload" {
+        $selectedSaveRoot = $nativeSaveRoot
+        $selectedBaselinePath = $nativeAfterWriteSnapshotPath
+        $captureRoot = $reloadCaptureRoot
+        $cacheRoot = $reloadCacheRoot
+        $logName = "fable2-native-reload-002.log"
+    }
+    "XeniaUpdate" {
+        $selectedSaveRoot = $xeniaUpdateRoot
+        $selectedBaselinePath = $referenceSnapshotPath
+        $captureRoot = $updateCaptureRoot
+        $cacheRoot = $updateCacheRoot
+        $logName = "fable2-native-update-D-001.log"
+    }
 }
 $tracePath = [IO.Path]::GetFullPath(
     (Join-Path $captureRoot "save-trace-events-v1.ndjson")
@@ -52,11 +64,12 @@ $metadataPath = [IO.Path]::GetFullPath(
     (Join-Path $captureRoot "save-trace-run-v1.json")
 )
 $logPath = [IO.Path]::GetFullPath(
-    (Join-Path $captureRoot "fable2-native-save-001.log")
+    (Join-Path $captureRoot $logName)
 )
 $reportPath = [IO.Path]::GetFullPath(
     (Join-Path $captureRoot "save-diagnostic-report-v1.json")
 )
+$captureArtifactPaths = @($tracePath, $metadataPath, $logPath, $reportPath)
 $executablePath = [IO.Path]::GetFullPath(
     (Join-Path $repoRoot "out\build\win-amd64-native-save-diagnostic-release\fable2.exe")
 )
@@ -110,6 +123,24 @@ function Assert-NoFiles {
     }
 }
 
+function Assert-HasFiles {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [Parameter(Mandatory)]
+        [string]$Purpose
+    )
+
+    if (-not (Test-Path -LiteralPath $Path -PathType Container)) {
+        throw "$Purpose directory does not exist: $Path"
+    }
+    $firstFile = Get-ChildItem -LiteralPath $Path -File -Recurse | Select-Object -First 1
+    if ($null -eq $firstFile) {
+        throw "$Purpose must contain the preserved files from the preceding state: $Path"
+    }
+}
+
 function Show-Paths {
     Write-Host "Diagnostic state:      $State"
     Write-Host "Diagnostic executable: $executablePath"
@@ -126,10 +157,15 @@ foreach ($path in @(
         $xeniaCopyRoot,
         $xeniaUpdateRoot,
         $freshCaptureRoot,
+        $reloadCaptureRoot,
         $updateCaptureRoot,
         $captureRoot,
+        $freshCacheRoot,
+        $reloadCacheRoot,
+        $updateCacheRoot,
         $cacheRoot,
         $baselinePath,
+        $nativeAfterWriteSnapshotPath,
         $referenceSnapshotPath,
         $tracePath,
         $metadataPath,
@@ -146,18 +182,34 @@ if ($Action -eq "Prepare") {
     New-Item -ItemType Directory -Force -Path $xeniaCopyRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $xeniaUpdateRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $freshCaptureRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path $reloadCaptureRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $updateCaptureRoot | Out-Null
     New-Item -ItemType Directory -Force -Path $cacheRoot | Out-Null
 
     Assert-NoFiles -Path $emptyStateRoot -Purpose "State A"
     if ($State -eq "FreshNative") {
         Assert-NoFiles -Path $nativeSaveRoot -Purpose "State B"
+        & python $analysisTool snapshot --root $emptyStateRoot --output $baselinePath
+        if ($LASTEXITCODE -ne 0) {
+            throw "State A snapshot failed with exit code $LASTEXITCODE."
+        }
+    }
+    elseif ($State -eq "FreshNativeReload") {
+        Assert-HasFiles -Path $nativeSaveRoot -Purpose "State B after capture 001"
+        if (Test-Path -LiteralPath $nativeAfterWriteSnapshotPath) {
+            throw "Refusing to overwrite the preserved State B snapshot: $nativeAfterWriteSnapshotPath"
+        }
+        & python $analysisTool snapshot `
+            --root $nativeSaveRoot `
+            --output $nativeAfterWriteSnapshotPath
+        if ($LASTEXITCODE -ne 0) {
+            throw "State B snapshot failed with exit code $LASTEXITCODE."
+        }
     }
     elseif (-not (Test-Path -LiteralPath $referenceSnapshotPath -PathType Leaf)) {
-        throw "State C reference snapshot does not exist; run -Action Prepare first."
-    }
-
-    if (Test-Path -LiteralPath $ReferenceSaveRoot -PathType Container) {
+        if (-not (Test-Path -LiteralPath $ReferenceSaveRoot -PathType Container)) {
+            throw "Reference save root does not exist: $ReferenceSaveRoot"
+        }
         $resolvedReference = [IO.Path]::GetFullPath($ReferenceSaveRoot)
         if (Test-PathWithin -Path $resolvedReference -Root $diagnosticRoot) {
             throw "Reference save root must be outside the writable diagnostic root."
@@ -171,13 +223,6 @@ if ($Action -eq "Prepare") {
             }
         }
         Write-Host "Copied the read-only reference into isolated states C and D."
-    }
-
-    & python $analysisTool snapshot --root $emptyStateRoot --output $baselinePath
-    if ($LASTEXITCODE -ne 0) {
-        throw "State A snapshot failed with exit code $LASTEXITCODE."
-    }
-    if (Test-Path -LiteralPath $xeniaCopyRoot -PathType Container) {
         & python $analysisTool snapshot `
             --root $xeniaCopyRoot `
             --output $referenceSnapshotPath
@@ -201,8 +246,20 @@ if ($Action -eq "Launch") {
     if (-not (Test-Path -LiteralPath $updateDataRoot -PathType Container)) {
         throw "Update-data root was not found: $updateDataRoot"
     }
-    Assert-NoFiles -Path $nativeSaveRoot -Purpose "State B"
-    foreach ($outputPath in @($tracePath, $metadataPath, $logPath, $reportPath)) {
+    if ($State -eq "FreshNative") {
+        Assert-NoFiles -Path $nativeSaveRoot -Purpose "State B"
+    }
+    elseif ($State -eq "FreshNativeReload") {
+        Assert-HasFiles -Path $nativeSaveRoot -Purpose "State B after capture 001"
+    }
+    else {
+        Assert-HasFiles -Path $xeniaUpdateRoot -Purpose "State D"
+    }
+    if (-not (Test-Path -LiteralPath $selectedBaselinePath -PathType Leaf)) {
+        throw "Selected baseline does not exist; run -Action Prepare first: $selectedBaselinePath"
+    }
+    Assert-NoFiles -Path $cacheRoot -Purpose "$State cache root"
+    foreach ($outputPath in $captureArtifactPaths) {
         if (Test-Path -LiteralPath $outputPath) {
             throw "Refusing to overwrite an existing capture artifact: $outputPath"
         }
@@ -239,8 +296,8 @@ if ($Action -eq "Report") {
     if (-not (Test-Path -LiteralPath $metadataPath -PathType Leaf)) {
         throw "Save trace metadata does not exist: $metadataPath"
     }
-    if (-not (Test-Path -LiteralPath $baselinePath -PathType Leaf)) {
-        throw "State A baseline does not exist: $baselinePath"
+    if (-not (Test-Path -LiteralPath $selectedBaselinePath -PathType Leaf)) {
+        throw "Selected baseline does not exist: $selectedBaselinePath"
     }
 
     & python $analysisTool report `
@@ -257,4 +314,9 @@ Write-Host "State A exists:        $(Test-Path -LiteralPath $emptyStateRoot)"
 Write-Host "State B exists:        $(Test-Path -LiteralPath $nativeSaveRoot)"
 Write-Host "State C exists:        $(Test-Path -LiteralPath $xeniaCopyRoot)"
 Write-Host "State D exists:        $(Test-Path -LiteralPath $xeniaUpdateRoot)"
-Write-Host "Capture already used:  $(Test-Path -LiteralPath $tracePath)"
+$captureAlreadyUsed = $null -ne (
+    $captureArtifactPaths |
+        Where-Object { Test-Path -LiteralPath $_ } |
+        Select-Object -First 1
+)
+Write-Host "Capture already used:  $captureAlreadyUsed"

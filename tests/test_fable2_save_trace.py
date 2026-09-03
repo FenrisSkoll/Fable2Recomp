@@ -167,6 +167,65 @@ class SaveTraceTest(unittest.TestCase):
         self.assertEqual(report["classifications"], ["unknown"])
         self.assertIn("restart", " ".join(report["notes"]).lower())
 
+    def test_fresh_slot_does_not_require_later_conditional_payloads(self) -> None:
+        slot = self.save_root / NATIVE_XUID / TITLE_ID / "00000001" / SLOT
+        slot.mkdir(parents=True)
+        for name in (
+            "chaptersave.bin",
+            "herosave.bin",
+            "mainsave.bin",
+            "saveuid.bin",
+            "texturemorphs.bin",
+        ):
+            (slot / name).write_bytes(b"synthetic")
+        self.create_header()
+
+        events = self.content_events()
+        events.extend(
+            [
+                event(
+                    4,
+                    "NtWriteFile",
+                    "request",
+                    guest_path="Save:\\mainsave.bin",
+                    requested_bytes=9,
+                    overlapped=0,
+                ),
+                event(
+                    5,
+                    "NtWriteFile",
+                    "result",
+                    request_sequence=4,
+                    requested_bytes=9,
+                    actual_bytes=9,
+                    operation_result=0,
+                ),
+            ]
+        )
+        self.write_events(events)
+
+        report = build_report(
+            self.trace, self.metadata, self.save_root, self.baseline
+        )
+        notes = " ".join(report["notes"]).lower()
+        self.assertEqual(report["classifications"], ["unknown"])
+        self.assertNotIn("missing expected files", notes)
+        self.assertIn("conditional", notes)
+        self.assertEqual(
+            report["payload_contract"]["required_fresh_slot"],
+            [
+                "chaptersave.bin",
+                "herosave.bin",
+                "mainsave.bin",
+                "saveuid.bin",
+                "texturemorphs.bin",
+            ],
+        )
+        self.assertEqual(
+            report["payload_contract"]["conditional_later_state"],
+            ["Fable2PubInfo.xml", "failquestsave.bin"],
+        )
+
     def test_content_create_without_payload_attempt_is_classified(self) -> None:
         slot = self.save_root / NATIVE_XUID / TITLE_ID / "00000001" / SLOT
         slot.mkdir(parents=True)
@@ -263,6 +322,19 @@ class SaveTraceTest(unittest.TestCase):
         self.assertIn("--save_trace_dir=$captureRoot", launcher)
         for forbidden in ("SendKeys", "mouse_event", "keybd_event"):
             self.assertNotIn(forbidden, launcher)
+
+    def test_launcher_has_guarded_fresh_restart_capture(self) -> None:
+        launcher = (
+            Path(__file__).parents[1] / "tools" / "Invoke-Fable2NativeSaveDiagnostic.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            'ValidateSet("FreshNative", "FreshNativeReload", "XeniaUpdate")',
+            launcher,
+        )
+        self.assertIn('"capture-002"', launcher)
+        self.assertIn('"cache-002"', launcher)
+        self.assertIn('"state-B-after-write.json"', launcher)
+        self.assertIn("Assert-HasFiles -Path $nativeSaveRoot", launcher)
 
 
 if __name__ == "__main__":

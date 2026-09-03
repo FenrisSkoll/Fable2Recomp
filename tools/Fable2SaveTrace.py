@@ -19,15 +19,18 @@ SNAPSHOT_SCHEMA_VERSION = 1
 NATIVE_XUID = "B13EBABEBABEBABE"
 TITLE_ID = "4D5307F1"
 SLOT = "Hero000"
-EXPECTED_PAYLOAD = (
+FRESH_REQUIRED_PAYLOAD = (
     "chaptersave.bin",
-    "Fable2PubInfo.xml",
-    "failquestsave.bin",
     "herosave.bin",
     "mainsave.bin",
     "saveuid.bin",
     "texturemorphs.bin",
 )
+CONDITIONAL_PAYLOAD = (
+    "Fable2PubInfo.xml",
+    "failquestsave.bin",
+)
+EXPECTED_PAYLOAD = FRESH_REQUIRED_PAYLOAD + CONDITIONAL_PAYLOAD
 FAILURE_CLASSES = (
     "guest_never_attempted_payload_save",
     "incorrect_profile_or_device_state",
@@ -228,9 +231,17 @@ def compare_snapshots(before: dict[str, Any] | None, after: dict[str, Any]) -> d
     }
 
 
-def expected_slot_paths() -> tuple[str, ...]:
+def slot_paths(names: Iterable[str]) -> tuple[str, ...]:
     base = f"{NATIVE_XUID}/{TITLE_ID}/00000001/{SLOT}"
-    return tuple(f"{base}/{name}" for name in EXPECTED_PAYLOAD)
+    return tuple(f"{base}/{name}" for name in names)
+
+
+def expected_slot_paths() -> tuple[str, ...]:
+    return slot_paths(FRESH_REQUIRED_PAYLOAD)
+
+
+def conditional_slot_paths() -> tuple[str, ...]:
+    return slot_paths(CONDITIONAL_PAYLOAD)
 
 
 def expected_header_path() -> str:
@@ -402,27 +413,43 @@ def classify_capture(
             content_results[-1] if content_results else content_requests[-1],
             f"Expected native content header is missing: {expected_header_path()}",
         )
-    missing_payload = [path for path in expected_slot_paths() if path not in file_paths]
-    payload_attempts = [
+    missing_required = [path for path in expected_slot_paths() if path not in file_paths]
+    missing_conditional = [
+        path for path in conditional_slot_paths() if path not in file_paths
+    ]
+    missing_required_names = {
+        Path(path).name.casefold() for path in missing_required
+    }
+    missing_required_attempts = [
         event
         for event in events
         if event["operation"] in ("NtCreateFile", "NtWriteFile")
-        and any(name.casefold() in str(event.get("guest_path", "")).casefold() for name in EXPECTED_PAYLOAD)
+        and any(
+            name in str(event.get("guest_path", "")).casefold()
+            for name in missing_required_names
+        )
     ]
-    if missing_payload and content_requests and not payload_attempts:
+    if missing_required and content_requests and not missing_required_attempts:
         add(
             "guest_never_attempted_payload_save",
             content_results[-1] if content_results else content_requests[-1],
-            "Content creation occurred, but no expected payload-file create/write was captured.",
+            "Content creation occurred, but no missing required fresh-slot payload "
+            "file was created or written.",
         )
-    if missing_payload:
-        notes.append("Missing expected files: " + ", ".join(missing_payload))
+    if missing_required:
+        notes.append("Missing required fresh-slot files: " + ", ".join(missing_required))
+    if missing_conditional:
+        notes.append(
+            "Conditional payload files not present (not a fresh-slot failure): "
+            + ", ".join(missing_conditional)
+        )
 
     if not classifications:
         classifications.append("unknown")
-        if not missing_payload:
+        if not missing_required:
             notes.append(
-                "The captured slot is structurally complete; restart enumeration/loading remains required."
+                "The captured slot contains the required fresh-slot payload; restart "
+                "enumeration/loading remains required."
             )
         else:
             notes.append("No decisive semantic mismatch was identified from this capture.")
@@ -468,6 +495,10 @@ def build_report(
         "first_anomaly": first_anomaly,
         "notes": notes,
         "tree_comparison": comparison,
+        "payload_contract": {
+            "required_fresh_slot": list(FRESH_REQUIRED_PAYLOAD),
+            "conditional_later_state": list(CONDITIONAL_PAYLOAD),
+        },
         "save_snapshot": after,
     }
 

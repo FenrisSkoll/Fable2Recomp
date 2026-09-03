@@ -19,6 +19,21 @@
     "event_count": { "type": "integer", "minimum": 0 },
     "classifications": { "type": "array", "minItems": 1 },
     "tree_comparison": { "type": "object" },
+    "payload_contract": {
+      "type": "object",
+      "required": ["required_fresh_slot", "conditional_later_state"],
+      "properties": {
+        "required_fresh_slot": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "conditional_later_state": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "additionalProperties": false
+    },
     "save_snapshot": { "type": "object" }
   },
   "additionalProperties": true

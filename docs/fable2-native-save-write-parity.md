@@ -1,20 +1,25 @@
 # Fable II native-save write-parity checkpoint
 
-## Status and stop boundary
+## Status
 
-Captures 001 and 002 are preserved and explained. Capture 001 proves that the
-TU1 guest created and wrote the required fresh-slot payload. Capture 002 proves
-that a genuinely new process enumerated `Hero000` and entered the existing-slot
-load path: all required payload files were opened successfully, the slot was
-closed successfully, execution continued, and the process exited cleanly. No
-save payload or header changed during reload.
+Native-save write parity is validated for the tested Fable II GOTY TU1
+`Hero000` workflow. Capture 001 proves that the guest created and completely
+wrote a fresh native slot. Capture 002 proves that a genuinely new native
+process enumerated and opened that slot. Capture D proves that a native process
+loaded an Xenia-origin slot, completed a coherent update, and exited cleanly.
+The user then confirmed that a new native process loaded the updated slot and
+that Xenia loaded the same updated slot after it was copied back.
 
-There is no failing or semantically divergent save-trace event in capture 002
-sequences `1..72`. The capture predates `NtReadFile` tracing, so byte-level read
-counts and meaningful-state restoration cannot be proved from the payload-free
-artifacts alone. Native-save parity is **not** claimed. Update-in-place and a
-subsequent restart/load remain untested. Interactive runtime validation stops
-before any retry or State D update.
+Capture D contains no failed, missing, short, or semantically divergent
+save-path operation in sequences `1..497`. Its one nonzero I/O completion is an
+expected `X_STATUS_END_OF_FILE` read and agrees with pinned Xenia Canary. The
+failure vocabulary therefore remains `unknown` with `first_anomaly: null`
+because it intentionally has no success category.
+
+The historical partial native tree was not reproduced, and no correctness fix
+was justified by the captures. Its root cause remains unproved. This checkpoint
+claims the demonstrated workflow, not universal parity across every profile,
+slot, interruption point, storage failure, or title variant.
 
 ## Exact provenance
 
@@ -37,6 +42,8 @@ before any retry or State D update.
   `a2b7349916bbcbd24fcded85f3422aaf126c820a`
 - ReXGlue read-trace pin commit:
   `748cff0b04875efb1e60e73b805ef4a089c54f6c`
+- Capture-D update-observation report commit:
+  `b883cf8608d88add5584744fa246af0c2ac194d1`
 - The final checkpoint commit is the commit containing this document. Resolve
   it with `git rev-parse HEAD` after checkout.
 
@@ -112,21 +119,21 @@ All writable states are below this ignored root:
 C:\Dev\Fable2Recomp\out\native-save-diagnostic
 ```
 
-Prepared states:
+Isolated states:
 
-| State | Exact root | Prepared contents | Intended future use |
+| State | Exact root | Preserved contents | Result |
 | --- | --- | --- | --- |
 | A | `...\A-empty` | 0 files, 0 directories | immutable empty baseline |
-| B | `...\B-fresh-native` | preserved capture-001 native slot and profile files | next-process enumeration/load attempt |
-| C | `...\C-xenia-copy` | isolated reference snapshot | Xenia-origin payload in confirmed native-loadable layout |
-| D | `...\D-xenia-update` | independent copy of C | later native update-in-place attempt |
+| B | `...\B-fresh-native` | capture-001 native slot and profile files | fresh create/write and new-process enumeration/open passed |
+| C | `...\C-xenia-copy` | isolated Xenia-origin reference | immutable pre-update State D reference |
+| D | `...\D-xenia-update` | native-updated independent copy of C | native update, native restart/load, and Xenia load passed |
 
 State C was copied from the already confirmed native-loadable working tree at
 `C:\Users\Fenris\Documents\fable2`; it contains the seven Xenia-origin payload
 files under the native XUID plus a 328-byte ReXGlue header. It is not a direct
-copy of Xenia's profile/content root. State D is the only future writable copy.
-The source tree's timestamps were rechecked after preparation and were not
-changed.
+copy of Xenia's profile/content root. State D was the only writable copy used
+for the update. The source tree's timestamps were rechecked after preparation
+and were not changed.
 
 The baseline and reference reports are ignored, payload-free inventories:
 
@@ -134,6 +141,7 @@ The baseline and reference reports are ignored, payload-free inventories:
 out\native-save-diagnostic\state-A-before.json
 out\native-save-diagnostic\state-B-after-write.json
 out\native-save-diagnostic\state-C-reference.json
+out\native-save-diagnostic\state-D-after-update.json
 ```
 
 They contain relative paths, sizes, SHA-256 values, nanosecond mtimes, and
@@ -1035,77 +1043,283 @@ analysis/rebuild continuation. The capture and State B payload were not
 rewritten. Neither original backup was modified. Nothing was pushed or
 uploaded.
 
-## Next user procedure: isolated Xenia-origin update
+## Capture-D-001 update and round-trip checkpoint (2026-09-08)
 
-Capture 002 is preserved and explained, so the next permitted interactive run
-is the independent State D update. Do not reuse `FreshNative` or
-`FreshNativeReload`; captures 001 and 002 are sealed.
+### Immutable artifacts and derived reports
 
-1. Open PowerShell and verify the guarded state:
-
-   ```powershell
-   Set-Location C:\Dev\Fable2Recomp
-   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Status -State XeniaUpdate
-   ```
-
-   Confirm selected root `...\D-xenia-update`, baseline
-   `...\state-C-reference.json`, trace directory `...\capture-D-001`, and
-   `Capture already used: False`.
-
-2. Launch exactly once through the helper:
-
-   ```powershell
-   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Launch -State XeniaUpdate
-   ```
-
-3. Choose the existing `Hero000`/continue path through normal game UI. Confirm
-   the Xenia-origin state loads, then play normally until one ordinary autosave
-   is visibly triggered and its indicator completes. Fable II's normal
-   autosave is the trigger; do not invent or use a manual-save menu path.
-
-4. Exit cleanly if possible. If it hangs or crashes, record that fact and do
-   not retry. Do not relaunch yet.
-
-5. Generate the payload-free comparison report:
-
-   ```powershell
-   .\tools\Invoke-Fable2NativeSaveDiagnostic.ps1 -Action Report -State XeniaUpdate
-   ```
-
-6. Preserve `state-C-reference.json`, all files under `capture-D-001`, and the
-   current ignored `D-xenia-update` tree. Resume the investigation before any
-   restart/load attempt.
-
-## Ready-to-paste continuation prompt
+The capture directory is:
 
 ```text
-Continue the Fable II native-save write-parity investigation from
-docs/fable2-native-save-write-parity.md. Do not launch Fable2Recomp, Xenia, or
-Xenia Canary. First inspect state-C-reference.json, every capture-D-001
-artifact, and the current D-xenia-update tree under
-C:\Dev\Fable2Recomp\out\native-save-diagnostic. Compare State D to its
-pre-update State C snapshot before changing or launching anything. Identify the
-first attempted update operation and the earliest failed, missing, short, or
-semantically divergent event against pinned Xenia Canary commit
-32460b5d887dcde6622bb17983b70752fa5f13b3. Preserve exact guest LR/caller PC,
-handles, paths, flags, offsets, requested/actual byte counts, results, IOSB,
-event/APC/completion state, and log lines. Determine whether the Xenia-origin
-slot remained coherent after the update, but do not launch a restart/load until
-the update capture is preserved and explained. Keep both repositories on
-fable2-native-save-write-parity, preserve ReXGlue's pre-existing dirty
-thirdparty/libmspack submodule, and do not push or upload anything.
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-D-001
 ```
 
-## Remaining work blocked solely on runtime interaction
+Every capture artifact was inspected read-only:
 
-- obtain or record the user's visual confirmation that capture 002 restored
-  the expected meaningful State B gameplay state;
-- update the isolated Xenia-origin State D and prove complete, non-corrupting
-  update semantics;
-- restart after that update and prove enumeration/load durability;
-- perform a native-origin update-in-place and another full-process reload;
-- retain tracing disabled by default and rerun the interactive gameplay
-  regression.
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `fable2-native-update-D-001.log` | 1,126,444 | `F01CAFAC583FF5881E53A2C78BF4C0BC16D3E40F05CF7F1AF34689E4ED5C5726` |
+| `save-diagnostic-report-v1.json` | 6,992 | `8291D40FB7AC701775A91874B848C778F7ADC0D8B02B8B5752F19D5A4A30D235` |
+| `save-trace-events-v1.ndjson` | 256,041 | `E3016F6EF58C95411752B472473351CF56644E3D45ABF34CE73991D3C0AFE337` |
+| `save-trace-run-v1.json` | 244 | `5B32B123BC2F4121118FF6F88911B00A3A1B9FC473EF9E589C811440DC1F1062` |
 
-No native-save parity claim is valid until meaningful restart/load and safe
-update/restart checks pass.
+The run metadata records schema version `1`, event schema version `1`, start
+time `2026-09-08T17:24:01Z`, process ID `16880`, and
+`contains_payload_bytes: false`. The pre-update reference is
+`state-C-reference.json`, 3,611 bytes, SHA-256
+`8C63F992FDD7448102215E78F428BC0E4676E24C4CFC0626D794A567093D41CA`.
+
+The current parser generated a second payload-free report without modifying
+the sealed capture:
+
+```text
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\analysis-capture-D-001\save-diagnostic-report-v1.json
+size:    8,210 bytes
+SHA-256: FDC10881F40EDDC78C698468A0959D94B883079C179F80C63A97CA98A5A844DF
+
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\state-D-after-update.json
+size:    4,413 bytes
+SHA-256: 5A3240F31F2B968FFA0480C264EF807DE7876741BC1755C1DDE02D4DCEDD030E
+```
+
+The trace has 497 contiguous sequences. Operation counts are 34
+`NtCreateFile`, 52 `NtReadFile`, 334 `NtWriteFile`, 34 `NtClose`, 20
+`XamContentCreate`, 15 `XamContentClose`, four
+`XamContentCreateEnumerator`, and four `XamShowDeviceSelectorUI` events.
+
+### State C to State D comparison
+
+No path was added or removed, and no traced path escaped the exact isolated
+root:
+
+```text
+C:\Dev\Fable2Recomp\out\native-save-diagnostic\D-xenia-update
+```
+
+Content changes were:
+
+| Path | Before | After |
+| --- | --- | --- |
+| `4D5307F1/profile/User/63E83FFF` | 40 bytes, `D258166064825153AA0263F166EB01B09D143D6EFE4064CF2558A6030F3393B6` | 40 bytes, `59F3BAC75E1DD108FDA4CC54E67D83BE2EB0CB58760EFA4C477C8EFEDB6028D5` |
+| `B13EBABEBABEBABE/4D5307F1/00000001/Hero000/mainsave.bin` | 356,173 bytes, `84F505C2C6315A9DA34DF439D0A19D48E81E5A9906BCADD2F1E4CA7038744C03` | 359,742 bytes, `1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4` |
+
+Content was unchanged but metadata changed for profile settings `63E83FFD`
+and `63E83FFE`, plus `chaptersave.bin`, `herosave.bin`, and
+`texturemorphs.bin`. `Fable2PubInfo.xml`, `failquestsave.bin`, `saveuid.bin`,
+and `Hero000.header` were unchanged in both content and metadata.
+
+The final payload hashes and sizes are:
+
+| File | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `chaptersave.bin` | 556 | `4E4C057FA745970CD243ECDD58FC32BD9C9E805B100390D52532429103D79074` |
+| `Fable2PubInfo.xml` | 558 | `E6CACCB352479340EF89718CC32EAED3B540604432C9C00E6C5A65D3788C3C2E` |
+| `failquestsave.bin` | 167,017 | `589AF4EABD343287CBD68734578AE0F9E45B949FD898490550ADB3044DEB6128` |
+| `herosave.bin` | 1,603 | `E1AC249F939CD0B09F4D3D7D27026504FF912EAF4C8F22C2A8BC437F4274D6CF` |
+| `mainsave.bin` | 359,742 | `1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4` |
+| `saveuid.bin` | 8 | `3FB361773CF634BAB341FCB1FCE89431EB4356C935EDAAB73D73692A71157D15` |
+| `texturemorphs.bin` | 33,500 | `E7FD915BD81F297099A6C4B3848234B160E2EEC3F10D1100511EFFA9DAC2E6C8` |
+| `Hero000.header` | 328 | `9BE20BAE420598D3D42766ACDD8557FFD0F0C70D98A8085F03E0475E257B6EFE` |
+
+### Existing-slot load before the update
+
+The same process first enumerated one item at sequences `1/2` and `7/8`,
+selected device `1` at `3..6`, and completed four existing-content mount/read
+cycles at `9..94`. All required payload files were opened and read. The common
+file-open guest LR/caller PC is `0x82CC35F4/0x82CC35F0`; the asynchronous
+read LR/caller PC is `0x82CC7E30/0x82CC7E2C`; the synchronous read LR/caller
+PC is `0x82CC3788/0x82CC3784`.
+
+The initial full `mainsave.bin` read used handle `0xF8000254` and returned
+354,304 bytes at offset `0`, then 1,869 bytes at offset `354304`. The initial
+`texturemorphs.bin` reads returned 32,768 bytes at offset `0` and 732 bytes at
+offset `32768`. `chaptersave.bin`, `saveuid.bin`, and `herosave.bin` returned
+556, 8, and 1,603 bytes respectively.
+
+The only nonzero result is the expected current-position EOF read at request
+sequence `72`, result sequence `73`:
+
+```text
+guest LR / caller PC: 0x82CC3788 / 0x82CC3784
+guest thread:         7
+path:                 \Device\Content\4\Fable2PubInfo.xml
+host path:            C:\Dev\Fable2Recomp\out\native-save-diagnostic\D-xenia-update\B13EBABEBABEBABE\4D5307F1\00000001\Hero000\Fable2PubInfo.xml
+handle:               0xF8000254
+event/APC/context:    0x00000000 / 0x00000000 / 0x00000000
+IOSB:                 0x701BEC90
+offset:               UINT64_MAX (current position)
+requested / actual:   4096 / 0
+operation/immediate:  0xC0000011 / 0xC0000011
+IOSB status/info:     0xC0000011 / 0
+completion:           synchronous; event not signaled; APC not queued;
+                      returns_pending false
+```
+
+Pinned Canary's `NtReadFile_entry` at
+`src/xenia/kernel/xboxkrnl/xboxkrnl_io.cc:125` writes IOSB
+status/information, signals an eligible event, queues an eligible APC, and does
+not replace `X_STATUS_END_OF_FILE` with `X_STATUS_PENDING` for an asynchronous
+handle. Sequence `73` therefore agrees with the pinned reference and is not a
+failure.
+
+### Native update path
+
+The first update operation is content-create request sequence `95`, not a file
+failure. It has guest LR/caller PC `0x82CC4264/0x82CC4260`, user `254`, device
+`1`, content type `1`, title `0x4D5307F1`, content/profile XUID
+`B13EBABEBABEBABE`, name `Hero000`, flags `4`, and overlapped
+`0x701BF680`. Sequence `96` returns immediate `997`
+(`X_ERROR_IO_PENDING`); sequence `97` reports host disposition `2`, operation
+result `0`, extended error `0`, and length `2`; sequence `98` completes with
+result/error `0`, length `2`, event `0xF80001DC` signaled, completion routine
+`0`, and no APC.
+
+Every update file is opened through guest LR/caller PC
+`0x82CC35F4/0x82CC35F0`. The existing file handle uses access `0x80100080`,
+attributes `0x80`, share `3`, disposition `5`, options `0x48`, file action `3`,
+and handle `0xF8000200`. The write handle uses access `0x40100080`, attributes
+`0x80`, share `3`, disposition `1`, options `0x40`, file action `1`, and handle
+`0xF8000250`. All are asynchronous and return `0` from `NtCreateFile`.
+
+The exact update ranges are:
+
+| File | Create sequences | Write sequences | Requests | Requested / actual bytes | Final range or writes |
+| --- | --- | --- | ---: | ---: | --- |
+| `mainsave.bin` | `99..102` | `103..452` | 162 | 372,631 / 372,631 | spans final `[0,359742)` with intentional overlaps; last write offset `358400`, 1,342 bytes |
+| `herosave.bin` | `457..460` | `461/462` | 1 | 1,603 / 1,603 | offset `0` |
+| `chaptersave.bin` | `467..470` | `471/472` | 1 | 556 / 556 | offset `0` |
+| `texturemorphs.bin` | `477..480` | `481..490` | 3 | 33,504 / 33,504 | `(0,32768)`, `(32768,732)`, then `(0,4)` |
+
+All 167 `NtWriteFile` requests use guest LR/caller PC
+`0x82CC702C/0x82CC7028`, guest thread `7`, handle `0xF8000250`, no APC routine,
+explicit offsets, and asynchronous completion. The first request/result at
+`103/104` targets `\Device\Content\5\mainsave.bin`, uses event
+`0xF8000258`, APC context/IOSB `0x701BEA80`, offset `0`, and requests/returns
+2,048 bytes. Its operation result and IOSB status are `0`, IOSB information is
+2,048, immediate result is `259` (`X_STATUS_PENDING`), the event is signaled,
+no APC is queued, and `returns_pending` is true.
+
+Write events use `0xF8000258` for 163 requests, `0xF8000260` for one, and
+`0xF800026C` for three. The single `herosave.bin` write uses IOSB/context
+`0x701BF3B0`; `chaptersave.bin` uses `0x701BF390`; the three
+`texturemorphs.bin` writes use `0x701BF180`, `0x701BF210`, and `0x701BF250`.
+There are no missing result pairs, short writes, failed writes, non-EOF read
+failures, or paths outside State D.
+
+All file handles close successfully at sequences `453..456`, `463..466`,
+`473..476`, and `491..494`, from guest LR/caller PC
+`0x82CC27D0/0x82CC27CC`. Content close `495..497` uses guest LR/caller PC
+`0x82449C3C/0x82449C38`, overlapped `0x701BF680`, returns operation/final/error
+`0`, length `0`, signals `0xF80001DC`, and queues no callback or APC. No
+explicit flush event occurs in this update, but all close/finalisation
+operations succeed, the process exits cleanly, and the later native and Xenia
+loads prove the files were durable and coherent.
+
+Pinned Canary's `NtWriteFile_entry` at
+`src/xenia/kernel/xboxkrnl/xboxkrnl_io.cc:304` performs the write, records the
+actual byte count in IOSB information, signals the event, and returns
+`X_STATUS_PENDING` for a nonsynchronous handle. The captured contract agrees.
+
+### Log evidence, classification, and runtime acceptance
+
+Exact significant log lines are:
+
+```text
+4745:[2026-09-08 18:24:01.034] [info] [sys] [t23160] Save-path trace enabled in 'C:\Dev\Fable2Recomp\out\native-save-diagnostic\capture-D-001' (schema v1)
+9260:[2026-09-08 18:24:59.584] [debug] [fs] [t24528] Registered symbolic link: Save: => \Device\Content\5\
+9291:[2026-09-08 18:25:00.792] [debug] [fs] [t23160] Unregistered symbolic link: Save: => \Device\Content\5\
+9506:[2026-09-08 18:25:09.112] [info] [core] [t27244] Window closing, shutting down...
+9516:[2026-09-08 18:25:09.317] [info] [core] [t27244] Title terminated; hard-exiting process.
+```
+
+No fatal, invalid/unregistered function, native exception, access violation,
+save-failure, or corruption line occurs after tracing starts.
+
+Capture-backed findings are **CONFIRMED**: the Xenia-origin slot enumerated and
+read, the native autosave completed every captured write, the tree remained
+complete, `mainsave.bin` changed plausibly, all handles/content closed, and the
+process exited cleanly. The user separately reported this complete interactive
+round trip:
+
+```text
+Xenia save -> load natively -> autosave natively -> restart ->
+load updated save natively -> copy updated save back to Xenia -> load in Xenia
+```
+
+All stages worked. This is direct runtime confirmation of native update
+durability, new-process native enumeration/deserialization, and native-to-Xenia
+compatibility for this slot. The trace captures the first native process; the
+later native restart and Xenia load are user-observed results and do not have
+additional artifacts under `capture-D-001`.
+
+There is no earliest divergent event to reproduce. Classification is `unknown`
+with `first_anomaly: null` solely because the documented failure vocabulary has
+no success category. This rules out, for the captured workflow,
+`guest_never_attempted_payload_save`, `incorrect_profile_or_device_state`,
+`content_create_result_mismatch`, `content_metadata_mismatch`,
+`path_translation_failure`, `file_create_semantics_mismatch`,
+`write_semantics_mismatch`, `overlapped_completion_mismatch`,
+`flush_or_close_mismatch`, `rename_or_replace_mismatch`, and
+`reload_enumeration_mismatch`.
+
+The historical three-file partial save remains unexplained because it did not
+recur. No synthetic failure reproduction or runtime correction was appropriate.
+
+### Report change and validation
+
+Fable2Recomp commit `b883cf8608d88add5584744fa246af0c2ac194d1`
+adds a payload-free `update_observation` to diagnostic report schema v1. It
+retains first mount/write sequences, filenames, request/actual totals,
+missing/short/failed write counts, read and EOF counts, and content/metadata
+changes. A focused synthetic test was written before the parser change and
+failed with `KeyError: 'update_observation'`; it passed after implementation.
+
+Exact non-interactive validation completed in this continuation:
+
+```powershell
+python -m unittest tests.test_fable2_save_trace.SaveTraceTest.test_update_capture_reports_complete_payload_writes
+python -m unittest discover -s tests -p "test_*.py"
+python -m compileall -q .\tools .\tests
+python .\tools\Fable2SaveTrace.py validate-schemas `
+    .\tools\schemas\fable2-save-trace-event-v1.schema.json `
+    .\tools\schemas\fable2-save-trace-run-v1.schema.json `
+    .\tools\schemas\fable2-save-diagnostic-report-v1.schema.json
+python .\tools\Fable2SaveTrace.py report `
+    --trace .\out\native-save-diagnostic\capture-D-001\save-trace-events-v1.ndjson `
+    --metadata .\out\native-save-diagnostic\capture-D-001\save-trace-run-v1.json `
+    --save-root .\out\native-save-diagnostic\D-xenia-update `
+    --baseline .\out\native-save-diagnostic\state-C-reference.json `
+    --output .\out\native-save-diagnostic\analysis-capture-D-001\save-diagnostic-report-v1.json
+python .\tools\Fable2SaveTrace.py snapshot `
+    --root .\out\native-save-diagnostic\D-xenia-update `
+    --output .\out\native-save-diagnostic\state-D-after-update.json
+```
+
+The focused test passed; the full Fable2Recomp suite passed all 72 tests;
+compile checks passed; schema validation reported `Validated 3 schema files.`;
+and PowerShell `Test-Json -SchemaFile` returned `True` for the derived State D
+report. The first post-commit schema-validation invocation misspelled the event
+schema as the nonexistent plural `fable2-save-trace-events-v1.schema.json` and
+failed with `[Errno 2]`; the corrected singular path shown above passed. No
+native rebuild was required because this continuation changes only the Python
+report, its schema/test, and documentation. The previously built diagnostic
+binary remains:
+
+```text
+C:\Dev\Fable2Recomp\out\build\win-amd64-native-save-diagnostic-release\fable2.exe
+size:    105042944 bytes
+SHA-256: 187892D793E6E14DEF0E2D38ADB96F25BEDB2957C58778CCF9C1F48CA677565A
+```
+
+Both repositories remain on `fable2-native-save-write-parity`. ReXGlue remains
+at `b1bf7701dfd778f0b61d8a599cbb6e4690cf547a`, with only its pre-existing dirty
+`thirdparty/libmspack` submodule preserved. This analysis did not launch
+Fable2Recomp, Xenia, or Xenia Canary; did not change either original save
+location; and did not push or upload anything.
+
+## Remaining coverage outside the validated workflow
+
+No further run is required to accept the tested native-save workflow. Optional
+future hardening may exercise multiple slots/profiles, interrupted or failed
+storage operations, native-origin repeated updates with read tracing, and other
+title/region/update combinations. Those are broader coverage tasks, not an
+unexplained failure in capture D.

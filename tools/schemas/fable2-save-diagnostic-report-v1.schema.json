@@ -38,6 +38,64 @@
       },
       "additionalProperties": false
     },
+    "update_observation": {
+      "type": "object",
+      "required": [
+        "first_content_write_mount_sequence",
+        "first_write_sequence",
+        "files_written",
+        "write_request_count",
+        "requested_write_bytes",
+        "actual_write_bytes",
+        "missing_write_result_count",
+        "short_write_count",
+        "failed_write_count",
+        "all_writes_completed",
+        "read_request_count",
+        "missing_read_result_count",
+        "end_of_file_read_count",
+        "non_eof_read_failure_count",
+        "content_changed_paths",
+        "metadata_changed_paths"
+      ],
+      "properties": {
+        "first_content_write_mount_sequence": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "first_write_sequence": {
+          "type": ["integer", "null"],
+          "minimum": 1
+        },
+        "files_written": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "write_request_count": { "type": "integer", "minimum": 0 },
+        "requested_write_bytes": { "type": "integer", "minimum": 0 },
+        "actual_write_bytes": { "type": "integer", "minimum": 0 },
+        "missing_write_result_count": { "type": "integer", "minimum": 0 },
+        "short_write_count": { "type": "integer", "minimum": 0 },
+        "failed_write_count": { "type": "integer", "minimum": 0 },
+        "all_writes_completed": { "type": "boolean" },
+        "read_request_count": { "type": "integer", "minimum": 0 },
+        "missing_read_result_count": { "type": "integer", "minimum": 0 },
+        "end_of_file_read_count": { "type": "integer", "minimum": 0 },
+        "non_eof_read_failure_count": { "type": "integer", "minimum": 0 },
+        "content_changed_paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "metadata_changed_paths": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
     "payload_contract": {
       "type": "object",
       "required": ["required_fresh_slot", "conditional_later_state"],

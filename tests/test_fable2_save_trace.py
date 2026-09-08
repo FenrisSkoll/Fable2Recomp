@@ -306,6 +306,70 @@ class SaveTraceTest(unittest.TestCase):
         self.assertIn("ntreadfile is not traced", notes)
         self.assertNotIn("restart enumeration/loading remains required", notes)
 
+    def test_update_capture_reports_complete_payload_writes(self) -> None:
+        self.create_complete_slot()
+        events = self.content_events()
+        events[0]["flags"] = 4
+        events.extend(
+            [
+                event(
+                    4,
+                    "NtWriteFile",
+                    "request",
+                    guest_path="Save:\\mainsave.bin",
+                    requested_bytes=2048,
+                    offset=0,
+                ),
+                event(
+                    5,
+                    "NtWriteFile",
+                    "result",
+                    request_sequence=4,
+                    requested_bytes=2048,
+                    actual_bytes=2048,
+                    operation_result=0,
+                    io_status=0,
+                    io_information=2048,
+                ),
+                event(
+                    6,
+                    "NtReadFile",
+                    "request",
+                    guest_path="Save:\\Fable2PubInfo.xml",
+                    requested_bytes=4096,
+                ),
+                event(
+                    7,
+                    "NtReadFile",
+                    "result",
+                    request_sequence=6,
+                    requested_bytes=4096,
+                    actual_bytes=0,
+                    operation_result=0xC0000011,
+                    io_status=0xC0000011,
+                    io_information=0,
+                ),
+            ]
+        )
+        self.write_events(events)
+
+        report = build_report(
+            self.trace, self.metadata, self.save_root, self.baseline
+        )
+        observation = report["update_observation"]
+        self.assertEqual(observation["first_content_write_mount_sequence"], 1)
+        self.assertEqual(observation["first_write_sequence"], 4)
+        self.assertEqual(observation["files_written"], ["mainsave.bin"])
+        self.assertEqual(observation["write_request_count"], 1)
+        self.assertEqual(observation["requested_write_bytes"], 2048)
+        self.assertEqual(observation["actual_write_bytes"], 2048)
+        self.assertEqual(observation["missing_write_result_count"], 0)
+        self.assertEqual(observation["short_write_count"], 0)
+        self.assertEqual(observation["failed_write_count"], 0)
+        self.assertTrue(observation["all_writes_completed"])
+        self.assertEqual(observation["end_of_file_read_count"], 1)
+        self.assertEqual(observation["non_eof_read_failure_count"], 0)
+
     def test_content_create_without_payload_attempt_is_classified(self) -> None:
         slot = self.save_root / NATIVE_XUID / TITLE_ID / "00000001" / SLOT
         slot.mkdir(parents=True)

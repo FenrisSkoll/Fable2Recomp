@@ -296,6 +296,119 @@ def observe_restart(events: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def observe_update(
+    events: list[dict[str, Any]], comparison: dict[str, Any]
+) -> dict[str, Any]:
+    content_write_mounts = [
+        event
+        for event in events
+        if event["operation"] == "XamContentCreate"
+        and event["phase"] == "request"
+        and int(event.get("flags", 0)) & 4
+    ]
+    write_requests = [
+        event
+        for event in events
+        if event["operation"] == "NtWriteFile" and event["phase"] == "request"
+    ]
+    write_results = {
+        event.get("request_sequence"): event
+        for event in events
+        if event["operation"] == "NtWriteFile" and event["phase"] == "result"
+    }
+
+    files_written: list[str] = []
+    seen_written: set[str] = set()
+    for request in write_requests:
+        guest_path = str(request.get("guest_path", "")).replace("\\", "/")
+        name = guest_path.rsplit("/", 1)[-1]
+        folded_name = name.casefold()
+        if name and folded_name not in seen_written:
+            files_written.append(name)
+            seen_written.add(folded_name)
+
+    missing_write_results = [
+        request
+        for request in write_requests
+        if request["sequence"] not in write_results
+    ]
+    completed_writes = [
+        write_results[request["sequence"]]
+        for request in write_requests
+        if request["sequence"] in write_results
+    ]
+    short_writes = [
+        event
+        for event in completed_writes
+        if event.get("actual_bytes") != event.get("requested_bytes")
+    ]
+    failed_writes = [
+        event
+        for event in completed_writes
+        if int(event.get("operation_result", 0)) & 0xFFFFFFFF
+        or int(event.get("io_status", 0)) & 0xFFFFFFFF
+    ]
+
+    read_requests = [
+        event
+        for event in events
+        if event["operation"] == "NtReadFile" and event["phase"] == "request"
+    ]
+    read_results = {
+        event.get("request_sequence"): event
+        for event in events
+        if event["operation"] == "NtReadFile" and event["phase"] == "result"
+    }
+    completed_reads = [
+        read_results[request["sequence"]]
+        for request in read_requests
+        if request["sequence"] in read_results
+    ]
+    end_of_file_reads = [
+        event
+        for event in completed_reads
+        if int(event.get("operation_result", 0)) & 0xFFFFFFFF == 0xC0000011
+        and int(event.get("io_status", 0)) & 0xFFFFFFFF == 0xC0000011
+        and event.get("actual_bytes") == 0
+        and event.get("io_information") == 0
+    ]
+    non_eof_read_failures = [
+        event
+        for event in completed_reads
+        if int(event.get("operation_result", 0)) & 0xFFFFFFFF
+        not in (0, 0xC0000011)
+        or int(event.get("io_status", 0)) & 0xFFFFFFFF not in (0, 0xC0000011)
+    ]
+
+    return {
+        "first_content_write_mount_sequence": (
+            content_write_mounts[0]["sequence"] if content_write_mounts else None
+        ),
+        "first_write_sequence": write_requests[0]["sequence"] if write_requests else None,
+        "files_written": files_written,
+        "write_request_count": len(write_requests),
+        "requested_write_bytes": sum(
+            int(event.get("requested_bytes", 0)) for event in write_requests
+        ),
+        "actual_write_bytes": sum(
+            int(event.get("actual_bytes", 0)) for event in completed_writes
+        ),
+        "missing_write_result_count": len(missing_write_results),
+        "short_write_count": len(short_writes),
+        "failed_write_count": len(failed_writes),
+        "all_writes_completed": bool(write_requests)
+        and not missing_write_results
+        and not short_writes
+        and not failed_writes,
+        "read_request_count": len(read_requests),
+        "missing_read_result_count": len(read_requests) - len(completed_reads),
+        "end_of_file_read_count": len(end_of_file_reads),
+        "non_eof_read_failure_count": len(non_eof_read_failures),
+        "content_changed_paths": list(comparison.get("changed", [])),
+        "metadata_changed_paths": list(comparison.get("metadata_changed", [])),
+    }
+
+
 def classify_capture(
     events: list[dict[str, Any]], save_root: Path, snapshot: dict[str, Any]
 ) -> tuple[list[str], dict[str, Any] | None, list[str], dict[str, Any]]:
@@ -551,6 +664,18 @@ def build_report(
     classifications, first_anomaly, notes, restart_observation = classify_capture(
         events, save_root, after
     )
+    update_observation = observe_update(events, comparison)
+    if update_observation["all_writes_completed"]:
+        notes.append(
+            "All captured payload writes completed successfully: "
+            f"{update_observation['write_request_count']} requests, "
+            f"{update_observation['actual_write_bytes']} bytes returned."
+        )
+    if update_observation["end_of_file_read_count"]:
+        notes.append(
+            "Observed expected end-of-file read completions: "
+            f"{update_observation['end_of_file_read_count']}."
+        )
 
     operations = Counter(event["operation"] for event in events)
     phases = Counter(event["phase"] for event in events)
@@ -568,6 +693,7 @@ def build_report(
         "first_anomaly": first_anomaly,
         "notes": notes,
         "restart_observation": restart_observation,
+        "update_observation": update_observation,
         "tree_comparison": comparison,
         "payload_contract": {
             "required_fresh_slot": list(FRESH_REQUIRED_PAYLOAD),

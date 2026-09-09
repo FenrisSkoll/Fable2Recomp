@@ -1,0 +1,181 @@
+{
+  "artifacts": [
+    {
+      "bytes": 5355,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-preflight.json",
+      "role": "collector preflight",
+      "sha256": "DF8869727FB0179B6580F0D6C957CBFDB9E17CFA46861E60A7BD35BD635CED33"
+    },
+    {
+      "bytes": 63996,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-config-before.toml",
+      "role": "immutable launch configuration",
+      "sha256": "EE3400A5F70E8082657455DB16164CA740E3B99D83CCA526CDFE31FCE12352BB"
+    },
+    {
+      "bytes": 17271808,
+      "path": "C:\\Dev\\Fable2Phase4Xenia\\xenia-canary\\build\\bin\\Windows\\Release\\xenia_canary.exe",
+      "role": "reference executable",
+      "sha256": "8DCD8FEA50BF971B4710C45494C47DB84EF77E9D04C60657EB3FE9311B49E65E"
+    },
+    {
+      "bytes": 4539,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\selected-checkpoint.json",
+      "role": "private copy verification metadata",
+      "sha256": "6A338023DA4EDA6B570F087058269233F8138864CE41EB875E225B9600BB2BDB"
+    }
+  ],
+  "build": {
+    "branch": "fable2-indirect-target-collector",
+    "embedded_binary_commit": "6b6715b029d442ff6ed5a89773f119400b1c19b5",
+    "executable": "C:\\Dev\\Fable2Phase4Xenia\\xenia-canary\\build\\bin\\Windows\\Release\\xenia_canary.exe",
+    "executable_sha256": "8DCD8FEA50BF971B4710C45494C47DB84EF77E9D04C60657EB3FE9311B49E65E",
+    "head": "32460b5d887dcde6622bb17983b70752fa5f13b3",
+    "root": "C:\\Dev\\Fable2Phase4Xenia\\xenia-canary",
+    "source_difference": "HEAD differs from embedded binary commit only in collector documentation; supported incremental build reports no work to do",
+    "status": "",
+    "tree": "114cb589291e2c87fcbcabc949a730ca5d1f6cad"
+  },
+  "configuration": {
+    "all_modules": false,
+    "arguments": [
+      "C:\\Dev\\Fable2Phase4Xenia\\xenia-canary\\build\\bin\\Windows\\Release\\xenia_canary.exe",
+      "--indirect_target_trace_path=C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\xenia-indirect-targets.raw.jsonl",
+      "--indirect_target_trace_run_id=phase5a-reference-001",
+      "--indirect_target_trace_label=Phase 5A forward-only tranche 001",
+      "--indirect_target_trace_image_sha256=BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "--indirect_target_trace_title_id=0x4D5307F1",
+      "--indirect_target_trace_media_id=0x716F0A0D",
+      "--indirect_target_trace_version=0.0.1.26",
+      "--indirect_target_trace_buffer_pairs=4096",
+      "--indirect_target_trace_dirty_pairs=3072",
+      "--indirect_target_trace_flush_interval_ms=300000",
+      "--indirect_target_trace_max_unique_aggregates=1000000",
+      "--content_root=C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\content",
+      "--apply_title_update=true",
+      "--storage_root=C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\storage",
+      "--log_file=C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\xenia-indirect-targets.raw.xenia.log",
+      "D:\\Fable2-Recomp\\disc\\Fable II - Game of the Year Edition.iso"
+    ],
+    "cache_state": "fresh isolated caches",
+    "collector_enabled": true,
+    "collector_persistence": {
+      "buffer_pairs": 4096,
+      "dirty_pair_limit": 3072,
+      "flush_interval_ms": 300000,
+      "max_unique_aggregates": 1000000,
+      "pair_count_semantics": "delta_since_previous_persistence",
+      "raw_schema_version": 2
+    },
+    "config_after": null,
+    "config_before": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-config-before.toml",
+    "include_returns": false,
+    "preflight": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-preflight.json",
+    "resolution_scale": [
+      1,
+      1
+    ]
+  },
+  "handoff": {
+    "end_save_source": null,
+    "native_destination": null,
+    "next_session": null,
+    "preserved_endpoint": null
+  },
+  "limitations": [
+    "No gameplay category is confirmed until the user reports exercising it in this session.",
+    "Session not yet launched; runtime target counts, coverage, footer, performance and end save remain unknown.",
+    "Forward-only strategy: preceding reference content will not be replayed in full natively; only the endpoint smoke test is required.",
+    "No controlled gameplay collector-off/on overhead measurement exists. Synthetic transfer benchmark is not gameplay FPS.",
+    "Starting in-game area is unconfirmed; no route or quest order inferred from save bytes."
+  ],
+  "outcome": {
+    "fatal_or_guest_exception": null,
+    "hang": null,
+    "interaction_progression": null,
+    "invalid_target": null,
+    "loading_transition": null,
+    "rendering": null,
+    "result": null,
+    "save_reload_exit": null
+  },
+  "performance_observations": [],
+  "runtime": "xenia_collector",
+  "schema_version": 1,
+  "session_id": "phase5a-reference-001",
+  "shutdown": {
+    "flush_reason": null,
+    "footer_count": null,
+    "user_report": null,
+    "validation": null
+  },
+  "starting_checkpoint": {
+    "copied_payload_files": 7,
+    "description": "State D accepted native update/restart and Xenia reload checkpoint from 2026-09-08; starting in-game area awaits user report",
+    "mainsave_bytes": 359742,
+    "mainsave_sha256": "1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4",
+    "original_native_profile": "B13EBABEBABEBABE",
+    "preserved_copy": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\start-001\\xenia-launch-content",
+    "reference_profile": "E03000002168622D",
+    "save_slot": "Hero000",
+    "source": "C:\\Dev\\Fable2Recomp\\out\\native-save-diagnostic\\D-xenia-update",
+    "writable_content_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\content",
+    "writable_storage_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\storage"
+  },
+  "status": "prepared",
+  "target_review": {
+    "applied_changes": [],
+    "classifications": {},
+    "known_targets": null,
+    "new_pairs": null,
+    "new_targets": null
+  },
+  "timing": {
+    "process_end_utc": null,
+    "process_start_utc": null,
+    "sampling_seconds": null,
+    "source": null
+  },
+  "title_identity": {
+    "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+    "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+    "executable_memory_sha256": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
+    "executable_sections": [
+      {
+        "end": "0x832BABBC",
+        "name": ".text",
+        "permissions": "r-x",
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+        "size": "0x0114ABBC",
+        "start": "0x82170000"
+      },
+      {
+        "end": "0x832CA03C",
+        "name": "BINK",
+        "permissions": "r-x",
+        "sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146",
+        "size": "0x0000F43C",
+        "start": "0x832BAC00"
+      }
+    ],
+    "image_base": "0x82000000",
+    "image_size": "0x01620000",
+    "media_id": "0x716F0A0D",
+    "observed_tu1_confirmed": null,
+    "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "shared_evidence_path": "tools/fable2-entrypoint-closure-evidence.json",
+    "shared_evidence_sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E",
+    "title_id": "0x4D5307F1",
+    "title_update_container_file": "TU_16L61VH_0000038000000.000000000008Q",
+    "title_update_container_sha256": "B36EB38CE1DB9E1195DEA494C8E75D5AB4BE737DCEF10565EF16A415DE27524C",
+    "title_update_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+    "version": "0.0.1.26",
+    "xenia_module_fingerprint": "341151E9932EC14CB4F520AA9DE35BCF7169BFE1",
+    "xenia_module_fingerprint_algorithm": "sha1_contiguous_loaded_executable_memory"
+  },
+  "user_coverage": {
+    "areas": [],
+    "categories": [],
+    "confirmation": null
+  }
+}

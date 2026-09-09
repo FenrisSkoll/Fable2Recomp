@@ -125,7 +125,7 @@ Back up important saves before testing development builds. Save-path tracing is 
 ## Technical status and contributor tooling
 
 - **TU1 recompilation:** the base XEX and sibling XEXP are loaded together, and code generation operates on the patched image.
-- **Discovery:** the project includes static entrypoint closure, function-map, jump-table and indirect-target analysis. See the [discovery pipeline](docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md) and [Phase 4 closeout](docs/fable2-discovery-pipeline/06-phase4-closeout.md).
+- **Discovery:** the project includes static entrypoint closure, function-map, jump-table and indirect-target analysis. See the [discovery pipeline](docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md), [Phase 4 closeout](docs/fable2-discovery-pipeline/06-phase4-closeout.md) and [focused ownership corroboration](docs/fable2-discovery-pipeline/07-focused-ownership-corroboration.md). All 42 reviewed internal entries and 114 switch destinations retain their existing owners; none was promoted to a new function.
 - **Runtime diagnosis:** dispatch-only and full fault-walker configurations are experimental, opt-in tools for contributors. See [Fault walking](docs/fault-walk.md).
 - **Rendering:** the normal build uses ReXGlue's Xenos plugin with the validated D3D12 path. The [native-renderer](docs/fable2-native-renderer/g1-completion.md) and [GPU reference](docs/fable2-gpu-reference/README.md) workstreams are research and architecture evidence, not an enabled replacement renderer.
 - **Saves:** the tested `Hero000` workflow supports native creation, restart loading, updating and Xenia interoperability. Payload-free, opt-in traces and synthetic filesystem/flush tests support further diagnosis.

@@ -1,5 +1,11 @@
 # Phase 4 closeout and deferred ownership backlog
 
+Subsequent focused review: [P1/P2 ownership corroboration](07-focused-ownership-corroboration.md)
+resolves the 42 internal-entry and 114 switch-case targets without promotion or
+manifest changes. Its ledger distinguishes conditional-return continuations
+from callable entries. The historical closeout below is preserved; the 411
+already registered targets were outside that focused review.
+
 ## Outcome and boundary
 
 Phase 4 delivers a disabled-by-default Xenia indirect-control-flow collector,

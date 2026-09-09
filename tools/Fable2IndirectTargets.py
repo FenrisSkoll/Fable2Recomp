@@ -2129,6 +2129,22 @@ def classify_target(
         None,
     )
     owner_range = containing_range(target, closure["ranges"], closure["starts"])
+    # A preliminary gap-fill extent may include bytes after its terminal
+    # branch. Only recovered body blocks establish ownership in that extent.
+    # Retain the rejected extent as evidence, without inventing a boundary.
+    if owner_range and owner_range["preliminary"] and not any(
+        address(block["start"], "body start") <= target
+        < address(block["end"], "body end")
+        for block in owner_range["basic_blocks"]
+    ):
+        evidence.append({
+            "kind": "preliminary_extent_without_body_ownership",
+            "start": address_text(owner_range["start"]),
+            "end": address_text(owner_range["end"]),
+            "authority": owner_range["authority"],
+            "conclusion": "enclosing extent does not establish target ownership",
+        })
+        owner_range = None
     exact_range = closure["ranges"].get(target)
     closure_candidate = closure["candidates"].get(target)
     jump_case = closure["jump_cases"].get(target)
@@ -2820,12 +2836,29 @@ def read_plan(path: Path) -> dict[str, Any]:
     return validate_plan(require_object(document, "plan"))
 
 
-def accepted_run_records(summary: dict[str, Any], location: str) -> list[dict[str, Any]]:
+def accepted_run_records(
+    summary: dict[str, Any], location: str, *, allow_multiple: bool = False
+) -> list[dict[str, Any]]:
     runs = [run for run in summary["runs"] if run["identity_match"]]
-    if len(runs) != 1:
+    if not runs or (not allow_multiple and len(runs) != 1):
         raise Phase4Error(
-            f"{location} must contain exactly one accepted run; found {len(runs)}"
+            f"{location} must contain {'one or more' if allow_multiple else 'exactly one'} "
+            f"accepted run; found {len(runs)}"
         )
+    return sorted(runs, key=lambda run: run["run_id"])
+
+
+def follow_up_baseline_ids(scope: dict[str, Any], version: int) -> list[str]:
+    """Keep v1's single-run contract; v2 names every accepted baseline run."""
+    if version == 1:
+        if "baseline_run_ids" in scope:
+            raise Phase4Error("v1 follow-up cannot contain a baseline cohort")
+        return [require_string(scope.get("baseline_run_id"), "baseline_run_id")]
+    if version != 2 or "baseline_run_id" in scope:
+        raise Phase4Error("invalid follow-up baseline representation")
+    runs = require_string_list(scope.get("baseline_run_ids"), "baseline_run_ids")
+    if len(runs) < 2 or runs != sorted(set(runs)):
+        raise Phase4Error("baseline_run_ids must contain at least two sorted unique runs")
     return runs
 
 
@@ -3032,17 +3065,23 @@ def build_static_ownership_follow_up(
     validate_summary(merged_summary, expected_identity)
     validate_plan(plan)
 
-    baseline_run = accepted_run_records(
-        baseline_summary, "baseline summary"
-    )[0]
+    baseline_runs = accepted_run_records(
+        baseline_summary, "baseline summary", allow_multiple=True
+    )
     contributing_run = accepted_run_records(
         contributing_summary, "contributing summary"
     )[0]
-    baseline_run_id = baseline_run["run_id"]
+    baseline_run_ids = [run["run_id"] for run in baseline_runs]
+    multi_baseline = len(baseline_runs) > 1
+    baseline_fields = (
+        {"baseline_run_ids": baseline_run_ids, "absent_from_baseline_runs": True}
+        if multi_baseline else
+        {"baseline_run_id": baseline_run_ids[0], "absent_from_baseline_run": True}
+    )
     contributing_run_id = contributing_run["run_id"]
-    if baseline_run_id == contributing_run_id:
+    if contributing_run_id in baseline_run_ids:
         raise Phase4Error("baseline and contributing summaries use the same run ID")
-    if baseline_run["raw_sha256"] == contributing_run["raw_sha256"]:
+    if contributing_run["raw_sha256"] in {run["raw_sha256"] for run in baseline_runs}:
         raise Phase4Error("baseline and contributing summaries use the same raw hash")
 
     expected_merged = merge_summaries(
@@ -3069,11 +3108,11 @@ def build_static_ownership_follow_up(
         raise Phase4Error("follow-up inputs omit merged_summary metadata")
     if plan_summary.get("sha256") != merged_input["sha256"]:
         raise Phase4Error("import plan does not describe the merged summary input")
-    expected_run_ids = sorted((baseline_run_id, contributing_run_id))
+    expected_run_ids = sorted([*baseline_run_ids, contributing_run_id])
     if plan_summary.get("run_ids") != expected_run_ids:
         raise Phase4Error("import plan run IDs disagree with the compact summaries")
     if sorted(plan_summary.get("raw_trace_sha256", [])) != sorted(
-        (baseline_run["raw_sha256"], contributing_run["raw_sha256"])
+        [*(run["raw_sha256"] for run in baseline_runs), contributing_run["raw_sha256"]]
     ):
         raise Phase4Error("import plan raw-hash provenance disagrees with summaries")
     safety = require_object(plan.get("safety"), "plan.safety")
@@ -3126,7 +3165,7 @@ def build_static_ownership_follow_up(
             contributing_targets[target], contributing_run_id
         )
         if any(
-            baseline_run_id in pair["run_hit_counts"]
+            any(run_id in pair["run_hit_counts"] for run_id in baseline_run_ids)
             for pair in contributing_targets[target]
         ):
             raise Phase4Error(
@@ -3162,8 +3201,7 @@ def build_static_ownership_follow_up(
             "target": address_text(target),
             "contributing_run_id": contributing_run_id,
             "contributing_run_hit_count": hit_count,
-            "absent_from_baseline_run": True,
-            "baseline_run_id": baseline_run_id,
+            **baseline_fields,
             "observed_sources": sources,
             "classification": classification,
             "confidence": target_record["confidence"],
@@ -3205,19 +3243,19 @@ def build_static_ownership_follow_up(
     report = {
         "schema": {
             "name": FOLLOW_UP_SCHEMA_NAME,
-            "version": FOLLOW_UP_SCHEMA_VERSION,
+            "version": 2 if multi_baseline else FOLLOW_UP_SCHEMA_VERSION,
         },
         "tool": {"name": "Fable2IndirectTargets", "version": TOOL_VERSION},
         "identity": json.loads(json.dumps(merged_summary["identity"])),
         "inputs": sorted(input_records, key=lambda item: item["role"]),
         "scope": {
-            "selection": "targets_observed_in_contributing_run_and_absent_from_baseline_run",
-            "baseline_run_id": baseline_run_id,
+            "selection": "targets_observed_in_contributing_run_and_absent_from_baseline_run" + ("s" if multi_baseline else ""),
+            **{key: value for key, value in baseline_fields.items() if key.startswith("baseline_")},
             "contributing_run_id": contributing_run_id,
             "sequence_domains": "independent_per_run_guest_thread",
         },
         "run_provenance": [
-            follow_up_run_provenance(baseline_run, "baseline"),
+            *(follow_up_run_provenance(run, "baseline") for run in baseline_runs),
             follow_up_run_provenance(contributing_run, "contributing"),
         ],
         "counts": {
@@ -3260,10 +3298,9 @@ def validate_static_ownership_follow_up(
     document: dict[str, Any],
 ) -> dict[str, Any]:
     schema = require_object(document.get("schema"), "follow_up.schema")
-    if schema != {
-        "name": FOLLOW_UP_SCHEMA_NAME,
-        "version": FOLLOW_UP_SCHEMA_VERSION,
-    }:
+    if schema not in [
+        {"name": FOLLOW_UP_SCHEMA_NAME, "version": version} for version in (1, 2)
+    ]:
         raise Phase4Error(f"unsupported ownership follow-up schema: {schema!r}")
     tool = require_object(document.get("tool"), "follow_up.tool")
     if tool.get("name") != "Fable2IndirectTargets":
@@ -3311,21 +3348,24 @@ def validate_static_ownership_follow_up(
         )
 
     scope = require_object(document.get("scope"), "follow_up.scope")
-    baseline_run_id = require_string(
-        scope.get("baseline_run_id"), "follow_up.scope.baseline_run_id"
-    )
+    baseline_run_ids = follow_up_baseline_ids(scope, schema["version"])
+    if scope.get("selection") != (
+        "targets_observed_in_contributing_run_and_absent_from_baseline_run"
+        + ("s" if schema["version"] == 2 else "")
+    ):
+        raise Phase4Error("follow_up selection disagrees with baseline schema")
     contributing_run_id = require_string(
         scope.get("contributing_run_id"),
         "follow_up.scope.contributing_run_id",
     )
-    if baseline_run_id == contributing_run_id:
+    if contributing_run_id in baseline_run_ids:
         raise Phase4Error("follow_up run roles must be distinct")
 
     run_provenance = document.get("run_provenance")
-    if not isinstance(run_provenance, list) or len(run_provenance) != 2:
-        raise Phase4Error("follow_up.run_provenance must contain exactly two runs")
+    if not isinstance(run_provenance, list) or len(run_provenance) != len(baseline_run_ids) + 1:
+        raise Phase4Error("follow_up.run_provenance must contain every baseline and contributing run")
     expected_run_roles = [
-        ("baseline", baseline_run_id),
+        *(("baseline", run_id) for run_id in baseline_run_ids),
         ("contributing", contributing_run_id),
     ]
     for index, (role, run_id) in enumerate(expected_run_roles):
@@ -3408,9 +3448,10 @@ def validate_static_ownership_follow_up(
 
         if item.get("contributing_run_id") != contributing_run_id:
             raise Phase4Error(f"{location} contributing run ID is invalid")
-        if item.get("baseline_run_id") != baseline_run_id:
-            raise Phase4Error(f"{location} baseline run ID is invalid")
-        if item.get("absent_from_baseline_run") is not True:
+        if follow_up_baseline_ids(item, schema["version"]) != baseline_run_ids:
+            raise Phase4Error(f"{location} baseline run IDs are invalid")
+        absent_key = "absent_from_baseline_runs" if schema["version"] == 2 else "absent_from_baseline_run"
+        if item.get(absent_key) is not True:
             raise Phase4Error(f"{location} is not marked baseline-absent")
         hit_count = require_uint64(
             item.get("contributing_run_hit_count"),
@@ -3588,7 +3629,8 @@ def static_ownership_follow_up_markdown_bytes(report: dict[str, Any]) -> bytes:
         "",
         "## Scope",
         "",
-        f"- Baseline run: `{report['scope']['baseline_run_id']}`",
+        (f"- Baseline run: `{report['scope']['baseline_run_id']}`" if report["schema"]["version"] == 1
+         else "- Baseline runs: " + ", ".join(f"`{run_id}`" for run_id in report["scope"]["baseline_run_ids"])),
         f"- Contributing run: `{report['scope']['contributing_run_id']}`",
         f"- Contributing-only targets: {counts['targets']}",
         "- Range proposals: 0",

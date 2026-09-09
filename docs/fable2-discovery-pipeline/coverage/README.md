@@ -86,6 +86,18 @@ codes and output hashes. Never merge an accepted summary together with one of
 its already-included constituent runs.
 
 Inspect all new targets with the existing planner and exact-image evidence.
+For an accepted baseline containing multiple sessions, `ownership-follow-up`
+uses schema v2 (`baseline_run_ids`, `absent_from_baseline_runs`); every baseline
+run and raw hash must be present in the merged plan. A target seen in any
+baseline run is known. Single-baseline-run reports retain schema v1 and its
+existing serialization. The contributor remains exactly one new run.
+
+A preliminary gap-fill enclosing extent is not an exact function body. The
+planner now requires recovered basic-block membership before calling a target
+internal to such an extent. Outside that body, the ordinary independent static
+boundary rules still apply; absence of a body alone cannot authorize a size or
+an import. Phase 5A target `0x825E28B0` exposed this distinction.
+
 The Phase 4 `ownership-follow-up` reporter deliberately accepts only its
 supported already-owned categories. If a new function proposal or conflict
 falls outside those categories, preserve that explicit rejection and review

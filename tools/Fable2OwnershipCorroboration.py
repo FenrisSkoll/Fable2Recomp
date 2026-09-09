@@ -128,11 +128,12 @@ def build(args):
     require(input_hashes["merged_summary"] == p4.sha256_file(summary_path), "queue/summary mismatch")
     require(input_hashes["entrypoint_closure"] == p4.sha256_file(args.closure), "queue/closure mismatch")
     run = queue["scope"]["contributing_run_id"]
-    baseline_run = queue["scope"]["baseline_run_id"]
+    p4.validate_static_ownership_follow_up(queue)
+    baseline_runs = set(p4.follow_up_baseline_ids(queue["scope"], queue["schema"]["version"]))
     grouped, _ = p4.group_target_observations(summary)
     expected_queue = {t for t, pairs in grouped.items()
                       if any(run in p["observed_runs"] for p in pairs)
-                      and not any(baseline_run in p["observed_runs"] for p in pairs)}
+                      and not any(baseline_runs.intersection(p["observed_runs"]) for p in pairs)}
     require(len(queue["targets"]) == len({r["target"] for r in queue["targets"]}), "duplicate queue target")
     require(expected_queue == {addr(r["target"]) for r in queue["targets"]}, "queue omits or adds targets")
     selected = [r for r in queue["targets"] if r["classification"] in POPULATIONS]

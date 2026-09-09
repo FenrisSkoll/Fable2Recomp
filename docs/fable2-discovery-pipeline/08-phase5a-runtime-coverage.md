@@ -54,13 +54,32 @@ The prepared record is
 planned work from user-confirmed coverage, raw termination from user reports,
 and source commits from executable identities.
 
-Selected start: **Hero000 from the accepted State D native update/restart and
-Xenia reload checkpoint of 2026-09-08**. Its actual starting area is not inferred
-from save bytes and remains for the user to report. The latest documented
+Selected start: **Bowerstone Market, Hero000 from the accepted State D native
+update/restart and Xenia reload checkpoint of 2026-09-08**. The user confirms
+that childhood/prologue content in Bowerstone Old Town is already completed.
+The current objective is to meet the blind woman from the Guild at the fountain
+in the middle of Bowerstone Market. These are user-reported checkpoint facts,
+not inferred save semantics or evidence of an already completed traced run.
+The latest documented
 native-updated `mainsave.bin` is 359,742 bytes, SHA-256
 `1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4`.
 The older current reference root still contained the 356,173-byte pre-update
 main save, so its payload was not selected as the campaign endpoint.
+
+The user reports an expected approximately five-minute wait for the NPC to
+appear. This is expected game behaviour, not automatically a hang or
+progression failure. It becomes suspicious only if the expected conditions
+are met and she still fails to appear substantially beyond the normal wait.
+No automatic timeout or arbitrary failure threshold is introduced. Waiting,
+interaction and all subsequent gameplay remain user-controlled.
+
+After the correction, all seven isolated Hero000 payloads were rechecked
+against State D and the preserved launch checkpoint. No save replacement or
+modification was needed. The ordinary working root at
+`C:\Users\Fenris\Documents\fable2` still has the earlier 356,173-byte main
+save dated `2026-09-02T17:10:02.8185507Z`; selected State D and its isolated
+copy have the 359,742-byte main save dated `2026-09-08T17:25:00.6841654Z`.
+Timestamps are corroboration; the exact payload hashes establish copy identity.
 
 | Role | Exact local path |
 | --- | --- |
@@ -115,19 +134,23 @@ From `C:\Dev\Fable2Recomp` in developer PowerShell:
 ```
 
 This is **Xenia Canary reference collection**, not native recompilation. Load
-the copied Hero000 checkpoint above and choose your own forward route. Aim for
+the copied Bowerstone Market Hero000 checkpoint above and choose your own
+forward route. Do not return to completed childhood content. Aim for
 a bounded 30–60 minute session where practical; a valid longer session is not
-discarded. Sample naturally available transitions/quests/dialogue, shops or
-equipment, and combat/Will. These are suggestions, not claimed coverage or a
-walkthrough. Save normally, wait for saving to finish, then close the Xenia
+discarded. The initial planned categories are Market crowds/NPC AI, timed
+quest-state progression, scripted NPC appearance, dialogue and whatever
+transition follows. Allow the expected approximately five-minute fountain
+wait. These are planned categories, not claimed coverage or a walkthrough.
+Save normally, wait for saving to finish, then close the Xenia
 window and allow the command to return.
 
 Raw JSONL and Xenia log are under
 `C:\Dev\Fable2Recomp\out\indirect-targets\phase5a-reference-001\`:
 `xenia-indirect-targets.raw.jsonl` and
 `xenia-indirect-targets.raw.xenia.log`. Report the starting/ending areas,
-categories actually exercised, whether saving and clean exit succeeded, and
-any blocker or performance symptom with approximate session time if known.
+categories actually exercised, whether the NPC appeared and dialogue/progression
+continued, whether saving and clean exit succeeded, and any blocker or
+performance symptom with approximate session time if known.
 Partial symptom reports are useful; no FPS measurement is required.
 
 ## First-tranche coverage matrix

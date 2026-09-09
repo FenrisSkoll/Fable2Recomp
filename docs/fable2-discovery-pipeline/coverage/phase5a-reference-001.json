@@ -87,7 +87,7 @@
     "Session not yet launched; runtime target counts, coverage, footer, performance and end save remain unknown.",
     "Forward-only strategy: preceding reference content will not be replayed in full natively; only the endpoint smoke test is required.",
     "No controlled gameplay collector-off/on overhead measurement exists. Synthetic transfer benchmark is not gameplay FPS.",
-    "Starting in-game area is unconfirmed; no route or quest order inferred from save bytes."
+    "Starting area and objective are user-reported checkpoint metadata, not a claim that this traced session has exercised them. No route or quest order is inferred from save bytes."
   ],
   "outcome": {
     "fatal_or_guest_exception": null,
@@ -111,7 +111,15 @@
   },
   "starting_checkpoint": {
     "copied_payload_files": 7,
-    "description": "State D accepted native update/restart and Xenia reload checkpoint from 2026-09-08; starting in-game area awaits user report",
+    "description": "Bowerstone Market, childhood/prologue completed; meet the blind woman from the Guild at the central fountain after an expected approximately five-minute wait. User checkpoint correction for the latest working save; isolated payload copy is the accepted State D checkpoint from 2026-09-08.",
+    "area": "Bowerstone Market",
+    "objective": "Meet the blind woman from the Guild at the fountain in the middle of Bowerstone Market",
+    "checkpoint_evidence": "User checkpoint correction in this conversation; payload identity independently checked against the selected working source",
+    "expected_wait": {
+      "approximate_seconds": 300,
+      "evidence": "user_report",
+      "policy": "Expected game behaviour, not automatically a hang or progression failure. Investigate only if expected conditions are met and the NPC still fails to appear substantially beyond the normal wait; no automatic timeout or invented threshold."
+    },
     "mainsave_bytes": 359742,
     "mainsave_sha256": "1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4",
     "original_native_profile": "B13EBABEBABEBABE",

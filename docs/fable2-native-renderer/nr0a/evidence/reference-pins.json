@@ -1,0 +1,1525 @@
+{
+  "format_version": 1,
+  "inspection_date": "2026-09-09",
+  "result": "CONDITIONAL ARCHITECTURE \u2014 DYNAMIC EVIDENCE REQUIRED",
+  "repositories": [
+    {
+      "local_path": "C:\\Dev\\Fable2Recomp",
+      "branch": "fable2-native-renderer-nr0a-architecture",
+      "commit": "9936fd1839da4286a9d09530ae0bb6ac11b5eda4",
+      "tree": "814f96b0ad58c891032233452027cfee5f5bad2a",
+      "shallow": "false",
+      "available_commit_count": 165,
+      "id": "fable",
+      "url": "https://github.com/FenrisSkoll/Fable2Recomp",
+      "inspection_date": "2026-09-09",
+      "baseline": "current canonical",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "MIT",
+        "scope": "repository license only; dependencies separate",
+        "blob": "084a61954e4401a772f10d0de28cbc043c5d3947"
+      },
+      "initial_status": "M fable2_manifest.toml",
+      "dependencies": []
+    },
+    {
+      "local_path": "C:\\Dev\\rexglue-sdk-v0.10",
+      "branch": "main",
+      "commit": "fc5a00b31f702e82377aa1010395af7ba8cff4f7",
+      "tree": "903af44f9aab5684443ddb22e505b0ea811d45d2",
+      "shallow": "false",
+      "available_commit_count": 694,
+      "id": "sdk",
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk",
+      "inspection_date": "2026-09-09",
+      "baseline": "current canonical",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "BSD-3-Clause",
+        "scope": "repository license only; dependencies separate",
+        "blob": "989af8778ded5b67521da99f4ed0a71960ac9caa"
+      },
+      "initial_status": "M thirdparty/libmspack",
+      "dependencies": [
+        {
+          "path": "thirdparty/FFmpeg",
+          "commit": "0604b464c7cb4ebc94940cf1f324a3b26b87717c",
+          "url": "https://github.com/wmarti/FFmpeg.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/catch2",
+          "commit": "88abf9bf325c798c33f54f6b9220ef885b267f4f",
+          "url": "https://github.com/catchorg/Catch2.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/cli11",
+          "commit": "bfffd37e1f804ca4fae1caae106935791696b6a9",
+          "url": "https://github.com/CLIUtils/CLI11",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/fmt",
+          "commit": "407c905e45ad75fc29bf0f9bb7c5c2fd3475976f",
+          "url": "https://github.com/fmtlib/fmt.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/glslang",
+          "commit": "f4f1d8a352ca1908943aea2ad8c54b39b4879080",
+          "url": "https://github.com/KhronosGroup/glslang.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/imgui",
+          "commit": "6d910d5487d11ca567b61c7824b0c78c569d62f0",
+          "url": "https://github.com/ocornut/imgui.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/inja",
+          "commit": "7d1b4600b68595085a949743331c2e5673f511ea",
+          "url": "https://github.com/pantor/inja.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/libmspack",
+          "commit": "305907723a4e7ab2018e58040059ffb5e77db837",
+          "url": "https://github.com/kyz/libmspack.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/moltenvk",
+          "commit": "db445ff2042d9ce348c439ad8451112f354b8d2a",
+          "url": "https://github.com/KhronosGroup/MoltenVK.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/o1heap",
+          "commit": "388a73fd9007300e5130c5fe352d9ce3288b6dde",
+          "url": "https://github.com/pavel-kirienko/o1heap.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/sdl3",
+          "commit": "8bf3b7215ad9fc3deb583c6a3a37c6c67f2e24e4",
+          "url": "https://github.com/libsdl-org/SDL",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/simde",
+          "commit": "71fd833d9666141edcd1d3c109a80e228303d8d7",
+          "url": "https://github.com/simd-everywhere/simde.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spdlog",
+          "commit": "79524ddd08a4ec981b7fea76afd08ee05f83755d",
+          "url": "https://github.com/gabime/spdlog.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spirv-headers",
+          "commit": "29981f65241605e08b0ede4cfeb999fe3b723c6a",
+          "url": "https://github.com/KhronosGroup/SPIRV-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spirv-tools",
+          "commit": "9a49b0883b9b635689a85b5647dbfcb223268151",
+          "url": "https://github.com/KhronosGroup/SPIRV-Tools.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/tomlplusplus",
+          "commit": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de",
+          "url": "https://github.com/marzer/tomlplusplus.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/tracy",
+          "commit": "05cceee0df3b8d7c6fa87e9638af311dbabc63cb",
+          "url": "https://github.com/wolfpld/tracy.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/utfcpp",
+          "commit": "63d64de49fd6b829f7c8694df5ab2ee625cb7134",
+          "url": "https://github.com/nemtrif/utfcpp.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vulkan-headers",
+          "commit": "e3b1eec08173d6b825cd3ac88c885a63b621504a",
+          "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vulkan-loader",
+          "commit": "5f157b62e333c63260d05d81bf66faa216ab0fb8",
+          "url": "https://github.com/KhronosGroup/Vulkan-Loader.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vulkan-memory-allocator",
+          "commit": "1d8f600fd424278486eade7ed3e877c99f0846b1",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/xxHash",
+          "commit": "e626a72bc2321cd320e953a0ccf1584cad60f363",
+          "url": "https://github.com/Cyan4973/xxHash.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\nr0a\\skate3recomp",
+      "branch": "main",
+      "commit": "f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd",
+      "tree": "1ccdb51bf28cace9ee9ece928e47f43a938bc438",
+      "shallow": "true",
+      "available_commit_count": 1,
+      "id": "skate",
+      "url": "https://github.com/mchughalex/skate3recomp",
+      "inspection_date": "2026-09-09",
+      "baseline": "NR0A new comparison",
+      "license": {
+        "path": null,
+        "assessment": "UNRESOLVED",
+        "scope": "repository license only; dependencies separate",
+        "blob": null
+      },
+      "initial_status": "",
+      "public_branch_observed": "f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd\trefs/heads/main",
+      "dependencies": [
+        {
+          "path": "third_party/rexglue-sdk",
+          "commit": "7eb0faf7787f5e01333c228b8e3f03c32f7295ea",
+          "url": "https://github.com/mchughalex/rexglue-skate3.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\nr0a\\rexglue-skate3",
+      "branch": "skate3-sdk-clean",
+      "commit": "7eb0faf7787f5e01333c228b8e3f03c32f7295ea",
+      "tree": "70080ed29377a18d38474aa035c6bc0f76245fd9",
+      "shallow": "true",
+      "available_commit_count": 1,
+      "id": "skate-sdk",
+      "url": "https://github.com/mchughalex/rexglue-skate3",
+      "inspection_date": "2026-09-09",
+      "baseline": "NR0A new comparison",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "BSD-3-Clause",
+        "scope": "repository license only; dependencies separate",
+        "blob": "989af8778ded5b67521da99f4ed0a71960ac9caa"
+      },
+      "initial_status": "",
+      "dependencies": [
+        {
+          "path": "thirdparty/FFmpeg",
+          "commit": "0604b464c7cb4ebc94940cf1f324a3b26b87717c",
+          "url": "https://github.com/wmarti/FFmpeg.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/catch2",
+          "commit": "88abf9bf325c798c33f54f6b9220ef885b267f4f",
+          "url": "https://github.com/catchorg/Catch2.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/cli11",
+          "commit": "bfffd37e1f804ca4fae1caae106935791696b6a9",
+          "url": "https://github.com/CLIUtils/CLI11",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/fmt",
+          "commit": "407c905e45ad75fc29bf0f9bb7c5c2fd3475976f",
+          "url": "https://github.com/fmtlib/fmt.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/glslang",
+          "commit": "f4f1d8a352ca1908943aea2ad8c54b39b4879080",
+          "url": "https://github.com/KhronosGroup/glslang.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/imgui",
+          "commit": "cdda62349d6068e906c2e0ee340d6ec31eedbb9c",
+          "url": "https://github.com/ocornut/imgui.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/inja",
+          "commit": "7d1b4600b68595085a949743331c2e5673f511ea",
+          "url": "https://github.com/pantor/inja.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/libmspack",
+          "commit": "305907723a4e7ab2018e58040059ffb5e77db837",
+          "url": "https://github.com/kyz/libmspack.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/o1heap",
+          "commit": "388a73fd9007300e5130c5fe352d9ce3288b6dde",
+          "url": "https://github.com/pavel-kirienko/o1heap.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/sdl3",
+          "commit": "8bf3b7215ad9fc3deb583c6a3a37c6c67f2e24e4",
+          "url": "https://github.com/libsdl-org/SDL",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/simde",
+          "commit": "71fd833d9666141edcd1d3c109a80e228303d8d7",
+          "url": "https://github.com/simd-everywhere/simde.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/snappy",
+          "commit": "6af9287fbdb913f0794d0148c6aa43b58e63c8e3",
+          "url": "https://github.com/google/snappy.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spdlog",
+          "commit": "79524ddd08a4ec981b7fea76afd08ee05f83755d",
+          "url": "https://github.com/gabime/spdlog.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spirv-headers",
+          "commit": "04f10f650d514df88b76d25e83db360142c7b174",
+          "url": "https://github.com/KhronosGroup/SPIRV-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/spirv-tools",
+          "commit": "04d0b166dcd62e29509bf2aac3ca0c5ccdcb6929",
+          "url": "https://github.com/KhronosGroup/SPIRV-Tools.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/tomlplusplus",
+          "commit": "30172438cee64926dc41fdd9c11fb3ba5b2ba9de",
+          "url": "https://github.com/marzer/tomlplusplus.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/tracy",
+          "commit": "05cceee0df3b8d7c6fa87e9638af311dbabc63cb",
+          "url": "https://github.com/wolfpld/tracy.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/utfcpp",
+          "commit": "63d64de49fd6b829f7c8694df5ab2ee625cb7134",
+          "url": "https://github.com/nemtrif/utfcpp.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/volk",
+          "commit": "0b17a763ba5643e32da1b2152f8140461b3b7345",
+          "url": "https://github.com/zeux/volk.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vulkan-headers",
+          "commit": "49f1a381e2aec33ef32adf4a377b5a39ec016ec4",
+          "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vulkan-memory-allocator",
+          "commit": "1d8f600fd424278486eade7ed3e877c99f0846b1",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/xxHash",
+          "commit": "e626a72bc2321cd320e953a0ccf1584cad60f363",
+          "url": "https://github.com/Cyan4973/xxHash.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\nr0a\\PGR4-Recomp",
+      "branch": "main",
+      "commit": "464cc5b62527755d6a365b36a0e40ff843d722e9",
+      "tree": "d8fc528f5bc37f2ceb2fe9e7ddb2b7ac123c2d8c",
+      "shallow": "true",
+      "available_commit_count": 1,
+      "id": "pgr4",
+      "url": "https://github.com/beatrixzy/PGR4-Recomp",
+      "inspection_date": "2026-09-09",
+      "baseline": "NR0A new comparison",
+      "license": {
+        "path": null,
+        "assessment": "UNRESOLVED",
+        "scope": "repository license only; dependencies separate",
+        "blob": null
+      },
+      "initial_status": "",
+      "public_branch_observed": "464cc5b62527755d6a365b36a0e40ff843d722e9\trefs/heads/main",
+      "dependencies": []
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\UnleashedRecomp",
+      "branch": "main",
+      "commit": "cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c",
+      "tree": "14f1bd3756796aa78aa05efebe68b79c31edb2da",
+      "shallow": "true",
+      "available_commit_count": 200,
+      "id": "unleashed",
+      "url": "https://github.com/hedge-dev/UnleashedRecomp",
+      "inspection_date": "2026-09-09",
+      "baseline": "retained G1/G1.5 pin",
+      "license": {
+        "path": "COPYING",
+        "assessment": "GPL-3.0",
+        "scope": "repository license only; dependencies separate",
+        "blob": "f288702d2fa16d3cdf0035b15a9fcbc552cd88e7"
+      },
+      "initial_status": "",
+      "public_branch_observed": "cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c\trefs/heads/main",
+      "dependencies": [
+        {
+          "path": "UnleashedRecomp/api",
+          "commit": "f299dd8cf272a0110c91e54e2b6e308a2d897966",
+          "url": "https://github.com/hedge-dev/SWA.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.md",
+            "url": "https://raw.githubusercontent.com/hedge-dev/SWA/f299dd8cf272a0110c91e54e2b6e308a2d897966/LICENSE.md",
+            "sha256": "BCB33AE2CBC6C0F2818712D806112E774E684FCE01CE80573F92ADF80B7487F4",
+            "bytes": 1089
+          }
+        },
+        {
+          "path": "UnleashedRecompResources",
+          "commit": "35322388006365a648f75f4981a496b12a7f7478",
+          "url": "https://github.com/hedge-dev/UnleashedRecompResources.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/MoltenVK/MoltenVK",
+          "commit": "3a0b07a24a4a681ffe70b461b1f4333b2729e2ef",
+          "url": "https://github.com/KhronosGroup/MoltenVK.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/MoltenVK/SPIRV-Cross",
+          "commit": "22b22f5685d868828be01c9ac00c31902e60afd9",
+          "url": "https://github.com/KhronosGroup/SPIRV-Cross.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/SDL",
+          "commit": "1edaad17218d67b567c149badce9ef0fc67f65fa",
+          "url": "https://github.com/libsdl-org/SDL.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/SDL_mixer",
+          "commit": "437992692cf9300f2b2f04be35adc7445a9055bf",
+          "url": "https://github.com/libsdl-org/SDL_mixer",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/concurrentqueue",
+          "commit": "6dd38b8a1dbaa7863aa907045f32308a56a6ff5d",
+          "url": "https://github.com/cameron314/concurrentqueue.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.md",
+            "url": "https://raw.githubusercontent.com/cameron314/concurrentqueue/6dd38b8a1dbaa7863aa907045f32308a56a6ff5d/LICENSE.md",
+            "sha256": "22331571E5E3DBE4C79AD715E23127BDF3BEABD75052C953DDABF191EF799E14",
+            "bytes": 3266
+          }
+        },
+        {
+          "path": "thirdparty/ddspp",
+          "commit": "98ce1d384706c8d7121876742a786f4eb89a23ef",
+          "url": "https://github.com/redorav/ddspp.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/redorav/ddspp/98ce1d384706c8d7121876742a786f4eb89a23ef/LICENSE",
+            "sha256": "BEC2B85D3040E8F9DE15F52E26B29311959D978BFB03FF941B699D7642A17868",
+            "bytes": 1075
+          }
+        },
+        {
+          "path": "thirdparty/imgui",
+          "commit": "8199457a7d9e453f8d3d9cadc14683fb54a858b5",
+          "url": "https://github.com/ocornut/imgui.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/implot",
+          "commit": "77674d270e851d3f3718aad00234201af2b76ac9",
+          "url": "https://github.com/epezent/implot.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/json",
+          "commit": "606b6347edf0758c531abb6c36743e09a4c48a84",
+          "url": "https://github.com/nlohmann/json",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/magic_enum",
+          "commit": "1a1824df7ac798177a521eed952720681b0bf482",
+          "url": "https://github.com/Neargye/magic_enum.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/msdf-atlas-gen",
+          "commit": "7e8d34645a67c6e4def5d281f7adec1c2501dc49",
+          "url": "https://github.com/Chlumsky/msdf-atlas-gen.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/nativefiledialog-extended",
+          "commit": "388549a5badaa7cbd138f5f189f50c67d5bf060c",
+          "url": "https://github.com/btzy/nativefiledialog-extended.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/plume",
+          "commit": "11926860e878e68626ea99ec88562ce2b8badc4f",
+          "url": "https://github.com/renderbag/plume.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/stb",
+          "commit": "5c205738c191bcb0abc65c4febfa9bd25ff35234",
+          "url": "https://github.com/nothings/stb.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/unordered_dense",
+          "commit": "d911053e390816ecc5dedd5a9d6b4bb5ed92b4c9",
+          "url": "https://github.com/martinus/unordered_dense.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "thirdparty/vcpkg",
+          "commit": "b322364f06308bdd24823f9d8f03fe0cc86fd46f",
+          "url": "https://github.com/microsoft/vcpkg",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "tools/XenonRecomp",
+          "commit": "c5bfd90d87f2ed0db8cff5c19ea3aff0e161e527",
+          "url": "https://github.com/hedge-dev/XenonRecomp.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "tools/XenosRecomp",
+          "commit": "990d03b28a27b50277ee5d8d942e1c5f873869d1",
+          "url": "https://github.com/hedge-dev/XenosRecomp.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\XenosRecomp",
+      "branch": "main",
+      "commit": "990d03b28a27b50277ee5d8d942e1c5f873869d1",
+      "tree": "27947117fe04e325d4fe923c6fa2afe11d79d836",
+      "shallow": "false",
+      "available_commit_count": 35,
+      "id": "xenosrecomp",
+      "url": "https://github.com/hedge-dev/XenosRecomp",
+      "inspection_date": "2026-09-09",
+      "baseline": "retained G1/G1.5 pin",
+      "license": {
+        "path": "LICENSE.md",
+        "assessment": "MIT",
+        "scope": "repository license only; dependencies separate",
+        "blob": "589ce8e59dbdb06da4ecad8f1a9b38f03e7e771f"
+      },
+      "initial_status": "",
+      "public_branch_observed": "990d03b28a27b50277ee5d8d942e1c5f873869d1\trefs/heads/main",
+      "dependencies": [
+        {
+          "path": "thirdparty/dxc-bin",
+          "commit": "737ac9f51c3d06f0cd1ee7e14dc065bafd52310d",
+          "url": "https://github.com/renderbag/dxc-bin.git",
+          "license_status": "UNRESOLVED",
+          "license_evidence": {
+            "error": "No root license at the five explicitly tried paths; reuse unresolved"
+          }
+        },
+        {
+          "path": "thirdparty/fmt",
+          "commit": "873670ba3f9e7bc77ec2c1c94b04f1f8bef77e9f",
+          "url": "https://github.com/fmtlib/fmt.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/fmtlib/fmt/873670ba3f9e7bc77ec2c1c94b04f1f8bef77e9f/LICENSE",
+            "sha256": "07580F2A3B35709CE703D523F447B242F6DFEC7582A8C0DF102C7FA2849375F8",
+            "bytes": 1431
+          }
+        },
+        {
+          "path": "thirdparty/smol-v",
+          "commit": "9dd54c379ac29fa148cb1b829bb939ba7381d8f4",
+          "url": "https://github.com/aras-p/smol-v",
+          "license_status": "UNRESOLVED",
+          "license_evidence": {
+            "error": "No root license at the five explicitly tried paths; reuse unresolved"
+          }
+        },
+        {
+          "path": "thirdparty/xxHash",
+          "commit": "2bf8313b934633b2a5b7e8fd239645b85e10c852",
+          "url": "https://github.com/Cyan4973/xxHash.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/Cyan4973/xxHash/2bf8313b934633b2a5b7e8fd239645b85e10c852/LICENSE",
+            "sha256": "6FFEDBC0F7878612D2B23589F1FF2AB15633E1DF7963A5D9FC750EC5500C7E7A",
+            "bytes": 1389
+          }
+        },
+        {
+          "path": "thirdparty/zstd",
+          "commit": "f7a8bb1263448e5028aceeba606a08fe3809550f",
+          "url": "https://github.com/facebook/zstd.git",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/facebook/zstd/f7a8bb1263448e5028aceeba606a08fe3809550f/LICENSE",
+            "sha256": "7055266497633C9025B777C78EB7235AF13922117480ED5C674677ADC381C9D8",
+            "bytes": 1549
+          }
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\plume",
+      "branch": "main",
+      "commit": "d890ac899e505fb30040e037a4037cdeca68f033",
+      "tree": "4102793d5b646ab164a42fc1b1692f173477581d",
+      "shallow": "false",
+      "available_commit_count": 70,
+      "id": "plume",
+      "url": "https://github.com/renderbag/plume",
+      "inspection_date": "2026-09-09",
+      "baseline": "retained G1/G1.5 pin",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "MIT",
+        "scope": "repository license only; dependencies separate",
+        "blob": "b05f2417451261d8c8bfa2dc543981c32228e25d"
+      },
+      "initial_status": "",
+      "public_branch_observed": "d890ac899e505fb30040e037a4037cdeca68f033\trefs/heads/main",
+      "dependencies": [
+        {
+          "path": "contrib/D3D12MemoryAllocator",
+          "commit": "9ef66bc14edd10dee0de3a545b98578363552f66",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.txt",
+            "url": "https://raw.githubusercontent.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator/9ef66bc14edd10dee0de3a545b98578363552f66/LICENSE.txt",
+            "sha256": "9DAB190F56EC64BD4DBAD25C349B4A381436D54FC908C312FFA3BBF7D1608FA0",
+            "bytes": 1099
+          }
+        },
+        {
+          "path": "contrib/Vulkan-Headers",
+          "commit": "2fa203425eb4af9dfc6b03f97ef72b0b5bcb8350",
+          "url": "https://github.com/KhronosGroup/Vulkan-Headers",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.md",
+            "url": "https://raw.githubusercontent.com/KhronosGroup/Vulkan-Headers/2fa203425eb4af9dfc6b03f97ef72b0b5bcb8350/LICENSE.md",
+            "sha256": "AC24E5EA920E4318E4D02C4086AE51F53CFB03FEED06C18DF1019E7ADA1EC7BC",
+            "bytes": 458
+          }
+        },
+        {
+          "path": "contrib/VulkanMemoryAllocator",
+          "commit": "29b35ea4232688c0f42cdff0c10848290760a417",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.txt",
+            "url": "https://raw.githubusercontent.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator/29b35ea4232688c0f42cdff0c10848290760a417/LICENSE.txt",
+            "sha256": "8D70E4CF2A9941F6454DA71CD60E38484DD3E34810C824760D550E982AF6D97A",
+            "bytes": 1099
+          }
+        },
+        {
+          "path": "contrib/volk",
+          "commit": "be3dbd49bf77052665e96b6c7484af855e7e5f67",
+          "url": "https://github.com/zeux/volk",
+          "license_status": "SOURCE-CONFIRMED license text inspected; see audit for bounded assessment",
+          "license_evidence": {
+            "path": "LICENSE.md",
+            "url": "https://raw.githubusercontent.com/zeux/volk/be3dbd49bf77052665e96b6c7484af855e7e5f67/LICENSE.md",
+            "sha256": "33C831F76B79501665E66C23AC8F876020457C216D44526A8F747DA897999B35",
+            "bytes": 1066
+          }
+        }
+      ]
+    },
+    {
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\xenia-canary",
+      "branch": "canary_experimental",
+      "commit": "3a44f20c7bc66db1da583e8a6f0ab740e31908e9",
+      "tree": "c343b0a5796590fadc3b78c993bfada51e7e9148",
+      "shallow": "true",
+      "available_commit_count": 200,
+      "id": "canary",
+      "url": "https://github.com/xenia-canary/xenia-canary",
+      "inspection_date": "2026-09-09",
+      "baseline": "retained G1/G1.5 pin",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "BSD-3-Clause",
+        "scope": "repository license only; dependencies separate",
+        "blob": "bc759869a1975823a4e1b1c78cb4e5356cadb7bf"
+      },
+      "initial_status": "",
+      "dependencies": [
+        {
+          "path": "third_party/DirectX-Headers",
+          "commit": "33374754f65baac0500dda6187e371136357246f",
+          "url": "https://github.com/microsoft/DirectX-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/DirectXShaderCompiler",
+          "commit": "69e54e29086b7035acffb304cec57a350225f8b0",
+          "url": "https://github.com/microsoft/DirectXShaderCompiler.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/FFmpeg",
+          "commit": "d980192e175e6ff95bcd287af77e16fcb6597974",
+          "url": "https://github.com/has207/FFmpeg.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/FidelityFX-CAS",
+          "commit": "9fabcc9a2c45f958aff55ddfda337e74ef894b7f",
+          "url": "https://github.com/GPUOpen-Effects/FidelityFX-CAS.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/FidelityFX-FSR",
+          "commit": "a21ffb8f6c13233ba336352bdff293894c706575",
+          "url": "https://github.com/GPUOpen-Effects/FidelityFX-FSR.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/SDL2",
+          "commit": "e11183ea6caa3ae4895f4bc54cad2bbb0e365417",
+          "url": "https://github.com/libsdl-org/SDL.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/SPIRV-Tools",
+          "commit": "33e02568181e3312f49a3cf33df470bf96ef293a",
+          "url": "https://github.com/KhronosGroup/SPIRV-Tools.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/Vulkan-Headers",
+          "commit": "2cd90f9d20df57eac214c148f3aed885372ddcfe",
+          "url": "https://github.com/KhronosGroup/Vulkan-Headers.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/VulkanMemoryAllocator",
+          "commit": "1d8f600fd424278486eade7ed3e877c99f0846b1",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/aes_128",
+          "commit": "7e3ac3bb6b478187472b4ac6f1698eb203e8e90b",
+          "url": "https://github.com/openluopworld/aes_128.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/capstone",
+          "commit": "66b08439abd988e87b4542389b4937ce13bd0063",
+          "url": "https://github.com/capstone-engine/capstone.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/catch",
+          "commit": "ee1450f268dfd5c13aa8670ba97e93cabaf2e15d",
+          "url": "https://github.com/catchorg/Catch2.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/cpplint",
+          "commit": "350702a4d39395571bd118c9a3cff0a573488d61",
+          "url": "https://github.com/cpplint/cpplint.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/cxxopts",
+          "commit": "f029892dab60526184ee42ae63a7f6d19a6b0e49",
+          "url": "https://github.com/jarro2783/cxxopts.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/date",
+          "commit": "f94b8f36c6180be0021876c4a397a054fe50c6f2",
+          "url": "https://github.com/HowardHinnant/date.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/discord-rpc",
+          "commit": "963aa9f3e5ce81a4682c6ca3d136cddda614db33",
+          "url": "https://github.com/discordapp/discord-rpc.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/disruptorplus",
+          "commit": "bf9c70c0cc92b6435f7edec75e12751ea37e5c2f",
+          "url": "https://github.com/xenia-canary/disruptorplus.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/fmt",
+          "commit": "407c905e45ad75fc29bf0f9bb7c5c2fd3475976f",
+          "url": "https://github.com/fmtlib/fmt.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/glslang",
+          "commit": "a57276bf558f5cf94d3a9854ebdf5a2236849a5a",
+          "url": "https://github.com/KhronosGroup/glslang.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/imgui",
+          "commit": "4806a1924ff6181180bf5e4b8b79ab4394118875",
+          "url": "https://github.com/ocornut/imgui.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/libusb",
+          "commit": "a61afe5f75d969c4561a1d0ad753aa23cee6329a",
+          "url": "https://github.com/libusb/libusb.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/pugixml",
+          "commit": "b2b466403084667c90a0f0cc4e960405cfc8117a",
+          "url": "https://github.com/zeux/pugixml.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/rapidcsv",
+          "commit": "a98b85e663114b8fdc9c0dc03abf22c296f38241",
+          "url": "https://github.com/d99kris/rapidcsv.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/rapidjson",
+          "commit": "7c73dd7de7c4f14379b781418c6e947ad464c818",
+          "url": "https://github.com/Tencent/rapidjson.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/snappy",
+          "commit": "6af9287fbdb913f0794d0148c6aa43b58e63c8e3",
+          "url": "https://github.com/google/snappy.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/tabulate",
+          "commit": "3a58301067bbc03da89ae5a51b3e05b7da719d38",
+          "url": "https://github.com/p-ranav/tabulate.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/tomlplusplus",
+          "commit": "708fff700f36ab3c2ab107b984ec9f3b8be5f055",
+          "url": "https://github.com/marzer/tomlplusplus.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/utfcpp",
+          "commit": "65701fe00700577f9f4e9b96d682bd7cfcc0b76e",
+          "url": "https://github.com/nemtrif/utfcpp.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/xbyak",
+          "commit": "4e44f4614ddbf038f2a6296f5b906d5c72691e0f",
+          "url": "https://github.com/herumi/xbyak.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/xbyak_aarch64",
+          "commit": "59c6a7e7368cd2dbb07c46abe83239ace4d58849",
+          "url": "https://github.com/fujitsu/xbyak_aarch64.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/xxhash",
+          "commit": "e626a72bc2321cd320e953a0ccf1584cad60f363",
+          "url": "https://github.com/Cyan4973/xxHash.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/zarchive",
+          "commit": "b467f7aa342895e66a1a003377ed63b3c1be3de3",
+          "url": "https://github.com/exzap/ZArchive.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/zlib-ng",
+          "commit": "860e4cff7917d93f54f5d7f0bc1d0e8b1a3cb988",
+          "url": "https://github.com/zlib-ng/zlib-ng.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        },
+        {
+          "path": "third_party/zstd",
+          "commit": "20707e3718ee14250fb8a44b3bf023ea36bd88df",
+          "url": "https://github.com/facebook/zstd.git",
+          "license_status": "UNRESOLVED - transitive pin recorded; not integrated or fully audited"
+        }
+      ]
+    },
+    {
+      "id": "plume-unleashed",
+      "url": "https://github.com/renderbag/plume",
+      "local_path": "C:\\Dev\\Fable2NativeRendererResearch\\plume",
+      "branch": "main (object-only historical dependency)",
+      "commit": "11926860e878e68626ea99ec88562ce2b8badc4f",
+      "tree": "7d3b327b32283e9b915a5a55fc31dadf9317304e",
+      "inspection_date": "2026-09-09",
+      "shallow": "false",
+      "available_commit_count": 28,
+      "baseline": "Unleashed dependency, distinct from G1 standalone Plume",
+      "license": {
+        "path": "LICENSE",
+        "assessment": "MIT",
+        "blob": "b05f2417451261d8c8bfa2dc543981c32228e25d"
+      },
+      "dependencies": [
+        {
+          "path": "contrib/D3D12MemoryAllocator",
+          "commit": "9ef66bc14edd10dee0de3a545b98578363552f66",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/D3D12MemoryAllocator",
+          "license_status": "UNRESOLVED - historical dependency pin recorded; root license of component not separately inspected at this revision"
+        },
+        {
+          "path": "contrib/Vulkan-Headers",
+          "commit": "89268a6d17fc87003b209a1422c17ab288be99a0",
+          "url": "https://github.com/KhronosGroup/Vulkan-Headers",
+          "license_status": "UNRESOLVED - historical dependency pin recorded; root license of component not separately inspected at this revision"
+        },
+        {
+          "path": "contrib/VulkanMemoryAllocator",
+          "commit": "29b35ea4232688c0f42cdff0c10848290760a417",
+          "url": "https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator",
+          "license_status": "UNRESOLVED - historical dependency pin recorded; root license of component not separately inspected at this revision"
+        },
+        {
+          "path": "contrib/volk",
+          "commit": "be3dbd49bf77052665e96b6c7484af855e7e5f67",
+          "url": "https://github.com/zeux/volk",
+          "license_status": "UNRESOLVED - historical dependency pin recorded; root license of component not separately inspected at this revision"
+        }
+      ],
+      "initial_status": ""
+    }
+  ],
+  "citations": [
+    {
+      "id": "skate-01",
+      "repository": "skate",
+      "path": "src/skate3_native_render.cpp",
+      "blob": "29d39f1e946ed8aa87aca8a59171fc4f5bb97c07",
+      "symbols": [
+        "sub_82795AD8",
+        "sub_827FAF50",
+        "sub_82B82E08",
+        "OnFrameEnd",
+        "sub_82C9A618",
+        "On2dPhase",
+        "OnDrawDone"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_native_render.cpp"
+    },
+    {
+      "id": "skate-02",
+      "repository": "skate",
+      "path": "src/skate3_native_scene.cpp",
+      "blob": "5a7672b774904e2ee5de7739510348dfa10f174b",
+      "symbols": [
+        "BuildFrameScene",
+        "ToggleSceneEnabled",
+        "ComputeItemFingerprint",
+        "AttribulatorMaterialName",
+        "kViewCameraFromView",
+        "g_scene = std::make_shared<const FrameScene>"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_native_scene.cpp"
+    },
+    {
+      "id": "skate-03",
+      "repository": "skate",
+      "path": "src/skate3_native_scene.h",
+      "blob": "f90267e078f4db7fe3f675eabb8d3b5dc75ddecd",
+      "symbols": [
+        "DrawItem",
+        "FrameScene",
+        "char_family",
+        "diffuse_fetch"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_native_scene.h"
+    },
+    {
+      "id": "skate-04",
+      "repository": "skate",
+      "path": "src/skate3_native_scene_gpu.cpp",
+      "blob": "f2009df6a17cb7b453b4d6c1ca2040838d0d01ea",
+      "symbols": [
+        "RenderScene",
+        "EnsureGuestTextureFromWords",
+        "ReleaseRetiredAndFlushCaches",
+        "YieldForMenus",
+        "YieldForPhotoEditor",
+        "RenderShadowAtlas",
+        "EnsurePipeline",
+        "SetNativeGuestOutputRenderer",
+        "RenderOutlineMask"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_native_scene_gpu.cpp"
+    },
+    {
+      "id": "skate-05",
+      "repository": "skate",
+      "path": "src/native/shaders/scene.hlsl",
+      "blob": "0d7a4c1cec49bcc8041858d88750d7e3b0ed76b9",
+      "symbols": [
+        "vs_main",
+        "ps_main",
+        "flowingwater.fx approximation"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/native/shaders/scene.hlsl"
+    },
+    {
+      "id": "skate-06",
+      "repository": "skate",
+      "path": "src/skate3_native_scene_post.cpp",
+      "blob": "cc81b89328f4dba22d73549650b0e2b150032f43",
+      "symbols": [
+        "PostProcessGuestOutput"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_native_scene_post.cpp"
+    },
+    {
+      "id": "skate-07",
+      "repository": "skate",
+      "path": "CMakeLists.txt",
+      "blob": "07972e0a023f8b675c92adb34c9dee5a017507cf",
+      "symbols": [
+        "SKATE3_NATIVE_SHADER_SOURCES",
+        "EmbedShaders.cmake",
+        "rex::runtime"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/CMakeLists.txt"
+    },
+    {
+      "id": "skate-08",
+      "repository": "skate",
+      "path": "src/skate3_app_common.cpp",
+      "blob": "a9126bfb2035de2030db8d170f5bea724a356995",
+      "symbols": [
+        "ToggleSceneEnabled"
+      ],
+      "url": "https://github.com/mchughalex/skate3recomp/blob/f6e0ae87fdfecbadb5c1e36c55d66a744187a3cd/src/skate3_app_common.cpp"
+    },
+    {
+      "id": "skate-sdk-09",
+      "repository": "skate-sdk",
+      "path": "include/rex/graphics/native_guest_renderer.h",
+      "blob": "a2ce48c6832dcb1773c096d433710768d043433f",
+      "symbols": [
+        "NativeGuestOutputRenderContext",
+        "NativeGuestOutputRenderer"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/include/rex/graphics/native_guest_renderer.h"
+    },
+    {
+      "id": "skate-sdk-10",
+      "repository": "skate-sdk",
+      "path": "src/graphics/native_guest_renderer.cpp",
+      "blob": "dd391160364dd6e3669bd55e9f00fdade43797de",
+      "symbols": [
+        "TryRenderNativeGuestOutput",
+        "ShouldSuppressEmulatedDraws",
+        "ShouldSuppressPassAtPitch"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/src/graphics/native_guest_renderer.cpp"
+    },
+    {
+      "id": "skate-sdk-11",
+      "repository": "skate-sdk",
+      "path": "src/graphics/d3d12/command_processor.cpp",
+      "blob": "1f4f04c34c31e423ea1fc4b2cd32d1ff66441b82",
+      "symbols": [
+        "TryRenderNativeGuestOutput",
+        "NativeRhiBeginFrame",
+        "ShouldSuppressPassAtPitch",
+        "active_occlusion_query_"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/src/graphics/d3d12/command_processor.cpp"
+    },
+    {
+      "id": "skate-sdk-12",
+      "repository": "skate-sdk",
+      "path": "src/graphics/vulkan/command_processor.cpp",
+      "blob": "69863ce540be9fca75ec03319f50d82b194dd3f9",
+      "symbols": [
+        "TryRenderNativeGuestOutput",
+        "ShouldSuppressPassAtPitch"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/src/graphics/vulkan/command_processor.cpp"
+    },
+    {
+      "id": "skate-sdk-13",
+      "repository": "skate-sdk",
+      "path": "include/rex/graphics/native_rhi.h",
+      "blob": "d2bdcd4357ab510bd5472ade0bd752d399708915",
+      "symbols": [
+        "CurrentSubmission",
+        "DestroyDeferred",
+        "Barrier"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/include/rex/graphics/native_rhi.h"
+    },
+    {
+      "id": "skate-sdk-14",
+      "repository": "skate-sdk",
+      "path": "src/graphics/d3d12/native_rhi_d3d12.cpp",
+      "blob": "cc9175ee712a169bdbc65f5938ecf6b077f5783d",
+      "symbols": [
+        "NativeRhiBeginFrame",
+        "CreateShader",
+        "D3DCompile"
+      ],
+      "url": "https://github.com/mchughalex/rexglue-skate3/blob/7eb0faf7787f5e01333c228b8e3f03c32f7295ea/src/graphics/d3d12/native_rhi_d3d12.cpp"
+    },
+    {
+      "id": "unleashed-15",
+      "repository": "unleashed",
+      "path": "UnleashedRecomp/gpu/video.cpp",
+      "blob": "a9edd0b39335f7af8764620b10d5eb75f8cb85d6",
+      "symbols": [
+        "CreateDevice",
+        "CreateShader",
+        "FindShaderCacheEntry",
+        "RenderCommand",
+        "ProcUnlockTextureRect",
+        "ProcDestructResource",
+        "FlushRenderStateForMainThread",
+        "Video::Present",
+        "ProcExecutePendingStretchRectCommands",
+        "GUEST_FUNCTION_HOOK(sub_82BE5CF0, DrawIndexedPrimitive)",
+        "GetOrLinkShader",
+        "g_renderThread"
+      ],
+      "url": "https://github.com/hedge-dev/UnleashedRecomp/blob/cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c/UnleashedRecomp/gpu/video.cpp"
+    },
+    {
+      "id": "unleashed-16",
+      "repository": "unleashed",
+      "path": "UnleashedRecomp/gpu/video.h",
+      "blob": "6c24d3014107a8c3d451255b0583ebf35643b815",
+      "symbols": [
+        "GuestDevice",
+        "GuestTexture",
+        "GuestResource"
+      ],
+      "url": "https://github.com/hedge-dev/UnleashedRecomp/blob/cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c/UnleashedRecomp/gpu/video.h"
+    },
+    {
+      "id": "unleashed-17",
+      "repository": "unleashed",
+      "path": "UnleashedRecomp/kernel/function.h",
+      "blob": "7c6beee16724af141edc1d9a28995513bdbeb04d",
+      "symbols": [
+        "GUEST_FUNCTION_HOOK",
+        "HostToGuestFunction"
+      ],
+      "url": "https://github.com/hedge-dev/UnleashedRecomp/blob/cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c/UnleashedRecomp/kernel/function.h"
+    },
+    {
+      "id": "unleashed-18",
+      "repository": "unleashed",
+      "path": "UnleashedRecomp/patches/video_patches.cpp",
+      "blob": "a2320b37ba215ac3cfecd28f286bb22beb923b0a",
+      "symbols": [
+        "RemoveMoviePlayerLetterboxMidAsmHook"
+      ],
+      "url": "https://github.com/hedge-dev/UnleashedRecomp/blob/cf829a9eca8fb680fba4b0409ddeb6ca92f22e3c/UnleashedRecomp/patches/video_patches.cpp"
+    },
+    {
+      "id": "xenosrecomp-19",
+      "repository": "xenosrecomp",
+      "path": "XenosRecomp/shader_recompiler.cpp",
+      "blob": "698a4189f877c386eff4ce4dd93ecc127b33a447",
+      "symbols": [
+        "UNLEASHED_RECOMP"
+      ],
+      "url": "https://github.com/hedge-dev/XenosRecomp/blob/990d03b28a27b50277ee5d8d942e1c5f873869d1/XenosRecomp/shader_recompiler.cpp"
+    },
+    {
+      "id": "xenosrecomp-20",
+      "repository": "xenosrecomp",
+      "path": "XenosRecomp/main.cpp",
+      "blob": "d0151455fc6c700fd39a4b52f276fe70942fff45",
+      "symbols": [
+        "XXH3_64bits"
+      ],
+      "url": "https://github.com/hedge-dev/XenosRecomp/blob/990d03b28a27b50277ee5d8d942e1c5f873869d1/XenosRecomp/main.cpp"
+    },
+    {
+      "id": "xenosrecomp-21",
+      "repository": "xenosrecomp",
+      "path": "README.md",
+      "blob": "506d9d2524cd7c6732071ad0d41a31e1643416f3",
+      "symbols": [
+        "Dynamic register indexing is unimplemented",
+        "Memory export"
+      ],
+      "url": "https://github.com/hedge-dev/XenosRecomp/blob/990d03b28a27b50277ee5d8d942e1c5f873869d1/README.md"
+    },
+    {
+      "id": "plume-22",
+      "repository": "plume",
+      "path": "plume_d3d12.cpp",
+      "blob": "2cdcf18f3b2e1729c2ff63684329c9c26770748c",
+      "symbols": [
+        "D3D12CommandList::barriers",
+        "D3D12CommandQueue::executeCommandLists"
+      ],
+      "url": "https://github.com/renderbag/plume/blob/d890ac899e505fb30040e037a4037cdeca68f033/plume_d3d12.cpp"
+    },
+    {
+      "id": "plume-23",
+      "repository": "plume",
+      "path": "plume_vulkan.cpp",
+      "blob": "f1dd5032706fe9396c42b1a25075b11ffb308a3d",
+      "symbols": [
+        "VulkanCommandList::barriers",
+        "VulkanCommandQueue::executeCommandLists"
+      ],
+      "url": "https://github.com/renderbag/plume/blob/d890ac899e505fb30040e037a4037cdeca68f033/plume_vulkan.cpp"
+    },
+    {
+      "id": "plume-24",
+      "repository": "plume",
+      "path": "CMakeLists.txt",
+      "blob": "0789c20371005833919d8e1045a9370ce45eb3b4",
+      "symbols": [
+        "PLUME_BUILD_EXAMPLES",
+        "D3D12MemAlloc.cpp",
+        "plume_vulkan.cpp"
+      ],
+      "url": "https://github.com/renderbag/plume/blob/d890ac899e505fb30040e037a4037cdeca68f033/CMakeLists.txt"
+    },
+    {
+      "id": "plume-25",
+      "repository": "plume",
+      "path": "README.md",
+      "blob": "27f51ae7e615171900a78b70efec6e1d8fc59bb1",
+      "symbols": [
+        "stable API",
+        "barrier management"
+      ],
+      "url": "https://github.com/renderbag/plume/blob/d890ac899e505fb30040e037a4037cdeca68f033/README.md"
+    },
+    {
+      "id": "pgr4-26",
+      "repository": "pgr4",
+      "path": "Future-plans.md",
+      "blob": "e23a764fc990b4f28a7f225a2d3de92b1cd11854",
+      "symbols": [
+        "Native Renderer"
+      ],
+      "url": "https://github.com/beatrixzy/PGR4-Recomp/blob/464cc5b62527755d6a365b36a0e40ff843d722e9/Future-plans.md"
+    },
+    {
+      "id": "pgr4-27",
+      "repository": "pgr4",
+      "path": "Status.md",
+      "blob": "a230b1176a0348c0827758a47e750fadd604be31",
+      "symbols": [
+        "v2.1 - Native Renderer"
+      ],
+      "url": "https://github.com/beatrixzy/PGR4-Recomp/blob/464cc5b62527755d6a365b36a0e40ff843d722e9/Status.md"
+    },
+    {
+      "id": "pgr4-28",
+      "repository": "pgr4",
+      "path": "CMakeLists.txt",
+      "blob": "e9221e74aa23c1256e5cfe0fbd30c3ea307f021e",
+      "symbols": [
+        "rexglue_setup_target"
+      ],
+      "url": "https://github.com/beatrixzy/PGR4-Recomp/blob/464cc5b62527755d6a365b36a0e40ff843d722e9/CMakeLists.txt"
+    },
+    {
+      "id": "sdk-29",
+      "repository": "sdk",
+      "path": "src/graphics/d3d12/command_processor.cpp",
+      "blob": "19874a530dbe3d4bedf78053442d5b34695fef24",
+      "symbols": [
+        "D3D12CommandProcessor::IssueDraw",
+        "D3D12CommandProcessor::EndSubmission",
+        "D3D12CommandProcessor::UpdateBindings",
+        "D3D12CommandProcessor::CheckSubmissionFence"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/d3d12/command_processor.cpp"
+    },
+    {
+      "id": "sdk-30",
+      "repository": "sdk",
+      "path": "src/graphics/command_processor.cpp",
+      "blob": "a74437566e952ee32ffc2761bed766aa3ba0c45e",
+      "symbols": [
+        "CommandProcessor::ExecutePacketType3",
+        "CommandProcessor::ExecutePacketType3_XE_SWAP"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/command_processor.cpp"
+    },
+    {
+      "id": "sdk-31",
+      "repository": "sdk",
+      "path": "src/graphics/d3d12/pipeline_cache.cpp",
+      "blob": "8e6b854b28f92d2d128c1e70080e44750329b12f",
+      "symbols": [
+        "PipelineCache::LoadShader",
+        "PipelineCache::ConfigurePipeline"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/d3d12/pipeline_cache.cpp"
+    },
+    {
+      "id": "sdk-32",
+      "repository": "sdk",
+      "path": "src/graphics/pipeline/shader/translator.cpp",
+      "blob": "e472251f476b133b1ba90d669db3cfc92a596eb6",
+      "symbols": [
+        "Shader::AnalyzeUcode"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/pipeline/shader/translator.cpp"
+    },
+    {
+      "id": "sdk-33",
+      "repository": "sdk",
+      "path": "src/graphics/pipeline/texture/cache.cpp",
+      "blob": "76f5600cf7b950b0469cf926ecd76ff578e80f24",
+      "symbols": [
+        "TextureCache::RequestTextures",
+        "TextureCache::BindingInfoFromFetchConstant"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/pipeline/texture/cache.cpp"
+    },
+    {
+      "id": "sdk-34",
+      "repository": "sdk",
+      "path": "src/graphics/d3d12/render_target_cache.cpp",
+      "blob": "dd321a5f5820d7f1f0d5958a7d66485e7403669a",
+      "symbols": [
+        "D3D12RenderTargetCache::Resolve",
+        "render_target_path_d3d12"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/d3d12/render_target_cache.cpp"
+    },
+    {
+      "id": "sdk-35",
+      "repository": "sdk",
+      "path": "src/graphics/pipeline/render_target/cache.cpp",
+      "blob": "953c5fd4cff4f9b4bfac546fdbd06d03cd0994f4",
+      "symbols": [
+        "RenderTargetCache::Update",
+        "RenderTargetCache::ChangeOwnership"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/pipeline/render_target/cache.cpp"
+    },
+    {
+      "id": "sdk-36",
+      "repository": "sdk",
+      "path": "src/graphics/util/draw.cpp",
+      "blob": "305380e99599bf1e0fa5731d3bd32e0a7d9330e1",
+      "symbols": [
+        "GetResolveInfo"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/util/draw.cpp"
+    },
+    {
+      "id": "sdk-37",
+      "repository": "sdk",
+      "path": "src/graphics/shared_memory.cpp",
+      "blob": "ec0df7c81818347935dd79f03787f7a3142dac17",
+      "symbols": [
+        "SharedMemory::RequestRanges",
+        "SharedMemory::RangeWrittenByGpu",
+        "SharedMemory::MemoryInvalidationCallback"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/shared_memory.cpp"
+    },
+    {
+      "id": "sdk-38",
+      "repository": "sdk",
+      "path": "src/ui/d3d12/d3d12_provider.cpp",
+      "blob": "bf8252b10fe920d1ade24fc1846612a3ce916553",
+      "symbols": [
+        "D3D12Provider::Initialize"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/ui/d3d12/d3d12_provider.cpp"
+    },
+    {
+      "id": "sdk-39",
+      "repository": "sdk",
+      "path": "src/ui/d3d12/d3d12_presenter.cpp",
+      "blob": "306118eec4e23646e5bacb77aa0b9468e60b6137",
+      "symbols": [
+        "D3D12Presenter::PaintAndPresentImpl"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/ui/d3d12/d3d12_presenter.cpp"
+    },
+    {
+      "id": "sdk-40",
+      "repository": "sdk",
+      "path": "src/ui/presenter.cpp",
+      "blob": "7360ed98ba3fa923789f4035c1e7a7c10bfdb2c1",
+      "symbols": [
+        "Presenter::RefreshGuestOutput",
+        "Presenter::ExecuteUIDrawersFromUIThread"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/ui/presenter.cpp"
+    },
+    {
+      "id": "sdk-41",
+      "repository": "sdk",
+      "path": "src/graphics/graphics_system.cpp",
+      "blob": "8f2fcb0b69b1359f80b02c304c1fe06e0c092552",
+      "symbols": [
+        "GraphicsSystem::SetupGuestGpu",
+        "GraphicsSystem::Shutdown",
+        "GraphicsSystem::OnHostGpuLossFromAnyThread"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/graphics/graphics_system.cpp"
+    },
+    {
+      "id": "sdk-42",
+      "repository": "sdk",
+      "path": "src/ui/rex_app.cpp",
+      "blob": "b94fe9e4814b7e66305d3b983732aebdfb0bced4",
+      "symbols": [
+        "ReXApp::SetupPresentation",
+        "ReXApp::OnClosing"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/src/ui/rex_app.cpp"
+    },
+    {
+      "id": "sdk-43",
+      "repository": "sdk",
+      "path": "include/rex/system/gpu_plugin.h",
+      "blob": "453c21009530c362ba3f8874ceb5871187b6d0d4",
+      "symbols": [
+        "GpuCreateInfo",
+        "kGpuPluginAbiVersion"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/include/rex/system/gpu_plugin.h"
+    },
+    {
+      "id": "sdk-44",
+      "repository": "sdk",
+      "path": "include/rex/system/interfaces/graphics.h",
+      "blob": "d54df8669311a6f6518eab2477bf166008a25775",
+      "symbols": [
+        "IGraphicsSystem"
+      ],
+      "url": "https://github.com/FenrisSkoll/rexglue-sdk/blob/fc5a00b31f702e82377aa1010395af7ba8cff4f7/include/rex/system/interfaces/graphics.h"
+    }
+  ],
+  "preserved_manifest_sha256": "EF1656D77D270F207C4A16D3B92D5B86C4414CE38292D079AEF52B120CE778E1",
+  "libmspack_worktree_sha256": {
+    "cabextract/mspack/ChangeLog": "B9E35458ABEDDE7086457E3D10284CF9204F353C9D2C9961A4D1FB96E89BC01D",
+    "cabextract/mspack/cab.h": "CFA1FB317B4F6418FF848C1630D45BEED4A165780D40B51C45448B8D9382B4D1",
+    "cabextract/mspack/cabd.c": "863FD5339BE807F7BEF396A7FF565A26F1A9D0E6E534BCDCDAF2CC52027735EB",
+    "cabextract/mspack/lzx.h": "3FAB60D43D09AEC570558125E4F6C391A69FC906738EF5FE56E15F22027BDDF5",
+    "cabextract/mspack/lzxd.c": "2ADA35D1FA8855BBCC645234D5745EBA90F8C37D7C8A694A22DF3B1159C6E21F",
+    "cabextract/mspack/macros.h": "31E34DF474E5B2E5781AE2ED52C329C9F4E6EB8FE935139200F566253E6A8436",
+    "cabextract/mspack/mspack.h": "E651545F9619F74E2AE3416895E243072B400E47E494426007BA1503A0DC2921",
+    "cabextract/mspack/mszip.h": "2C2965DBFF4F363D905E4103782094A6E9753979DD9A45AE7B935254240F581F",
+    "cabextract/mspack/mszipd.c": "F64E1A4FB7304BA485AD78E1705C22485DF28B54FD987604F325AE1082BE2ECF",
+    "cabextract/mspack/qtm.h": "E5E0A27721AB3D26C6322CFCC01BD19750852476FB157E6738115BB2C488466A",
+    "cabextract/mspack/qtmd.c": "49E006AE055249A6000A523AAFFFC634ABAD7698135E9A2FDC3AB4010A2EA837",
+    "cabextract/mspack/readbits.h": "FE0FF476FD8AD602A1EB1A6D3131AFA43210FC2FB7DD230A806A0FE2C7F51618",
+    "cabextract/mspack/readhuff.h": "E2217871A1446E8881F9013280F6532B0D65DA7FDAEB08762CFDEA9B42A10546",
+    "cabextract/mspack/system.c": "27B6921B4859346A7992148DABDF9A9480735552F790054D7E2DA3AF31B77389",
+    "cabextract/mspack/system.h": "62E06060EE7F1CF0D254A0D0C8751C23BADAA28FC339FC10E74BBF560A1B5D9D"
+  },
+  "historical_identities": {
+    "g1": "c44e8c16f4422f9a828caf30899ac989170b8a8c",
+    "g16b": "cd440652451e558b88ba50402721e4cbe82b9a90",
+    "g2a_retirement": "7e8d9e92fff5ca766f9aa12506b6205868e34f62",
+    "research_integration": "8d1b10d9f56905b0aa518621614d51beda60c962",
+    "sdk_reference": "956c6a8b5da4c54b9899a2593e9c67c26de30194",
+    "tu1_post_patch_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "gpu_dll_sha256": "8232051BED6E5CE99CF37B2EF581C824F58875C140A4D3C75DE14E8A5DF4AA99",
+    "gpu_dll_bytes": 2770944,
+    "exe_sha256": "EEACEAA8DB38E728B79F4F78B0298B7036E13EB4903518C503199697FA64AE6F",
+    "missing_logs": [
+      "fable2-run-047.1.log",
+      "fable2-run-047.log",
+      "fable2-run-048.log"
+    ]
+  },
+  "current_disk_artifacts": [
+    {
+      "path": "out/build/win-amd64-release/fable2.exe",
+      "bytes": 105042944,
+      "sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9",
+      "status": "SOURCE-CONFIRMED disk file; not loaded or executed by NR0A"
+    },
+    {
+      "path": "out/build/win-amd64-release/rexgpu-xenos.dll",
+      "bytes": 2770944,
+      "sha256": "70492C8612DEF79C9E3946817F424111FAB2155A3BE63CEA6E717CA73893ADC5",
+      "status": "SOURCE-CONFIRMED disk file; not loaded or executed by NR0A"
+    },
+    {
+      "path": "out/build/win-amd64-release/rexruntime.dll",
+      "bytes": 10332160,
+      "sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+      "status": "SOURCE-CONFIRMED disk file; not loaded or executed by NR0A"
+    }
+  ]
+}

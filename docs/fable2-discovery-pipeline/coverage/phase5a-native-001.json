@@ -17,10 +17,35 @@
       "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\Launch.ps1",
       "role": "launch command card",
       "sha256": "CB876E02B86F6CD1E583958DDD59BBBE92618E5103A823EDBE920A693A9FA8DB"
+    },
+    {
+      "bytes": 948,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\invocation.json",
+      "role": "native invocation",
+      "sha256": "947D7823B04D8CEB774A9D29EEA30EE060EFF4ED5079F37904FA33B5422AB64B"
+    },
+    {
+      "bytes": 1105403,
+      "path": "C:\\Dev\\Fable2Recomp\\fable2-run-002.log",
+      "role": "native runtime log",
+      "sha256": "2F214CC13C482A5B35FD70265DBF0CF047F8BA675C0F35FC4396E5E13316D516"
+    },
+    {
+      "bytes": 3506,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\closeout\\native-log-review.json",
+      "role": "native log review",
+      "sha256": "56BB5867D618FBF3E5E92B921C359C2B67725DF91ACAF0A81616BA15C00EFED1"
+    },
+    {
+      "bytes": 3527,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\closeout\\native-endpoint-inventory.json",
+      "role": "preserved native endpoint inventory",
+      "sha256": "53B9E67F28F66A8676888826D4BF9A03B638914BEEF05EBFCDCE1E4EFE15446F"
     }
   ],
   "build": {
     "branch": "fable2-phase5a-runtime-coverage",
+    "closeout_executable_hash_verified": true,
     "executable": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\fable2.exe",
     "executable_sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9",
     "fault_walk": false,
@@ -30,6 +55,7 @@
     "manifest_sha256": "07B142A69AB3400BEF72086C65B052A3B18CAC8BAAD03E8A720FD1E2F0648330",
     "sdk_head": "fc5a00b31f702e82377aa1010395af7ba8cff4f7",
     "sdk_tree": "903af44f9aab5684443ddb22e505b0ea811d45d2",
+    "source_validation_reused": "Recorded successful generation/build, 98 Python tests and SDK 1764 passes/4 skips; executable identical and tested source unchanged. Pre-existing manifest edit removes one blank line only; TOML values equal tested committed manifest.",
     "tree": "2b0ee576bf8a564d6f05e1f0003cd804e4b6adc7"
   },
   "configuration": {
@@ -45,34 +71,122 @@
     "user_data_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data"
   },
   "handoff": {
-    "end_save_source": null,
+    "copy_validation": "Exact full-root path sets, sizes and hashes; no source moved or overwritten",
+    "end_save_source": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data",
+    "inventory": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\closeout\\native-endpoint-inventory.json",
+    "mainsave": {
+      "bytes": 415039,
+      "mtime_ns": 1788984270853287400,
+      "sha256": "13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489"
+    },
     "native_destination": null,
     "next_session": null,
-    "preserved_endpoint": null
+    "next_tranche_started": false,
+    "preserved_endpoint": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001-native\\user-data"
   },
   "limitations": [
-    "Not launched; no native endpoint gameplay outcome is claimed.",
-    "Short load/control/basic-interaction/save/exit test only; full preceding reference tranche will not be replayed."
+    "Bowerstone Market to Oakfield was covered in the reference runtime; only the transferred Oakfield endpoint was smoke-tested natively. Full native replay parity is not claimed.",
+    "The three reference visual defects remain outstanding and non-blocking; endpoint success does not show they were fixed.",
+    "Gameplay tracing overhead and quantitative native performance remain unmeasured.",
+    "Invocation exit code is null and end timestamp precedes application logging; no captured OS exit status or process lifetime.",
+    "Saving is user-confirmed; unchanged payload contents/timestamps and available log do not independently prove a fresh persisted save write."
   ],
   "outcome": {
-    "fatal_or_guest_exception": null,
-    "hang": null,
-    "interaction_progression": null,
-    "invalid_target": null,
-    "loading_transition": null,
-    "rendering": null,
-    "result": null,
-    "save_reload_exit": null
+    "fatal_or_guest_exception": "None reported; no fatal/critical, unhandled exception or access-violation diagnostic found",
+    "hang": "None reported; normal shutdown path logged",
+    "interaction_progression": "Control and basic interaction worked, user confirmed; no full-tranche progression claim",
+    "invalid_target": "None reported; no invalid/unregistered function-target diagnostic found",
+    "loading_transition": "Transferred save loaded successfully, user confirmed; no extra transition confirmed",
+    "log_review": {
+      "fatal_invalid_target_matches": 0,
+      "first_log_timestamp_local": "2026-09-09 21:51:01.059",
+      "invocation": {
+        "arguments": [
+          "--game_data_root",
+          "C:\\Dev\\Fable2Recomp\\assets\\runtime",
+          "--update_data_root",
+          "C:\\Dev\\Fable2Recomp\\assets\\update",
+          "--user_data_root",
+          "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data",
+          "--gpu_plugin=xenos",
+          "--log_level",
+          "debug",
+          "--log_file",
+          "C:\\Dev\\Fable2Recomp\\fable2-run-002.log"
+        ],
+        "executable": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\fable2.exe",
+        "executable_sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9",
+        "exit_code": null,
+        "log": "C:\\Dev\\Fable2Recomp\\fable2-run-002.log",
+        "process_end_utc": "2026-09-09T20:51:01.0320820Z",
+        "process_start_utc": "2026-09-09T20:51:00.9939640Z",
+        "runtime": "native_normal",
+        "session_id": "phase5a-native-001",
+        "user_data_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data"
+      },
+      "last_log_timestamp_local": "2026-09-09 21:52:23.294",
+      "limitations": [
+        "invocation process_end_utc precedes first application log; not a valid process termination timestamp",
+        "exit_code is null; no captured OS process exit status",
+        "runtime log confirms reaching normal termination path, whose pinned SDK source flushes logging and calls std::_Exit(0); user independently confirms normal exit",
+        "logs do not independently establish gameplay location, control responsiveness or successful game-level saving; user supplies those observations"
+      ],
+      "log_lines": 9332,
+      "logged_window_seconds": 82.235,
+      "severity_messages": {
+        "critical": {},
+        "error": {
+          "sys: BaseHeap::AllocFixed attempting to reserve an already reserved range": 3856
+        },
+        "fatal": {},
+        "warning": {
+          "core: SDL GameControllerDB: file 'gamecontrollerdb.txt' does not exist.": 1,
+          "fs: Attempted to open read-only file/dir for write: D:\\lhdebug.log": 1,
+          "krnl: [NtCreateFile] FAILED: path='D:\\lhdebug.log' -> 0xc0000022": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\build_version.txt' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\episodic_exec.txt' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\cs-cz\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\en-uk\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\hu-hu\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\ko-kr\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\pl-pl\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\sk-sk\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='game:\\data\\language\\zh-cht\\lang.ini' -> 0xc000000f": 1,
+          "krnl: [NtCreateFile] FAILED: path='update:\\build_version.txt' -> 0xc000000f": 1
+        }
+      },
+      "shutdown_lines": {
+        "9320": "[2026-09-09 21:52:23.094] [info] [core] [t3472] Window closing, shutting down...",
+        "9321": "[2026-09-09 21:52:23.094] [debug] [sys] [t3472] KernelState::TerminateTitle",
+        "9332": "[2026-09-09 21:52:23.294] [info] [core] [t3472] Title terminated; hard-exiting process."
+      }
+    },
+    "rendering": "No additional problem noticed during short test; reference Spire cutoff, elongated dog shadows and excessive moon bloom remain outstanding non-blocking defects",
+    "result": "native_endpoint_smoke_passed_user_confirmed_and_log_corroborated",
+    "save_evidence": "Closed runtime root copied exactly; only pipeline-cache contents differ from initial root, save payload unchanged",
+    "save_reload_exit": "Saving and normal exit worked, user confirmed. Log corroborates normal close path; all seven payload files and timestamps remain unchanged, so no fresh persisted save write is independently demonstrated. No separate post-save reload performed."
   },
-  "performance_observations": [],
+  "performance_observations": [
+    {
+      "collector_overhead": null,
+      "frame_time_distribution": null,
+      "limitation": "Endpoint smoke is not a quantitative performance benchmark; gameplay tracing overhead remains unmeasured.",
+      "measured_fps": null,
+      "observation": "No additional problem was noticed during this short test.",
+      "source": "user_report",
+      "subjective": true
+    }
+  ],
   "runtime": "native_normal",
   "schema_version": 1,
   "session_id": "phase5a-native-001",
   "shutdown": {
+    "exit_code": null,
     "flush_reason": null,
     "footer_count": null,
-    "user_report": null,
-    "validation": null
+    "invocation_limitation": "process_end_utc predates first native log entry and is unusable as an exit time; exit_code is null. Original record retained unchanged.",
+    "user_report": "Normal exit worked.",
+    "validation": "Runtime log reaches Window closing, shutting down..., KernelState::TerminateTitle, Title terminated; hard-exiting process. Pinned SDK normal OnClosing then flushes logging and calls std::_Exit(0). OS process exit code not captured."
   },
   "starting_checkpoint": {
     "area": "Oakfield tavern",
@@ -86,19 +200,37 @@
     "source_reference_session": "phase5a-reference-001",
     "writable_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data"
   },
-  "status": "prepared",
+  "status": "analysed",
   "target_review": {
     "applied_changes": [],
     "classifications": {},
     "known_targets": null,
+    "native_target_counts_measured": false,
     "new_pairs": null,
-    "new_targets": null
+    "new_targets": null,
+    "reference_session": "phase5a-reference-001",
+    "reference_totals_unchanged": {
+      "existing_registrations": 323,
+      "missing_thunks": 1,
+      "new_targets": 479,
+      "only_added_target": "0x825E28B0",
+      "repeat_targets": 15560,
+      "return_continuations": 68,
+      "size": "0x10",
+      "switch_blocks": 87
+    }
   },
   "timing": {
+    "invocation_recorded_end_is_valid_process_exit": false,
+    "invocation_recorded_end_utc": "2026-09-09T20:51:01.0320820Z",
+    "invocation_recorded_start_utc": "2026-09-09T20:51:00.9939640Z",
+    "log_first_local": "2026-09-09 21:51:01.059",
+    "log_last_local": "2026-09-09 21:52:23.294",
+    "logged_window_seconds": 82.235,
     "process_end_utc": null,
     "process_start_utc": null,
     "sampling_seconds": null,
-    "source": null
+    "source": "Invocation marks launch preparation/early return, not measured process lifetime. Runtime log timestamps delimit logged activity only."
   },
   "title_identity": {
     "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
@@ -125,7 +257,7 @@
     "image_base": "0x82000000",
     "image_size": "0x01620000",
     "media_id": "0x716F0A0D",
-    "observed_tu1_confirmed": null,
+    "observed_tu1_confirmed": true,
     "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
     "shared_evidence_path": "tools/fable2-entrypoint-closure-evidence.json",
     "shared_evidence_sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E",
@@ -138,8 +270,15 @@
     "xenia_module_fingerprint_algorithm": "sha1_contiguous_loaded_executable_memory"
   },
   "user_coverage": {
-    "areas": [],
-    "categories": [],
-    "confirmation": null
+    "areas": [
+      "Oakfield tavern"
+    ],
+    "categories": [
+      "save_load",
+      "control_basic_interaction",
+      "save",
+      "orderly_exit"
+    ],
+    "confirmation": "The `phase5a-native-001` endpoint smoke test worked fine:\n\n* Transferred Oakfield tavern save loaded successfully.\n* Control and basic interaction worked.\n* Saving worked.\n* Normal exit worked.\n* No additional problem was noticed during this short test."
   }
 }

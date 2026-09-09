@@ -23,6 +23,12 @@ records evidence; it neither launches a runtime nor applies an import.
 - `timing` separates process lifetime from the gameplay sampling window.
   Use null without reliable evidence. Collector sequences are per-thread
   counters, not timestamps or frame counts.
+  The native tranche-001 launch card returned before the GUI application's
+  first log entry: its recorded `process_end_utc` is not a process-exit time
+  and `exit_code` is null. Preserve the original invocation record, annotate
+  those fields as unusable, and use the identified runtime log for lifecycle
+  evidence. A future launcher must wait on an actual process handle before
+  claiming process duration or exit status; `$LASTEXITCODE` alone is not proof.
 - `shutdown` separates user-reported clean exit from validated raw footer
   evidence. Require exactly one normal schema-2 footer, matching run/build,
   complete checkpoint accounting, newline termination and zero loss/error

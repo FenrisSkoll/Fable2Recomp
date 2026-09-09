@@ -190,12 +190,14 @@
     },
     "native_destination": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data",
     "native_metadata_source": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\start-001\\native-save",
+    "native_smoke_result": "User confirmed load, control/basic interaction, saving and normal exit; native log corroborates startup and normal close path.",
     "next_session": "phase5a-native-001",
     "payload_files_copied": 7,
-    "preserved_endpoint": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001\\xenia-content"
+    "preserved_endpoint": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001\\xenia-content",
+    "preserved_native_endpoint": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001-native\\user-data"
   },
   "limitations": [
-    "Earlier events were reference-covered and statically/build validated but not immediately replay-validated in the native recompilation; endpoint smoke is pending.",
+    "Earlier events were reference-covered and statically/build validated but not immediately replay-validated in the native recompilation; the transferred Oakfield endpoint smoke test passed in phase5a-native-001.",
     "Coverage is user-confirmed only; no full native parity or whole-game claim.",
     "Collector-off/on controlled gameplay overhead and current normal-native FPS remain unmeasured. No historical instrumented 4\u00e2\u20ac\u201c5 FPS claim is assigned to this normal build.",
     "Reported visual defects are non-blocking rendering observations, not performance complaints.",

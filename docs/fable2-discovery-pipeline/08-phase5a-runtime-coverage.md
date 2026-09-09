@@ -1,14 +1,14 @@
 # Phase 5A: first forward-only coverage tranche
 
-## Status: reference processed; native endpoint smoke pending
+## Status: tranche 001 complete; historical preparation record
 
-Preparation date: 2026-09-09. **Phase 5A is not complete.** The completed
+Preparation date: 2026-09-09. **Phase 5A tranche 001 is complete.** The completed
 Bowerstone Market-to-Oakfield tavern reference session, reviewed thunk import,
-coverage matrix, save handoff and current native run card are recorded in the
+coverage matrix, save handoff and successful native endpoint result are recorded in the
 [tranche report](09-phase5a-tranche-001.md). That report supersedes the pending
-items in this historical preparation record. Only the short native endpoint
-load/control/basic-interaction/save/exit smoke test remains; no full replay is
-required. The sections below preserve the pre-run baseline and preparation.
+items in this historical preparation record. The user confirmed endpoint
+load/control/basic-interaction/save/exit; no full replay was required or claimed.
+The sections below preserve the pre-run baseline and preparation.
 
 ## Reconstructed baseline
 
@@ -241,10 +241,9 @@ optimization or new performance instrumentation is introduced.
 
 ## Remaining gate and next forward-only tranche
 
-Reference processing and the isolated endpoint handoff are now complete.
-The remaining dependency is the short Oakfield tavern native smoke test in
-the [tranche report](09-phase5a-tranche-001.md). Do not repeat the reference
-run card above or replay its complete gameplay section.
+Reference processing, isolated endpoint handoff and the short Oakfield tavern
+native smoke test are complete; see the [tranche report](09-phase5a-tranche-001.md).
+Do not repeat the reference run card above or replay its complete gameplay section.
 
 The earlier Xenia events will be **reference-covered and statically/build
 validated but not immediately replay-validated in the recompilation**. This

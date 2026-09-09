@@ -4,8 +4,11 @@
 
 2026-09-09: reference processing, conservative review, one justified thunk
 import, regeneration, normal build and isolated save handoff are complete.
-**Phase 5A remains pending the user-performed native endpoint smoke test.**
-No native gameplay result is inferred from compilation.
+**Phase 5A tranche 001 is complete.** The user confirmed the transferred
+Oakfield endpoint loaded, control/basic interaction and saving worked, and
+normal exit succeeded, with no additional problem noticed. The identified
+native log supports startup and the normal shutdown path. Gameplay success
+is user-observed, not inferred from compilation or log duration.
 
 The authoritative reference boundaries are **Bowerstone Market → Oakfield
 tavern**. Childhood was already completed. The starting fountain wait of
@@ -25,7 +28,7 @@ Durable evidence:
   [readable table](coverage/phase5a-reference-001-ownership/ownership-ledger.md),
   [annotation-only reviewed companion](coverage/phase5a-reference-001-ownership/ownership-reviewed-import-plan.json).
 - [Individually reviewed thunk](coverage/phase5a-825E28B0-review.json).
-- [Prepared native endpoint session](coverage/phase5a-native-001.json).
+- [Completed native endpoint session](coverage/phase5a-native-001.json).
 - [Reusable workflow and session contract](coverage/README.md) and
   [baseline reconstruction/preparation](08-phase5a-runtime-coverage.md).
 
@@ -53,6 +56,18 @@ precise crowd density are not independently confirmed. Timed/scripted quest
 progression completed, but no exact NPC appearance latency was measured.
 The Old Town visit was forward progression from the adult Market checkpoint,
 not a replay of childhood.
+
+The separate native endpoint coverage is deliberately narrower:
+
+| Category | User-confirmed `phase5a-native-001` result |
+| --- | --- |
+| Transferred save loading | Oakfield tavern save loaded successfully |
+| Control and basic interaction | Worked |
+| Saving | Worked according to user; no fresh payload write independently demonstrated |
+| Normal exit | Worked; runtime log also reaches window-close/title-termination path |
+
+No nearby transition or preceding Market-to-Oakfield event is claimed as
+native-covered. No additional problem was noticed during this short test.
 
 ## Reference provenance and shutdown
 
@@ -260,7 +275,7 @@ python tools/Fable2OwnershipCorroboration.py `
     --check
 ```
 
-## Endpoint handoff and native run card
+## Endpoint handoff and completed native run
 
 Source, preserved endpoint and destination are explicit:
 
@@ -284,35 +299,128 @@ equal to the preserved native metadata source. The endpoint mainsave is
 Original working roots, the Market checkpoint, and both protected backup roots
 were preserved. No runtime was launched against a source or checkpoint.
 
-**Native session `phase5a-native-001`:** in developer PowerShell, run:
+**Completed native session `phase5a-native-001`:** the user ran this command
+in developer PowerShell. It is retained as provenance, not a request to rerun:
 
 ```powershell
 & 'C:\Dev\Fable2Recomp\out\phase5a\sessions\phase5a-native-001\Launch.ps1'
 ```
 
-Load the copied **Oakfield tavern** save. Confirm control and one basic
-interaction; optionally try one nearby transition or interaction. Save
-normally, allow saving to finish, then close the application normally and let
-the command return. Report whether load, control/interaction, save and exit
-worked, and any error, freeze, progression problem or performance symptom.
-No Market-to-Oakfield replay is requested.
+The requested scope was to load the copied **Oakfield tavern** save, confirm control and one basic
+interaction, optionally try one nearby transition or interaction, save and
+exit normally. The user confirmed load, control/basic interaction, saving and
+normal exit; no additional problem was noticed. No Market-to-Oakfield replay
+was performed or requested, and no additional run is required for closeout.
 
 The session-local command card follows `fable2-run`'s normal argument pattern
 and `Get-Fable2NextRunNumber`, adding the required explicit `--user_data_root`.
 It does not change the global helper or copy/select any root at launch. It
 verifies the prepared executable/save hashes, rejects reuse of this session,
-and supplies no input. It writes the next `C:\Dev\Fable2Recomp\fable2-run-NNN.log`
-(next available at preparation: `fable2-run-002.log`) and
+and supplies no input. It selected `C:\Dev\Fable2Recomp\fable2-run-002.log` and
 `out/phase5a/sessions/phase5a-native-001/invocation.json` with arguments,
-timestamps, log path and process return code. The script's identity is in the
-native manifest; it has been parsed but not run.
+timestamps, log path and an **uncaptured (null) exit code**. The script's
+identity is in the native manifest; it was executed by the user.
 
 Normal executable SHA-256:
 `1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9`.
 Both fault-walk switches are OFF. The normal helper's debug logging is retained;
-no fault walker or generated boundary instrumentation is enabled. All native
-progression, crash/hang, rendering and save/exit outcomes remain **unknown**
-until the user returns this endpoint result.
+no fault walker or generated boundary instrumentation is enabled. The
+executable hash is unchanged from the successfully tested build and agrees
+with the invocation record and original launch-time hash guard.
+
+### Native evidence review and limitations
+
+`invocation.json` records launch preparation at
+`2026-09-09T20:51:00.9939640Z`, `process_end_utc` at
+`2026-09-09T20:51:01.0320820Z`, and `exit_code: null`. That alleged end time
+precedes the first native log entry; it is **not a valid process termination
+timestamp**. The launch card returned without capturing the GUI process's
+lifetime/status. The original invocation is preserved unchanged. No exit code
+or process lifetime is manufactured from it, and no repeat run is required.
+
+The 9332-line native log spans local timestamps
+`2026-09-09 21:51:01.059` through `2026-09-09 21:52:23.294` (82.235 seconds of
+logged activity, not a gameplay benchmark). It independently establishes:
+
+- The intended isolated user-data and cache roots, runtime/update roots and
+  `xenos` plugin were used.
+- TU1 patching reached `0.0.1.26`; 60918 functions were registered with
+  0 duplicates and 0 rejected entries.
+- No fatal/critical log entry, invalid/unregistered function-target failure,
+  unhandled exception or access-violation diagnostic was found. Filesystem
+  `Unregistered symbolic link`/`Unregistered device` entries are ordinary
+  content unmounting, not function-target failures.
+- Line 9320: `Window closing, shutting down...`; line 9321:
+  `KernelState::TerminateTitle`; line 9332:
+  `Title terminated; hard-exiting process.` The pinned SDK's
+  `src/ui/rex_app.cpp:498` normal `ReXApp::OnClosing` path flushes logging and
+  calls `std::_Exit(0)` after that last message. This corroborates the user's
+  normal-exit observation but does not supply a captured OS exit code.
+
+There are 3856 instances of the established non-blocking
+`BaseHeap::AllocFixed attempting to reserve an already reserved range` message.
+The 13 warnings concern the missing controller database, denied optional
+`D:\lhdebug.log` write (`0xc0000022`) and missing build-version, episodic or
+language probes (`0xc000000f`). These are retained rather than describing the
+log as warning-free; execution proceeds through the supported shutdown path.
+Nothing found contradicts the successful user-observed endpoint result.
+
+The user supplies the location, control/interaction and game-level saving
+observations. All seven save payloads, including their timestamps, are
+unchanged from the transferred starting endpoint; the log does not identify
+a fresh `mainsave.bin` write. Saving therefore remains **user-confirmed**,
+not independently proven as a new persisted payload by this short session.
+No failed-save diagnostic was found and no save regression is inferred.
+
+The complete closed native root was copied, without replacing any source, to
+`C:\Dev\Fable2Recomp\out\phase5a\checkpoints\end-001-native\user-data`.
+Its path set and all file hashes match the runtime root. The mainsave remains
+415039 bytes with SHA-256
+`13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489`.
+Only the shader pipeline-cache file changed relative to the initial native
+inventory. The original reference endpoint, reference writable content and
+earlier native checkpoint still match their preserved inventories.
+
+New evidence hashes:
+
+```text
+invocation.json SHA-256:
+947D7823B04D8CEB774A9D29EEA30EE060EFF4ED5079F37904FA33B5422AB64B
+fable2-run-002.log SHA-256:
+2F214CC13C482A5B35FD70265DBF0CF047F8BA675C0F35FC4396E5E13316D516
+```
+
+The session manifest references the log review and complete private endpoint
+inventory under `out/phase5a/tranche-001/closeout/`. Raw logs and saves remain
+uncommitted.
+
+### Closeout checks and integration readiness
+
+The closeout changes only documentation/session metadata. The executable hash
+matches the previously generated and built binary; SDK source/identity and
+tested Python tools remain unchanged. The successful regeneration, normal
+build, 98 Python tests and SDK 1764 passes/4 established skips above are reused.
+No expensive build or full test rerun was performed solely for these edits.
+Closeout checks validate session schemas, the exact unchanged reference totals,
+new native artifact hashes, source/binary identity, preserved save inventories,
+SDK dirt, Git whitespace and the staged file list.
+
+A pre-existing worktree edit removes one blank line before the thunk in
+`fable2_manifest.toml`. It is preserved and excluded from the closeout commit.
+Parsed TOML equals the tested committed manifest, including all 81 overrides.
+Its working-file SHA-256 is
+`EF1656D77D270F207C4A16D3B92D5B86C4414CE38292D079AEF52B120CE778E1`;
+historical byte-bound plans still identify the original manifest hash, so
+their stale-input guards must not be bypassed against this reformatted file.
+This is not another function or runtime change.
+
+The committed Phase 5A branch is ready for local integration into `main`.
+The local `main` remains `07184adfeab7018670c3205bbef9087caa960dd5` and is an
+ancestor of the topic; no integration was performed. Preserve the unrelated
+manifest formatting edit during any later integration. The index is clean
+after closeout; that manifest edit and the SDK's original libmspack dirt are
+the only worktree changes. Exact checks and final identities are recorded in
+`out/phase5a/tranche-001/closeout/final-state.json` after the closeout commit.
 
 ## Rendering and performance observations
 
@@ -321,6 +429,8 @@ at **20:23**, extremely elongated dog shadows in Old Town at **20:26**, and
 excessive/improperly blended moon bloom at **20:30**. Rookridge terrain rendered
 correctly, unlike the other recompilation attempt. These are reference-runtime
 rendering observations, not native results or performance faults.
+All three visual defects remain outstanding. A successful native endpoint
+test does not establish that the Spire cutoff, dog shadows or moon bloom were fixed.
 
 Assuming the reported clock is the workstation's Europe/London timezone, those
 observations fall about 7m39s, 10m39s and 14m39s after the collector header.
@@ -337,11 +447,14 @@ median ratio 1.381899) is only a transfer microbenchmark. Fresh isolated Xenia
 caches further limit any comparison. The historical instrumented 4–5 FPS
 figure is not assigned to the current normal build. No optimization phase or
 additional tracing was started.
+The user's native report likewise contains no additional problem, but the
+brief smoke test provides no quantitative FPS, frame-time or tracing-overhead
+measurement. Gameplay tracing overhead remains **unmeasured**.
 
 ## Next tranche and repository state
 
-After a successful native endpoint result, preserve that updated native
-checkpoint and copy its compatible payload forward into a newly named isolated
+The successful native endpoint has been preserved. A future separately
+authorized tranche may copy its compatible payload into a newly named isolated
 reference root. Start from the latest **Oakfield tavern endpoint**, not Market
 or childhood. The user may continue the already accepted Rookridge
 bandit-elimination quest and naturally reachable content. Prioritize a new
@@ -350,9 +463,11 @@ and a distinct reload session, which remain unconfirmed here. No quest route
 or control sequence is prescribed. Finish the next bounded run with save and
 orderly exit, then process it before requesting further collection.
 
-The exact remaining gate is the native endpoint smoke result. No native
-failure currently justifies fault walking or x-high investigation. If it
-reveals a failure, localize that concrete event and minimize any required replay.
+No tranche-001 completion gate remains. No native failure justifies fault
+walking, another gameplay run or x-high investigation. No next tranche or
+renderer work was begun during closeout. Full native replay parity, the three
+visual defects and quantitative performance/overhead remain outside this
+completed endpoint validation.
 
 Starting Fable branch/commit/tree: `main`,
 `07184adfeab7018670c3205bbef9087caa960dd5`,
@@ -379,10 +494,12 @@ fix(recomp): register traced TU1 tail-dispatch thunk 825E28B0
 The prior preparation commits are `4221ee1a4824934548c285b14b68fe3b50d42849`,
 `93c69d4af821059d9e2fa5e107a332e1b510764e`, and
 `dd169a16093e512d127ac831cd7fd0dc9a535fb5`. Exact final Fable commit/tree,
-index/worktree states, complete local commit list and byte-for-byte preservation
-checks are recorded after the evidence commit in
-`out/phase5a/tranche-001/final-state.json`; a tracked report cannot contain its
-own resulting commit hash. Recover its committed identity with
+index/worktree states, complete local commit list and preservation checks for
+the pre-smoke evidence commit are retained in
+`out/phase5a/tranche-001/final-state.json`. Completed closeout identities and
+the preserved pre-existing manifest edit are recorded separately in
+`out/phase5a/tranche-001/closeout/final-state.json`; a tracked report cannot
+contain its own resulting commit hash. Recover its committed identity with
 `git log -1 --format='%H %T' -- docs/fable2-discovery-pipeline/09-phase5a-tranche-001.md`.
 Nothing has been pushed, pulled, remotely merged, tagged, uploaded, released,
 published or otherwise remotely modified.

@@ -1,5 +1,7 @@
 [CmdletBinding()]
-param()
+param(
+    [string]$SdkRoot = 'C:\Dev\rexglue-sdk'
+)
 
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
@@ -8,7 +10,6 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $sourcePath = Join-Path $PSScriptRoot 'ppc-disasm.cpp'
 $outputDirectory = Join-Path $repositoryRoot 'out\tools'
 $outputPath = Join-Path $outputDirectory 'ppc-disasm.exe'
-$sdkRoot = 'C:\Dev\rexglue-sdk'
 $disasmInclude = Join-Path $sdkRoot 'thirdparty\disasm'
 $disasmSource = Join-Path $disasmInclude 'disasm.c'
 $ppcDisasmSource = Join-Path $disasmInclude 'ppc-dis.c'

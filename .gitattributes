@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Deterministic ownership evidence is hashed and compared byte-for-byte.
+/docs/fable2-discovery-pipeline/ownership/*.json text eol=lf
+/docs/fable2-discovery-pipeline/ownership/*.md text eol=lf

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fable II focused ownership corroboration ledger",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "tool", "image_identity", "inputs", "source_queue_counts", "run_provenance", "counts", "targets", "dispatchers", "unresolved_shortlist", "safety"],
+  "properties": {
+    "schema": {"const": {"name": "fable2-focused-ownership-ledger", "version": 1}},
+    "tool": {"type": "object"},
+    "image_identity": {"type": "object"},
+    "inputs": {"type": "object", "required": ["phase4_queue", "import_plan", "summary", "closure", "ghidra_map", "guest_snapshot", "manifest", "shared_evidence"]},
+    "source_queue_counts": {"type": "object"},
+    "run_provenance": {"type": "array", "items": {"type": "object"}},
+    "counts": {"type": "object", "required": ["targets", "by_phase4_category", "by_classification", "unresolved", "dispatchers", "genuine_functions_or_thunks", "corrected_owners", "rejected_promotions", "manifest_changes"], "properties": {
+      "targets": {"type": "integer", "minimum": 0},
+      "by_phase4_category": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+      "by_classification": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+      "unresolved": {"type": "integer", "minimum": 0},
+      "dispatchers": {"type": "integer", "minimum": 0},
+      "genuine_functions_or_thunks": {"const": 0},
+      "corrected_owners": {"const": 0},
+      "manifest_changes": {"const": 0},
+      "rejected_promotions": {"type": "integer", "minimum": 0}
+    }},
+    "targets": {"type": "array", "items": {"$ref": "#/$defs/target"}},
+    "dispatchers": {"type": "array", "items": {"type": "object", "required": ["dispatcher", "owner", "table_address", "decoded_destinations", "bound_proofs", "index_transform_chain", "target_expression", "all_entries_and_evidence_instructions_match_tu1"], "properties": {
+      "dispatcher": {"$ref": "#/$defs/address"}, "owner": {"$ref": "#/$defs/address"},
+      "decoded_destinations": {"type": "array", "items": {"$ref": "#/$defs/address"}},
+      "all_entries_and_evidence_instructions_match_tu1": {"const": true}
+    }}},
+    "unresolved_shortlist": {"type": "array", "items": {"type": "object", "required": ["target", "questions"]}},
+    "safety": {"const": {"manifest_modified": false, "generated_code_modified": false, "raw_runtime_observations_preserved": true, "automatic_promotion": false, "runtime_correctness_claimed_from_compilation": false}}
+  },
+  "$defs": {
+    "address": {"type": "string", "pattern": "^0x[0-9A-F]{8}$"},
+    "range": {"type": "object", "required": ["start", "end"], "properties": {"start": {"$ref": "#/$defs/address"}, "end": {"$ref": "#/$defs/address"}}},
+    "target": {"type": "object", "additionalProperties": false,
+      "required": ["target", "phase4_category", "phase4_candidate_id", "current_owner", "observations", "return_checks", "case_membership", "immediate_tail_transfer", "boundary_evidence", "classification", "confidence", "action", "promotion_would_overlap_owner", "independent_function_proven", "runtime_entry_requirement", "rationale", "unresolved_questions", "xhigh_material"],
+      "properties": {
+        "target": {"$ref": "#/$defs/address"},
+        "phase4_category": {"enum": ["existing_function_internal_entry", "known_jump_table_case"]},
+        "phase4_candidate_id": {"type": "string", "minLength": 1},
+        "current_owner": {"type": "object", "required": ["address", "range", "body_ranges", "authority", "pdata", "generated"], "properties": {
+          "address": {"$ref": "#/$defs/address"}, "range": {"$ref": "#/$defs/range"}, "body_ranges": {"type": "array", "items": {"$ref": "#/$defs/range"}}
+        }},
+        "observations": {"type": "array", "items": {"type": "object", "required": ["source", "target", "branch_kind", "link", "observed_runs"]}},
+        "return_checks": {"type": "array", "items": {"type": "object", "required": ["source", "source_owner", "call_site", "call_instruction", "lr_after_call", "lr_value_observed_directly", "pairing_established", "generated_lr_assignment_lines", "generated_return_mnemonic_lines"]}},
+        "case_membership": {"type": "array", "items": {"type": "object", "required": ["dispatcher", "table", "indices", "default_destination"]}},
+        "immediate_tail_transfer": {"oneOf": [{"type": "null"}, {"type": "object", "required": ["site", "destination", "destination_range", "instruction", "link", "case_itself_is_standalone_thunk"], "properties": {"link": {"const": false}, "case_itself_is_standalone_thunk": {"const": false}}}]},
+        "boundary_evidence": {"type": "object", "required": ["exact_pdata_start", "exact_ghidra_start", "exact_direct_edges", "unique_exact_body_owners", "closure_candidate", "ghidra_owner_entry_present", "ghidra_owner_body_contains_target"]},
+        "classification": {"enum": ["return_continuation", "switch_case_block", "shared_switch_case_body", "switch_default_case", "switch_case_tail_transfer", "unresolved"]},
+        "confidence": {"enum": ["CONFIRMED", "UNRESOLVED"]},
+        "action": {"const": "retain_owner_no_promotion"},
+        "promotion_would_overlap_owner": {"const": true},
+        "independent_function_proven": {"const": false},
+        "runtime_entry_requirement": {"type": "string", "minLength": 1},
+        "rationale": {"type": "string", "minLength": 1},
+        "unresolved_questions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "xhigh_material": {"type": "boolean"}
+      }
+    }
+  }
+}

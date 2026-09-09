@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fable II annotation-only ownership review companion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "input_plan", "ledger_sha256", "application_policy", "function_proposals", "targets"],
+  "properties": {
+    "schema": {"const": {"name": "fable2-ownership-reviewed-plan", "version": 1}},
+    "input_plan": {"type": "object", "required": ["file", "sha256", "plan_id"]},
+    "ledger_sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"},
+    "application_policy": {"const": "annotation_only_no_manifest_application"},
+    "function_proposals": {"const": []},
+    "targets": {"type": "array", "items": {"type": "object", "additionalProperties": false,
+      "required": ["target", "phase4_candidate_id", "phase4_category", "semantic_classification", "owner", "action"],
+      "properties": {
+        "target": {"type": "string", "pattern": "^0x[0-9A-F]{8}$"},
+        "owner": {"type": "string", "pattern": "^0x[0-9A-F]{8}$"},
+        "phase4_candidate_id": {"type": "string", "minLength": 1},
+        "phase4_category": {"enum": ["existing_function_internal_entry", "known_jump_table_case"]},
+        "semantic_classification": {"enum": ["return_continuation", "switch_case_block", "shared_switch_case_body", "switch_default_case", "switch_case_tail_transfer", "unresolved"]},
+        "action": {"const": "retain_owner_no_promotion"}
+      }
+    }}
+  }
+}

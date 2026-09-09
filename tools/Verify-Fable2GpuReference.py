@@ -2137,25 +2137,14 @@ def validate_g16a_evidence(
     if not sdk_repo.is_dir():
         validation.error(f"G1.6A ReXGlue repository is unavailable: {sdk_repo}")
     else:
-        sdk_checks = (
-            ("HEAD", git_text(sdk_repo, "rev-parse", "HEAD"), sdk_pin.get("commit")),
-            (
-                "tree",
-                git_text(sdk_repo, "rev-parse", "HEAD^{tree}"),
-                sdk_pin.get("tree"),
-            ),
-            (
-                "branch",
-                git_text(sdk_repo, "branch", "--show-current"),
-                sdk_pin.get("branch"),
-            ),
+        validate_required_milestone(
+            sdk_repo,
+            "HEAD",
+            str(sdk_pin.get("commit", "")),
+            str(sdk_pin.get("tree", "")),
+            "G1.6A ReXGlue",
+            validation,
         )
-        for label, actual, expected in sdk_checks:
-            if actual != expected:
-                validation.error(
-                    f"G1.6A ReXGlue {label} mismatch: expected {expected!r}, "
-                    f"actual {actual!r}"
-                )
         sdk_status_text = git_text(
             sdk_repo, "status", "--short", "--untracked-files=all"
         )
@@ -2686,10 +2675,14 @@ def validate_g16b_evidence(
     if not sdk_repo.is_dir():
         validation.error(f"G1.6B ReXGlue repository is unavailable: {sdk_repo}")
     else:
-        if git_text(sdk_repo, "rev-parse", "HEAD") != sdk_pin.get("commit"):
-            validation.error("G1.6B ReXGlue HEAD mismatch")
-        if git_text(sdk_repo, "rev-parse", "HEAD^{tree}") != sdk_pin.get("tree"):
-            validation.error("G1.6B ReXGlue tree mismatch")
+        validate_required_milestone(
+            sdk_repo,
+            "HEAD",
+            str(sdk_pin.get("commit", "")),
+            str(sdk_pin.get("tree", "")),
+            "G1.6B ReXGlue",
+            validation,
+        )
         status_text = git_text(sdk_repo, "status", "--short", "--untracked-files=all")
         actual_status = [] if status_text in (None, "") else status_text.splitlines()
         if actual_status != sdk_pin.get("allowed_preexisting_status"):

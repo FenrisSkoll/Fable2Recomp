@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fable II forward-only runtime coverage session v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "session_id", "status", "runtime", "build", "configuration", "title_identity", "starting_checkpoint", "user_coverage", "timing", "shutdown", "artifacts", "target_review", "outcome", "performance_observations", "handoff", "limitations"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[A-Za-z0-9_.-]+$"},
+    "status": {"enum": ["prepared", "awaiting_analysis", "analysed", "blocked"]},
+    "runtime": {"enum": ["xenia_collector", "xenia_without_collector", "native_normal", "native_diagnostics"]},
+    "build": {"type": "object"},
+    "configuration": {"type": "object"},
+    "title_identity": {"type": "object"},
+    "starting_checkpoint": {"type": "object"},
+    "user_coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["areas", "categories", "confirmation"],
+      "properties": {
+        "areas": {"type": "array", "items": {"type": "string"}},
+        "categories": {"type": "array", "uniqueItems": true, "items": {"enum": ["boot_profile_load", "save_load", "childhood", "adult_region", "region_transition", "dialogue_crowds_npc_ai", "shops", "inventory_equipment", "melee", "ranged", "will", "quest_state_change", "scripted_scene_cutscene", "save", "reload", "orderly_exit", "control_basic_interaction"]}},
+        "confirmation": {"oneOf": [{"type": "string"}, {"type": "null"}]}
+      }
+    },
+    "timing": {"type": "object"},
+    "shutdown": {"type": "object"},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/artifact"}},
+    "target_review": {"type": "object"},
+    "outcome": {"type": "object"},
+    "performance_observations": {"type": "array", "items": {"type": "object"}},
+    "handoff": {"type": "object"},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "path", "bytes", "sha256"],
+      "properties": {
+        "role": {"type": "string"},
+        "path": {"type": "string"},
+        "bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+      }
+    }
+  }
+}

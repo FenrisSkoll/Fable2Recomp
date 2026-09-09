@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "session_id": "replace-with-unique-session-id",
+  "status": "prepared",
+  "runtime": "xenia_collector",
+  "build": {"repository": null, "branch": null, "commit": null, "tree": null, "executable": null},
+  "configuration": {"collector_enabled": true, "preflight": null, "config_before": null, "config_after": null, "arguments": []},
+  "title_identity": {"shared_evidence_path": "tools/fable2-entrypoint-closure-evidence.json", "shared_evidence_sha256": null, "patched_image_sha256": null, "observed_tu1_confirmed": null},
+  "starting_checkpoint": {"description": null, "source": null, "preserved_copy": null, "writable_content_root": null, "writable_storage_root": null},
+  "user_coverage": {"areas": [], "categories": [], "confirmation": null},
+  "timing": {"process_start_utc": null, "process_end_utc": null, "sampling_seconds": null, "source": null},
+  "shutdown": {"user_report": null, "footer_count": null, "flush_reason": null, "validation": null},
+  "artifacts": [],
+  "target_review": {"known_targets": null, "new_targets": null, "new_pairs": null, "classifications": {}, "applied_changes": []},
+  "outcome": {"result": null, "invalid_target": null, "fatal_or_guest_exception": null, "hang": null, "loading_transition": null, "interaction_progression": null, "rendering": null, "save_reload_exit": null},
+  "performance_observations": [],
+  "handoff": {"end_save_source": null, "preserved_endpoint": null, "native_destination": null, "next_session": null},
+  "limitations": ["No gameplay category is confirmed until the user reports exercising it in this session."]
+}

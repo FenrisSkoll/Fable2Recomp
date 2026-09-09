@@ -24,6 +24,13 @@ G1.6 evidence remain unchanged as historical records. The superseding audit,
 path inventory and local-branch disposition are in the
 [G2A retirement record](g2a-retirement.md).
 
+The current architecture decision is [NR0A](../fable2-native-renderer/nr0a/README.md):
+**CONDITIONAL ARCHITECTURE — DYNAMIC EVIDENCE REQUIRED**. It carries forward
+G1.6B's configuration-first gate and specifies a bounded next experiment without
+reviving G2A. The source/artifact identities above describe this historical
+corpus; [NR0A provenance](../fable2-native-renderer/nr0a/reading-and-provenance.md)
+records newer accepted save/testing work and current disk artifacts separately.
+
 ## Reading order
 
 1. [Scope, evidence rules and immutable pins](00-scope-and-pins.md)

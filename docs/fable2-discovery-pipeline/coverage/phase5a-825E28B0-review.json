@@ -1,0 +1,289 @@
+{
+  "boundary": {
+    "exact_ghidra_start": false,
+    "exact_pdata_start": false,
+    "exclusive_end": "0x825E28C0",
+    "existing_body_owners": [],
+    "ghidra_body_owners": [],
+    "jump_table_membership": false,
+    "next_pdata_entry": "0x825E28C0",
+    "preceding_terminal_branch": "0x825E28AC",
+    "size": "0x00000010",
+    "start": "0x825E28B0"
+  },
+  "call": {
+    "instruction": "bctrl",
+    "link": true,
+    "lr_after_call": "0x822665B8",
+    "lr_observed_directly": false,
+    "owner": {
+      "end": "0x822665CC",
+      "size": "0x000000B4",
+      "start": "0x82266518"
+    },
+    "site": "0x822665B4"
+  },
+  "candidate": {
+    "address": "0x825E28B0",
+    "basic_blocks": [
+      {
+        "owner_address": "0x825E28B0",
+        "range": {
+          "end": "0x825E28C0",
+          "size": "0x00000010",
+          "start": "0x825E28B0"
+        },
+        "termination": "indirect_tail_transfer"
+      }
+    ],
+    "boundary_provenance": "indirect_tail_transfer",
+    "classification": "strong_new_function",
+    "complete_traversal": true,
+    "confidence": "strong",
+    "conflicts": [],
+    "decoded_instruction": "lwz",
+    "direct_edges": [],
+    "evidence": [
+      {
+        "attributes": {
+          "entries": "132",
+          "form": "lis/addi",
+          "high_site": "0x8263062C",
+          "low_site": "0x8263064C",
+          "run_start": "0x82007258",
+          "slot": "70"
+        },
+        "kind": "callback_table",
+        "provenance": "non-RTTI pointer array referenced by PPC address materialization",
+        "source_address": "0x8263062C",
+        "source_section": ".rdata",
+        "storage_address": "0x82007370",
+        "target_address": "0x825E28B0"
+      },
+      {
+        "attributes": {
+          "entries": "132",
+          "run_end": "0x82007468",
+          "run_start": "0x82007258",
+          "slot": "70"
+        },
+        "kind": "pointer_table_run",
+        "provenance": "contiguous executable-pointer run",
+        "source_address": "0x82007258",
+        "source_section": ".rdata",
+        "storage_address": "0x82007370",
+        "target_address": "0x825E28B0"
+      },
+      {
+        "attributes": {
+          "form": "lis/addi",
+          "high_site": "0x8263062C",
+          "low_site": "0x8263064C",
+          "table_or_storage": "0x82007258"
+        },
+        "kind": "pointer_table_run",
+        "provenance": "bounded PPC xref to pointer storage/table",
+        "source_address": "0x8263062C",
+        "source_section": ".text",
+        "storage_address": "0x82007370",
+        "target_address": "0x825E28B0"
+      },
+      {
+        "attributes": {
+          "executable": "false",
+          "inline_executable_storage": "false",
+          "next_value": "0x826EC610",
+          "previous_value": "0x825E28A0",
+          "readable": "true",
+          "writable": "false"
+        },
+        "kind": "readonly_code_pointer",
+        "provenance": "aligned big-endian 32-bit executable pointer",
+        "source_address": "0x82007370",
+        "source_section": ".rdata",
+        "storage_address": "0x82007370",
+        "target_address": "0x825E28B0"
+      }
+    ],
+    "hit_depth_limit": false,
+    "hit_instruction_limit": false,
+    "indirect_sites": [
+      {
+        "kind": "indirect_tail_transfer",
+        "link": false,
+        "owner_address": "0x825E28B0",
+        "site": "0x825E28BC"
+      }
+    ],
+    "known_range_relationship": "inside_preliminary_function_0x825E28A0",
+    "proposed_range": {
+      "end": "0x825E28C0",
+      "size": "0x00000010",
+      "start": "0x825E28B0"
+    },
+    "rejection_reasons": []
+  },
+  "confidence": "CONFIRMED",
+  "decision": "apply_exact_callable_tail_dispatch_thunk",
+  "decoded_sequence": [
+    "lwz r11,0(r3)",
+    "lwz r10,116(r11)",
+    "mtctr r10",
+    "bctr"
+  ],
+  "inputs": {
+    "closure": {
+      "analyzer_version": "2.0.0",
+      "file_name": "entrypoint-closure.json",
+      "schema_version": 3,
+      "sha256": "665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397"
+    },
+    "generated_registration": {
+      "file_name": "fable2_init.cpp",
+      "import_count": 255,
+      "recompiled_function_count": 60425,
+      "registration_count": 60917,
+      "runtime_helper_count": 237,
+      "sha256": "926FD29BBFE32FCAA314571E6EA4DEB86773C7383B5BA681C1DEF8EDE5CEB6BE"
+    },
+    "ghidra_maps": [
+      {
+        "artifact_id": "local-private-fable2-goty-tu1",
+        "automatic_tu1_use_allowed": true,
+        "file_name": "ghidra-function-map.json",
+        "function_count": 42462,
+        "identity_state": "exact_image_match",
+        "sha256": "03516B3A1F33433E493739418C9939D4FF1AEB0989F4ACEF2FD4D8204A077F58"
+      }
+    ],
+    "manifest": {
+      "file_name": "fable2_manifest.toml",
+      "function_count": 80,
+      "sha256": "E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0"
+    },
+    "shared_evidence": {
+      "file_name": "fable2-entrypoint-closure-evidence.json",
+      "schema_version": 5,
+      "sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E"
+    },
+    "summary": {
+      "file_name": "xenia-indirect-targets.summary.json",
+      "raw_trace_sha256": [
+        "05E6344E2992089A9F7B7F509D8099D7E8851D130F2769BE9B9A8F72F20E03D0",
+        "83DAA210412E6941AC0EE44D69EAED19C244FACC3D3637E93F4647132E67BD4D",
+        "59CD5C1A985A46AFC211D9B550E82E36F12AC304A6B256684713496DC15EE298"
+      ],
+      "run_ids": [
+        "fable2-tu1-manual-001",
+        "fable2-tu1-manual-002",
+        "phase5a-reference-001"
+      ],
+      "sha256": "EBD21437C40BEB0AFCD10CD7724BE4F1FE45A758060CB147C2DF9D1E5A17D6B6"
+    }
+  },
+  "manifest_line": "\"0x825E28B0\" = { size = 0x10 }",
+  "plan": {
+    "candidate_id": "P4-FF74FACDEA53A5E8",
+    "path": "out\\phase5a\\tranche-001\\pre-application.import-plan.json",
+    "plan_id": "P4PLAN-A592732E55F064C4B821",
+    "sha256": "B929FD75D86654170F2162AB356A05886C221C8695D003B8116E6483A8487D03"
+  },
+  "private_snapshot": "out\\phase3-regression-closure-final-smoke\\iteration-01\\tu1-text-0x82000000.bin",
+  "readonly_pointer_slot": "0x82007370",
+  "rejected_owner": {
+    "authority": "gap_fill",
+    "body_end": "0x825E28B0",
+    "explanation": "Preliminary enclosing extent includes this target; actual body and generated function end at preceding terminal bctr.",
+    "extent_end": "0x825E2A34",
+    "start": "0x825E28A0",
+    "trusted": false
+  },
+  "review_policy": "Explicit single-candidate guarded apply after independent TU1 byte, boundary, link, ownership and table review; no other static candidate promoted.",
+  "runtime": {
+    "branch_kinds": [
+      "bctrl"
+    ],
+    "hit_count": 5,
+    "observations": [
+      {
+        "branch_kind": "bctrl",
+        "hit_count": 5,
+        "link": true,
+        "observed_runs": [
+          "phase5a-reference-001"
+        ],
+        "ordinary_return": false,
+        "run_hit_counts": {
+          "phase5a-reference-001": 5
+        },
+        "source": "0x822665B4",
+        "source_module": "default",
+        "target": "0x825E28B0",
+        "target_module": "default",
+        "target_validity": [
+          "known_executable_module"
+        ],
+        "thread_observations": [
+          {
+            "first_sequence": 1809086094,
+            "hit_count": 5,
+            "last_sequence": 6114737750,
+            "run_id": "phase5a-reference-001",
+            "thread_key": "guest:00000007"
+          }
+        ]
+      }
+    ],
+    "observed_runs": [
+      "phase5a-reference-001"
+    ],
+    "source_sites": [
+      "0x822665B4"
+    ]
+  },
+  "schema": {
+    "name": "fable2-phase5a-thunk-review",
+    "version": 1
+  },
+  "target": "0x825E28B0",
+  "tu1_verified_sections": [
+    {
+      "end": "0x832BABBC",
+      "name": ".text",
+      "permissions": "r-x",
+      "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+      "size": "0x0114ABBC",
+      "start": "0x82170000"
+    },
+    {
+      "end": "0x832CA03C",
+      "name": "BINK",
+      "permissions": "r-x",
+      "sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146",
+      "size": "0x0000F43C",
+      "start": "0x832BAC00"
+    },
+    {
+      "artificial": false,
+      "hash_status": "complete",
+      "initialized": true,
+      "loaded": true,
+      "mapped": false,
+      "name": ".pdata",
+      "overlay": false,
+      "permissions": {
+        "execute": false,
+        "read": true,
+        "write": false
+      },
+      "range": {
+        "end": "0x82165B20",
+        "size": "0x0005A320",
+        "start": "0x8210B800"
+      },
+      "sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+      "source_name": null,
+      "volatile": false
+    }
+  ]
+}

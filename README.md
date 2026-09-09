@@ -1,6 +1,6 @@
 # Fable II Recomp
 
-**Fable2Recomp** is a native static-recompilation project for the Xbox 360 release of **Fable II: Game of the Year Edition with Title Update 1**. It uses [ReXGlue](https://github.com/rexglue/rexglue-sdk) for the Xbox 360 runtime and the Xenos graphics path.
+**Fable2Recomp** is a native static-recompilation project for the Xbox 360 release of **Fable II: Game of the Year Edition with Title Update 1**. It uses the [required ReXGlue fork](https://github.com/FenrisSkoll/rexglue-sdk) for the Xbox 360 runtime and the Xenos graphics path.
 
 The project aims for accurate, vanilla game behaviour first. Higher resolutions, frame rates, graphics enhancements and other PC-specific features come after the original game is stable.
 

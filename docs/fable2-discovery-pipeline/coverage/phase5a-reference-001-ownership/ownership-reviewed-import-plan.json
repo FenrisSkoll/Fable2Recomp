@@ -1,0 +1,1256 @@
+{
+  "application_policy": "annotation_only_no_manifest_application",
+  "function_proposals": [],
+  "input_plan": {
+    "file": "fable2-indirect-targets.import-plan.json",
+    "plan_id": "P4PLAN-E7D6579DE5CF3677D3D4",
+    "sha256": "BAD7CB32D7EED752E00829591C640D32F75DDFA920254E36092C039AA2E618CD"
+  },
+  "ledger_sha256": "912D239FAEA50BF11EB78ED98DE7598E7049A380FAC7A9C39190924AB185B261",
+  "schema": {
+    "name": "fable2-ownership-reviewed-plan",
+    "version": 1
+  },
+  "targets": [
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82171C68",
+      "phase4_candidate_id": "P4-F27653BF66A9C0F5",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82171D84"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82171F60",
+      "phase4_candidate_id": "P4-8DE8E079D273275D",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8217200C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8217F390",
+      "phase4_candidate_id": "P4-73C8CA5C48D88233",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8217F3BC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x821A1380",
+      "phase4_candidate_id": "P4-D9466B7FA3155559",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x821A1448"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x821AD468",
+      "phase4_candidate_id": "P4-A7B210CE5089A106",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x821AD704"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8223A210",
+      "phase4_candidate_id": "P4-A6FBAC59694CD1A4",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8223A5CC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82290478",
+      "phase4_candidate_id": "P4-124B0E1AB44025D0",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822904BC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822C10A8",
+      "phase4_candidate_id": "P4-E3B638064F05158B",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822C15E0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822C10A8",
+      "phase4_candidate_id": "P4-E4E2A3E92225B253",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822C17B0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D0F00",
+      "phase4_candidate_id": "P4-3A5C766263C1401B",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822D10D0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D0F00",
+      "phase4_candidate_id": "P4-CD637DC5676AA911",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822D10D8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D0F00",
+      "phase4_candidate_id": "P4-54C37708D0756C8E",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822D1114"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D0F00",
+      "phase4_candidate_id": "P4-DEB2FEC300CF349A",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822D11C0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D2760",
+      "phase4_candidate_id": "P4-0D16EDF7FDFEC010",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822D28C0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822E32A0",
+      "phase4_candidate_id": "P4-7312BF6D86F88D6C",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x822E69C4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8236FE38",
+      "phase4_candidate_id": "P4-EE47359E06EF86C0",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8236FE8C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824CAA08",
+      "phase4_candidate_id": "P4-46051EBDBF1282CC",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x824CAD3C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253EB40",
+      "phase4_candidate_id": "P4-0E7A3FEFF03B7328",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8253EC5C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253EB40",
+      "phase4_candidate_id": "P4-101E34E0B1B64C63",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8253EC80"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253EEE0",
+      "phase4_candidate_id": "P4-2909CF9FCF89FEEE",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8253EF30"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253EEE0",
+      "phase4_candidate_id": "P4-F9300D783F3AB392",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8253EF58"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x825483B8",
+      "phase4_candidate_id": "P4-BF36D80481CEC61E",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82548400"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x825633B0",
+      "phase4_candidate_id": "P4-93D8A4114BD9BD09",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82563488"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82587278",
+      "phase4_candidate_id": "P4-27309000E55CBF58",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82587400"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x825F66D8",
+      "phase4_candidate_id": "P4-20069B513E9FB719",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x825F66FC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x825FEFC8",
+      "phase4_candidate_id": "P4-826607CC6BFAE51A",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x825FF054"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x825FFAD8",
+      "phase4_candidate_id": "P4-E44AA7179677A7D3",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x825FFD7C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8260CDC0",
+      "phase4_candidate_id": "P4-C1258817BCAB1AE0",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8260CF14"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82629E90",
+      "phase4_candidate_id": "P4-2BE906F0FAE8A47C",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8262A3B0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-0CFEDC931EFD19E5",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82659770"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-64BF7C41AF895C6C",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826597D0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-CAA9B9180306C542",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82659904"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-3033F50A40D39C78",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82659948"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-167914DDF410746D",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82659CA0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82659550",
+      "phase4_candidate_id": "P4-33680D6268BEE0A3",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82659E4C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8265A638",
+      "phase4_candidate_id": "P4-62B361B20AC47A4B",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8265A7F4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A9A60",
+      "phase4_candidate_id": "P4-546D1BE600B09BAF",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826A9D4C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A9A60",
+      "phase4_candidate_id": "P4-264030E8BE384047",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826A9DC4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A9A60",
+      "phase4_candidate_id": "P4-61ABBA498B56EF12",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826A9E18"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826AA060",
+      "phase4_candidate_id": "P4-EF4DB33EF05216BA",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826AA180"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826AB1F8",
+      "phase4_candidate_id": "P4-793BA9B47DF6DDEC",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826AB37C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826ABCD0",
+      "phase4_candidate_id": "P4-EC3D0696B417A188",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826ABCEC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C6698",
+      "phase4_candidate_id": "P4-AED1D67C015CA54E",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x826C67FC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x827C6AF0",
+      "phase4_candidate_id": "P4-5927881333A76D3A",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x827C6B14"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x827CD180",
+      "phase4_candidate_id": "P4-C6BBDBF5B5451FCF",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x827CD21C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8281D968",
+      "phase4_candidate_id": "P4-D83899FA646BB850",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8281DAD8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x828C5A18",
+      "phase4_candidate_id": "P4-22229266420F7EE8",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x828C5E5C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x829287A8",
+      "phase4_candidate_id": "P4-F6BE31AE34864737",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8292884C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82936D68",
+      "phase4_candidate_id": "P4-8C6813DC240C37F1",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82936E18"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82956B30",
+      "phase4_candidate_id": "P4-3BD2FE11219B5920",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82956B68"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8298A870",
+      "phase4_candidate_id": "P4-7CB21F5B83B69602",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8298AFE4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8298B718",
+      "phase4_candidate_id": "P4-E7E760AF9512F385",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8298B814"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82990B30",
+      "phase4_candidate_id": "P4-CA63DFB83727586E",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82990CBC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8299FC98",
+      "phase4_candidate_id": "P4-69B418E5D9D388EB",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x829A011C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8299FC98",
+      "phase4_candidate_id": "P4-0E827FB8605182D9",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x829A0784"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x829A3260",
+      "phase4_candidate_id": "P4-3D4D016EE7958C54",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x829A34A4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x829D6EE8",
+      "phase4_candidate_id": "P4-2BFF440632B81E57",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x829D759C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82A07FF0",
+      "phase4_candidate_id": "P4-3F285CCD52B546A1",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82A08008"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82B8BA38",
+      "phase4_candidate_id": "P4-9D94943C6617E3B6",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82B8C0D0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82C18F90",
+      "phase4_candidate_id": "P4-D3248CD6DF2592C1",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82C1905C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82CB2A90",
+      "phase4_candidate_id": "P4-8FEC6D8AF4E34CFD",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82CB2C38"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82D8ADF0",
+      "phase4_candidate_id": "P4-1C472656CBCCB79B",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82D8AE20"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82D93A18",
+      "phase4_candidate_id": "P4-5AB0CD308CCA5703",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82D93AEC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82D93AF8",
+      "phase4_candidate_id": "P4-64084D067E9F19BA",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82D93BCC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82E11100",
+      "phase4_candidate_id": "P4-203AFDD12D339969",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82E11210"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82E12908",
+      "phase4_candidate_id": "P4-02519348209E4AF1",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x82E13138"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8300E198",
+      "phase4_candidate_id": "P4-9870AA3421F1C4D0",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x8300E1F0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x832BDEA0",
+      "phase4_candidate_id": "P4-530871CBF35E2270",
+      "phase4_category": "existing_function_internal_entry",
+      "semantic_classification": "return_continuation",
+      "target": "0x832BDFB0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8226EA50",
+      "phase4_candidate_id": "P4-C16B32204B313322",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8226F8E0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8226EA50",
+      "phase4_candidate_id": "P4-243E23D6F9E208D9",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8226FE64"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x822D7530",
+      "phase4_candidate_id": "P4-B9BBDB42202F9608",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x822D757C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823D2658",
+      "phase4_candidate_id": "P4-9C82F5CE63B72819",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823D2690"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823DBC70",
+      "phase4_candidate_id": "P4-42E7B1EE0654484C",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823DBD34"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823DBC70",
+      "phase4_candidate_id": "P4-90B867D9AB3D3243",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823DBFC4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823DBC70",
+      "phase4_candidate_id": "P4-E06CF3D2FD918A90",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823DC098"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823DBC70",
+      "phase4_candidate_id": "P4-FC008ECA463204ED",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x823DC0F4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823E6528",
+      "phase4_candidate_id": "P4-5D5ED51758589AA5",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823E65F8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823E6528",
+      "phase4_candidate_id": "P4-1DD35C7303F173A4",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823E6608"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x823F07C0",
+      "phase4_candidate_id": "P4-FF90030209ABEACF",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x823F0C20"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82415470",
+      "phase4_candidate_id": "P4-9067E7602BD2C17D",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x824157D0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-CD98FD05A5FEB876",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F010"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-343398B40C6496AE",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F118"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-036E005D38376891",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F298"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-19B07412E9C53772",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F2B0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-362DA547963DD1F8",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F478"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-1CA8D8DE831AECDE",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F670"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-F5B973DED52B9EF5",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F6D0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-2A4EA72EE5D8D97D",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F730"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-59D06E5D4D4183DD",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F7A8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-0D6D3ECAD917DAB8",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244F8B0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-E22ECCF0495EE521",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FA48"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-E058DAA260E9A31B",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FC58"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-B9D9EE2016615AA3",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FC70"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-C8B4C059496B6DEF",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FDD8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-3544791FA5062A4C",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FF58"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8244EB60",
+      "phase4_candidate_id": "P4-4DE4F24990BE52BB",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8244FF88"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824D8BD0",
+      "phase4_candidate_id": "P4-E3E77DE77D9413D2",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824D8D2C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824D8BD0",
+      "phase4_candidate_id": "P4-AEDE3B236EBD70CC",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824D8D44"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DF8B8",
+      "phase4_candidate_id": "P4-AEBDBB0B1946E6EE",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824DFA30"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DF8B8",
+      "phase4_candidate_id": "P4-E57E5722A004F259",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824DFA58"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-E1BE6B5F50F5E42D",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E002C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-30A4C7F2EED5FD4A",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E00F4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-145399587541A9BF",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E01CC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-73C322861AFD138B",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E01D4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-3533BB5BFF1CD072",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E01DC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-AC4BD62EFCA15758",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E01EC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-DB419607772B81A0",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E027C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824DFDC8",
+      "phase4_candidate_id": "P4-B511FFC8A9C4EB07",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E0284"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824E02B0",
+      "phase4_candidate_id": "P4-E85FC398D169578E",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E049C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824E02B0",
+      "phase4_candidate_id": "P4-AAC9FE9DBA2B9488",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824E0514"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x824F1F68",
+      "phase4_candidate_id": "P4-398357182828FC2F",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x824F20A8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E840",
+      "phase4_candidate_id": "P4-F539DD32008D5BED",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8253E8C0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E840",
+      "phase4_candidate_id": "P4-B8F5243C5994191E",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8253E924"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E840",
+      "phase4_candidate_id": "P4-6EC59C4F80B05D51",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8253E944"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E990",
+      "phase4_candidate_id": "P4-EBC5525DF637178C",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8253EA30"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E990",
+      "phase4_candidate_id": "P4-CDF4F84874018B33",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8253EA98"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8253E990",
+      "phase4_candidate_id": "P4-D56D4777975DCB83",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x8253EADC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82541BA0",
+      "phase4_candidate_id": "P4-BDE133E2281981B8",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x82541C00"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82663498",
+      "phase4_candidate_id": "P4-9461ADA37EB0357F",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82663520"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82663498",
+      "phase4_candidate_id": "P4-A54FCBCC56D98790",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82663618"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A92D8",
+      "phase4_candidate_id": "P4-2EEDA7EF2DAD9315",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826A9480"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A92D8",
+      "phase4_candidate_id": "P4-E6CFCB1853F8679A",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826A9660"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826A92D8",
+      "phase4_candidate_id": "P4-677E849EB0DCD1DC",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826A968C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C2958",
+      "phase4_candidate_id": "P4-E8C49F190C89F178",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x826C2B04"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C5B00",
+      "phase4_candidate_id": "P4-E91753441B3C7321",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826C5DD8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C5B00",
+      "phase4_candidate_id": "P4-323A14F9478D3A19",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826C5DF0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C5E70",
+      "phase4_candidate_id": "P4-0311A48403EDC17D",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826C5F70"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C5E70",
+      "phase4_candidate_id": "P4-3271D2E2A4260625",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x826C5F78"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C63C8",
+      "phase4_candidate_id": "P4-942CA9B90ADD6079",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x826C6540"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826C6698",
+      "phase4_candidate_id": "P4-C4B55D9050D3CC16",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826C67E4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826CEB60",
+      "phase4_candidate_id": "P4-5A4FC33B505A55B9",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826CED14"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826CEB60",
+      "phase4_candidate_id": "P4-F3A4FB4337F395F5",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826CED30"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826CEB60",
+      "phase4_candidate_id": "P4-FBDFCB975486B68A",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826CED68"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826CEB60",
+      "phase4_candidate_id": "P4-204D049544A49EA3",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826CEDD8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x826E6B98",
+      "phase4_candidate_id": "P4-422D632342D5129C",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x826E6F08"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8270D0A0",
+      "phase4_candidate_id": "P4-B1A8BC32DA18F7A6",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x8270D8DC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8279EC50",
+      "phase4_candidate_id": "P4-C92C15D501CE86D9",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8279ECB0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x827C6858",
+      "phase4_candidate_id": "P4-BCFC3A93DE66860B",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x827C6954"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x827CDEC0",
+      "phase4_candidate_id": "P4-C9D12A9824E11C17",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x827CE388"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82805360",
+      "phase4_candidate_id": "P4-B46665381644A26C",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82805E60"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82805360",
+      "phase4_candidate_id": "P4-38933BF428B309F7",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82805F8C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82805360",
+      "phase4_candidate_id": "P4-960E933A4CD57518",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x828060E4"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82805360",
+      "phase4_candidate_id": "P4-503AB355491CABAA",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x828061E8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82820640",
+      "phase4_candidate_id": "P4-BD54CB5F89860DEE",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82820798"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82820640",
+      "phase4_candidate_id": "P4-26A6CCA8D8A01AB0",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x8282081C"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82820640",
+      "phase4_candidate_id": "P4-8F163077DCBA258E",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82820948"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82820F58",
+      "phase4_candidate_id": "P4-CDDDCE4CF0701592",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82821378"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x828B5E28",
+      "phase4_candidate_id": "P4-AF8514AD0D9F64A3",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x828B5E70"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8298A870",
+      "phase4_candidate_id": "P4-BDF2D0B68821E109",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x8298AF90"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8298A870",
+      "phase4_candidate_id": "P4-BD9E13FE421BEA97",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "shared_switch_case_body",
+      "target": "0x8298B368"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x829D9DC0",
+      "phase4_candidate_id": "P4-5E90381DC5526267",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_default_case",
+      "target": "0x829D9ECC"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x82B59220",
+      "phase4_candidate_id": "P4-9A592D41F665714F",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x82B59EA0"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x8322A9B0",
+      "phase4_candidate_id": "P4-F4D3F7C0213D6F7D",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x8322AD00"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x83230330",
+      "phase4_candidate_id": "P4-B31D8186ED4808E4",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x832303E8"
+    },
+    {
+      "action": "retain_owner_no_promotion",
+      "owner": "0x83230D50",
+      "phase4_candidate_id": "P4-D393E88009E5B95A",
+      "phase4_category": "known_jump_table_case",
+      "semantic_classification": "switch_case_block",
+      "target": "0x83230E00"
+    }
+  ]
+}

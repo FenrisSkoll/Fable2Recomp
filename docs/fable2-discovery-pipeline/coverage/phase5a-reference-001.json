@@ -23,6 +23,108 @@
       "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\selected-checkpoint.json",
       "role": "private copy verification metadata",
       "sha256": "6A338023DA4EDA6B570F087058269233F8138864CE41EB875E225B9600BB2BDB"
+    },
+    {
+      "bytes": 1280153418,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\xenia-indirect-targets.raw.jsonl",
+      "role": "raw reference session",
+      "sha256": "59CD5C1A985A46AFC211D9B550E82E36F12AC304A6B256684713496DC15EE298"
+    },
+    {
+      "bytes": 485811,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\xenia-indirect-targets.raw.xenia.log",
+      "role": "reference runtime log",
+      "sha256": "2824675D3D8F3BB997BA93585266DCA8FCCCD4A43BF1B3AEA453263FD9B475E4"
+    },
+    {
+      "bytes": 20384962,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\review\\xenia-indirect-targets.summary.json",
+      "role": "session summary",
+      "sha256": "B2C077EE3620F477979833AFA0F59F93A81B7D10296A436E5C2E3D5BCF0A242E"
+    },
+    {
+      "bytes": 4084726,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\review\\xenia-indirect-targets.summary.csv",
+      "role": "session CSV",
+      "sha256": "246F6055107C381D8635742470F32E6973FD873B1C2E22BE322039DCDADA68B4"
+    },
+    {
+      "bytes": 48849110,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\indirect-targets\\phase5a-reference-001\\review\\fable2-indirect-targets.import-plan.json",
+      "role": "initial PostRun dry-run plan before ownership correction",
+      "sha256": "65AC344CF42F4E95EE0CDE3C147D5FD728DAA59C3361E16C1F85E9990F3803DF"
+    },
+    {
+      "bytes": 36505520,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\merged\\xenia-indirect-targets.summary.json",
+      "role": "merged summary",
+      "sha256": "EBD21437C40BEB0AFCD10CD7724BE4F1FE45A758060CB147C2DF9D1E5A17D6B6"
+    },
+    {
+      "bytes": 7416624,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\merged\\xenia-indirect-targets.summary.csv",
+      "role": "merged CSV",
+      "sha256": "DA027442181CA6F23B110E7FDCC26542B990EC62FB46EFAF17F6F76BE426FE89"
+    },
+    {
+      "bytes": 71293002,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\pre-application.import-plan.json",
+      "role": "reviewed pre-application dry-run plan",
+      "sha256": "B929FD75D86654170F2162AB356A05886C221C8695D003B8116E6483A8487D03"
+    },
+    {
+      "bytes": 71289842,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\merged\\fable2-indirect-targets.import-plan.json",
+      "role": "final dry-run plan",
+      "sha256": "BAD7CB32D7EED752E00829591C640D32F75DDFA920254E36092C039AA2E618CD"
+    },
+    {
+      "bytes": 341022857,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\closure-after\\entrypoint-closure.json",
+      "role": "regenerated closure",
+      "sha256": "DDEFE79AF86561188C1F7E59D5F6FA71347BE4220B618DF5EF88F9183C176FA7"
+    },
+    {
+      "bytes": 1039711,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\merged\\phase4-static-ownership-follow-up.json",
+      "role": "new versus known queue",
+      "sha256": "C9FB126B706232A726F9F08D9CBE049B2E4022EC280F160481E9F8DA7DC3B8EF"
+    },
+    {
+      "bytes": 72799,
+      "path": "C:\\Dev\\Fable2Recomp\\docs\\fable2-discovery-pipeline\\coverage\\phase5a-reference-001-targets.csv",
+      "role": "per-target classification CSV",
+      "sha256": "F90DCCC90BD944B7F85EA5C619C4A5DE1D7AB6D58B231C9612C30CCE6CAFBD3D"
+    },
+    {
+      "bytes": 1480121,
+      "path": "C:\\Dev\\Fable2Recomp\\docs\\fable2-discovery-pipeline\\coverage\\phase5a-reference-001-ownership\\ownership-ledger.json",
+      "role": "ownership proof ledger",
+      "sha256": "912D239FAEA50BF11EB78ED98DE7598E7049A380FAC7A9C39190924AB185B261"
+    },
+    {
+      "bytes": 8677,
+      "path": "C:\\Dev\\Fable2Recomp\\docs\\fable2-discovery-pipeline\\coverage\\phase5a-825E28B0-review.json",
+      "role": "reviewed thunk proof",
+      "sha256": "4737EC54D9395976A7AA6BC554E6E91D2DA63C8622068A85AD5D9E8F9FF427AE"
+    },
+    {
+      "bytes": 63996,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\reference-config-after.toml",
+      "role": "after-run config",
+      "sha256": "EE3400A5F70E8082657455DB16164CA740E3B99D83CCA526CDFE31FCE12352BB"
+    },
+    {
+      "bytes": 7721,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\save-handoff-inventory.json",
+      "role": "endpoint inventory",
+      "sha256": "888D31FFEFF1ECC7FD632F204C1EBE3BAD131297A8AD0AF29D88CC9DAE1E9F36"
+    },
+    {
+      "bytes": 2402,
+      "path": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\Launch.ps1",
+      "role": "native launch card",
+      "sha256": "CB876E02B86F6CD1E583958DDD59BBBE92618E5103A823EDBE920A693A9FA8DB"
     }
   ],
   "build": {
@@ -67,8 +169,9 @@
       "pair_count_semantics": "delta_since_previous_persistence",
       "raw_schema_version": 2
     },
-    "config_after": null,
+    "config_after": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\reference-config-after.toml",
     "config_before": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-config-before.toml",
+    "config_before_after_identical": true,
     "include_returns": false,
     "preflight": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\preparation\\reference-preflight.json",
     "resolution_scale": [
@@ -77,44 +180,104 @@
     ]
   },
   "handoff": {
-    "end_save_source": null,
-    "native_destination": null,
-    "next_session": null,
-    "preserved_endpoint": null
+    "copy_validation": "Exact path sets and hashes; native non-payload files equal preserved native source; all sources retained",
+    "end_save_source": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\content",
+    "endpoint": "Oakfield tavern",
+    "inventory": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\tranche-001\\save-handoff-inventory.json",
+    "mainsave": {
+      "bytes": 415039,
+      "sha256": "13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489"
+    },
+    "native_destination": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-native-001\\user-data",
+    "native_metadata_source": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\start-001\\native-save",
+    "next_session": "phase5a-native-001",
+    "payload_files_copied": 7,
+    "preserved_endpoint": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001\\xenia-content"
   },
   "limitations": [
-    "No gameplay category is confirmed until the user reports exercising it in this session.",
-    "Session not yet launched; runtime target counts, coverage, footer, performance and end save remain unknown.",
-    "Forward-only strategy: preceding reference content will not be replayed in full natively; only the endpoint smoke test is required.",
-    "No controlled gameplay collector-off/on overhead measurement exists. Synthetic transfer benchmark is not gameplay FPS.",
-    "Starting area and objective are user-reported checkpoint metadata, not a claim that this traced session has exercised them. No route or quest order is inferred from save bytes."
+    "Earlier events were reference-covered and statically/build validated but not immediately replay-validated in the native recompilation; endpoint smoke is pending.",
+    "Coverage is user-confirmed only; no full native parity or whole-game claim.",
+    "Collector-off/on controlled gameplay overhead and current normal-native FPS remain unmeasured. No historical instrumented 4\u00e2\u20ac\u201c5 FPS claim is assigned to this normal build.",
+    "Reported visual defects are non-blocking rendering observations, not performance complaints.",
+    "Collector counters are not frame counts or timestamps. Persistence window includes non-gameplay activity; exact event/log timestamp correlation is unavailable.",
+    "Separate profile loading, shops, inventory/equipment and reload are not independently confirmed categories for this session."
   ],
   "outcome": {
-    "fatal_or_guest_exception": null,
-    "hang": null,
-    "interaction_progression": null,
-    "invalid_target": null,
-    "loading_transition": null,
-    "rendering": null,
-    "result": null,
-    "save_reload_exit": null
+    "authoritative_end": "Oakfield tavern",
+    "authoritative_start": "Bowerstone Market",
+    "fatal_or_guest_exception": "no crash reported; no demonstrated fatal failure",
+    "hang": "none reported",
+    "interaction_progression": "no blocker reported; quest/script/dialogue events in user confirmation",
+    "invalid_target": "none reported",
+    "loading_transition": "no failure reported",
+    "rendering": {
+      "classification": "non_blocking_visual_defects_user_reported",
+      "correlation": "User local HH:mm; Europe/London is the workstation zone. Assuming that zone gives offsets approximately 7m39s, 10m39s, 14m39s from the collector header. This timezone mapping is an inference. Xenia log has thread prefixes without wall-clock timestamps; no exact log-line correlation or renderer cause established.",
+      "observations": [
+        {
+          "description": "Distant Spire: upper part only, noticeable hard cutoff",
+          "time": "20:23"
+        },
+        {
+          "description": "Extremely elongated dog shadows in Bowerstone Old Town",
+          "time": "20:26"
+        },
+        {
+          "description": "Moon bloom/glow excessively large and did not blend correctly",
+          "time": "20:30"
+        }
+      ],
+      "positive_comparison": "Rookridge ground rendered correctly; no missing terrain like the other recompilation attempt"
+    },
+    "result": "reference_tranche_completed_user_reported",
+    "save_reload_exit": "Saved and quit normally; separate reload not confirmed in this process"
   },
-  "performance_observations": [],
+  "performance_observations": [
+    {
+      "collector_overhead": null,
+      "frame_time_distribution": null,
+      "measured_fps": null,
+      "observation": "No separate performance complaint such as sustained low FPS, stuttering or progressive slowdown during this session.",
+      "source": "user_report",
+      "subjective": true
+    }
+  ],
   "runtime": "xenia_collector",
   "schema_version": 1,
   "session_id": "phase5a-reference-001",
   "shutdown": {
-    "flush_reason": null,
-    "footer_count": null,
-    "user_report": null,
-    "validation": null
+    "flush_reason": "window_close",
+    "footer": {
+      "aggregate_limit_exceeded": 0,
+      "batches": 1113,
+      "checkpoint_records": 1113,
+      "checkpoint_sequence": 1113,
+      "collector_version": 2,
+      "count_overflows": 0,
+      "dropped_hits": 0,
+      "final_sequence": 22651186418,
+      "final_unique_aggregates": 32155,
+      "flush_reason": "window_close",
+      "io_errors": 0,
+      "pair_count_semantics": "delta_since_previous_persistence",
+      "raw_schema_version": 2,
+      "record": "footer",
+      "run_id": "phase5a-reference-001",
+      "sequence_scope": "maximum_per_thread_sequence",
+      "shutdown_status": "normal",
+      "total_hits": 28657174372,
+      "total_pair_records": 2960760,
+      "unique_aggregate_count_complete": true
+    },
+    "footer_count": 1,
+    "user_report": "Saved and quit normally.",
+    "validation": "normal; complete accounting; no corrupt tail or missing newline; zero dropped hits, I/O errors, overflows, limit events and uncommitted pair records"
   },
   "starting_checkpoint": {
+    "area": "Bowerstone Market",
+    "checkpoint_evidence": "User checkpoint correction in this conversation; payload identity independently checked against the selected working source",
     "copied_payload_files": 7,
     "description": "Bowerstone Market, childhood/prologue completed; meet the blind woman from the Guild at the central fountain after an expected approximately five-minute wait. User checkpoint correction for the latest working save; isolated payload copy is the accepted State D checkpoint from 2026-09-08.",
-    "area": "Bowerstone Market",
-    "objective": "Meet the blind woman from the Guild at the fountain in the middle of Bowerstone Market",
-    "checkpoint_evidence": "User checkpoint correction in this conversation; payload identity independently checked against the selected working source",
     "expected_wait": {
       "approximate_seconds": 300,
       "evidence": "user_report",
@@ -122,6 +285,7 @@
     },
     "mainsave_bytes": 359742,
     "mainsave_sha256": "1643F56CADC91A75CAF7D6620DFCEC4323BEDF079AF663B7BA3758A62685A9D4",
+    "objective": "Meet the blind woman from the Guild at the fountain in the middle of Bowerstone Market",
     "original_native_profile": "B13EBABEBABEBABE",
     "preserved_copy": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\start-001\\xenia-launch-content",
     "reference_profile": "E03000002168622D",
@@ -130,19 +294,62 @@
     "writable_content_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\content",
     "writable_storage_root": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\sessions\\phase5a-reference-001\\storage"
   },
-  "status": "prepared",
+  "status": "analysed",
   "target_review": {
-    "applied_changes": [],
-    "classifications": {},
-    "known_targets": null,
-    "new_pairs": null,
-    "new_targets": null
+    "applied_changes": [
+      {
+        "candidate_id": "P4-FF74FACDEA53A5E8",
+        "end": "0x825E28C0",
+        "review": "phase5a-825E28B0-review.json",
+        "size": "0x10",
+        "target": "0x825E28B0"
+      }
+    ],
+    "baseline_runs": [
+      "fable2-tu1-manual-001",
+      "fable2-tu1-manual-002"
+    ],
+    "baseline_targets": 16143,
+    "classifications": {
+      "existing_effective_registration": 323,
+      "new_callable_tail_dispatch_thunk": 1,
+      "return_continuation": 68,
+      "shared_switch_case_body": 8,
+      "switch_case_block": 73,
+      "switch_default_case": 6
+    },
+    "final_plan_id": "P4PLAN-E7D6579DE5CF3677D3D4",
+    "final_plan_proposals": 0,
+    "known_targets": 15560,
+    "merged_pairs": 28743,
+    "merged_targets": 16622,
+    "new_pairs": 958,
+    "new_targets": 479,
+    "session_pairs": 27665,
+    "session_targets": 16039,
+    "static_nonlink_ctr_reservoir_after": 712,
+    "static_nonlink_ctr_reservoir_before": 711,
+    "static_reservoir_change": {
+      "disposition": "Existing registered destination; new thunk makes this computed tail-dispatch site visible to the reservoir. No table annotation or speculative target needed.",
+      "failure": "missing_bound",
+      "observed_hits": 5,
+      "observed_target": "0x82676398",
+      "owner": "0x825E28B0",
+      "site": "0x825E28BC",
+      "static_classification": "computed_tail_bctr"
+    },
+    "static_reservoir_is_not_a_quota": true,
+    "unresolved_new_targets": 0
   },
   "timing": {
+    "approximate_collector_persistence_window_seconds": 2963.575,
+    "collector_start_utc": "2026-09-09T19:15:20.793517100Z",
+    "collector_started_unix_ns": 1788981320793517100,
     "process_end_utc": null,
     "process_start_utc": null,
+    "raw_last_write_utc": "2026-09-09T20:04:44.3685104Z",
     "sampling_seconds": null,
-    "source": null
+    "source": "Collector header wall clock to final raw-file write; approximately 49m24s, includes loading/saving/exit, not a measured gameplay-only or process lifetime window."
   },
   "title_identity": {
     "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
@@ -169,7 +376,7 @@
     "image_base": "0x82000000",
     "image_size": "0x01620000",
     "media_id": "0x716F0A0D",
-    "observed_tu1_confirmed": null,
+    "observed_tu1_confirmed": true,
     "patched_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
     "shared_evidence_path": "tools/fable2-entrypoint-closure-evidence.json",
     "shared_evidence_sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E",
@@ -182,8 +389,27 @@
     "xenia_module_fingerprint_algorithm": "sha1_contiguous_loaded_executable_memory"
   },
   "user_coverage": {
-    "areas": [],
-    "categories": [],
-    "confirmation": null
+    "areas": [
+      "Bowerstone Market",
+      "Bowerstone Old Town",
+      "cellar",
+      "Rookridge",
+      "Hobbe Cave",
+      "Oakfield",
+      "Oakfield tavern"
+    ],
+    "categories": [
+      "adult_region",
+      "region_transition",
+      "dialogue_crowds_npc_ai",
+      "melee",
+      "ranged",
+      "will",
+      "quest_state_change",
+      "scripted_scene_cutscene",
+      "save",
+      "orderly_exit"
+    ],
+    "confirmation": "Phase 5A traced gameplay session completed.\n\n## Coverage boundaries\n\nStarted:\n\n* Bowerstone Market\n\nEnded:\n\n* Oakfield tavern\n\nUse these as the authoritative start and end locations for the session manifest.\n\n## Rendering observations\n\n* **20:23 \u00e2\u20ac\u201d Distant Spire:** Only the upper part of the Spire rendered, with the remainder ending in a noticeable hard cutoff.\n* **20:26 \u00e2\u20ac\u201d Dog shadows:** The dog\u00e2\u20ac\u2122s shadows were extremely elongated in Bowerstone Old Town.\n* **20:30 \u00e2\u20ac\u201d Moon bloom:** The moon\u00e2\u20ac\u2122s bloom/glow was excessively large and did not appear to blend correctly.\n* **Positive comparison \u00e2\u20ac\u201d Rookridge terrain:** The ground rendered correctly in Rookridge. There was no missing terrain like that seen in the other recompilation attempt.\n\nTreat these as non-blocking rendering defects rather than performance faults.\n\n## Gameplay and systems exercised\n\n* Started from the working Bowerstone Market checkpoint.\n* Completed the relevant cutscene/scripted sequence.\n* Used the blacksmithing minigame.\n* Transitioned into Bowerstone Old Town.\n* Completed quest conversations and scripted dialogue.\n* Entered a cellar and opened a chest.\n* Triggered the crime/vandalism system and paid the resulting fine.\n* Dug up a dig spot.\n* Received the objective: `Find the abbot in Oakfield`.\n* Travelled to Rookridge.\n* Exercised NPC death/event handling by accidentally killing Dave.\n* Fought bandits using all three combat types:\n\n  * melee;\n  * ranged;\n  * Will.\n* Triggered a working killcam.\n* Entered Hobbe Cave.\n* Transitioned from Rookridge to Oakfield.\n* Spoke to the monk in Oakfield.\n* Accepted the Rookridge bandit-elimination quest.\n* Reached the Oakfield tavern.\n* Saved and quit normally.\n\n## Runtime outcome\n\nI did not encounter:\n\n* a crash;\n* a hang;\n* an invalid or unregistered function-target failure;\n* a loading or transition failure;\n* a save failure;\n* a progression blocker.\n\nI did not record a separate performance complaint such as sustained low FPS, stuttering or progressive slowdown during this session. The three timestamped observations above were visual/rendering issues."
   }
 }

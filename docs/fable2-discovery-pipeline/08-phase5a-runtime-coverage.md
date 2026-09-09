@@ -1,12 +1,14 @@
 # Phase 5A: first forward-only coverage tranche
 
-## Status: prepared; awaiting user reference gameplay
+## Status: reference processed; native endpoint smoke pending
 
-Preparation date: 2026-09-09. **Phase 5A is not complete.** No Phase 5A
-gameplay session has run, and no gameplay category or runtime outcome is
-claimed. The user's forward-only amendment replaces the original full-tranche
-native replay requirement. After reference processing, only an isolated native
-endpoint load/control/basic-interaction/save/exit smoke test is required.
+Preparation date: 2026-09-09. **Phase 5A is not complete.** The completed
+Bowerstone Market-to-Oakfield tavern reference session, reviewed thunk import,
+coverage matrix, save handoff and current native run card are recorded in the
+[tranche report](09-phase5a-tranche-001.md). That report supersedes the pending
+items in this historical preparation record. Only the short native endpoint
+load/control/basic-interaction/save/exit smoke test remains; no full replay is
+required. The sections below preserve the pre-run baseline and preparation.
 
 ## Reconstructed baseline
 
@@ -120,7 +122,7 @@ Actual executable: 17,271,808 bytes, SHA-256
 This actual artifact is recorded separately from the older Phase 4 documented
 binary hash; no unsupported claim of binary identity is made.
 
-## Run card
+## Preparation run card (completed; do not reuse this RunId)
 
 From `C:\Dev\Fable2Recomp` in developer PowerShell:
 
@@ -153,7 +155,7 @@ continued, whether saving and clean exit succeeded, and any blocker or
 performance symptom with approximate session time if known.
 Partial symptom reports are useful; no FPS measurement is required.
 
-## First-tranche coverage matrix
+## First-tranche coverage matrix at preparation time
 
 Only user-confirmed exercised categories will be added here.
 
@@ -224,7 +226,7 @@ later reviewed change and before the native endpoint run.
 
 ## Performance evidence and limits
 
-No Phase 5A gameplay performance observation exists yet. The optional
+At preparation time no Phase 5A gameplay performance observation existed. The optional
 collector test's seven paired 200,000-transfer synthetic JIT samples measured
 disabled median 22.828 ns/transfer, enabled median 31.546 ns/transfer, median
 ratio 1.381899. This is a microbenchmark, not a gameplay-overhead estimate or
@@ -239,12 +241,10 @@ optimization or new performance instrumentation is introduced.
 
 ## Remaining gate and next forward-only tranche
 
-Next dependency is the user reference run above. Complete raw provenance,
-footer/schema/accounting validation, repeated PostRun/merge/plan generation
-and every new target review before requesting another run. Preserve the
-closed reference endpoint, copy it into an explicitly named isolated native
-root and provide the short native smoke-test command. The source/destination
-hashes and writable root must be recorded before native launch.
+Reference processing and the isolated endpoint handoff are now complete.
+The remaining dependency is the short Oakfield tavern native smoke test in
+the [tranche report](09-phase5a-tranche-001.md). Do not repeat the reference
+run card above or replay its complete gameplay section.
 
 The earlier Xenia events will be **reference-covered and statically/build
 validated but not immediately replay-validated in the recompilation**. This

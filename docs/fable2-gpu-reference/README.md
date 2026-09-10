@@ -31,10 +31,11 @@ reviving G2A. The source/artifact identities above describe this historical
 corpus; [NR0A provenance](../fable2-native-renderer/nr0a/reading-and-provenance.md)
 records newer accepted save/testing work and current disk artifacts separately.
 
-[NR0B-1 preparation](../fable2-native-renderer/nr0b1/README.md) now supplies an
-isolated user-run card and default-off effective-configuration reporting.
-Status is **PREPARED — USER RUN REQUIRED**, not runtime completion of
-EXP-CONFIG-CAP-001. Historical source/artifact evidence above is unchanged.
+[NR0B-1](../fable2-native-renderer/nr0b1/README.md) now completes
+EXP-CONFIG-CAP-001 for the reviewed user-operated Oakfield snapshot:
+**CONFIGURATION VERIFIED — READY FOR NR0B-2**. This does not qualify a frame
+contract or diagnose the black/blank surfaces. Historical source/artifact
+evidence above is unchanged.
 
 ## Reading order
 

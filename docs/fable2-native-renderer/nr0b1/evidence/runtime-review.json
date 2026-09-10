@@ -1,0 +1,330 @@
+{
+  "schema": "fable2-nr0b1-reviewed-run-v1",
+  "result": "CONFIGURATION VERIFIED \u2014 READY FOR NR0B-2",
+  "review_date": "2026-09-10",
+  "run_id": "nr0b1-oakfield-20260910-001",
+  "launch_identity": {
+    "pid": 27668,
+    "start_utc": "2026-09-10T17:24:23.5099166Z",
+    "end_utc": "2026-09-10T17:25:34.4411796Z",
+    "exit_code": 0,
+    "log": "C:\\Dev\\Fable2Recomp\\fable2-run-004.log",
+    "log_identity": {
+      "bytes": 989466,
+      "sha256": "C36B71B578DB40DDDFE5612A8DA90DACEA268AB9CD07EBA50CF240A7F457A04D"
+    },
+    "restoration_utc": "2026-09-10T15:11:27.574326+00:00",
+    "previous_log_excluded": {
+      "path": "C:\\Dev\\Fable2Recomp\\fable2-run-003.log",
+      "bytes": 654415,
+      "sha256": "882EB89739B465230EB91693B86684E0C54ED853BE4B4DD407D5C29FFB4EC5EF"
+    },
+    "log_time_offset": "+01:00; all log timestamps fall inside process UTC lifetime"
+  },
+  "raw_input_identities": {
+    "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\preparation.json": {
+      "bytes": 7116,
+      "sha256": "421D509B481B54D4294C9374CE7CFDC70DD86C4A1991E2AF71DE41A0231B6824"
+    },
+    "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\process.json": {
+      "bytes": 2928,
+      "sha256": "682CF50A6F88668E0C140BB3652F10DA314265A511A01E4B2FD54E520F4EA9B5"
+    },
+    "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\effective-report.json": {
+      "bytes": 7633,
+      "sha256": "24EEF5462E7C1085249B7177634B396DCD55E998A95D7AEAE854F58C9FE59829"
+    },
+    "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\launch.claim": {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "C:\\Dev\\Fable2Recomp\\fable2-run-004.log": {
+      "bytes": 989466,
+      "sha256": "C36B71B578DB40DDDFE5612A8DA90DACEA268AB9CD07EBA50CF240A7F457A04D"
+    }
+  },
+  "user_confirmation": {
+    "loaded_scene": "Stood outside Oakfield Inn",
+    "gameplay_loaded_normally": "yes",
+    "visible_symptoms": "Character and dog textures not loaded / black / blank",
+    "exited_normally": "yes",
+    "powershell_helper_returned": "yes"
+  },
+  "process": {
+    "run_id": "nr0b1-oakfield-20260910-001",
+    "executable": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\fable2.exe",
+    "arguments": [
+      "--game_data_root",
+      "C:\\Dev\\Fable2Recomp\\assets\\runtime",
+      "--update_data_root",
+      "C:\\Dev\\Fable2Recomp\\assets\\update",
+      "--gpu_plugin=xenos",
+      "--log_level",
+      "debug",
+      "--log_file",
+      "C:\\Dev\\Fable2Recomp\\fable2-run-004.log",
+      "--user_data_root",
+      "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data",
+      "--cache_root",
+      "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache",
+      "--gpu_config_report",
+      "nr0b1-oakfield-20260910-001"
+    ],
+    "working_directory": "C:\\Dev\\Fable2Recomp",
+    "log": "C:\\Dev\\Fable2Recomp\\fable2-run-004.log",
+    "os": "Microsoft Windows NT 10.0.26200.0",
+    "os_source": "System.Environment.OSVersion",
+    "pid": 27668,
+    "start_utc": "2026-09-10T17:24:23.5099166Z",
+    "end_utc": "2026-09-10T17:25:34.4411796Z",
+    "exit_code": 0,
+    "command_line_observed": "\"C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\fable2.exe\" --game_data_root C:\\Dev\\Fable2Recomp\\assets\\runtime --update_data_root C:\\Dev\\Fable2Recomp\\assets\\update --gpu_plugin=xenos --log_level debug --log_file C:\\Dev\\Fable2Recomp\\fable2-run-004.log --user_data_root C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data --cache_root C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache --gpu_config_report nr0b1-oakfield-20260910-001",
+    "modules": {
+      "rexgpu-xenos.dll": {
+        "identity_kind": "loaded module path plus on-disk file hash; not process memory",
+        "sha256": "6DBD1336DC219D8181DF65D4AB179512400ED6A7BF5FDAEACE29A7162EDD3BB8",
+        "bytes": 2817024,
+        "observed_utc": "2026-09-10T17:24:23.7267299Z",
+        "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\rexgpu-xenos.dll"
+      },
+      "fable2.exe": {
+        "identity_kind": "loaded module path plus on-disk file hash; not process memory",
+        "sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9",
+        "bytes": 105042944,
+        "observed_utc": "2026-09-10T17:24:23.7130940Z",
+        "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\fable2.exe"
+      },
+      "rexruntime.dll": {
+        "identity_kind": "loaded module path plus on-disk file hash; not process memory",
+        "sha256": "D325FA4296577565137AD9480A258CE65AD071D9C538C0362783F89725B111B6",
+        "bytes": 10380288,
+        "observed_utc": "2026-09-10T17:24:23.7235700Z",
+        "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\rexruntime.dll"
+      }
+    },
+    "reporting_errors": []
+  },
+  "configuration_records": {
+    "device": {
+      "api": "d3d12",
+      "device_create_feature_level": "11_0",
+      "adapter_description": "NVIDIA GeForce RTX 5080",
+      "adapter_luid": "00000000:0000C6A4",
+      "vendor_id": "0x10DE",
+      "device_id": "0x2C02",
+      "adapter_requested": "-1",
+      "adapter_selected_index": "0",
+      "driver_version": "32.0.16.1664",
+      "driver_source": "IDXGIAdapter::CheckInterfaceSupport(IDXGIDevice)",
+      "driver_hresult": "0x00000000",
+      "options_hresult": "0x00000000",
+      "rov_supported": "true",
+      "resource_binding_tier": "3",
+      "tiled_resources_tier": "4",
+      "alpha_blend_factor_supported": "true",
+      "alpha_options13_hresult": "0x00000000",
+      "pix_attached": "false"
+    },
+    "runtime-paths": {
+      "game_data_root": "C:\\Dev\\Fable2Recomp\\assets\\runtime",
+      "user_data_root": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data",
+      "update_data_root": "C:\\Dev\\Fable2Recomp\\assets\\update",
+      "cache_root": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache",
+      "metadata_root": ""
+    },
+    "shared-memory": {
+      "tiled_requested": "true",
+      "tiled_effective": "true",
+      "selection_reason": "reserved_resource_created"
+    },
+    "pipeline-policy": {
+      "async_shader_compilation_requested": "true",
+      "pipeline_threads_requested": "-1",
+      "pipeline_threads_created": "15",
+      "async_effective_policy": "eligible_pipelines_with_pixel_shader"
+    },
+    "requested": {
+      "gpu_plugin": "xenos",
+      "gpu_plugin_source": "command_line",
+      "d3d12_adapter": "-1",
+      "d3d12_adapter_source": "default",
+      "render_target_path_d3d12": "",
+      "render_target_path_d3d12_source": "default",
+      "d3d12_bindless": "true",
+      "d3d12_bindless_source": "default",
+      "d3d12_tiled_shared_memory": "true",
+      "d3d12_tiled_shared_memory_source": "default",
+      "draw_resolution_scale_x": "1",
+      "draw_resolution_scale_x_source": "default",
+      "draw_resolution_scale_y": "1",
+      "draw_resolution_scale_y_source": "default",
+      "anisotropic_override": "3",
+      "anisotropic_override_source": "default",
+      "clear_memory_page_state": "true",
+      "clear_memory_page_state_source": "default",
+      "async_shader_compilation": "true",
+      "async_shader_compilation_source": "default",
+      "d3d12_pipeline_creation_threads": "-1",
+      "d3d12_pipeline_creation_threads_source": "default",
+      "vsync": "true",
+      "vsync_source": "default"
+    },
+    "context": {
+      "render_target_path": "rtv",
+      "render_target_selection": "vendor_default",
+      "bindless_effective": "true",
+      "bindless_requirement": "requested_and_resource_binding_tier_at_least_2",
+      "draw_resolution_scale_x": "1",
+      "draw_resolution_scale_y": "1",
+      "scale_clamped": "false",
+      "internal_extent": "unavailable_multiple_target_extents",
+      "anisotropy_effective": "per_eligible_sampler_not_observed"
+    },
+    "host-present": {
+      "width": "3840",
+      "height": "2160",
+      "sync_interval": "0",
+      "restart": "true",
+      "allow_tearing": "true",
+      "hresult": "0x00000000",
+      "scope": "first_successful_host_present_not_gameplay_confirmation"
+    },
+    "shader-storage": {
+      "cache_root": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache",
+      "title_id": "0x4D5307F1",
+      "shader_file": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache\\shaders\\shareable\\4D5307F1.xsh",
+      "pipeline_file": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache\\shaders\\shareable\\4D5307F1.rtv.d3d12.xpso",
+      "storage_initialized": "true",
+      "host_pso_blob_storage": "not_implemented"
+    },
+    "guest-output": {
+      "width": "1280",
+      "height": "720",
+      "scope": "first_valid_swap_output_only"
+    }
+  },
+  "tracy_review": {
+    "classification": "NOT APPLICABLE as required loaded runtime module for this audited Release build",
+    "observed_loaded": false,
+    "staged_identity": {
+      "bytes": 232960,
+      "sha256": "FDBE7A329E1B06A86FE61A2C5BE6B335F32F9BBCA7E05F7B183A35C515D2D1A5",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\TracyClient.dll",
+      "source": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\TracyClient.dll"
+    },
+    "original_report_preserved": true,
+    "basis": "Three exact observed images have no Tracy imports; SDK Release excludes REXGLUE_ENABLE_PROFILING. Not a claim that arbitrary profiling builds may omit this DLL.",
+    "sdk_commit": "06c4b7002a449ad4d173ec90c625e490ed03fe74",
+    "source_blobs": {
+      "CMakeLists.txt": "9b3cdf564234b3f010407f7ff0226d0e28baf2b3",
+      "include/rex/perf/counter.h": "b3947e0ff101a17d206702fa20fca70c91ee6d4f",
+      "cmake/rexglue_helpers.cmake": "41e6dce3254bae528ac80e52a6c799eb6c300373",
+      "thirdparty/CMakeLists.txt": "f102b56a18ad266586d0ea65cd0f376112db27e1"
+    },
+    "import_inspection_command": "llvm-readobj --coff-imports <exact-staged-image>",
+    "imported_module_names": {
+      "fable2.exe": [
+        "rexruntime.dll",
+        "KERNEL32.dll",
+        "ole32.dll",
+        "SHELL32.dll",
+        "MSVCP140.dll",
+        "VCRUNTIME140.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-time-l1-1-0.dll",
+        "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-environment-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll"
+      ],
+      "rexruntime.dll": [
+        "WS2_32.dll",
+        "dxgi.dll",
+        "bcrypt.dll",
+        "KERNEL32.dll",
+        "USER32.dll",
+        "IMM32.dll",
+        "ole32.dll",
+        "ADVAPI32.dll",
+        "SHELL32.dll",
+        "MSVCP140.dll",
+        "MSVCP140_ATOMIC_WAIT.dll",
+        "WINMM.dll",
+        "SETUPAPI.dll",
+        "GDI32.dll",
+        "VERSION.dll",
+        "HID.DLL",
+        "VCRUNTIME140.dll",
+        "VCRUNTIME140_1.dll",
+        "api-ms-win-crt-time-l1-1-0.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-environment-l1-1-0.dll",
+        "api-ms-win-crt-convert-l1-1-0.dll",
+        "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll",
+        "api-ms-win-crt-utility-l1-1-0.dll"
+      ],
+      "rexgpu-xenos.dll": [
+        "rexruntime.dll",
+        "KERNEL32.dll",
+        "ole32.dll",
+        "MSVCP140.dll",
+        "VCRUNTIME140.dll",
+        "api-ms-win-crt-locale-l1-1-0.dll",
+        "api-ms-win-crt-stdio-l1-1-0.dll",
+        "api-ms-win-crt-runtime-l1-1-0.dll",
+        "api-ms-win-crt-math-l1-1-0.dll",
+        "api-ms-win-crt-time-l1-1-0.dll",
+        "api-ms-win-crt-filesystem-l1-1-0.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll",
+        "api-ms-win-crt-environment-l1-1-0.dll",
+        "api-ms-win-crt-string-l1-1-0.dll"
+      ]
+    }
+  },
+  "integrity": {
+    "source_and_preserved_14_files_unchanged": true,
+    "baseline_four_artifacts_unchanged": true,
+    "staged_four_artifacts_unchanged": true,
+    "title_input_hashes_unchanged": true,
+    "configuration_still_absent": true,
+    "writable_changes": {
+      "4D5307F1/profile/User/63E83FFF": {
+        "before": {
+          "bytes": 40,
+          "sha256": "59F3BAC75E1DD108FDA4CC54E67D83BE2EB0CB58760EFA4C477C8EFEDB6028D5"
+        },
+        "after": {
+          "bytes": 40,
+          "sha256": "78C4EBF61DDB6DAEB09BA8D55DA9244E0564A589CF80D28CCBED35C8302F71A9"
+        }
+      },
+      "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/mainsave.bin": {
+        "before": {
+          "bytes": 415039,
+          "sha256": "13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489"
+        },
+        "after": {
+          "bytes": 420928,
+          "sha256": "D2783E257A5866BF7AD122D80961DDA7673C94F8C39E34F35FBAB183CE7E7888"
+        }
+      }
+    },
+    "writable_cache_files_unchanged": true
+  },
+  "limitations": [
+    "Loaded module identity is mapped path plus contemporaneous disk hash, not process memory hash",
+    "Driver-cache contents/isolation unavailable; copied cache does not establish warmed performance",
+    "Output extents describe first valid swap and first successful present, not all gameplay targets",
+    "Per-sampler anisotropy, one global internal extent and post-patch runtime image hash remain unavailable",
+    "User visual symptom report does not establish missing texture payloads or root cause",
+    "No frame-contract recorder, workload seam or visual correctness qualification"
+  ]
+}

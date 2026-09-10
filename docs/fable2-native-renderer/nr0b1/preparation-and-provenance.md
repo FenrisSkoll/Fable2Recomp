@@ -1,5 +1,10 @@
 # Preparation and provenance
 
+This is the historical preparation record. The subsequent user-operated run
+and recreated-session provenance are reconciled in [runtime closeout](runtime-closeout.md),
+which now completes the configuration gate. Original preparation identities
+below and `evidence/preparation-summary.json` are retained unchanged.
+
 Date: 2026-09-10. Evidence below is **SOURCE-CONFIRMED** (code/Git) or direct
 file/inventory verification, never a claim that the game ran. Planned scene
 identity is **PROJECT-REPORTED** from the accepted handoff. Runtime selections

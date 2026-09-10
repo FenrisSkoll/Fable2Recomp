@@ -13,9 +13,10 @@ This is an architecture decision with unresolved gates, dated **2026-09-09**.
 It authorizes no implementation or experiment. The original G1–G1.6 evidence
 retains its own classifications, dates and pins.
 
-Follow-on status: [NR0B-1](../nr0b1/README.md) is **PREPARED — USER RUN REQUIRED**.
-Its separately authorized configuration reporting and isolated run card do not
-complete NR0A's dynamic frame-contract gate or qualify a renderer seam.
+Follow-on status: [NR0B-1](../nr0b1/README.md) is **CONFIGURATION VERIFIED — READY
+FOR NR0B-2** following the user-operated Oakfield run. This completes the
+configuration gate only; NR0A's dynamic frame-contract gate and renderer seam
+qualification remain unresolved.
 
 ## Decision package
 

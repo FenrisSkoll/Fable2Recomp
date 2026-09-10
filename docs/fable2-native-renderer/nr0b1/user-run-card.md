@@ -1,6 +1,10 @@
 # One user-operated configuration run
 
-Status: **PREPARED — USER RUN REQUIRED**. Run once from the accepted developer
+Status: **COMPLETED**, PID 27668 / `fable2-run-004.log`, actual exit 0.
+See [runtime closeout](runtime-closeout.md). Do not rerun or recreate this used
+session. The following is the retained historical run card.
+
+Run once from the accepted developer
 PowerShell profile (which defines `Get-Fable2NextRunNumber`):
 
 ```powershell

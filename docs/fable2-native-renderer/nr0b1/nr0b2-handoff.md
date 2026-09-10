@@ -1,10 +1,27 @@
 # NR0B-2 recorder preparation — specification only
 
-NR0B-1 remains **PREPARED**, not runtime-verified. First finish its
-[run card](user-run-card.md), reconcile all stages and loaded artifacts, and
-review the user-confirmed scene/termination. Do not add the recorder before
-this dependency closes. Reuse the same verified configuration and checkpoint
-provenance; any later process needs a fresh unique writable root and run ID.
+NR0B-1 is **CONFIGURATION VERIFIED — READY FOR NR0B-2**. The
+[runtime closeout](runtime-closeout.md) reconciles PID 27668 / log 004 and the
+user-confirmed scene outside Oakfield Inn, normal gameplay load and exit 0.
+This closes the configuration dependency only; the recorder still requires
+separate authorization. Any later process needs a fresh unique writable root
+and run ID. Do not reuse the completed or previously recreated session.
+
+Verified baseline: RTX 5080, driver `32.0.16.1664`, Xenos/D3D12, RTV vendor
+default despite ROV support, bindless and tiled shared memory enabled, scale
+1×1, 15 workers with conditional async policy. First guest output was 1280×720;
+first host present 3840×2160 (not a global gameplay/internal extent). Copied
+baseline caches were used; driver-cache state remains unknown. Carry the
+exact loaded hashes and requested/source records from the
+[reviewed ledger](evidence/runtime-review.json), not merely these labels.
+Future launch metadata must distinguish required loaded modules from staged
+optional files: this Release build has no Tracy imports, explaining its
+unobserved staged Tracy DLL. Reassess that dependency if the build changes.
+
+The source checkpoint remains protected and unchanged. The writable run's
+main save/profile update is evidence, not automatically a replacement capture
+checkpoint. The user reported black/blank character and dog surfaces; NR0B-2
+must not pre-label them as failed texture loads or assume this symptom's cause.
 
 The SDK source below is present at reporting commit
 `06c4b7002a449ad4d173ec90c625e490ed03fe74`. These locations and existing values

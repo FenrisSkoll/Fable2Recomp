@@ -1,6 +1,8 @@
 # Effective GPU configuration: reporting gap assessment
 
-Status: **PREPARED; runtime observations pending**. This table was
+Status: **CONFIGURATION VERIFIED — READY FOR NR0B-2**. Actual results and
+scoped limitations are in the [runtime closeout](runtime-closeout.md).
+The following historical gap table was
 produced before implementing reporting. It carries forward `EXP-CONFIG-CAP-001`
 from [NR0A](../nr0a/nr0b-evidence-plan.md). No requested setting below is changed
 to attempt a visual fix. Paths in the source column are relative to canonical
@@ -80,7 +82,7 @@ unavailable because multiple target extents exist. First guest swap output and
 first successful host-present extents are separately scoped, may differ and
 may precede gameplay. Resizes after these records are not captured.
 
-## Current evidence status
+## Preparation-stage evidence status (historical)
 
 | Group | Prepared/verified now | Requires the user-operated process |
 |---|---|---|

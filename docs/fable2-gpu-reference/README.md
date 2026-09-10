@@ -37,6 +37,11 @@ EXP-CONFIG-CAP-001 for the reviewed user-operated Oakfield snapshot:
 contract or diagnose the black/blank surfaces. Historical source/artifact
 evidence above is unchanged.
 
+[NR0B-2](../fable2-native-renderer/nr0b2/README.md) is now **RECORDER PREPARED —
+USER CAPTURE REQUIRED**. Its default-off metadata observer and isolated manual
+session are built and validated; no runtime workload or native renderer is
+qualified. Historical corpus evidence remains unchanged.
+
 ## Reading order
 
 1. [Scope, evidence rules and immutable pins](00-scope-and-pins.md)

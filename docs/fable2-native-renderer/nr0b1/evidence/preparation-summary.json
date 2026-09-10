@@ -1,0 +1,185 @@
+{
+  "run_id": "nr0b1-oakfield-20260910-001",
+  "status": "PREPARED \u2014 USER RUN REQUIRED",
+  "session": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001",
+  "source": "C:\\Dev\\Fable2Recomp\\out\\phase5a\\checkpoints\\end-001-native\\user-data",
+  "preserved": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\checkpoints\\nr0b1-oakfield-20260910-001\\user-data",
+  "writable": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data",
+  "save_inventory": {
+    "4D5307F1/profile/User/63E83FFD": {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "4D5307F1/profile/User/63E83FFE": {
+      "bytes": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+    },
+    "4D5307F1/profile/User/63E83FFF": {
+      "bytes": 40,
+      "sha256": "59F3BAC75E1DD108FDA4CC54E67D83BE2EB0CB58760EFA4C477C8EFEDB6028D5"
+    },
+    "achievements/4D5307F1.toml": {
+      "bytes": 237,
+      "sha256": "76279537A9B0670534ABD9B39230651A3A0BD3EECCF44D7533935F03916849CA"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/chaptersave.bin": {
+      "bytes": 551,
+      "sha256": "52C46764998E208FFD80690A13497D478452CD2C0C914B5C07BB0361D7E67ABB"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/Fable2PubInfo.xml": {
+      "bytes": 560,
+      "sha256": "B92B1E2ECEAD5236DA6C87397CF26F5B61C7F08FC698F89DDECCF7C5FC58C6CB"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/failquestsave.bin": {
+      "bytes": 328979,
+      "sha256": "022286047C9C10F9980163B686E389854CEAA8F08D52B94D4A4E584BA95422B6"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/herosave.bin": {
+      "bytes": 1610,
+      "sha256": "417C4A01DF041F1C359D16111CF1E35F1891F750DB081D648810CCFF9DD48962"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/mainsave.bin": {
+      "bytes": 415039,
+      "sha256": "13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/saveuid.bin": {
+      "bytes": 8,
+      "sha256": "3FB361773CF634BAB341FCB1FCE89431EB4356C935EDAAB73D73692A71157D15"
+    },
+    "B13EBABEBABEBABE/4D5307F1/00000001/Hero000/texturemorphs.bin": {
+      "bytes": 22304,
+      "sha256": "3752426EC59C366287EAE591E842B56B24AC2A64A82CF7AF6737FC68E0844D7D"
+    },
+    "B13EBABEBABEBABE/4D5307F1/Headers/00000001/Hero000.header": {
+      "bytes": 328,
+      "sha256": "9BE20BAE420598D3D42766ACDD8557FFD0F0C70D98A8085F03E0475E257B6EFE"
+    },
+    "cache/shaders/shareable/4D5307F1.rtv.d3d12.xpso": {
+      "bytes": 46956,
+      "sha256": "B84C25906C3E0C5F3560E436BA1954AC0A536651E28CEB10346458A1C0123D22"
+    },
+    "cache/shaders/shareable/4D5307F1.xsh": {
+      "bytes": 246884,
+      "sha256": "72DB0BC95A784DD65BB1621AFCA6638708D4CDD60900ED05202FA6E7FCC5CD32"
+    }
+  },
+  "staged": {
+    "fable2.exe": {
+      "bytes": 105042944,
+      "sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\fable2.exe",
+      "source": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\fable2.exe"
+    },
+    "rexruntime.dll": {
+      "bytes": 10380288,
+      "sha256": "D325FA4296577565137AD9480A258CE65AD071D9C538C0362783F89725B111B6",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\rexruntime.dll",
+      "source": "C:\\Dev\\rexglue-sdk-v0.10\\out\\win-amd64\\Release\\rexruntime.dll"
+    },
+    "rexgpu-xenos.dll": {
+      "bytes": 2817024,
+      "sha256": "6DBD1336DC219D8181DF65D4AB179512400ED6A7BF5FDAEACE29A7162EDD3BB8",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\rexgpu-xenos.dll",
+      "source": "C:\\Dev\\rexglue-sdk-v0.10\\out\\win-amd64\\Release\\rexgpu-xenos.dll"
+    },
+    "TracyClient.dll": {
+      "bytes": 232960,
+      "sha256": "FDBE7A329E1B06A86FE61A2C5BE6B335F32F9BBCA7E05F7B183A35C515D2D1A5",
+      "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\TracyClient.dll",
+      "source": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release\\TracyClient.dll"
+    }
+  },
+  "baseline": "C:\\Dev\\Fable2Recomp\\out\\build\\win-amd64-release",
+  "baseline_artifacts": {
+    "fable2.exe": {
+      "bytes": 105042944,
+      "sha256": "1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9"
+    },
+    "rexruntime.dll": {
+      "bytes": 10332160,
+      "sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793"
+    },
+    "rexgpu-xenos.dll": {
+      "bytes": 2770944,
+      "sha256": "70492C8612DEF79C9E3946817F424111FAB2155A3BE63CEA6E717CA73893ADC5"
+    },
+    "TracyClient.dll": {
+      "bytes": 232960,
+      "sha256": "FDBE7A329E1B06A86FE61A2C5BE6B335F32F9BBCA7E05F7B183A35C515D2D1A5"
+    }
+  },
+  "configuration": {
+    "path": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\runtime\\fable2.toml",
+    "identity": null
+  },
+  "cache": {
+    "root": "C:\\Dev\\Fable2Recomp\\out\\nr0b1\\sessions\\nr0b1-oakfield-20260910-001\\user-data\\cache",
+    "isolated": true,
+    "existed_before_launch": true,
+    "state": "copied baseline material",
+    "files": {
+      "cache/shaders/shareable/4D5307F1.rtv.d3d12.xpso": {
+        "bytes": 46956,
+        "sha256": "B84C25906C3E0C5F3560E436BA1954AC0A536651E28CEB10346458A1C0123D22"
+      },
+      "cache/shaders/shareable/4D5307F1.xsh": {
+        "bytes": 246884,
+        "sha256": "72DB0BC95A784DD65BB1621AFCA6638708D4CDD60900ED05202FA6E7FCC5CD32"
+      }
+    },
+    "driver_cache": "unavailable; no isolated driver-cache mechanism"
+  },
+  "schema": "fable2-nr0b1-preparation-summary-v1",
+  "inspection_date": "2026-09-10",
+  "fable_preparation_tool_commit": "e2fd89acca684a7f4437d2bb510bd9d59ba25d6b",
+  "fable_preparation_tool_tree": "7c2be7d08800529ab668c2977ce1c4d09a487c51",
+  "sdk_reporting_commit": "06c4b7002a449ad4d173ec90c625e490ed03fe74",
+  "sdk_reporting_tree": "5feea2389d0ce264ab970bf7807ee4ae6bd7960d",
+  "sdk_source_blobs": {
+    "include/rex/graphics/config_report.h": "535b54f7f98f687a2c92cee57858d19888b1e60e",
+    "src/system/runtime.cpp": "c3998253d8bef1bb2ec774009ecf5553f069a6b9",
+    "src/ui/d3d12/d3d12_provider.cpp": "1b6714488db4bf889ab96cd2ab8f217bfcdab5bc",
+    "src/ui/d3d12/d3d12_presenter.cpp": "25df5fc461f1f152fbaced8a12482a32026a2351",
+    "src/graphics/d3d12/command_processor.cpp": "dd9d9711294d8fd6bae124cbddc9aaa815e29e4a",
+    "src/graphics/d3d12/shared_memory.cpp": "168fdd9c4031adbabf1fa1e596652e9e1101f418",
+    "src/graphics/d3d12/pipeline_cache.cpp": "babd21cfe6fae536e3b1dd72a9dcd1316f42ff94",
+    "src/system/gpu_plugin_loader.cpp": "754fa13832016ae37164d2bd72f334f7d4e3c046",
+    "src/system/xex_module.cpp": "1ae0de6e94e11034760ca43be14f674148bd2a92",
+    "src/graphics/command_processor.cpp": "a74437566e952ee32ffc2761bed766aa3ba0c45e",
+    "src/graphics/pipeline/texture/cache.cpp": "76f5600cf7b950b0469cf926ecd76ff578e80f24",
+    "src/graphics/pipeline/render_target/cache.cpp": "953c5fd4cff4f9b4bfac546fdbd06d03cd0994f4",
+    "src/graphics/d3d12/render_target_cache.cpp": "dd321a5f5820d7f1f0d5958a7d66485e7403669a",
+    "src/ui/presenter.cpp": "7360ed98ba3fa923789f4035c1e7a7c10bfdb2c1",
+    "src/ui/rex_app.cpp": "b94fe9e4814b7e66305d3b983732aebdfb0bced4"
+  },
+  "title_disk_inputs": {
+    "default.xex": {
+      "bytes": 21217280,
+      "sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662"
+    },
+    "default.xexp": {
+      "bytes": 2992128,
+      "sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C"
+    }
+  },
+  "post_patch_image_sha256_inherited_not_runtime_measured": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+  "build": {
+    "command": "cmake --build --preset win-amd64-release --target rexruntime rexgpu-xenos unit_tests",
+    "configuration": "Release; Clang; Ninja Multi-Config; D3D12 ON; Vulkan OFF",
+    "source_boundary": "Same SDK content built immediately before reporting commit; existing libmspack materializations retained",
+    "fable_executable": "Reused accepted baseline bytes; not rebuilt",
+    "log": "out/nr0b1/release-build.log",
+    "exit_code": 0
+  },
+  "runtime": {
+    "status": "NOT RUN",
+    "pid": null,
+    "start_utc": null,
+    "end_utc": null,
+    "exit_code": null,
+    "loaded_modules": null,
+    "selected_device": null,
+    "effective_rendering_paths": null,
+    "scene_confirmed": false
+  }
+}

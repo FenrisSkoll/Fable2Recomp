@@ -27,7 +27,7 @@ import VerifyFable2PrototypePhase1Consistency as phase1_consistency
 
 
 TOOL_NAME = "Fable2PrototypeCorrespondence.py"
-TOOL_VERSION = "1.0.2"
+TOOL_VERSION = "1.0.3"
 SCHEMA_VERSION = 1
 POLICY_VERSION = "precision-first-v1"
 SCORE_VERSION = "review-ranking-v1"
@@ -1281,11 +1281,19 @@ def exhaustive_function_features(analysis: BuildAnalysis) -> list[dict[str, Any]
     ]
 
 
-def build_review_queue(index: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def build_review_queue(
+    index: list[dict[str, Any]],
+    accepted_topology_support: dict[str, int] | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, dict[str, int]]]:
+    topology_support = accepted_topology_support or {}
     strata = collections.OrderedDict(
         (
             ("accepted-exact", lambda row: row["status"] == "accepted-exact-unique"),
             ("accepted-normalized", lambda row: row["status"] == "accepted-normalized-corroborated"),
+            (
+                "topology-supported",
+                lambda row: topology_support.get(row["donor_start"], 0) > 0,
+            ),
             ("candidate-structural", lambda row: row["status"] == "candidate-structural"),
             ("ambiguous", lambda row: row["status"] == "ambiguous"),
             ("quarantined", lambda row: row["status"] == "quarantined"),
@@ -1298,16 +1306,24 @@ def build_review_queue(index: list[dict[str, Any]]) -> list[dict[str, Any]]:
     )
     selected: set[str] = set()
     queue: list[dict[str, Any]] = []
+    counts: dict[str, dict[str, int]] = {}
     for stratum, predicate in strata.items():
-        candidates = [row for row in index if predicate(row) and row["donor_start"] not in selected]
+        available = [row for row in index if predicate(row)]
+        candidates = [row for row in available if row["donor_start"] not in selected]
         candidates.sort(
             key=lambda row: (
                 -row["size"],
                 -row["candidate_count"],
                 row["donor_start"],
             )
-        )
-        for row in candidates[:5]:
+            )
+        selection = candidates[:5]
+        counts[stratum] = {
+            "available": len(available),
+            "eligible_after_non_overlap": len(candidates),
+            "selected": len(selection),
+        }
+        for row in selection:
             selected.add(row["donor_start"])
             queue.append(
                 {
@@ -1323,7 +1339,7 @@ def build_review_queue(index: list[dict[str, Any]]) -> list[dict[str, Any]]:
                     "review_reason": f"deterministic {stratum} stratum sample",
                 }
             )
-    return queue
+    return queue, counts
 
 
 def positive_control(result: dict[str, Any], total: int) -> dict[str, Any]:
@@ -1889,7 +1905,13 @@ def generate(args: argparse.Namespace) -> int:
     write_json(feature_path, feature_output, compact=True)
     feature_hash = sha256_file(feature_path)
 
-    review = build_review_queue(primary["index"])
+    accepted_topology_support = {
+        record["donor_start"]: record["evidence"]["topology"]["support"]
+        for record in primary["accepted"]
+    }
+    review, review_counts = build_review_queue(
+        primary["index"], accepted_topology_support
+    )
     aggregate = aggregate_index(primary["index"])
     status_counts = primary["status_counts"]
     accepted_counts = collections.Counter(record["status"] for record in primary["accepted"])
@@ -1913,7 +1935,11 @@ def generate(args: argparse.Namespace) -> int:
             "fable2-prototype-correspondence-review",
             args.generated_at,
             binding,
-            selection_policy="up to five deterministic, non-overlapping records per documented review stratum",
+            selection_policy={
+                "description": "up to five deterministic, non-overlapping records per documented review stratum",
+                "per_stratum_limit": 5,
+                "strata": review_counts,
+            },
             records=review,
         ),
         "prototype-correspondence-validation.json": envelope(

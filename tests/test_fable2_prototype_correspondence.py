@@ -63,7 +63,7 @@ class SyntheticFixtureTests(unittest.TestCase):
                 self.assertTrue(fixture["passed"])
 
     def test_runtime_identity_is_exact_and_stable(self) -> None:
-        self.assertEqual("1.0.2", correspondence.TOOL_VERSION)
+        self.assertEqual("1.0.3", correspondence.TOOL_VERSION)
         self.assertEqual(
             {
                 "implementation": platform.python_implementation(),
@@ -82,6 +82,34 @@ class SyntheticFixtureTests(unittest.TestCase):
             outside = Path(directory) / "phase2a"
             with self.assertRaises(correspondence.CorrespondenceError):
                 correspondence.require_repository_output(outside, "test output")
+
+    def test_review_queue_reports_topology_and_empty_boundary_strata(self) -> None:
+        row = {
+            "accepted_target": None,
+            "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+            "candidate_count": 1,
+            "donor_end_exclusive": "0x00001040",
+            "donor_start": "0x00001000",
+            "references": {"data_anchor_count": 0, "string_count": 0},
+            "risk_flags": [],
+            "shape": {"indirect_branches": 0},
+            "size": 64,
+            "status": "candidate-structural",
+            "top_candidates": [],
+        }
+        queue, counts = correspondence.build_review_queue(
+            [row], {row["donor_start"]: 2}
+        )
+        self.assertEqual(1, counts["topology-supported"]["available"])
+        self.assertEqual(0, counts["boundary-change"]["available"])
+        self.assertIn("topology-supported", {item["stratum"] for item in queue})
+
+        without_topology = row | {
+            "donor_start": "0x00001040",
+            "donor_end_exclusive": "0x00001080",
+        }
+        _, counts = correspondence.build_review_queue([without_topology])
+        self.assertEqual(0, counts["topology-supported"]["available"])
 
     def test_fixture_results_are_deterministic(self) -> None:
         first = correspondence.canonical_json_bytes(correspondence.run_synthetic_fixtures())

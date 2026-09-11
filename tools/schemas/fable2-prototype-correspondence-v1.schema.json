@@ -133,9 +133,6 @@
         "donor_start",
         "donor_end_exclusive",
         "size",
-        "pdata_record",
-        "boundary_flags",
-        "risk_flags",
         "status",
         "candidate_count",
         "candidate_counts_by_feature",
@@ -158,7 +155,7 @@
         },
         "top_candidates": {
           "type": "array",
-          "maxItems": 6
+          "maxItems": 3
         }
       }
     },

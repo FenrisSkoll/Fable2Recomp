@@ -30,7 +30,7 @@ TOOL_VERSION = "1.0.0"
 SCHEMA_VERSION = 1
 POLICY_VERSION = "precision-first-v1"
 SCORE_VERSION = "review-ranking-v1"
-TOP_CANDIDATE_LIMIT = 6
+TOP_CANDIDATE_LIMIT = 3
 NEIGHBOUR_WINDOW = 8
 
 EXPECTED = {
@@ -740,6 +740,49 @@ def candidate_score(evidence: dict[str, Any], donor: FunctionEvidence, target: F
     return score
 
 
+def compact_accepted_evidence(evidence: dict[str, Any]) -> dict[str, Any]:
+    source = evidence["fingerprints"]
+
+    def fingerprint_pair(name: str) -> dict[str, Any]:
+        equal = source[f"{name}_equal"]
+        donor_hash = source[f"donor_{name}_sha256"]
+        target_hash = source[f"target_{name}_sha256"]
+        if equal:
+            return {"equal": True, "shared_sha256": donor_hash}
+        return {"equal": False, "donor_sha256": donor_hash, "target_sha256": target_hash}
+
+    shape = evidence["shape"]
+    shared_shape = shape["donor"] if shape["equal"] else None
+    return {
+        "fingerprints": {
+            "raw": fingerprint_pair("raw"),
+            "branch_normalized": fingerprint_pair("branch_normalized"),
+            "opcode_structure": fingerprint_pair("opcode_structure"),
+            "constant_signature": fingerprint_pair("constant_signature"),
+        },
+        "boundaries": evidence["boundaries"],
+        "shape": {
+            "equal": shape["equal"],
+            "cfg_equal": shape["cfg_equal"],
+            "shared": shared_shape,
+            "donor": None if shared_shape is not None else shape["donor"],
+            "target": None if shared_shape is not None else shape["target"],
+        },
+        "neighbourhood": evidence["neighbourhood"]
+        | {"anchors": evidence["neighbourhood"]["anchors"][:2]},
+        "topology": evidence["topology"]
+        | {"observations": evidence["topology"]["observations"][:2]},
+        "references": {
+            "shared_strings": evidence["references"]["shared_strings"][:4],
+            "shared_string_count": evidence["references"]["shared_string_count"],
+            "shared_data_anchors": evidence["references"]["shared_data_anchors"][:4],
+            "shared_data_anchor_count": evidence["references"]["shared_data_anchor_count"],
+        },
+        "corroborating_feature_classes": evidence["corroborating_feature_classes"],
+        "contradictions": evidence["contradictions"],
+    }
+
+
 def fingerprint_groups(
     donor_functions: list[FunctionEvidence], target_functions: list[FunctionEvidence]
 ) -> tuple[dict[str, dict[str, list[FunctionEvidence]]], dict[str, dict[str, list[FunctionEvidence]]]]:
@@ -893,7 +936,7 @@ def match_builds(
                 "evidence_grade": "confirmed" if status == "accepted-exact-unique" else "strongly-supported",
                 "semantic_name_assigned": False,
                 "acceptance_policy": POLICY_VERSION,
-                "evidence": evidence,
+                "evidence": compact_accepted_evidence(evidence),
                 "contradiction_checks": {
                     "boundary_valid": not donor.boundary_flags and not target.boundary_flags,
                     "reciprocal_unique": True,
@@ -971,10 +1014,11 @@ def match_builds(
         status_counts[status] += 1
         if include_index:
             scored: list[tuple[int, int, dict[str, Any]]] = []
-            for candidate_start in candidates:
-                target = target_by_start[candidate_start]
-                evidence = pair_evidence(donor, target, accepted, donor_functions, target_by_start)
-                scored.append((candidate_score(evidence, donor, target), candidate_start, evidence))
+            if accepted_target is None:
+                for candidate_start in candidates:
+                    target = target_by_start[candidate_start]
+                    evidence = pair_evidence(donor, target, accepted, donor_functions, target_by_start)
+                    scored.append((candidate_score(evidence, donor, target), candidate_start, evidence))
             scored.sort(key=lambda item: (-item[0], item[1]))
             top_candidates = []
             for score, candidate_start, evidence in scored[:TOP_CANDIDATE_LIMIT]:
@@ -982,14 +1026,20 @@ def match_builds(
                     {
                         "target_start": address_text(candidate_start),
                         "score": score,
-                        "raw_equal": evidence["fingerprints"]["raw_equal"],
-                        "branch_normalized_equal": evidence["fingerprints"]["branch_normalized_equal"],
-                        "opcode_structure_equal": evidence["fingerprints"]["opcode_structure_equal"],
-                        "cfg_equal": evidence["shape"]["cfg_equal"],
-                        "neighbour_delta_support": evidence["neighbourhood"]["exact_delta_support"],
-                        "topology_support": evidence["topology"]["support"],
-                        "shared_string_count": evidence["references"]["shared_string_count"],
-                        "shared_data_anchor_count": evidence["references"]["shared_data_anchor_count"],
+                        "matching_features": [
+                            name
+                            for name, present in (
+                                ("raw", evidence["fingerprints"]["raw_equal"]),
+                                ("branch-normalized", evidence["fingerprints"]["branch_normalized_equal"]),
+                                ("opcode-structure", evidence["fingerprints"]["opcode_structure_equal"]),
+                                ("cfg", evidence["shape"]["cfg_equal"]),
+                                ("local-delta", evidence["neighbourhood"]["exact_delta_support"] > 0),
+                                ("call-topology", evidence["topology"]["support"] > 0),
+                                ("string", evidence["references"]["shared_string_count"] > 0),
+                                ("data", evidence["references"]["shared_data_anchor_count"] > 0),
+                            )
+                            if present
+                        ],
                         "contradictions": evidence["contradictions"],
                     }
                 )
@@ -1078,12 +1128,8 @@ def compact_index(index: list[dict[str, Any]]) -> list[dict[str, Any]]:
         "donor_start",
         "donor_end_exclusive",
         "size",
-        "pdata_record",
-        "boundary_flags",
-        "risk_flags",
         "status",
         "candidate_count",
-        "candidate_counts_by_feature",
         "ambiguity_class",
         "accepted_target",
         "top_candidates",
@@ -1653,10 +1699,12 @@ def validate_documents(documents: dict[str, dict[str, Any]], binding_hash: str) 
         raise CorrespondenceError("accepted target addresses are not injective")
     for row in accepted:
         evidence = row["evidence"]
+        raw_equal = evidence["fingerprints"]["raw"]["equal"]
+        normalized_equal = evidence["fingerprints"]["branch_normalized"]["equal"]
         if row["status"] == "accepted-normalized-corroborated":
-            if evidence["fingerprints"]["raw_equal"] or not has_required_corroboration(evidence):
+            if raw_equal or not has_required_corroboration(evidence):
                 raise CorrespondenceError("normalized acceptance lacks required corroboration")
-        if not evidence["fingerprints"]["raw_equal"] and not evidence["fingerprints"]["branch_normalized_equal"]:
+        if not raw_equal and not normalized_equal:
             raise CorrespondenceError("opcode/XO-only candidate was accepted")
         if evidence["contradictions"]:
             raise CorrespondenceError("accepted record retains contradictory evidence")
@@ -1838,7 +1886,11 @@ def generate(args: argparse.Namespace) -> int:
         with tempfile.TemporaryDirectory() as directory:
             temporary_root = Path(directory)
             for filename, document in documents.items():
-                write_json(temporary_root / filename, document, compact=filename.endswith("-index.json"))
+                write_json(
+                    temporary_root / filename,
+                    document,
+                    compact=filename.endswith(("-index.json", "-accepted.json")),
+                )
             regenerated = {path.name: sha256_file(path) for path in temporary_root.glob("*.json")}
         if existing != regenerated:
             changed = sorted(set(existing) | set(regenerated))
@@ -1847,7 +1899,11 @@ def generate(args: argparse.Namespace) -> int:
                 f"determinism check failed for: {', '.join(differences)}"
             )
     for filename, document in documents.items():
-        write_json(output / filename, document, compact=filename.endswith("-index.json"))
+        write_json(
+            output / filename,
+            document,
+            compact=filename.endswith(("-index.json", "-accepted.json")),
+        )
     print(
         f"Generated Phase 2A: {len(primary['index'])} donor functions, "
         f"{len(primary['accepted'])} accepted, {len(review)} review records"

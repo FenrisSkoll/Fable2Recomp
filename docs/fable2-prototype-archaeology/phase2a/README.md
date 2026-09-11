@@ -22,11 +22,11 @@ python .\tools\Fable2PrototypeArchaeology.py verify
 python .\tools\VerifyFable2PrototypePhase1Consistency.py
 
 python .\tools\Fable2PrototypeCorrespondence.py generate `
-    --tool-commit <full-Phase-2A-tooling-commit> `
+    --tool-commit 972e3b114496f60a4b7bf8aae73246c05aa64685 `
     --generated-at 2026-09-11T00:00:00Z
 
 python .\tools\Fable2PrototypeCorrespondence.py verify `
-    --tool-commit <full-Phase-2A-tooling-commit>
+    --tool-commit 972e3b114496f60a4b7bf8aae73246c05aa64685
 
 .\tools\Verify-Fable2PrototypeCorrespondenceJson.ps1
 python -m unittest .\tests\test_fable2_prototype_correspondence.py -v
@@ -44,3 +44,13 @@ the aggregate policy and result summary. Every artifact repeats the same hash-bo
 The ignored exhaustive candidate representation is lossless: for each shared fingerprint, its
 candidate edges are the Cartesian product of the recorded donor and target member sets. Its exact
 path, size, and SHA-256 are recorded in the committed summary.
+
+## Results and handoff
+
+- [Phase 2A technical report](report.md)
+- [Phase 2B handoff](phase2b-handoff.md)
+- [Machine-readable evidence](evidence/)
+
+The five committed JSON artifacts validate against
+[`fable2-prototype-correspondence-v1.schema.json`](../../../tools/schemas/fable2-prototype-correspondence-v1.schema.json).
+They contain no prototype or canonical executable bytes.

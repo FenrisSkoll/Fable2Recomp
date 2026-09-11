@@ -1,0 +1,1336 @@
+{
+  "generated_at_utc": "2026-09-11T00:00:00Z",
+  "generator": {
+    "name": "Fable2PrototypeCorrespondence.py",
+    "version": "1.0.1"
+  },
+  "input_binding": {
+    "closure": {
+      "analyzer_version": "2.0.0",
+      "repository_relative_path": "C:/Dev/Fable2Recomp/out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json",
+      "schema_version": 3,
+      "sha256": "665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397"
+    },
+    "donor": {
+      "container": {
+        "relative_path": "Fable II July 10 2009 23.12.02.0330/default.xex",
+        "sha256": "0686A9F292A3F6777BEB6E8D4924F96247D1E8E3E2370323572F797E6637A4AA",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "766C7F743F54C467B3BD720A16AD6A514353CAA0F7468E1541EE3356571199AA",
+      "exact_image_alias": {
+        "relative_path": "Fable II (Jul 10, 2009 prototype)/default.xex",
+        "sha256": "0AAA3C8EF72ECBB607C9D8A50C42022F3E0BDE759A462CB14148621790C0E348",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "executable_memory_fingerprint": "AE15F6D9AF8C76B3643A0CB5EF7B108E686794250F6822C2A71C78FE3D0BE956",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "pdata": {
+        "function_count": 46179,
+        "sha256": "1805B91295ACEAEC07CE437A84DFF25E75A8B69B155C764838E3864E26C0BCB9",
+        "size": 369432,
+        "start": "0x8210B800"
+      },
+      "preferred_id": "build-23.12.02.0330",
+      "text": {
+        "sha256": "A49213732D2E64610939BBBAE6985F9248457DFE46278E3215F11CB68A071878",
+        "size": 18132124,
+        "start": "0x82170000"
+      }
+    },
+    "input_bundle_sha256": "EA27C522595617E2785AC324E3CC630B5289D746805C0B6D59F0C86DAEBA3A78",
+    "phase1_evidence": {
+      "crossbuild_feasibility_sha256": "FBB0A1067F20952788C83C4D025599DBCB9779C36CD0261F9703564571D2E56D",
+      "tu1_relationship_sha256": "FA544543982556ADD1BA1DB93AD512135276E0530AFA6B6F7833754EECDB299A",
+      "xex_metadata_sha256": "F04F4993E09790C0FB09A77D9DC5901C330B080EEF0EF906EECECD289A3F79BA"
+    },
+    "secondary": {
+      "container": {
+        "relative_path": "Fable II (Sep 13, 2008 prototype)/default.xex",
+        "sha256": "9997088F23FEFA2C700F18DA2CCB614AAE221C6F39B3BE9BA7AAAA059DB6BFAF",
+        "size": 20758528,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "E2787C5C2B2016B880F6B413B3DD8E0404F25E5B090885207287A745BAF43216",
+      "function_count": 45707,
+      "id": "sep-2008",
+      "pdata_sha256": "FFEC95F455BE9CAF2017D36E7BC8942D5F011F0EFA34BB2F5D80D8E5EC2C8FB2",
+      "text_sha256": "B13E8571539FCD74735A16F3F4E434EDDB6F9ECF09E970CC725E78756192FFB3"
+    },
+    "target": {
+      "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "derived_manifest_sha256": "4FC12E2765A8A770F600CCC9C9209ABC68E0859ACC5A0EB745921C2C992D8424",
+      "entry_point": "0x82CC21C0",
+      "executable_memory_fingerprint": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "id": "canonical-fable2-goty-tu1-postpatch",
+      "image_base": "0x82000000",
+      "image_size": "0x01620000",
+      "pdata": {
+        "function_count": 46180,
+        "sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+        "size": 369440,
+        "start": "0x8210B800"
+      },
+      "postpatch_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "retail_xexp_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "text": {
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+        "size": 18131900,
+        "start": "0x82170000"
+      },
+      "version": "0.0.1.26"
+    },
+    "toolchain": {
+      "fable2_repository_commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+      "generator": {
+        "commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+        "name": "Fable2PrototypeCorrespondence.py",
+        "version": "1.0.1"
+      },
+      "ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      },
+      "python_runtime": {
+        "cache_tag": "cpython-314",
+        "implementation": "CPython",
+        "version": "3.14.3"
+      },
+      "rexglue_repository_commit": "fa10315ff88ca56b2d0b380de40bad5b59b542bd",
+      "target_ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "target_ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      }
+    }
+  },
+  "records": [
+    {
+      "accepted_target": "0x82CA4458",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82CA4EB4",
+      "donor_start": "0x82CA44C8",
+      "review_reason": "deterministic accepted-exact stratum sample",
+      "size": 2540,
+      "status": "accepted-exact-unique",
+      "stratum": "accepted-exact",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x831C2880",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x831C2EB4",
+      "donor_start": "0x831C2938",
+      "review_reason": "deterministic accepted-exact stratum sample",
+      "size": 1404,
+      "status": "accepted-exact-unique",
+      "stratum": "accepted-exact",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x831C0D78",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x831C1374",
+      "donor_start": "0x831C0E30",
+      "review_reason": "deterministic accepted-exact stratum sample",
+      "size": 1348,
+      "status": "accepted-exact-unique",
+      "stratum": "accepted-exact",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x82803598",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x828047BC",
+      "donor_start": "0x82804290",
+      "review_reason": "deterministic accepted-exact stratum sample",
+      "size": 1324,
+      "status": "accepted-exact-unique",
+      "stratum": "accepted-exact",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x82CD00E0",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82CD0630",
+      "donor_start": "0x82CD0110",
+      "review_reason": "deterministic accepted-exact stratum sample",
+      "size": 1312,
+      "status": "accepted-exact-unique",
+      "stratum": "accepted-exact",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x8308EF40",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83090D78",
+      "donor_start": "0x8308EEC8",
+      "review_reason": "deterministic accepted-normalized stratum sample",
+      "size": 7856,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x831262A8",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8312809C",
+      "donor_start": "0x83126300",
+      "review_reason": "deterministic accepted-normalized stratum sample",
+      "size": 7580,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x82BA0380",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82BA1E64",
+      "donor_start": "0x82BA07E0",
+      "review_reason": "deterministic accepted-normalized stratum sample",
+      "size": 5764,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x8311F648",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83120D30",
+      "donor_start": "0x8311F740",
+      "review_reason": "deterministic accepted-normalized stratum sample",
+      "size": 5616,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x82C7C450",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82C7DD98",
+      "donor_start": "0x82C7C9A0",
+      "review_reason": "deterministic accepted-normalized stratum sample",
+      "size": 5112,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8225DEC0",
+      "donor_start": "0x82243150",
+      "review_reason": "deterministic candidate-structural stratum sample",
+      "size": 109936,
+      "status": "candidate-structural",
+      "stratum": "candidate-structural",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology"
+          ],
+          "score": 89,
+          "target_start": "0x82242F10"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8239CCA0",
+      "donor_start": "0x82392300",
+      "review_reason": "deterministic candidate-structural stratum sample",
+      "size": 43424,
+      "status": "candidate-structural",
+      "stratum": "candidate-structural",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 102,
+          "target_start": "0x82392250"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x831B4258",
+      "donor_start": "0x831AAC68",
+      "review_reason": "deterministic candidate-structural stratum sample",
+      "size": 38384,
+      "status": "candidate-structural",
+      "stratum": "candidate-structural",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string",
+            "data"
+          ],
+          "score": 119,
+          "target_start": "0x831AAB70"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8318AF8C",
+      "donor_start": "0x83183958",
+      "review_reason": "deterministic candidate-structural stratum sample",
+      "size": 30260,
+      "status": "candidate-structural",
+      "stratum": "candidate-structural",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology"
+          ],
+          "score": 89,
+          "target_start": "0x83183970"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x822EA578",
+      "donor_start": "0x822E3660",
+      "review_reason": "deterministic candidate-structural stratum sample",
+      "size": 28440,
+      "status": "candidate-structural",
+      "stratum": "candidate-structural",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "string"
+          ],
+          "score": 90,
+          "target_start": "0x822E32A0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "multiple-fingerprint-candidates",
+      "candidate_count": 2,
+      "donor_end_exclusive": "0x821B306C",
+      "donor_start": "0x821B2628",
+      "review_reason": "deterministic ambiguous stratum sample",
+      "size": 2628,
+      "status": "ambiguous",
+      "stratum": "ambiguous",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "data"
+          ],
+          "score": 104,
+          "target_start": "0x821B25F8"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "data"
+          ],
+          "score": 30,
+          "target_start": "0x82A59DD0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "multiple-fingerprint-candidates",
+      "candidate_count": 2,
+      "donor_end_exclusive": "0x82A59974",
+      "donor_start": "0x82A58F30",
+      "review_reason": "deterministic ambiguous stratum sample",
+      "size": 2628,
+      "status": "ambiguous",
+      "stratum": "ambiguous",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "data"
+          ],
+          "score": 104,
+          "target_start": "0x82A59DD0"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "data"
+          ],
+          "score": 30,
+          "target_start": "0x821B25F8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "multiple-fingerprint-candidates",
+      "candidate_count": 2,
+      "donor_end_exclusive": "0x83238CF4",
+      "donor_start": "0x83238420",
+      "review_reason": "deterministic ambiguous stratum sample",
+      "size": 2260,
+      "status": "ambiguous",
+      "stratum": "ambiguous",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology"
+          ],
+          "score": 74,
+          "target_start": "0x83239AE0"
+        },
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology"
+          ],
+          "score": 50,
+          "target_start": "0x8323A3B8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "multiple-fingerprint-candidates",
+      "candidate_count": 2,
+      "donor_end_exclusive": "0x832395CC",
+      "donor_start": "0x83238CF8",
+      "review_reason": "deterministic ambiguous stratum sample",
+      "size": 2260,
+      "status": "ambiguous",
+      "stratum": "ambiguous",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology"
+          ],
+          "score": 74,
+          "target_start": "0x8323A3B8"
+        },
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology"
+          ],
+          "score": 50,
+          "target_start": "0x83239AE0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "multiple-fingerprint-candidates",
+      "candidate_count": 2,
+      "donor_end_exclusive": "0x830044E4",
+      "donor_start": "0x83003CD8",
+      "review_reason": "deterministic ambiguous stratum sample",
+      "size": 2060,
+      "status": "ambiguous",
+      "stratum": "ambiguous",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "string"
+          ],
+          "score": 90,
+          "target_start": "0x830038B8"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "string"
+          ],
+          "score": 40,
+          "target_start": "0x830051E0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "contradictory-exact-evidence",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x824A39B8",
+      "donor_start": "0x824A3810",
+      "review_reason": "deterministic quarantined stratum sample",
+      "size": 424,
+      "status": "quarantined",
+      "stratum": "quarantined",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 195,
+          "target_start": "0x824A2F50"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "contradictory-exact-evidence",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82579CD4",
+      "donor_start": "0x82579B30",
+      "review_reason": "deterministic quarantined stratum sample",
+      "size": 420,
+      "status": "quarantined",
+      "stratum": "quarantined",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 195,
+          "target_start": "0x82577FF8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "contradictory-exact-evidence",
+      "candidate_count": 5,
+      "donor_end_exclusive": "0x8219E0B0",
+      "donor_start": "0x8219DF10",
+      "review_reason": "deterministic quarantined stratum sample",
+      "size": 416,
+      "status": "quarantined",
+      "stratum": "quarantined",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg",
+            "local-delta"
+          ],
+          "score": 219,
+          "target_start": "0x8219E210"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x823FA970"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x824342F8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "contradictory-exact-evidence",
+      "candidate_count": 5,
+      "donor_end_exclusive": "0x823FC368",
+      "donor_start": "0x823FC1C8",
+      "review_reason": "deterministic quarantined stratum sample",
+      "size": 416,
+      "status": "quarantined",
+      "stratum": "quarantined",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 195,
+          "target_start": "0x823FA970"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x8219E210"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x824342F8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "contradictory-exact-evidence",
+      "candidate_count": 5,
+      "donor_end_exclusive": "0x827832A8",
+      "donor_start": "0x82783108",
+      "review_reason": "deterministic quarantined stratum sample",
+      "size": 416,
+      "status": "quarantined",
+      "stratum": "quarantined",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 195,
+          "target_start": "0x82782650"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x8219E210"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": -15,
+          "target_start": "0x823FA970"
+        }
+      ]
+    },
+    {
+      "accepted_target": "0x82B3DB58",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 17,
+      "donor_end_exclusive": "0x82B3CEDC",
+      "donor_start": "0x82B3CED0",
+      "review_reason": "deterministic tiny-leaf stratum sample",
+      "size": 12,
+      "status": "accepted-exact-unique",
+      "stratum": "tiny-leaf",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "risky-compiler-idiom",
+      "candidate_count": 17,
+      "donor_end_exclusive": "0x82CBB790",
+      "donor_start": "0x82CBB784",
+      "review_reason": "deterministic tiny-leaf stratum sample",
+      "size": 12,
+      "status": "quarantined",
+      "stratum": "tiny-leaf",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg",
+            "local-delta"
+          ],
+          "score": 194,
+          "target_start": "0x82CBB714"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB848"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBBFD8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "risky-compiler-idiom",
+      "candidate_count": 17,
+      "donor_end_exclusive": "0x82CBB8C4",
+      "donor_start": "0x82CBB8B8",
+      "review_reason": "deterministic tiny-leaf stratum sample",
+      "size": 12,
+      "status": "quarantined",
+      "stratum": "tiny-leaf",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg",
+            "local-delta"
+          ],
+          "score": 194,
+          "target_start": "0x82CBB848"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB714"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBBFD8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "risky-compiler-idiom",
+      "candidate_count": 17,
+      "donor_end_exclusive": "0x82CBC054",
+      "donor_start": "0x82CBC048",
+      "review_reason": "deterministic tiny-leaf stratum sample",
+      "size": 12,
+      "status": "quarantined",
+      "stratum": "tiny-leaf",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg",
+            "local-delta"
+          ],
+          "score": 194,
+          "target_start": "0x82CBBFD8"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB714"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB848"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "risky-compiler-idiom",
+      "candidate_count": 17,
+      "donor_end_exclusive": "0x82CBC0B8",
+      "donor_start": "0x82CBC0AC",
+      "review_reason": "deterministic tiny-leaf stratum sample",
+      "size": 12,
+      "status": "quarantined",
+      "stratum": "tiny-leaf",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg",
+            "local-delta"
+          ],
+          "score": 194,
+          "target_start": "0x82CBC03C"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB714"
+        },
+        {
+          "contradictions": [
+            "mapped-neighbour-order-contradiction"
+          ],
+          "matching_features": [
+            "raw",
+            "branch-normalized",
+            "opcode-structure",
+            "cfg"
+          ],
+          "score": 120,
+          "target_start": "0x82CBB848"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83042290",
+      "donor_start": "0x8303B570",
+      "review_reason": "deterministic indirect-branch stratum sample",
+      "size": 27936,
+      "status": "candidate-structural",
+      "stratum": "indirect-branch",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x8303B6B0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8233477C",
+      "donor_start": "0x8232E1A8",
+      "review_reason": "deterministic indirect-branch stratum sample",
+      "size": 26068,
+      "status": "candidate-structural",
+      "stratum": "indirect-branch",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x8232E398"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83212D30",
+      "donor_start": "0x8320C968",
+      "review_reason": "deterministic indirect-branch stratum sample",
+      "size": 25544,
+      "status": "candidate-structural",
+      "stratum": "indirect-branch",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x8320C7D0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82F2D4B8",
+      "donor_start": "0x82F27CD0",
+      "review_reason": "deterministic indirect-branch stratum sample",
+      "size": 22504,
+      "status": "candidate-structural",
+      "stratum": "indirect-branch",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string",
+            "data"
+          ],
+          "score": 119,
+          "target_start": "0x82F288C8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x831B8038",
+      "donor_start": "0x831B4CB8",
+      "review_reason": "deterministic indirect-branch stratum sample",
+      "size": 13184,
+      "status": "candidate-structural",
+      "stratum": "indirect-branch",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x831B4BC0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83197EC4",
+      "donor_start": "0x83191350",
+      "review_reason": "deterministic string-reference stratum sample",
+      "size": 27508,
+      "status": "candidate-structural",
+      "stratum": "string-reference",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x83191368"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8328BE40",
+      "donor_start": "0x83288D80",
+      "review_reason": "deterministic string-reference stratum sample",
+      "size": 12480,
+      "status": "candidate-structural",
+      "stratum": "string-reference",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "call-topology",
+            "string",
+            "data"
+          ],
+          "score": 95,
+          "target_start": "0x83288CA0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x824E0630",
+      "donor_start": "0x824DDBA0",
+      "review_reason": "deterministic string-reference stratum sample",
+      "size": 10896,
+      "status": "candidate-structural",
+      "stratum": "string-reference",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x824DBFD8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x828109F4",
+      "donor_start": "0x8280E0A0",
+      "review_reason": "deterministic string-reference stratum sample",
+      "size": 10580,
+      "status": "candidate-structural",
+      "stratum": "string-reference",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "string"
+          ],
+          "score": 84,
+          "target_start": "0x8280D328"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8278A2B8",
+      "donor_start": "0x82787978",
+      "review_reason": "deterministic string-reference stratum sample",
+      "size": 10560,
+      "status": "candidate-structural",
+      "stratum": "string-reference",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x82786F58"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8316120C",
+      "donor_start": "0x8315B118",
+      "review_reason": "deterministic data-anchor stratum sample",
+      "size": 24820,
+      "status": "candidate-structural",
+      "stratum": "data-anchor",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology"
+          ],
+          "score": 89,
+          "target_start": "0x8315B170"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82E432FC",
+      "donor_start": "0x82E40580",
+      "review_reason": "deterministic data-anchor stratum sample",
+      "size": 11644,
+      "status": "candidate-structural",
+      "stratum": "data-anchor",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "data"
+          ],
+          "score": 94,
+          "target_start": "0x82E40AD8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8311AA84",
+      "donor_start": "0x831181E8",
+      "review_reason": "deterministic data-anchor stratum sample",
+      "size": 10396,
+      "status": "candidate-structural",
+      "stratum": "data-anchor",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x831180F0"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82F26E5C",
+      "donor_start": "0x82F245F0",
+      "review_reason": "deterministic data-anchor stratum sample",
+      "size": 10348,
+      "status": "candidate-structural",
+      "stratum": "data-anchor",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string"
+          ],
+          "score": 114,
+          "target_start": "0x82F251E8"
+        }
+      ]
+    },
+    {
+      "accepted_target": null,
+      "ambiguity_class": "unique-candidate-below-acceptance-threshold",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x823BFB28",
+      "donor_start": "0x823BD2D8",
+      "review_reason": "deterministic data-anchor stratum sample",
+      "size": 10320,
+      "status": "candidate-structural",
+      "stratum": "data-anchor",
+      "top_candidates": [
+        {
+          "contradictions": [],
+          "matching_features": [
+            "opcode-structure",
+            "cfg",
+            "local-delta",
+            "call-topology",
+            "string",
+            "data"
+          ],
+          "score": 119,
+          "target_start": "0x823BC570"
+        }
+      ]
+    }
+  ],
+  "schema": {
+    "name": "fable2-prototype-correspondence-review",
+    "version": 1
+  },
+  "selection_policy": "up to five deterministic, non-overlapping records per documented review stratum"
+}

@@ -1,0 +1,546 @@
+{
+  "accepted_counts": {
+    "accepted-exact-unique": 2779,
+    "accepted-normalized-corroborated": 12520
+  },
+  "aggregate": {
+    "by_function_shape": [
+      {
+        "bucket": "branching",
+        "status_counts": {
+          "accepted-exact-unique": 160,
+          "ambiguous": 6,
+          "candidate-structural": 105,
+          "quarantined": 5
+        },
+        "total": 276
+      },
+      {
+        "bucket": "direct-call",
+        "status_counts": {
+          "accepted-exact-unique": 1196,
+          "accepted-normalized-corroborated": 9280,
+          "ambiguous": 12914,
+          "candidate-structural": 9866,
+          "quarantined": 5,
+          "unmatched": 2
+        },
+        "total": 33263
+      },
+      {
+        "bucket": "indirect-branch",
+        "status_counts": {
+          "accepted-exact-unique": 1393,
+          "accepted-normalized-corroborated": 3240,
+          "ambiguous": 2411,
+          "candidate-structural": 5320,
+          "quarantined": 184
+        },
+        "total": 12548
+      },
+      {
+        "bucket": "linear",
+        "status_counts": {
+          "accepted-exact-unique": 29,
+          "candidate-structural": 46
+        },
+        "total": 75
+      },
+      {
+        "bucket": "tiny-leaf",
+        "status_counts": {
+          "accepted-exact-unique": 1,
+          "quarantined": 16
+        },
+        "total": 17
+      }
+    ],
+    "by_one_megabyte_donor_region": [
+      {
+        "bucket": "0x82100000-0x82200000",
+        "status_counts": {
+          "accepted-exact-unique": 63,
+          "accepted-normalized-corroborated": 363,
+          "ambiguous": 127,
+          "candidate-structural": 576,
+          "quarantined": 5
+        },
+        "total": 1134
+      },
+      {
+        "bucket": "0x82200000-0x82300000",
+        "status_counts": {
+          "accepted-exact-unique": 96,
+          "accepted-normalized-corroborated": 573,
+          "ambiguous": 173,
+          "candidate-structural": 832,
+          "quarantined": 2
+        },
+        "total": 1676
+      },
+      {
+        "bucket": "0x82300000-0x82400000",
+        "status_counts": {
+          "accepted-exact-unique": 125,
+          "accepted-normalized-corroborated": 676,
+          "ambiguous": 663,
+          "candidate-structural": 1067,
+          "quarantined": 16
+        },
+        "total": 2547
+      },
+      {
+        "bucket": "0x82400000-0x82500000",
+        "status_counts": {
+          "accepted-exact-unique": 104,
+          "accepted-normalized-corroborated": 620,
+          "ambiguous": 618,
+          "candidate-structural": 933,
+          "quarantined": 27
+        },
+        "total": 2302
+      },
+      {
+        "bucket": "0x82500000-0x82600000",
+        "status_counts": {
+          "accepted-exact-unique": 145,
+          "accepted-normalized-corroborated": 593,
+          "ambiguous": 601,
+          "candidate-structural": 963,
+          "quarantined": 36
+        },
+        "total": 2338
+      },
+      {
+        "bucket": "0x82600000-0x82700000",
+        "status_counts": {
+          "accepted-exact-unique": 81,
+          "accepted-normalized-corroborated": 548,
+          "ambiguous": 872,
+          "candidate-structural": 1045,
+          "quarantined": 11,
+          "unmatched": 1
+        },
+        "total": 2558
+      },
+      {
+        "bucket": "0x82700000-0x82800000",
+        "status_counts": {
+          "accepted-exact-unique": 84,
+          "accepted-normalized-corroborated": 382,
+          "ambiguous": 507,
+          "candidate-structural": 894,
+          "quarantined": 28
+        },
+        "total": 1895
+      },
+      {
+        "bucket": "0x82800000-0x82900000",
+        "status_counts": {
+          "accepted-exact-unique": 132,
+          "accepted-normalized-corroborated": 556,
+          "ambiguous": 619,
+          "candidate-structural": 918,
+          "quarantined": 19
+        },
+        "total": 2244
+      },
+      {
+        "bucket": "0x82900000-0x82A00000",
+        "status_counts": {
+          "accepted-exact-unique": 152,
+          "accepted-normalized-corroborated": 375,
+          "ambiguous": 749,
+          "candidate-structural": 893,
+          "quarantined": 12
+        },
+        "total": 2181
+      },
+      {
+        "bucket": "0x82A00000-0x82B00000",
+        "status_counts": {
+          "accepted-exact-unique": 76,
+          "accepted-normalized-corroborated": 450,
+          "ambiguous": 900,
+          "candidate-structural": 764,
+          "quarantined": 4
+        },
+        "total": 2194
+      },
+      {
+        "bucket": "0x82B00000-0x82C00000",
+        "status_counts": {
+          "accepted-exact-unique": 135,
+          "accepted-normalized-corroborated": 648,
+          "ambiguous": 751,
+          "candidate-structural": 1044,
+          "quarantined": 6,
+          "unmatched": 1
+        },
+        "total": 2585
+      },
+      {
+        "bucket": "0x82C00000-0x82D00000",
+        "status_counts": {
+          "accepted-exact-unique": 449,
+          "accepted-normalized-corroborated": 1334,
+          "ambiguous": 936,
+          "candidate-structural": 938,
+          "quarantined": 23
+        },
+        "total": 3680
+      },
+      {
+        "bucket": "0x82D00000-0x82E00000",
+        "status_counts": {
+          "accepted-exact-unique": 216,
+          "accepted-normalized-corroborated": 921,
+          "ambiguous": 540,
+          "candidate-structural": 963,
+          "quarantined": 2
+        },
+        "total": 2642
+      },
+      {
+        "bucket": "0x82E00000-0x82F00000",
+        "status_counts": {
+          "accepted-exact-unique": 234,
+          "accepted-normalized-corroborated": 810,
+          "ambiguous": 697,
+          "candidate-structural": 1026,
+          "quarantined": 2
+        },
+        "total": 2769
+      },
+      {
+        "bucket": "0x82F00000-0x83000000",
+        "status_counts": {
+          "accepted-exact-unique": 339,
+          "accepted-normalized-corroborated": 1665,
+          "ambiguous": 551,
+          "candidate-structural": 791,
+          "quarantined": 4
+        },
+        "total": 3350
+      },
+      {
+        "bucket": "0x83000000-0x83100000",
+        "status_counts": {
+          "accepted-exact-unique": 156,
+          "accepted-normalized-corroborated": 684,
+          "ambiguous": 374,
+          "candidate-structural": 782,
+          "quarantined": 1
+        },
+        "total": 1997
+      },
+      {
+        "bucket": "0x83100000-0x83200000",
+        "status_counts": {
+          "accepted-exact-unique": 112,
+          "accepted-normalized-corroborated": 881,
+          "ambiguous": 157,
+          "candidate-structural": 476,
+          "quarantined": 12
+        },
+        "total": 1638
+      },
+      {
+        "bucket": "0x83200000-0x83300000",
+        "status_counts": {
+          "accepted-exact-unique": 80,
+          "accepted-normalized-corroborated": 441,
+          "ambiguous": 5496,
+          "candidate-structural": 432
+        },
+        "total": 6449
+      }
+    ],
+    "by_size_bucket": [
+      {
+        "bucket": "0001-0016",
+        "status_counts": {
+          "accepted-exact-unique": 1,
+          "quarantined": 16
+        },
+        "total": 17
+      },
+      {
+        "bucket": "0017-0032",
+        "status_counts": {
+          "accepted-normalized-corroborated": 1,
+          "candidate-structural": 1,
+          "quarantined": 2
+        },
+        "total": 4
+      },
+      {
+        "bucket": "0033-0064",
+        "status_counts": {
+          "accepted-exact-unique": 296,
+          "accepted-normalized-corroborated": 385,
+          "ambiguous": 5132,
+          "candidate-structural": 55,
+          "quarantined": 5
+        },
+        "total": 5873
+      },
+      {
+        "bucket": "0065-0256",
+        "status_counts": {
+          "accepted-exact-unique": 1822,
+          "accepted-normalized-corroborated": 7622,
+          "ambiguous": 6729,
+          "candidate-structural": 5671,
+          "quarantined": 38
+        },
+        "total": 21882
+      },
+      {
+        "bucket": "0257-1024",
+        "status_counts": {
+          "accepted-exact-unique": 648,
+          "accepted-normalized-corroborated": 4138,
+          "ambiguous": 3083,
+          "candidate-structural": 7247,
+          "quarantined": 149
+        },
+        "total": 15265
+      },
+      {
+        "bucket": "1025-plus",
+        "status_counts": {
+          "accepted-exact-unique": 12,
+          "accepted-normalized-corroborated": 374,
+          "ambiguous": 387,
+          "candidate-structural": 2363,
+          "unmatched": 2
+        },
+        "total": 3138
+      }
+    ]
+  },
+  "conclusions": {
+    "crossbuild_feasibility": "viable with a precision-first accepted core and an explicit ambiguity/quarantine tail",
+    "same_address_used_as_acceptance_evidence": false,
+    "semantic_names_assigned": false
+  },
+  "exhaustive_candidate_groups": {
+    "committed_index_top_candidate_limit": 3,
+    "ignored_repository_relative_path": "out/prototype-archaeology/phase2a/prototype-correspondence-candidate-groups.json",
+    "lossless": true,
+    "sha256": "62E2B281FD5CD415BF1D3A5E144C851656CC5304ACF7C72FCCF60FFFE42BA15A",
+    "size": 9638565
+  },
+  "exhaustive_function_features": {
+    "builds": [
+      "build-23.12.02.0330",
+      "canonical-tu1"
+    ],
+    "ignored_repository_relative_path": "out/prototype-archaeology/phase2a/prototype-correspondence-function-features.json",
+    "lossless": true,
+    "sha256": "AE88ACE3A49BF1DDD1630D35CA2E0D80571DC24E9FA31A410321DE4CEBD14C1C",
+    "size": 136999220
+  },
+  "fingerprint_candidate_statistics": {
+    "boundary_normalized_prefix16_sha256": {
+      "acceptance_eligible": false,
+      "candidate_edge_count_within_feature": 92491129,
+      "donor_unique_fingerprints": 2794,
+      "purpose": "possible split/merge or shifted-boundary review only",
+      "reciprocal_unique_pairs": 2778,
+      "shared_fingerprint_groups": 4479,
+      "target_unique_fingerprints": 2795
+    },
+    "branch_normalized_sha256": {
+      "candidate_edge_count_within_feature": 236293,
+      "donor_unique_fingerprints": 41976,
+      "reciprocal_unique_pairs": 16523,
+      "shared_fingerprint_groups": 17375,
+      "target_unique_fingerprints": 41974
+    },
+    "opcode_structure_sha256": {
+      "candidate_edge_count_within_feature": 9048713,
+      "donor_unique_fingerprints": 27580,
+      "reciprocal_unique_pairs": 27578,
+      "shared_fingerprint_groups": 30414,
+      "target_unique_fingerprints": 27580
+    },
+    "raw_sha256": {
+      "candidate_edge_count_within_feature": 3630,
+      "donor_unique_fingerprints": 46025,
+      "reciprocal_unique_pairs": 2971,
+      "shared_fingerprint_groups": 3018,
+      "target_unique_fingerprints": 46020
+    }
+  },
+  "generated_at_utc": "2026-09-11T00:00:00Z",
+  "generator": {
+    "name": "Fable2PrototypeCorrespondence.py",
+    "version": "1.0.1"
+  },
+  "input_binding": {
+    "closure": {
+      "analyzer_version": "2.0.0",
+      "repository_relative_path": "C:/Dev/Fable2Recomp/out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json",
+      "schema_version": 3,
+      "sha256": "665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397"
+    },
+    "donor": {
+      "container": {
+        "relative_path": "Fable II July 10 2009 23.12.02.0330/default.xex",
+        "sha256": "0686A9F292A3F6777BEB6E8D4924F96247D1E8E3E2370323572F797E6637A4AA",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "766C7F743F54C467B3BD720A16AD6A514353CAA0F7468E1541EE3356571199AA",
+      "exact_image_alias": {
+        "relative_path": "Fable II (Jul 10, 2009 prototype)/default.xex",
+        "sha256": "0AAA3C8EF72ECBB607C9D8A50C42022F3E0BDE759A462CB14148621790C0E348",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "executable_memory_fingerprint": "AE15F6D9AF8C76B3643A0CB5EF7B108E686794250F6822C2A71C78FE3D0BE956",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "pdata": {
+        "function_count": 46179,
+        "sha256": "1805B91295ACEAEC07CE437A84DFF25E75A8B69B155C764838E3864E26C0BCB9",
+        "size": 369432,
+        "start": "0x8210B800"
+      },
+      "preferred_id": "build-23.12.02.0330",
+      "text": {
+        "sha256": "A49213732D2E64610939BBBAE6985F9248457DFE46278E3215F11CB68A071878",
+        "size": 18132124,
+        "start": "0x82170000"
+      }
+    },
+    "input_bundle_sha256": "EA27C522595617E2785AC324E3CC630B5289D746805C0B6D59F0C86DAEBA3A78",
+    "phase1_evidence": {
+      "crossbuild_feasibility_sha256": "FBB0A1067F20952788C83C4D025599DBCB9779C36CD0261F9703564571D2E56D",
+      "tu1_relationship_sha256": "FA544543982556ADD1BA1DB93AD512135276E0530AFA6B6F7833754EECDB299A",
+      "xex_metadata_sha256": "F04F4993E09790C0FB09A77D9DC5901C330B080EEF0EF906EECECD289A3F79BA"
+    },
+    "secondary": {
+      "container": {
+        "relative_path": "Fable II (Sep 13, 2008 prototype)/default.xex",
+        "sha256": "9997088F23FEFA2C700F18DA2CCB614AAE221C6F39B3BE9BA7AAAA059DB6BFAF",
+        "size": 20758528,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "E2787C5C2B2016B880F6B413B3DD8E0404F25E5B090885207287A745BAF43216",
+      "function_count": 45707,
+      "id": "sep-2008",
+      "pdata_sha256": "FFEC95F455BE9CAF2017D36E7BC8942D5F011F0EFA34BB2F5D80D8E5EC2C8FB2",
+      "text_sha256": "B13E8571539FCD74735A16F3F4E434EDDB6F9ECF09E970CC725E78756192FFB3"
+    },
+    "target": {
+      "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "derived_manifest_sha256": "4FC12E2765A8A770F600CCC9C9209ABC68E0859ACC5A0EB745921C2C992D8424",
+      "entry_point": "0x82CC21C0",
+      "executable_memory_fingerprint": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "id": "canonical-fable2-goty-tu1-postpatch",
+      "image_base": "0x82000000",
+      "image_size": "0x01620000",
+      "pdata": {
+        "function_count": 46180,
+        "sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+        "size": 369440,
+        "start": "0x8210B800"
+      },
+      "postpatch_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "retail_xexp_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "text": {
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+        "size": 18131900,
+        "start": "0x82170000"
+      },
+      "version": "0.0.1.26"
+    },
+    "toolchain": {
+      "fable2_repository_commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+      "generator": {
+        "commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+        "name": "Fable2PrototypeCorrespondence.py",
+        "version": "1.0.1"
+      },
+      "ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      },
+      "python_runtime": {
+        "cache_tag": "cpython-314",
+        "implementation": "CPython",
+        "version": "3.14.3"
+      },
+      "rexglue_repository_commit": "fa10315ff88ca56b2d0b380de40bad5b59b542bd",
+      "target_ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "target_ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      }
+    }
+  },
+  "policy": {
+    "exact_acceptance": "reciprocal unique raw bytes, exact valid boundaries, injective, shape/CFG consistent, and no final neighbourhood/topology contradiction",
+    "never_automatic": [
+      "opcode/XO structure only",
+      "same guest address",
+      "function size",
+      "prototype script/debug/PDB/source-path name",
+      "split/merge or changed-boundary hypothesis"
+    ],
+    "normalized_acceptance": "reciprocal unique branch-normalized bytes plus at least two corroborating classes including exact address-delta neighbourhood, direct-call topology, or a sound string/data anchor; injective and contradiction-free",
+    "precision_first": true,
+    "risk_policy": "tiny leaves, short thunks, padding-dominated functions, overlaps, and duplicate fingerprints require corroboration or quarantine",
+    "version": "precision-first-v1"
+  },
+  "review_score": {
+    "acceptance_uses_score": false,
+    "formula": {
+      "branch_normalized_equal": 60,
+      "cfg_equal": 15,
+      "contradiction_each": -50,
+      "neighbour_delta_support_each_max_2": 12,
+      "opcode_structure_equal": 10,
+      "raw_equal": 100,
+      "risk_present": -25,
+      "shape_equal": 10,
+      "shared_data_anchor_each_max_3": 5,
+      "shared_string": 25,
+      "topology_support_each_max_2": 15
+    },
+    "version": "review-ranking-v1"
+  },
+  "schema": {
+    "name": "fable2-prototype-correspondence-summary",
+    "version": 1
+  },
+  "status_counts": {
+    "accepted-exact-unique": 2779,
+    "accepted-normalized-corroborated": 12520,
+    "ambiguous": 15331,
+    "boundary-change": 0,
+    "candidate-structural": 15337,
+    "quarantined": 210,
+    "unmatched": 2
+  }
+}

@@ -18,6 +18,16 @@ committed.
 The evidence envelope schema is
 [`tools/schemas/fable2-prototype-archaeology-v1.schema.json`](../../tools/schemas/fable2-prototype-archaeology-v1.schema.json).
 
+## Phase 2A
+
+- [Correspondence engine, reproduction guide and outputs](phase2a/README.md)
+- [Technical report](phase2a/report.md)
+- [Phase 2B handoff](phase2a/phase2b-handoff.md)
+- [Machine-readable evidence](phase2a/evidence/)
+
+Phase 2A maps binary function correspondence only. It does not assign or propagate semantic names,
+change the TU1 manifest, add overrides, or alter generated recompilation/runtime sources.
+
 ## Reproduction
 
 Requirements:

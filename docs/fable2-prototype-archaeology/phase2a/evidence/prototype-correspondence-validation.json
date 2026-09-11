@@ -1,0 +1,304 @@
+{
+  "generated_at_utc": "2026-09-11T00:00:00Z",
+  "generator": {
+    "name": "Fable2PrototypeCorrespondence.py",
+    "version": "1.0.1"
+  },
+  "input_binding": {
+    "closure": {
+      "analyzer_version": "2.0.0",
+      "repository_relative_path": "C:/Dev/Fable2Recomp/out/analysis/BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00/entrypoint-closure.json",
+      "schema_version": 3,
+      "sha256": "665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397"
+    },
+    "donor": {
+      "container": {
+        "relative_path": "Fable II July 10 2009 23.12.02.0330/default.xex",
+        "sha256": "0686A9F292A3F6777BEB6E8D4924F96247D1E8E3E2370323572F797E6637A4AA",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "766C7F743F54C467B3BD720A16AD6A514353CAA0F7468E1541EE3356571199AA",
+      "exact_image_alias": {
+        "relative_path": "Fable II (Jul 10, 2009 prototype)/default.xex",
+        "sha256": "0AAA3C8EF72ECBB607C9D8A50C42022F3E0BDE759A462CB14148621790C0E348",
+        "size": 21282816,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "executable_memory_fingerprint": "AE15F6D9AF8C76B3643A0CB5EF7B108E686794250F6822C2A71C78FE3D0BE956",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "pdata": {
+        "function_count": 46179,
+        "sha256": "1805B91295ACEAEC07CE437A84DFF25E75A8B69B155C764838E3864E26C0BCB9",
+        "size": 369432,
+        "start": "0x8210B800"
+      },
+      "preferred_id": "build-23.12.02.0330",
+      "text": {
+        "sha256": "A49213732D2E64610939BBBAE6985F9248457DFE46278E3215F11CB68A071878",
+        "size": 18132124,
+        "start": "0x82170000"
+      }
+    },
+    "input_bundle_sha256": "EA27C522595617E2785AC324E3CC630B5289D746805C0B6D59F0C86DAEBA3A78",
+    "phase1_evidence": {
+      "crossbuild_feasibility_sha256": "FBB0A1067F20952788C83C4D025599DBCB9779C36CD0261F9703564571D2E56D",
+      "tu1_relationship_sha256": "FA544543982556ADD1BA1DB93AD512135276E0530AFA6B6F7833754EECDB299A",
+      "xex_metadata_sha256": "F04F4993E09790C0FB09A77D9DC5901C330B080EEF0EF906EECECD289A3F79BA"
+    },
+    "secondary": {
+      "container": {
+        "relative_path": "Fable II (Sep 13, 2008 prototype)/default.xex",
+        "sha256": "9997088F23FEFA2C700F18DA2CCB614AAE221C6F39B3BE9BA7AAAA059DB6BFAF",
+        "size": 20758528,
+        "source_root_id": "fable2-prototype-corpus"
+      },
+      "derived_manifest_sha256": "E2787C5C2B2016B880F6B413B3DD8E0404F25E5B090885207287A745BAF43216",
+      "function_count": 45707,
+      "id": "sep-2008",
+      "pdata_sha256": "FFEC95F455BE9CAF2017D36E7BC8942D5F011F0EFA34BB2F5D80D8E5EC2C8FB2",
+      "text_sha256": "B13E8571539FCD74735A16F3F4E434EDDB6F9ECF09E970CC725E78756192FFB3"
+    },
+    "target": {
+      "base_xex_sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "derived_manifest_sha256": "4FC12E2765A8A770F600CCC9C9209ABC68E0859ACC5A0EB745921C2C992D8424",
+      "entry_point": "0x82CC21C0",
+      "executable_memory_fingerprint": "5C8B78B84C93028D166E3DF347206E6642BA40BF374AD1AF8D958B2211320357",
+      "executable_memory_fingerprint_algorithm": "fable2-executable-memory-sha256-v1",
+      "id": "canonical-fable2-goty-tu1-postpatch",
+      "image_base": "0x82000000",
+      "image_size": "0x01620000",
+      "pdata": {
+        "function_count": 46180,
+        "sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+        "size": 369440,
+        "start": "0x8210B800"
+      },
+      "postpatch_image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "retail_xexp_sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "text": {
+        "sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+        "size": 18131900,
+        "start": "0x82170000"
+      },
+      "version": "0.0.1.26"
+    },
+    "toolchain": {
+      "fable2_repository_commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+      "generator": {
+        "commit": "972e3b114496f60a4b7bf8aae73246c05aa64685",
+        "name": "Fable2PrototypeCorrespondence.py",
+        "version": "1.0.1"
+      },
+      "ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      },
+      "python_runtime": {
+        "cache_tag": "cpython-314",
+        "implementation": "CPython",
+        "version": "3.14.3"
+      },
+      "rexglue_repository_commit": "fa10315ff88ca56b2d0b380de40bad5b59b542bd",
+      "target_ghidra_exporter": {
+        "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
+        "name": "ExportFable2PrototypeImage.java",
+        "version": "1.0.0"
+      },
+      "target_ghidra_toolchain": {
+        "compiler_spec": "default",
+        "ghidra_version": "12.1.2",
+        "language_id": "PowerPC:BE:64:A2ALT-32addr",
+        "loader_name": "XEX Loader by Warranty Voider",
+        "processor": "PowerPC",
+        "xexloader": "ghidra-12.1.2-commit-d0af801aee083c86950b90c3db78b2e1c642067f"
+      }
+    }
+  },
+  "positive_control": {
+    "accepted_pairs": 46025,
+    "by_function_shape": [
+      {
+        "accepted_correct": 276,
+        "bucket": "branching"
+      },
+      {
+        "accepted_correct": 33193,
+        "bucket": "direct-call",
+        "not_accepted": 70
+      },
+      {
+        "accepted_correct": 12480,
+        "bucket": "indirect-branch",
+        "not_accepted": 68
+      },
+      {
+        "accepted_correct": 75,
+        "bucket": "linear"
+      },
+      {
+        "accepted_correct": 1,
+        "bucket": "tiny-leaf",
+        "not_accepted": 16
+      }
+    ],
+    "by_size_bucket": [
+      {
+        "accepted_correct": 1,
+        "bucket": "0001-0016",
+        "not_accepted": 16
+      },
+      {
+        "accepted_correct": 4,
+        "bucket": "0017-0032"
+      },
+      {
+        "accepted_correct": 5841,
+        "bucket": "0033-0064",
+        "not_accepted": 32
+      },
+      {
+        "accepted_correct": 21776,
+        "bucket": "0065-0256",
+        "not_accepted": 106
+      },
+      {
+        "accepted_correct": 15265,
+        "bucket": "0257-1024"
+      },
+      {
+        "accepted_correct": 3138,
+        "bucket": "1025-plus"
+      }
+    ],
+    "correct_same_start_accepted_pairs": 46025,
+    "false_accepted_cross_address_pairs": 0,
+    "oracle": "byte-identical July 2009 and build-23 initialized images; true pair is identical .pdata start and boundary",
+    "precision": 1.0,
+    "precision_definition": "correct same-start accepted pairs / all accepted pairs",
+    "recall": 0.996665150826,
+    "recall_definition": "correct same-start accepted pairs / all oracle .pdata functions",
+    "status_counts": {
+      "accepted-exact-unique": 46025,
+      "accepted-normalized-corroborated": 0,
+      "ambiguous": 138,
+      "boundary-change": 0,
+      "candidate-structural": 0,
+      "quarantined": 16,
+      "unmatched": 0
+    },
+    "total_functions_represented": 46179
+  },
+  "schema": {
+    "name": "fable2-prototype-correspondence-validation",
+    "version": 1
+  },
+  "september_robustness_study": {
+    "accepted_by_precision_policy": 9600,
+    "accuracy_reported": false,
+    "failure_classes": [
+      "duplicate fingerprints",
+      "risk/quarantine rules",
+      "changed or split .pdata boundaries",
+      "structural candidates without corroboration",
+      "no shared fingerprint candidate"
+    ],
+    "left_build": "sep-2008",
+    "left_function_count": 45707,
+    "policy_status_counts": {
+      "accepted-exact-unique": 1847,
+      "accepted-normalized-corroborated": 7753,
+      "ambiguous": 14884,
+      "boundary-change": 33,
+      "candidate-structural": 16243,
+      "quarantined": 162,
+      "unmatched": 4785
+    },
+    "reason_accuracy_not_reported": "No complete ground-truth correspondence exists for the independent September image.",
+    "reciprocal_fingerprint_statistics": {
+      "boundary_normalized_prefix16_sha256": {
+        "acceptance_eligible": false,
+        "candidate_edge_count_within_feature": 89756672,
+        "donor_unique_fingerprints": 2754,
+        "purpose": "possible split/merge or shifted-boundary review only",
+        "reciprocal_unique_pairs": 2319,
+        "shared_fingerprint_groups": 3878,
+        "target_unique_fingerprints": 2794
+      },
+      "branch_normalized_sha256": {
+        "candidate_edge_count_within_feature": 219634,
+        "donor_unique_fingerprints": 41608,
+        "reciprocal_unique_pairs": 12176,
+        "shared_fingerprint_groups": 12952,
+        "target_unique_fingerprints": 41976
+      },
+      "opcode_structure_sha256": {
+        "candidate_edge_count_within_feature": 9545807,
+        "donor_unique_fingerprints": 26963,
+        "reciprocal_unique_pairs": 24080,
+        "shared_fingerprint_groups": 26767,
+        "target_unique_fingerprints": 27580
+      },
+      "raw_sha256": {
+        "candidate_edge_count_within_feature": 2613,
+        "donor_unique_fingerprints": 45553,
+        "reciprocal_unique_pairs": 1991,
+        "shared_fingerprint_groups": 2028,
+        "target_unique_fingerprints": 46025
+      }
+    },
+    "right_build": "build-23.12.02.0330",
+    "right_function_count": 46179
+  },
+  "synthetic_fixtures": [
+    {
+      "name": "b-bl-bc-displacement-normalization",
+      "passed": true
+    },
+    {
+      "name": "identical-functions-relocated-as-block",
+      "passed": true
+    },
+    {
+      "name": "branch-normalized-with-exact-neighbour-delta",
+      "passed": true
+    },
+    {
+      "name": "duplicate-tiny-leaves-and-thunks",
+      "passed": true
+    },
+    {
+      "name": "split-merged-shifted-pdata-boundary",
+      "passed": true
+    },
+    {
+      "name": "opcode-similar-semantically-different",
+      "passed": true
+    },
+    {
+      "name": "reordered-neighbouring-functions",
+      "passed": true
+    },
+    {
+      "name": "one-to-many-and-many-to-one-ambiguity",
+      "passed": true
+    },
+    {
+      "name": "changed-direct-call-target",
+      "passed": true
+    },
+    {
+      "name": "materialized-string-data-addresses-move",
+      "passed": true
+    }
+  ]
+}

@@ -22,11 +22,11 @@ python .\tools\Fable2PrototypeArchaeology.py verify
 python .\tools\VerifyFable2PrototypePhase1Consistency.py
 
 python .\tools\Fable2PrototypeCorrespondence.py generate `
-    --tool-commit 972e3b114496f60a4b7bf8aae73246c05aa64685 `
+    --tool-commit f5836c4736b370e8e7b027fb6a602f2dad1d0992 `
     --generated-at 2026-09-11T00:00:00Z
 
 python .\tools\Fable2PrototypeCorrespondence.py verify `
-    --tool-commit 972e3b114496f60a4b7bf8aae73246c05aa64685
+    --tool-commit f5836c4736b370e8e7b027fb6a602f2dad1d0992
 
 .\tools\Verify-Fable2PrototypeCorrespondenceJson.ps1
 python -m unittest .\tests\test_fable2_prototype_correspondence.py -v

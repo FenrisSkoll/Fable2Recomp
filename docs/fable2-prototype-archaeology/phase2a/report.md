@@ -2,8 +2,8 @@
 
 Generated evidence timestamp: `2026-09-11T00:00:00Z`
 
-Generator: `Fable2PrototypeCorrespondence.py` version `1.0.1`, policy
-`precision-first-v1`, commit `972e3b114496f60a4b7bf8aae73246c05aa64685`
+Generator: `Fable2PrototypeCorrespondence.py` version `1.0.2`, policy
+`precision-first-v1`, commit `f5836c4736b370e8e7b027fb6a602f2dad1d0992`
 
 ## Executive result
 
@@ -44,7 +44,7 @@ hashed input causes generation or verification to fail.
 | Target entry/version | `0x82CC21C0`, `0.0.1.26` |
 | Closure SHA-256 | `665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397` |
 | Generator runtime | `CPython 3.14.3`, cache tag `cpython-314` |
-| Input bundle SHA-256 | `EA27C522595617E2785AC324E3CC630B5289D746805C0B6D59F0C86DAEBA3A78` |
+| Input bundle SHA-256 | `8A3C3C25DFDAA856BA848C408B4677B719217449C7BE111F42D40F08B3F07194` |
 
 The July and build-23 containers have different hashes, but all 15 initialized derived sections,
 their `.pdata`, and the resulting executable-memory fingerprint are byte-identical. The preferred
@@ -211,8 +211,9 @@ Important negative findings and limitations:
 
 ## Outputs
 
-All committed JSON documents use schema name `fable2-prototype-correspondence`, version `1`, and
-validate against `tools/schemas/fable2-prototype-correspondence-v1.schema.json`.
+All committed JSON documents use the artifact-specific names in the
+`fable2-prototype-correspondence` schema family, version `1`, and validate against
+`tools/schemas/fable2-prototype-correspondence-v1.schema.json`.
 
 | File | Purpose |
 | --- | --- |
@@ -235,7 +236,7 @@ The final evidence passed the following checks from the repository root:
   valid, reciprocal/injective mappings, terminal totals reconciled, no opcode-only acceptance, and
   all bound identities/hashes current;
 - `Verify-Fable2PrototypeCorrespondenceJson.ps1`: five artifacts schema-valid;
-- `test_fable2_prototype_correspondence.py`: 11 tests passed, including all ten synthetic fixtures;
+- `test_fable2_prototype_correspondence.py`: 12 tests passed, including all ten synthetic fixtures;
 - Phase 1 generation with `--check-determinism`: 11 artifacts byte-identical;
 - Phase 1 immutable verification: 1,184 files and ten evidence artifacts verified;
 - Phase 1 cross-artifact consistency: three XEX builds and 15 initialized-section aliases

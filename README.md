@@ -132,6 +132,7 @@ Back up important saves before testing development builds. Save-path tracing is 
 - **Saves:** the tested `Hero000` workflow supports native creation, restart loading, updating and Xenia interoperability. Payload-free, opt-in traces and synthetic filesystem/flush tests support further diagnosis.
 - **GPU configuration:** [NR0B-1](docs/fable2-native-renderer/nr0b1/README.md) is verified from the user-operated Oakfield run: RTX 5080, Xenos/D3D12 RTV, bindless/tiled resources, 1× scale and actual exit 0. Black/blank character and dog surfaces remain unexplained.
 - **GPU metadata:** [NR0B-2](docs/fable2-native-renderer/nr0b2/README.md) has a default-off bounded consumer recorder, validated Release staging and a fresh isolated Oakfield session. **Recorder prepared — user capture required.** No runtime workload is selected and no native renderer is implemented.
+- **Prototype archaeology:** [Phase 1](docs/fable2-prototype-archaeology/phase1/report.md) inventories the read-only prototype corpus, recovers CodeView/PDB and source-path evidence, establishes the `23.12.02.0330` development-TU relationship and validates relocation-aware cross-build matching feasibility. Prototype evidence does not override canonical TU1 bytes.
 
 ## Near-term priorities
 

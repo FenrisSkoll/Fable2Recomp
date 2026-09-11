@@ -1,0 +1,1185 @@
+{
+  "schema": {
+    "name": "fable2-prototype-crossbuild-feasibility",
+    "version": 1
+  },
+  "generator": {
+    "name": "Fable2PrototypeArchaeology.py",
+    "version": "1.0.0"
+  },
+  "generated_at_utc": "2026-09-11T00:00:00Z",
+  "method": {
+    "boundary_source": "big-endian IMAGE_CE_RUNTIME_FUNCTION records from each derived .pdata block",
+    "raw_fingerprint": "SHA-256 of exact function bytes",
+    "branch_normalized_fingerprint": "SHA-256 after clearing PPC b/bl LI and bc BD displacement fields",
+    "opcode_structure_fingerprint": "SHA-256 of primary opcode plus XO for opcodes 19/31/59/63",
+    "limitation": "Phase 1 feasibility only; fingerprints are candidates and do not authorize TU1 renames."
+  },
+  "comparisons": [
+    {
+      "left_build": "sep-2008",
+      "right_build": "jul-2009",
+      "left_function_count": 45707,
+      "right_function_count": 46179,
+      "shared_start_address_count": 1035,
+      "same_address_exact_function_count": 0,
+      "same_address_branch_normalized_count": 9,
+      "fingerprint_matching": {
+        "raw_sha256": {
+          "left_unique_fingerprint_count": 45553,
+          "right_unique_fingerprint_count": 46025,
+          "unique_matches": 1991,
+          "same_address_matches": 0,
+          "most_common_address_deltas": [
+            {
+              "delta": 304088,
+              "delta_hex": "+0x4a3d8",
+              "count": 39
+            },
+            {
+              "delta": 303072,
+              "delta_hex": "+0x49fe0",
+              "count": 37
+            },
+            {
+              "delta": 304080,
+              "delta_hex": "+0x4a3d0",
+              "count": 37
+            },
+            {
+              "delta": 274944,
+              "delta_hex": "+0x43200",
+              "count": 34
+            },
+            {
+              "delta": 304208,
+              "delta_hex": "+0x4a450",
+              "count": 32
+            },
+            {
+              "delta": 303920,
+              "delta_hex": "+0x4a330",
+              "count": 30
+            },
+            {
+              "delta": 304104,
+              "delta_hex": "+0x4a3e8",
+              "count": 29
+            },
+            {
+              "delta": 304096,
+              "delta_hex": "+0x4a3e0",
+              "count": 28
+            },
+            {
+              "delta": 304216,
+              "delta_hex": "+0x4a458",
+              "count": 28
+            },
+            {
+              "delta": 302672,
+              "delta_hex": "+0x49e50",
+              "count": 25
+            },
+            {
+              "delta": 304240,
+              "delta_hex": "+0x4a470",
+              "count": 23
+            },
+            {
+              "delta": 302584,
+              "delta_hex": "+0x49df8",
+              "count": 22
+            }
+          ]
+        },
+        "branch_normalized_sha256": {
+          "left_unique_fingerprint_count": 41608,
+          "right_unique_fingerprint_count": 41976,
+          "unique_matches": 12176,
+          "same_address_matches": 8,
+          "most_common_address_deltas": [
+            {
+              "delta": 304080,
+              "delta_hex": "+0x4a3d0",
+              "count": 241
+            },
+            {
+              "delta": 304104,
+              "delta_hex": "+0x4a3e8",
+              "count": 206
+            },
+            {
+              "delta": 304216,
+              "delta_hex": "+0x4a458",
+              "count": 197
+            },
+            {
+              "delta": 303072,
+              "delta_hex": "+0x49fe0",
+              "count": 180
+            },
+            {
+              "delta": 304192,
+              "delta_hex": "+0x4a440",
+              "count": 172
+            },
+            {
+              "delta": 304088,
+              "delta_hex": "+0x4a3d8",
+              "count": 168
+            },
+            {
+              "delta": 304176,
+              "delta_hex": "+0x4a430",
+              "count": 168
+            },
+            {
+              "delta": 303920,
+              "delta_hex": "+0x4a330",
+              "count": 144
+            },
+            {
+              "delta": 304184,
+              "delta_hex": "+0x4a438",
+              "count": 138
+            },
+            {
+              "delta": 304272,
+              "delta_hex": "+0x4a490",
+              "count": 130
+            },
+            {
+              "delta": 304096,
+              "delta_hex": "+0x4a3e0",
+              "count": 129
+            },
+            {
+              "delta": 303824,
+              "delta_hex": "+0x4a2d0",
+              "count": 109
+            }
+          ]
+        },
+        "opcode_structure_sha256": {
+          "left_unique_fingerprint_count": 26963,
+          "right_unique_fingerprint_count": 27580,
+          "unique_matches": 24080,
+          "same_address_matches": 8,
+          "most_common_address_deltas": [
+            {
+              "delta": 304080,
+              "delta_hex": "+0x4a3d0",
+              "count": 344
+            },
+            {
+              "delta": 303920,
+              "delta_hex": "+0x4a330",
+              "count": 336
+            },
+            {
+              "delta": 304176,
+              "delta_hex": "+0x4a430",
+              "count": 319
+            },
+            {
+              "delta": 304216,
+              "delta_hex": "+0x4a458",
+              "count": 313
+            },
+            {
+              "delta": 304088,
+              "delta_hex": "+0x4a3d8",
+              "count": 294
+            },
+            {
+              "delta": 304192,
+              "delta_hex": "+0x4a440",
+              "count": 246
+            },
+            {
+              "delta": 303944,
+              "delta_hex": "+0x4a348",
+              "count": 245
+            },
+            {
+              "delta": 304104,
+              "delta_hex": "+0x4a3e8",
+              "count": 238
+            },
+            {
+              "delta": 303072,
+              "delta_hex": "+0x49fe0",
+              "count": 203
+            },
+            {
+              "delta": 303824,
+              "delta_hex": "+0x4a2d0",
+              "count": 202
+            },
+            {
+              "delta": 304096,
+              "delta_hex": "+0x4a3e0",
+              "count": 179
+            },
+            {
+              "delta": 304184,
+              "delta_hex": "+0x4a438",
+              "count": 172
+            }
+          ]
+        }
+      },
+      "representative_samples": [
+        {
+          "category": "tiny-leaf-exact",
+          "left": {
+            "start": 2192563072,
+            "start_hex": "0x82AFDB80",
+            "size": 12,
+            "end_exclusive": "0x82AFDB8C",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8212D7B8"
+          },
+          "right": {
+            "start": 2192821968,
+            "start_hex": "0x82B3CED0",
+            "size": 12,
+            "end_exclusive": "0x82B3CEDC",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82135858"
+          }
+        },
+        {
+          "category": "relocated-exact",
+          "left": {
+            "start": 2193696640,
+            "start_hex": "0x82C12780",
+            "size": 548,
+            "end_exclusive": "0x82C129A4",
+            "raw_sha256": "00220427E3FD967F27EE90F596D3C1EACAD815F6C1CB57B38CBA7FF2DCC3AA17",
+            "branch_normalized_sha256": "FCC3779545E75189C8515F5E86C331CF6DAF3889FB89F8CF8DEFFFDAA4ABE16F",
+            "opcode_structure_sha256": "7BE513B62599292A2499A1E668DD51A4ADB30DA2ED4F0F2D4FA677209841E675",
+            "instruction_count": 137,
+            "direct_call_count": 0,
+            "conditional_branch_count": 16,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82134708"
+          },
+          "right": {
+            "start": 2193949280,
+            "start_hex": "0x82C50260",
+            "size": 548,
+            "end_exclusive": "0x82C50484",
+            "raw_sha256": "00220427E3FD967F27EE90F596D3C1EACAD815F6C1CB57B38CBA7FF2DCC3AA17",
+            "branch_normalized_sha256": "FCC3779545E75189C8515F5E86C331CF6DAF3889FB89F8CF8DEFFFDAA4ABE16F",
+            "opcode_structure_sha256": "7BE513B62599292A2499A1E668DD51A4ADB30DA2ED4F0F2D4FA677209841E675",
+            "instruction_count": 137,
+            "direct_call_count": 0,
+            "conditional_branch_count": 16,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8213C650"
+          }
+        },
+        {
+          "category": "indirect-dispatch-exact",
+          "left": {
+            "start": 2194565624,
+            "start_hex": "0x82CE69F8",
+            "size": 140,
+            "end_exclusive": "0x82CE6A84",
+            "raw_sha256": "0213BF133F44056439E1740C9D92D4D2CD6B877F1EBBF3F59C8CDC52C6C186C2",
+            "branch_normalized_sha256": "9CC3B4FD3E7641E2ABA48743C9730AF9CE097C1FB9711EA223C429379A53D1EE",
+            "opcode_structure_sha256": "2DE378262680BBDDB0E40A3BAC67767F517D491D62FE3238106C418FA3523702",
+            "instruction_count": 35,
+            "direct_call_count": 0,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82139840"
+          },
+          "right": {
+            "start": 2194870440,
+            "start_hex": "0x82D310A8",
+            "size": 140,
+            "end_exclusive": "0x82D31134",
+            "raw_sha256": "0213BF133F44056439E1740C9D92D4D2CD6B877F1EBBF3F59C8CDC52C6C186C2",
+            "branch_normalized_sha256": "9CC3B4FD3E7641E2ABA48743C9730AF9CE097C1FB9711EA223C429379A53D1EE",
+            "opcode_structure_sha256": "2DE378262680BBDDB0E40A3BAC67767F517D491D62FE3238106C418FA3523702",
+            "instruction_count": 35,
+            "direct_call_count": 0,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82141C58"
+          }
+        },
+        {
+          "category": "branch-relocation-normalized",
+          "left": {
+            "start": 2186437504,
+            "start_hex": "0x82526380",
+            "size": 80,
+            "end_exclusive": "0x825263D0",
+            "raw_sha256": "D2C65644CB2EE22E42FB63D2916A48CBF3E01CFF076E7B1409559FF86E7C9B74",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82114C40"
+          },
+          "right": {
+            "start": 2186554312,
+            "start_hex": "0x82542BC8",
+            "size": 80,
+            "end_exclusive": "0x82542C18",
+            "raw_sha256": "F9A8AA400588E29D4F22D287FE08F8FFDACAE78D0B84DF9E9F7473C946C2D19E",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8211BA80"
+          }
+        },
+        {
+          "category": "opcode-structure-only",
+          "left": {
+            "start": 2194859376,
+            "start_hex": "0x82D2E570",
+            "size": 216,
+            "end_exclusive": "0x82D2E648",
+            "raw_sha256": "9957286E8539D72C466399E20BCE1E9B59DDB973B3D0E12511DF2E03DDB8A853",
+            "branch_normalized_sha256": "81D995C992EB3436D96E5BD80342DD740B806EB81DBC725D3E00351A1C9CE0E6",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x8213B088"
+          },
+          "right": {
+            "start": 2195162600,
+            "start_hex": "0x82D785E8",
+            "size": 216,
+            "end_exclusive": "0x82D786C0",
+            "raw_sha256": "BB1DFC0EB14ACF04797FF8D381404EAABF143CFC4AB789CB6294EF4FC1B152E2",
+            "branch_normalized_sha256": "57E62B8010D27C2BE6257AF81F4825CEE683FCBE33E4356DC741EB70E6A37AB7",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82143468"
+          }
+        },
+        {
+          "category": "changed-same-address",
+          "left": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "C53D4589402481DEB47001E12FD31ED607446A87B6F7F8F74244F372BB9718A9",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82104E00"
+          },
+          "right": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "600F90D1A90A00CD1E87E42D96DD3B7D6277E0F6B8471D639699BD45824F6CFF",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8210B800"
+          }
+        }
+      ]
+    },
+    {
+      "left_build": "jul-2009",
+      "right_build": "canonical-tu1",
+      "left_function_count": 46179,
+      "right_function_count": 46180,
+      "shared_start_address_count": 2900,
+      "same_address_exact_function_count": 2,
+      "same_address_branch_normalized_count": 32,
+      "fingerprint_matching": {
+        "raw_sha256": {
+          "left_unique_fingerprint_count": 46025,
+          "right_unique_fingerprint_count": 46020,
+          "unique_matches": 2971,
+          "same_address_matches": 2,
+          "most_common_address_deltas": [
+            {
+              "delta": -112,
+              "delta_hex": "-0x70",
+              "count": 98
+            },
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 66
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 57
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 50
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 47
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 41
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 41
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 37
+            },
+            {
+              "delta": -512,
+              "delta_hex": "-0x200",
+              "count": 35
+            },
+            {
+              "delta": 2872,
+              "delta_hex": "+0xb38",
+              "count": 34
+            },
+            {
+              "delta": -5336,
+              "delta_hex": "-0x14d8",
+              "count": 33
+            },
+            {
+              "delta": 1104,
+              "delta_hex": "+0x450",
+              "count": 28
+            }
+          ]
+        },
+        "branch_normalized_sha256": {
+          "left_unique_fingerprint_count": 41976,
+          "right_unique_fingerprint_count": 41974,
+          "unique_matches": 16523,
+          "same_address_matches": 24,
+          "most_common_address_deltas": [
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 348
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 277
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 251
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 245
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 233
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 231
+            },
+            {
+              "delta": 24,
+              "delta_hex": "+0x18",
+              "count": 212
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 201
+            },
+            {
+              "delta": 2872,
+              "delta_hex": "+0xb38",
+              "count": 185
+            },
+            {
+              "delta": -88,
+              "delta_hex": "-0x58",
+              "count": 169
+            },
+            {
+              "delta": -112,
+              "delta_hex": "-0x70",
+              "count": 164
+            },
+            {
+              "delta": 5824,
+              "delta_hex": "+0x16c0",
+              "count": 164
+            }
+          ]
+        },
+        "opcode_structure_sha256": {
+          "left_unique_fingerprint_count": 27580,
+          "right_unique_fingerprint_count": 27580,
+          "unique_matches": 27578,
+          "same_address_matches": 23,
+          "most_common_address_deltas": [
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 558
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 482
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 354
+            },
+            {
+              "delta": 1104,
+              "delta_hex": "+0x450",
+              "count": 338
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 317
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 313
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 311
+            },
+            {
+              "delta": 1264,
+              "delta_hex": "+0x4f0",
+              "count": 306
+            },
+            {
+              "delta": 432,
+              "delta_hex": "+0x1b0",
+              "count": 302
+            },
+            {
+              "delta": 328,
+              "delta_hex": "+0x148",
+              "count": 262
+            },
+            {
+              "delta": 5824,
+              "delta_hex": "+0x16c0",
+              "count": 256
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 239
+            }
+          ]
+        }
+      },
+      "representative_samples": [
+        {
+          "category": "tiny-leaf-exact",
+          "left": {
+            "start": 2192821968,
+            "start_hex": "0x82B3CED0",
+            "size": 12,
+            "end_exclusive": "0x82B3CEDC",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82135858"
+          },
+          "right": {
+            "start": 2192825176,
+            "start_hex": "0x82B3DB58",
+            "size": 12,
+            "end_exclusive": "0x82B3DB64",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82135850"
+          }
+        },
+        {
+          "category": "relocated-exact",
+          "left": {
+            "start": 2189772040,
+            "start_hex": "0x82854508",
+            "size": 100,
+            "end_exclusive": "0x8285456C",
+            "raw_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "branch_normalized_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "opcode_structure_sha256": "88552E0C4A56CEADA55F543AD8D2D14D9BCFECBC8237491F89ACA14C3A2CC5ED",
+            "instruction_count": 25,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x821291E8"
+          },
+          "right": {
+            "start": 2189767248,
+            "start_hex": "0x82853250",
+            "size": 100,
+            "end_exclusive": "0x828532B4",
+            "raw_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "branch_normalized_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "opcode_structure_sha256": "88552E0C4A56CEADA55F543AD8D2D14D9BCFECBC8237491F89ACA14C3A2CC5ED",
+            "instruction_count": 25,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82129110"
+          }
+        },
+        {
+          "category": "branch-relocation-normalized",
+          "left": {
+            "start": 2186554312,
+            "start_hex": "0x82542BC8",
+            "size": 80,
+            "end_exclusive": "0x82542C18",
+            "raw_sha256": "F9A8AA400588E29D4F22D287FE08F8FFDACAE78D0B84DF9E9F7473C946C2D19E",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8211BA80"
+          },
+          "right": {
+            "start": 2186548632,
+            "start_hex": "0x82541598",
+            "size": 80,
+            "end_exclusive": "0x825415E8",
+            "raw_sha256": "BB74FD388D0C95B2BFF39A751F09F7410F70A3A43903CE01512913049FDFE98B",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8211B9C0"
+          }
+        },
+        {
+          "category": "opcode-structure-only",
+          "left": {
+            "start": 2195162600,
+            "start_hex": "0x82D785E8",
+            "size": 216,
+            "end_exclusive": "0x82D786C0",
+            "raw_sha256": "BB1DFC0EB14ACF04797FF8D381404EAABF143CFC4AB789CB6294EF4FC1B152E2",
+            "branch_normalized_sha256": "57E62B8010D27C2BE6257AF81F4825CEE683FCBE33E4356DC741EB70E6A37AB7",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82143468"
+          },
+          "right": {
+            "start": 2195162720,
+            "start_hex": "0x82D78660",
+            "size": 216,
+            "end_exclusive": "0x82D78738",
+            "raw_sha256": "884B0C719F5C37BF04A3FC830DC53ABE84CA64E2255FC40FDC1D18E046228D38",
+            "branch_normalized_sha256": "74F71F3F53341922FCF0F6AA62E2E01CF042326E226194BA94BFFA67B58EC7A8",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82143478"
+          }
+        },
+        {
+          "category": "changed-same-address",
+          "left": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "600F90D1A90A00CD1E87E42D96DD3B7D6277E0F6B8471D639699BD45824F6CFF",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8210B800"
+          },
+          "right": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "D3EA2FE1E50DE2A5ED2F9698BB2ABD211D0A0A2195B5000E5C0381CA2939AAB6",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8210B800"
+          }
+        }
+      ]
+    },
+    {
+      "left_build": "build-23.12.02.0330",
+      "right_build": "canonical-tu1",
+      "left_function_count": 46179,
+      "right_function_count": 46180,
+      "shared_start_address_count": 2900,
+      "same_address_exact_function_count": 2,
+      "same_address_branch_normalized_count": 32,
+      "fingerprint_matching": {
+        "raw_sha256": {
+          "left_unique_fingerprint_count": 46025,
+          "right_unique_fingerprint_count": 46020,
+          "unique_matches": 2971,
+          "same_address_matches": 2,
+          "most_common_address_deltas": [
+            {
+              "delta": -112,
+              "delta_hex": "-0x70",
+              "count": 98
+            },
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 66
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 57
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 50
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 47
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 41
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 41
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 37
+            },
+            {
+              "delta": -512,
+              "delta_hex": "-0x200",
+              "count": 35
+            },
+            {
+              "delta": 2872,
+              "delta_hex": "+0xb38",
+              "count": 34
+            },
+            {
+              "delta": -5336,
+              "delta_hex": "-0x14d8",
+              "count": 33
+            },
+            {
+              "delta": 1104,
+              "delta_hex": "+0x450",
+              "count": 28
+            }
+          ]
+        },
+        "branch_normalized_sha256": {
+          "left_unique_fingerprint_count": 41976,
+          "right_unique_fingerprint_count": 41974,
+          "unique_matches": 16523,
+          "same_address_matches": 24,
+          "most_common_address_deltas": [
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 348
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 277
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 251
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 245
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 233
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 231
+            },
+            {
+              "delta": 24,
+              "delta_hex": "+0x18",
+              "count": 212
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 201
+            },
+            {
+              "delta": 2872,
+              "delta_hex": "+0xb38",
+              "count": 185
+            },
+            {
+              "delta": -88,
+              "delta_hex": "-0x58",
+              "count": 169
+            },
+            {
+              "delta": -112,
+              "delta_hex": "-0x70",
+              "count": 164
+            },
+            {
+              "delta": 5824,
+              "delta_hex": "+0x16c0",
+              "count": 164
+            }
+          ]
+        },
+        "opcode_structure_sha256": {
+          "left_unique_fingerprint_count": 27580,
+          "right_unique_fingerprint_count": 27580,
+          "unique_matches": 27578,
+          "same_address_matches": 23,
+          "most_common_address_deltas": [
+            {
+              "delta": -248,
+              "delta_hex": "-0xf8",
+              "count": 558
+            },
+            {
+              "delta": -176,
+              "delta_hex": "-0xb0",
+              "count": 482
+            },
+            {
+              "delta": -240,
+              "delta_hex": "-0xf0",
+              "count": 354
+            },
+            {
+              "delta": 1104,
+              "delta_hex": "+0x450",
+              "count": 338
+            },
+            {
+              "delta": -48,
+              "delta_hex": "-0x30",
+              "count": 317
+            },
+            {
+              "delta": 832,
+              "delta_hex": "+0x340",
+              "count": 313
+            },
+            {
+              "delta": -224,
+              "delta_hex": "-0xe0",
+              "count": 311
+            },
+            {
+              "delta": 1264,
+              "delta_hex": "+0x4f0",
+              "count": 306
+            },
+            {
+              "delta": 432,
+              "delta_hex": "+0x1b0",
+              "count": 302
+            },
+            {
+              "delta": 328,
+              "delta_hex": "+0x148",
+              "count": 262
+            },
+            {
+              "delta": 5824,
+              "delta_hex": "+0x16c0",
+              "count": 256
+            },
+            {
+              "delta": 1432,
+              "delta_hex": "+0x598",
+              "count": 239
+            }
+          ]
+        }
+      },
+      "representative_samples": [
+        {
+          "category": "tiny-leaf-exact",
+          "left": {
+            "start": 2192821968,
+            "start_hex": "0x82B3CED0",
+            "size": 12,
+            "end_exclusive": "0x82B3CEDC",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82135858"
+          },
+          "right": {
+            "start": 2192825176,
+            "start_hex": "0x82B3DB58",
+            "size": 12,
+            "end_exclusive": "0x82B3DB64",
+            "raw_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "branch_normalized_sha256": "42ACD3D7F80E350BE38C082870E8901B1003D3EE8BD97B5B2285B5802D90FA23",
+            "opcode_structure_sha256": "9F6F9F26305A112287A2B7C8416FEABB576327AD20686EE0C1C84E2511CA9A66",
+            "instruction_count": 3,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82135850"
+          }
+        },
+        {
+          "category": "relocated-exact",
+          "left": {
+            "start": 2189772040,
+            "start_hex": "0x82854508",
+            "size": 100,
+            "end_exclusive": "0x8285456C",
+            "raw_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "branch_normalized_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "opcode_structure_sha256": "88552E0C4A56CEADA55F543AD8D2D14D9BCFECBC8237491F89ACA14C3A2CC5ED",
+            "instruction_count": 25,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x821291E8"
+          },
+          "right": {
+            "start": 2189767248,
+            "start_hex": "0x82853250",
+            "size": 100,
+            "end_exclusive": "0x828532B4",
+            "raw_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "branch_normalized_sha256": "000A99EAD61B0A352A29017DB889F2F6B552F041719BEC71D7FDB4E487463E3F",
+            "opcode_structure_sha256": "88552E0C4A56CEADA55F543AD8D2D14D9BCFECBC8237491F89ACA14C3A2CC5ED",
+            "instruction_count": 25,
+            "direct_call_count": 0,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82129110"
+          }
+        },
+        {
+          "category": "branch-relocation-normalized",
+          "left": {
+            "start": 2186554312,
+            "start_hex": "0x82542BC8",
+            "size": 80,
+            "end_exclusive": "0x82542C18",
+            "raw_sha256": "F9A8AA400588E29D4F22D287FE08F8FFDACAE78D0B84DF9E9F7473C946C2D19E",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8211BA80"
+          },
+          "right": {
+            "start": 2186548632,
+            "start_hex": "0x82541598",
+            "size": 80,
+            "end_exclusive": "0x825415E8",
+            "raw_sha256": "BB74FD388D0C95B2BFF39A751F09F7410F70A3A43903CE01512913049FDFE98B",
+            "branch_normalized_sha256": "000078CF5E84DAC3A25A1E0BA32C4E9B86D05C80624599556CAF464912660765",
+            "opcode_structure_sha256": "15F0DFECCFAB87C88BE57B65B2445AA82191AF2CD497D2CC776B39DFA5B30C98",
+            "instruction_count": 20,
+            "direct_call_count": 1,
+            "conditional_branch_count": 1,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8211B9C0"
+          }
+        },
+        {
+          "category": "opcode-structure-only",
+          "left": {
+            "start": 2195162600,
+            "start_hex": "0x82D785E8",
+            "size": 216,
+            "end_exclusive": "0x82D786C0",
+            "raw_sha256": "BB1DFC0EB14ACF04797FF8D381404EAABF143CFC4AB789CB6294EF4FC1B152E2",
+            "branch_normalized_sha256": "57E62B8010D27C2BE6257AF81F4825CEE683FCBE33E4356DC741EB70E6A37AB7",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82143468"
+          },
+          "right": {
+            "start": 2195162720,
+            "start_hex": "0x82D78660",
+            "size": 216,
+            "end_exclusive": "0x82D78738",
+            "raw_sha256": "884B0C719F5C37BF04A3FC830DC53ABE84CA64E2255FC40FDC1D18E046228D38",
+            "branch_normalized_sha256": "74F71F3F53341922FCF0F6AA62E2E01CF042326E226194BA94BFFA67B58EC7A8",
+            "opcode_structure_sha256": "000018416F2AB7664675F2CAAE976CF6E7B421241481F478F83B1DC7BE67A658",
+            "instruction_count": 54,
+            "direct_call_count": 2,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 2,
+            "pdata_record_address": "0x82143478"
+          }
+        },
+        {
+          "category": "changed-same-address",
+          "left": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "600F90D1A90A00CD1E87E42D96DD3B7D6277E0F6B8471D639699BD45824F6CFF",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8210B800"
+          },
+          "right": {
+            "start": 2182545424,
+            "start_hex": "0x82170010",
+            "size": 64,
+            "end_exclusive": "0x82170050",
+            "raw_sha256": "D3EA2FE1E50DE2A5ED2F9698BB2ABD211D0A0A2195B5000E5C0381CA2939AAB6",
+            "branch_normalized_sha256": "F5405634A45ABE8713D96172D98BEB3F9B7EE2116C8CDE4205C56687F3D322A1",
+            "opcode_structure_sha256": "783653F75D811AAAD987004CF222D36582D765D685B088D53585C588D80C28CC",
+            "instruction_count": 16,
+            "direct_call_count": 2,
+            "conditional_branch_count": 0,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x8210B800"
+          }
+        }
+      ]
+    }
+  ],
+  "assessment": {
+    "grade": "strongly-supported",
+    "phase2_matcher_practical": true,
+    "recommended_features": [
+      "exact .pdata boundaries",
+      "unique raw or branch-normalized PPC fingerprints",
+      "address delta neighbourhood",
+      "direct-call topology",
+      "string and constant references",
+      "CFG verification before accepting non-exact matches"
+    ],
+    "do_not_trust_alone": [
+      "function size",
+      "opcode-only structure",
+      "same guest address",
+      "prototype semantic name"
+    ]
+  }
+}

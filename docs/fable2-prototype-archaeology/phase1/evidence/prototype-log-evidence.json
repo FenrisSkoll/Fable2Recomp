@@ -1,0 +1,200 @@
+{
+  "schema": {
+    "name": "fable2-prototype-log-evidence",
+    "version": 1
+  },
+  "generator": {
+    "name": "Fable2PrototypeArchaeology.py",
+    "version": "1.0.0"
+  },
+  "generated_at_utc": "2026-09-11T00:00:00Z",
+  "records": [
+    {
+      "build_id": "jul-2009",
+      "relative_path": "lhdebug.log",
+      "size": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "empty-file",
+      "confidence": "confirmed",
+      "evidence_lines": []
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R.dat",
+      "size": 741,
+      "sha256": "1D9EEAE778FAD741A2983BDE96B3363C238A4DC80DBB1F6D06795647DEEF69F9",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "strongly-supported",
+      "evidence_lines": [
+        {
+          "line": 1,
+          "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+        },
+        {
+          "line": 7,
+          "text": "    <version>-insert version-</version>"
+        },
+        {
+          "line": 13,
+          "text": "  <game name=\"Fable_II_R\">"
+        },
+        {
+          "line": 15,
+          "text": "    <description>Fable_II_R</description>"
+        },
+        {
+          "line": 16,
+          "text": "    <rom name=\"Fable_II_R.iso\" size=\"7042990080\" crc=\"c7c76c69\" md5=\"edf82f2d9547cb50d7b97d2a95a450d2\" sha1=\"09d1d143ca5748caf777625823aa8fb8a9002f89\" />"
+        }
+      ]
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_20210401T101950.txt",
+      "size": 120,
+      "sha256": "347976B5B1CE9D1F34738D63E3EECC74C142B69D2E1CEE0987F5349D42254A5F",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "confirmed",
+      "evidence_lines": [
+        {
+          "line": 1,
+          "text": "C:\\Users\\User\\Desktop\\New folder\\Programs\\Creator\\DiscImageCreator.exe dvd H D:\\NEW Builds\\Fable_II_R\\Fable_II_R.iso 24 "
+        }
+      ]
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_disc.txt",
+      "size": 21394,
+      "sha256": "BAA137BA2CB73D24007BA3874E9A383665F7C9BFB7E229BFAEC5162F706AAB5B",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "strongly-supported",
+      "evidence_lines": [
+        {
+          "line": 5,
+          "text": "\t       BookVersion: 1"
+        },
+        {
+          "line": 18,
+          "text": "\t     MediaSpecific: "
+        }
+      ]
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_drive.txt",
+      "size": 8898,
+      "sha256": "989478EB9AB1A8667929A17CD124DFA8845279FDBB6C50595EE2572383D66BC0",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "strongly-supported",
+      "evidence_lines": [
+        {
+          "line": 2,
+          "text": "\t              Version: 32"
+        },
+        {
+          "line": 9,
+          "text": "\t      CommandQueueing: False"
+        },
+        {
+          "line": 12,
+          "text": "\t      BusMajorVersion: 2"
+        },
+        {
+          "line": 13,
+          "text": "\t      BusMinorVersion: 0"
+        },
+        {
+          "line": 18,
+          "text": "\t      RemovableMedia: Yes"
+        },
+        {
+          "line": 19,
+          "text": "\t            Versions: 0"
+        },
+        {
+          "line": 30,
+          "text": "\t        CommandQueue: No"
+        },
+        {
+          "line": 31,
+          "text": "\t      LinkedCommands: No"
+        },
+        {
+          "line": 74,
+          "text": "\t\tErrorRecoveryPagePresent: Yes"
+        },
+        {
+          "line": 83,
+          "text": "\t\t   Version: 0"
+        },
+        {
+          "line": 153,
+          "text": "\t       MediaCatalogNumber:                 "
+        },
+        {
+          "line": 181,
+          "text": "\t                Immediate: Yes"
+        }
+      ]
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_mainError.txt",
+      "size": 0,
+      "sha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "empty-file",
+      "confidence": "confirmed",
+      "evidence_lines": []
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_mainInfo.txt",
+      "size": 19824,
+      "sha256": "035536305360B6DA40B85963CBB6D630EC2A7F85326B9041781751CC32171CC8",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "strongly-supported",
+      "evidence_lines": []
+    },
+    {
+      "build_id": "sep-2008",
+      "relative_path": "Fable_II_R_logs/Fable_II_R_volDesc.txt",
+      "size": 3431,
+      "sha256": "153D166C583B7B291989537413CDBC8A7D70DA97DEBFFD24BB2A033CCBFD52FE",
+      "text_encoding": "utf-8-sig",
+      "provenance_classification": "disc-preservation-or-extraction-log",
+      "confidence": "strongly-supported",
+      "evidence_lines": [
+        {
+          "line": 4,
+          "text": "\t                    Volume Descriptor Version: 1"
+        },
+        {
+          "line": 36,
+          "text": "\t                       File Structure Version: 1"
+        },
+        {
+          "line": 41,
+          "text": "\t                    Volume Descriptor Version: 1"
+        }
+      ]
+    }
+  ],
+  "conclusions": [
+    {
+      "grade": "confirmed",
+      "finding": "Fable II (Jul 10, 2009 prototype)/lhdebug.log is zero bytes and contains no runtime evidence."
+    },
+    {
+      "grade": "confirmed",
+      "finding": "The September Fable_II_R_logs files are preservation/extraction records, not Lionhead runtime logs."
+    }
+  ]
+}

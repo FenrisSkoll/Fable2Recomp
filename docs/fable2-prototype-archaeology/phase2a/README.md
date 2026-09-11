@@ -28,8 +28,10 @@ python .\tools\Fable2PrototypeCorrespondence.py generate `
 python .\tools\Fable2PrototypeCorrespondence.py verify `
     --tool-commit 5f96fcf81bf9511dabadc63326468d9de94f87da
 
+python .\tools\VerifyFable2PrototypePhase2AConsistency.py
 .\tools\Verify-Fable2PrototypeCorrespondenceJson.ps1
 python -m unittest .\tests\test_fable2_prototype_correspondence.py -v
+python -m unittest .\tests\test_fable2_prototype_phase2a_consistency.py -v
 ```
 
 Re-run `generate` with `--check-determinism` and the same timestamp after the committed outputs

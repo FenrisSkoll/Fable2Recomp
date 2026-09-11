@@ -170,12 +170,19 @@ Lossless exhaustive material remains ignored because it is reproducible and subs
 
 | Artifact | Size | SHA-256 |
 | --- | ---: | --- |
-| `out/prototype-archaeology/phase2a/prototype-correspondence-candidate-groups.json` | 9,638,474 | `99F3DB1F430A1D540D05067891795E1A5CD35C9A98A9F9DD83468298B50B3AB2` |
-| `out/prototype-archaeology/phase2a/prototype-correspondence-function-features.json` | 136,999,129 | `9D165A7F2A43BF662CB25317AC0EF71C581A175A141D28260CCE6E65CA64A312` |
+| `out/prototype-archaeology/phase2a/prototype-correspondence-candidate-groups.json` | 9,638,545 | `2B295524D79DFCECEC2ED7553D7B594BBF799BE2FF468F94196E98C15C175ED1` |
+| `out/prototype-archaeology/phase2a/prototype-correspondence-function-features.json` | 136,999,200 | `AA88EF6D3961AB3D502B71993FFAF17DF69F7118A457E2E7C27DA6806F7E3AE9` |
 
 For each shared fingerprint, the exhaustive group file is lossless because its donor and target
 members define the full Cartesian candidate edge set. The committed summary binds both ignored
 files by path, byte size, and SHA-256.
+
+Both files grew by exactly 71 bytes during the final Phase 2A provenance hardening. The compact
+`python_runtime` object added 91 bytes to each common evidence envelope, while changing the closure
+identity from `C:/Dev/Fable2Recomp/out/...` to repository-relative `out/...` removed 20 bytes. The
+candidate groups and per-function feature payloads did not change; neither did accepted mappings,
+terminal status counts, or the then-current review selection. The original rows above were not
+updated when the provenance-only envelopes were regenerated.
 
 ## Independent September robustness study
 
@@ -237,6 +244,8 @@ The final evidence passed the following checks from the repository root:
 - `Fable2PrototypeCorrespondence.py verify`: all functions represented once, accepted boundaries
   valid, reciprocal/injective mappings, terminal totals reconciled, no opcode-only acceptance, and
   all bound identities/hashes current;
+- `VerifyFable2PrototypePhase2AConsistency.py`: report rows, committed summary identities, and
+  actual ignored exhaustive bytes agree for both artifacts;
 - `Verify-Fable2PrototypeCorrespondenceJson.ps1`: five artifacts schema-valid;
 - `test_fable2_prototype_correspondence.py`: 13 tests passed, including all ten synthetic fixtures;
 - Phase 1 generation with `--check-determinism`: 11 artifacts byte-identical;

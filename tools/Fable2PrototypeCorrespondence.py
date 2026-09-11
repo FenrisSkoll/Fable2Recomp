@@ -14,6 +14,7 @@ import bisect
 import collections
 import hashlib
 import json
+import platform
 import re
 import struct
 import sys
@@ -26,7 +27,7 @@ import VerifyFable2PrototypePhase1Consistency as phase1_consistency
 
 
 TOOL_NAME = "Fable2PrototypeCorrespondence.py"
-TOOL_VERSION = "1.0.0"
+TOOL_VERSION = "1.0.1"
 SCHEMA_VERSION = 1
 POLICY_VERSION = "precision-first-v1"
 SCORE_VERSION = "review-ranking-v1"
@@ -87,6 +88,14 @@ def sha256_file(path: Path) -> str:
     except OSError as error:
         raise CorrespondenceError(f"could not hash {path}: {error}") from error
     return digest.hexdigest().upper()
+
+
+def python_runtime_identity() -> dict[str, str]:
+    return {
+        "implementation": platform.python_implementation(),
+        "version": platform.python_version(),
+        "cache_tag": sys.implementation.cache_tag,
+    }
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -1711,6 +1720,7 @@ def input_binding(
         },
         "toolchain": {
             "generator": {"name": TOOL_NAME, "version": TOOL_VERSION, "commit": tool_commit},
+            "python_runtime": python_runtime_identity(),
             "fable2_repository_commit": tool_commit,
             "rexglue_repository_commit": rexglue_commit,
             "ghidra_exporter": donor_manifest.get("exporter"),

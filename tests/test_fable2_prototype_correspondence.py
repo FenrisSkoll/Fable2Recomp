@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import platform
 import struct
 import sys
 import unittest
@@ -59,6 +60,17 @@ class SyntheticFixtureTests(unittest.TestCase):
         for fixture in fixtures:
             with self.subTest(fixture=fixture["name"]):
                 self.assertTrue(fixture["passed"])
+
+    def test_runtime_identity_is_exact_and_stable(self) -> None:
+        self.assertEqual("1.0.1", correspondence.TOOL_VERSION)
+        self.assertEqual(
+            {
+                "implementation": platform.python_implementation(),
+                "version": platform.python_version(),
+                "cache_tag": sys.implementation.cache_tag,
+            },
+            correspondence.python_runtime_identity(),
+        )
 
     def test_fixture_results_are_deterministic(self) -> None:
         first = correspondence.canonical_json_bytes(correspondence.run_synthetic_fixtures())

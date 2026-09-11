@@ -81,9 +81,14 @@ and devkit encryption. The extracted `.text` identities are:
 
 | Build | `.text` start | Size | SHA-256 |
 | --- | --- | ---: | --- |
-| September | `0x82170000` | 17,858,716 | `B13E857C468951B8D22F6D042AF04DE41BB4CC7CD315D3476E1418E7F9D68E75` |
-| July / build 23 | `0x82170000` | 18,132,124 | `A4921375A74DC0E7178313910739410901E780810478077743B15850357401656` |
+| September | `0x82170000` | 17,858,716 | `B13E8571539FCD74735A16F3F4E434EDDB6F9ECF09E970CC725E78756192FFB3` |
+| July / build 23 | `0x82170000` | 18,132,124 | `A49213732D2E64610939BBBAE6985F9248457DFE46278E3215F11CB68A071878` |
 | Canonical TU1 | `0x82170000` | 18,131,900 | `1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724` |
+
+These values are SHA-256 hashes of the exact initialized `.text` bytes named by each
+`derived_relative_path` in `prototype-xex-metadata.json`. The consistency verifier rehashes those
+ignored exports, checks the relationship JSON, and requires this table to describe the same byte
+domain.
 
 The prototype original PE name is `Fable2_xfr.exe`. Static-library metadata consistently names
 XDK `2.0.7645.0` libraries (`LIBCMT`, `XAPILIB`, `XAUD`, `XMP`, `X3DAUD`, `XBOXKRNL`, `XONLINE`,

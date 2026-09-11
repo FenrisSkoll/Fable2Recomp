@@ -67,8 +67,10 @@ python .\tools\Fable2PrototypeArchaeology.py generate `
     --check-determinism
 
 python .\tools\Fable2PrototypeArchaeology.py verify
+python .\tools\VerifyFable2PrototypePhase1Consistency.py
 .\tools\Verify-Fable2PrototypeArchaeologyJson.ps1
 python -m unittest .\tests\test_fable2_prototype_archaeology.py -v
+python -m unittest .\tests\test_fable2_prototype_phase1_consistency.py -v
 ```
 
 `--generated-at` is deliberately explicit. Reusing the same value and unchanged inputs produces

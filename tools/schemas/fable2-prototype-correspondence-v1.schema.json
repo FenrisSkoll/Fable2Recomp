@@ -32,7 +32,7 @@
       "required": ["name", "version"],
       "properties": {
         "name": { "const": "Fable2PrototypeCorrespondence.py" },
-        "version": { "const": "1.0.1" }
+        "version": { "const": "1.0.2" }
       },
       "additionalProperties": false
     },

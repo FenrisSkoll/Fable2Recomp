@@ -27,12 +27,13 @@ import VerifyFable2PrototypePhase1Consistency as phase1_consistency
 
 
 TOOL_NAME = "Fable2PrototypeCorrespondence.py"
-TOOL_VERSION = "1.0.1"
+TOOL_VERSION = "1.0.2"
 SCHEMA_VERSION = 1
 POLICY_VERSION = "precision-first-v1"
 SCORE_VERSION = "review-ranking-v1"
 TOP_CANDIDATE_LIMIT = 3
 NEIGHBOUR_WINDOW = 8
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 EXPECTED = {
     "sep_container": "9997088F23FEFA2C700F18DA2CCB614AAE221C6F39B3BE9BA7AAAA059DB6BFAF",
@@ -96,6 +97,23 @@ def python_runtime_identity() -> dict[str, str]:
         "version": platform.python_version(),
         "cache_tag": sys.implementation.cache_tag,
     }
+
+
+def require_repository_output(path: Path, label: str) -> Path:
+    resolved = path.resolve()
+    try:
+        resolved.relative_to(REPOSITORY_ROOT)
+    except ValueError as error:
+        raise CorrespondenceError(
+            f"{label} must remain beneath repository root {REPOSITORY_ROOT}: {resolved}"
+        ) from error
+    return resolved
+
+
+def repository_relative_path(path: Path) -> str:
+    return require_repository_output(path, "bound repository path").relative_to(
+        REPOSITORY_ROOT
+    ).as_posix()
 
 
 def canonical_json_bytes(value: Any) -> bytes:
@@ -1704,7 +1722,7 @@ def input_binding(
             "function_count": len(analyses["sep-2008"].functions),
         },
         "closure": {
-            "repository_relative_path": closure_path.as_posix(),
+            "repository_relative_path": repository_relative_path(closure_path),
             "sha256": closure_hash,
             "schema_version": closure["schema_version"],
             "analyzer_version": closure["analyzer_version"],
@@ -1847,7 +1865,8 @@ def generate(args: argparse.Namespace) -> int:
         },
         groups=primary["exhaustive_groups"],
     )
-    exhaustive_path = args.scratch_output.resolve() / "prototype-correspondence-candidate-groups.json"
+    scratch_root = require_repository_output(args.scratch_output, "scratch output")
+    exhaustive_path = scratch_root / "prototype-correspondence-candidate-groups.json"
     write_json(exhaustive_path, exhaustive, compact=True)
     exhaustive_hash = sha256_file(exhaustive_path)
     feature_output = envelope(
@@ -1866,7 +1885,7 @@ def generate(args: argparse.Namespace) -> int:
             "canonical-tu1": exhaustive_function_features(analyses["canonical-tu1"]),
         },
     )
-    feature_path = args.scratch_output.resolve() / "prototype-correspondence-function-features.json"
+    feature_path = scratch_root / "prototype-correspondence-function-features.json"
     write_json(feature_path, feature_output, compact=True)
     feature_hash = sha256_file(feature_path)
 
@@ -1949,7 +1968,7 @@ def generate(args: argparse.Namespace) -> int:
             fingerprint_candidate_statistics=primary["fingerprint_groups"],
             aggregate=aggregate,
             exhaustive_candidate_groups={
-                "ignored_repository_relative_path": exhaustive_path.relative_to(Path.cwd()).as_posix()
+                "ignored_repository_relative_path": repository_relative_path(exhaustive_path)
                 if exhaustive_path.is_relative_to(Path.cwd())
                 else exhaustive_path.as_posix(),
                 "sha256": exhaustive_hash,
@@ -1958,7 +1977,7 @@ def generate(args: argparse.Namespace) -> int:
                 "committed_index_top_candidate_limit": TOP_CANDIDATE_LIMIT,
             },
             exhaustive_function_features={
-                "ignored_repository_relative_path": feature_path.relative_to(Path.cwd()).as_posix()
+                "ignored_repository_relative_path": repository_relative_path(feature_path)
                 if feature_path.is_relative_to(Path.cwd())
                 else feature_path.as_posix(),
                 "sha256": feature_hash,
@@ -1974,7 +1993,7 @@ def generate(args: argparse.Namespace) -> int:
         ),
     }
     validate_documents(documents, binding["input_bundle_sha256"])
-    output = args.output.resolve()
+    output = require_repository_output(args.output, "committed output")
     if args.check_determinism and output.is_dir():
         existing = {
             path.name: sha256_file(path)
@@ -2019,7 +2038,7 @@ def verify(args: argparse.Namespace) -> int:
         args.tool_commit,
         args.rexglue_commit,
     )
-    output = args.output.resolve()
+    output = require_repository_output(args.output, "committed output")
     filenames = (
         "prototype-correspondence-index.json",
         "prototype-correspondence-accepted.json",
@@ -2031,11 +2050,11 @@ def verify(args: argparse.Namespace) -> int:
     validate_documents(documents, binding["input_bundle_sha256"])
     summary = documents["prototype-correspondence-summary.json"]
     exhaustive_info = summary["exhaustive_candidate_groups"]
-    exhaustive_path = Path(exhaustive_info["ignored_repository_relative_path"])
+    exhaustive_path = REPOSITORY_ROOT / exhaustive_info["ignored_repository_relative_path"]
     if sha256_file(exhaustive_path) != exhaustive_info["sha256"]:
         raise CorrespondenceError("ignored exhaustive candidate-group artifact hash mismatch")
     feature_info = summary["exhaustive_function_features"]
-    feature_path = Path(feature_info["ignored_repository_relative_path"])
+    feature_path = REPOSITORY_ROOT / feature_info["ignored_repository_relative_path"]
     if sha256_file(feature_path) != feature_info["sha256"]:
         raise CorrespondenceError("ignored exhaustive function-feature artifact hash mismatch")
     validation = documents["prototype-correspondence-validation.json"]

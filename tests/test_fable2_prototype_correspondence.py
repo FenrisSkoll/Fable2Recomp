@@ -5,6 +5,7 @@ import json
 import platform
 import struct
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -62,7 +63,7 @@ class SyntheticFixtureTests(unittest.TestCase):
                 self.assertTrue(fixture["passed"])
 
     def test_runtime_identity_is_exact_and_stable(self) -> None:
-        self.assertEqual("1.0.1", correspondence.TOOL_VERSION)
+        self.assertEqual("1.0.2", correspondence.TOOL_VERSION)
         self.assertEqual(
             {
                 "implementation": platform.python_implementation(),
@@ -71,6 +72,16 @@ class SyntheticFixtureTests(unittest.TestCase):
             },
             correspondence.python_runtime_identity(),
         )
+
+    def test_repository_paths_are_relative_and_outputs_cannot_escape(self) -> None:
+        self.assertEqual(
+            "tools/Fable2PrototypeCorrespondence.py",
+            correspondence.repository_relative_path(MODULE_PATH),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            outside = Path(directory) / "phase2a"
+            with self.assertRaises(correspondence.CorrespondenceError):
+                correspondence.require_repository_output(outside, "test output")
 
     def test_fixture_results_are_deterministic(self) -> None:
         first = correspondence.canonical_json_bytes(correspondence.run_synthetic_fixtures())

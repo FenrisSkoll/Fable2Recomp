@@ -94,5 +94,4 @@ longjmp_address = 0x82CAFA30
 "0x8305DAD8" = { size = 0x10 }
 "0x8305DAE8" = { size = 0x10 }
 "0x8305DAF8" = { size = 0x10 }
-
 "0x825E28B0" = { size = 0x10 } # Phase 4 reviewed P4-FF74FACDEA53A5E8

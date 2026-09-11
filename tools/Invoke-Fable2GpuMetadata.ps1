@@ -8,6 +8,7 @@ param([Parameter(Mandatory)][string]$SessionRoot)
 
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
+. (Join-Path $PSScriptRoot 'Fable2GpuMetadataTransitions.ps1')
 $session = (Resolve-Path -LiteralPath $SessionRoot).Path
 $prep = Get-Content -LiteralPath (Join-Path $session 'preparation.json') -Raw | ConvertFrom-Json
 if ($prep.session -ne $session.Replace('\', '/')) {
@@ -69,28 +70,23 @@ $report = [ordered]@{
         REX_GPU_METADATA_OUTPUT = $prep.capture
     }
     recorder_status = [Collections.Generic.List[object]]::new()
+    recorder_transitions = [Collections.Generic.List[object]]::new()
     reporting_errors = [Collections.Generic.List[string]]::new()
 }
-$script:lastMetadataStatus = ''
-function Show-MetadataStatus {
-    $statusPath = Join-Path $prep.capture 'status.txt'
-    if (-not (Test-Path -LiteralPath $statusPath -PathType Leaf)) { return }
-    try {
-        $status = [IO.File]::ReadAllText($statusPath)
-        # The worker writes a tiny status file; ignore a transient partial write.
-        if ($status.Length -gt 1024 -or -not $status.EndsWith("`n")) { return }
-        if ($status -ne $script:lastMetadataStatus) {
-            $script:lastMetadataStatus = $status
-            Write-Host $status.Trim()
-            if ($report.recorder_status.Count -lt 16) {
-                $report.recorder_status.Add(@{
-                    observed_utc = [DateTime]::UtcNow.ToString('o')
-                    text = $status.Trim()
-                })
-            }
-        }
-    } catch {
-        # Transient status-file sharing failures are retried; never affect gameplay.
+$script:lastMetadataTransition = 0
+function Show-MetadataTransitions {
+    $transitionRoot = Join-Path $prep.capture 'transitions'
+    $newTransitions = Read-Fable2GpuMetadataTransitions -TransitionRoot $transitionRoot `
+        -RunId $prep.run_id -ProcessId $process.Id `
+        -AfterSequence $script:lastMetadataTransition
+    foreach ($transition in $newTransitions) {
+        $script:lastMetadataTransition = [long]$transition.sequence
+        Write-Host ('[{0}] {1}' -f $transition.sequence,
+            (Format-Fable2GpuMetadataTransition -Record $transition))
+        $report.recorder_transitions.Add(@{
+            observed_utc = [DateTime]::UtcNow.ToString('o')
+            record = $transition
+        })
     }
 }
 try {
@@ -98,8 +94,9 @@ try {
     $report.pid = $process.Id
     $report.start_utc = $process.StartTime.ToUniversalTime().ToString('o')
     Write-Host "PID $($process.Id); log $log"
-    Write-Host 'Wait for ARMED. Load the save, keep a stationary ordinary-gameplay view, then press Ctrl+Shift+F10 once.'
-    Write-Host 'Keep game focus. A rising two-tone sound means STOPPED and flushed. Then exit normally; let this helper return.'
+    Write-Host 'Wait for READY: two rising tones. Do not press Ctrl+Shift+F10 if READY never occurs.'
+    Write-Host 'After loading the scene, press Ctrl+Shift+F10 once with game focus. STARTED is one high tone.'
+    Write-Host 'STOPPED is three rising tones and means flushed. Then exit normally; let this helper return.'
     try {
         $instance = Get-CimInstance Win32_Process -Filter "ProcessId = $($process.Id)"
         $report.command_line_observed = $instance.CommandLine
@@ -109,7 +106,7 @@ try {
     $deadline = [DateTime]::UtcNow.AddSeconds(60)
     $moduleError = $null
     while (-not $process.HasExited -and [DateTime]::UtcNow -lt $deadline) {
-        Show-MetadataStatus
+        Show-MetadataTransitions
         try {
             $process.Refresh()
             foreach ($module in $process.Modules) {
@@ -135,8 +132,8 @@ try {
     }
     if ($moduleError) { $report.reporting_errors.Add("Module observation: $moduleError") }
     # No deadline or forced termination: wait on the launched process itself.
-    while (-not $process.WaitForExit(250)) { Show-MetadataStatus }
-    Show-MetadataStatus
+    while (-not $process.WaitForExit(250)) { Show-MetadataTransitions }
+    Show-MetadataTransitions
     $report.end_utc = $process.ExitTime.ToUniversalTime().ToString('o')
     $report.exit_code = $process.ExitCode
 } catch {

@@ -1,5 +1,6 @@
 """Synthetic metadata, not gameplay/equivalence evidence."""
 import copy
+import json
 import importlib.util
 from pathlib import Path
 import struct
@@ -30,6 +31,66 @@ def fixture(events, reason=6):
               (count + 2) * 256, 0, 0, 0, hosts, 25600000]
     records.append(gpu.RECORD.pack(count + 1, 0, 0, 100 + count, 1, len(fields),
                                    *(fields + [0] * (27 - len(fields)))))
+    return header + b''.join(records)
+
+
+def fixture_v2(events, reason=6):
+    wire, definitions, bundles, state_references = [], {}, {}, []
+    definition_reuses = bundle_reuses = logical_references = 0
+
+    def append(item):
+        wire.append(item)
+        return len(wire)
+
+    for item in events:
+        decision, submission, type_id, fields = item
+        if type_id in gpu.STATE_TYPES:
+            key = (type_id, tuple(fields))
+            if key in definitions:
+                definition_reuses += 1
+            else:
+                definitions[key] = append([0, submission, type_id, fields])
+            state_references.append(definitions[key])
+            continue
+        if type_id == 3 and state_references:
+            key = tuple(state_references)
+            if key in bundles:
+                bundle_reuses += 1
+                bundle_id = bundles[key]
+            else:
+                bundle_id = len(wire) + 1
+                bundles[key] = bundle_id
+                chunks = (len(key) + 22) // 23
+                for chunk in range(chunks):
+                    references = list(key[chunk * 23:(chunk + 1) * 23])
+                    append([0, submission, 29,
+                            [bundle_id, len(key), chunk, chunks] + references])
+            append([decision, submission, 30, [bundle_id]])
+            logical_references += len(state_references)
+            state_references = []
+        append(item)
+    self_contained = len(definitions)
+    decisions = sum(item[2] == 2 for item in wire)
+    swaps = sum(item[2] == 21 for item in wire)
+    hosts = sum(item[2] == 17 for item in wire)
+    storage = 25600000
+    recorder_owned = storage + (128 + 64) * 4 + 64 * 8 + 200
+    header = gpu.HEADER_V2.pack(
+        b'REXMETA2', b'synthetic', 42, 256, 100000, gpu.MAX_BYTES, 20000, 3,
+        5000000000, storage, 200, 2, 128, 64, 64, recorder_owned, 32, 2048,
+        bytes(56))
+    records = []
+    for sequence, (decision, submission, type_id, fields) in enumerate(wire, 1):
+        records.append(gpu.RECORD.pack(
+            sequence, decision, submission, 100 + sequence, type_id, len(fields),
+            *(fields + [0] * (27 - len(fields)))))
+    terminal = [reason, 100, 100 + len(wire), len(wire), decisions, swaps,
+                max(0, swaps - 1), (len(wire) + 2) * 256, 0, 0, 0, hosts,
+                storage, self_contained, definition_reuses, len(bundles),
+                bundle_reuses, logical_references, recorder_owned, 42]
+    records.append(gpu.RECORD.pack(
+        len(wire) + 1, 0, 0, 100 + len(wire), 1, len(terminal),
+        *(terminal + [0] * (27 - len(terminal)))))
     return header + b''.join(records)
 
 
@@ -69,6 +130,38 @@ class MetadataTests(unittest.TestCase):
         self.assertIn('further evidence', result['candidate']['qualification'])
         self.assertEqual(result['open_edges']['completion_unobserved'], [7])
         self.assertEqual(result['host_operation_counts'], {'dispatch': 1, 'indexed_draw': 1})
+
+    def test_v2_dictionary_bundle_and_candidate_preserve_v1_semantics(self):
+        result = self.parse(fixture_v2(ordinary()))
+        self.assertEqual(result['format'], {'magic': 'REXMETA2', 'version': 2})
+        self.assertEqual(result['intervals']['complete'], 1)
+        self.assertEqual(result['candidate']['decision'], 1)
+        self.assertGreater(result['dictionary']['logical_state_references'], 0)
+        self.assertEqual(result['dictionary']['bundle_reference_records'], 1)
+        self.assertEqual(result['decision_outcomes'], {'deferred_main_draw_recorded': 1})
+
+    def test_v2_unknown_reference_and_duplicate_equal_definition_rejected(self):
+        data = bytearray(fixture_v2(ordinary()))
+        for offset in range(256, len(data) - 256, 256):
+            if struct.unpack_from('<I', data, offset + 32)[0] == 30:
+                struct.pack_into('<Q', data, offset + 40, 999999)
+                break
+        with self.assertRaisesRegex(ValueError, 'unknown|Missing'):
+            self.parse(data)
+
+        data = bytearray(fixture_v2(ordinary()))
+        shader_offsets = [offset for offset in range(256, len(data) - 256, 256)
+                          if struct.unpack_from('<I', data, offset + 32)[0] == 5]
+        data[shader_offsets[1] + 40:shader_offsets[1] + 72] = \
+            data[shader_offsets[0] + 40:shader_offsets[0] + 72]
+        with self.assertRaisesRegex(ValueError, 'Duplicate equal'):
+            self.parse(data)
+
+    def test_unsupported_format_version_is_explicit(self):
+        data = bytearray(fixture([]))
+        data[:8] = b'REXMETA9'
+        with self.assertRaisesRegex(ValueError, 'Unsupported'):
+            self.parse(data)
 
     def test_wrong_session_and_pid_rejected(self):
         data = fixture([])
@@ -131,6 +224,37 @@ class MetadataTests(unittest.TestCase):
             (root / 'out/nr0b2/sessions/synthetic').mkdir(parents=True)
             with self.assertRaisesRegex(ValueError, 'already exists'):
                 gpu.prepare(root, root, 'synthetic')
+
+    def test_durable_transition_replay_after_delayed_polling(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            transitions = root / 'transitions'
+            transitions.mkdir()
+            records = []
+            for sequence, (kind, monotonic, reason, flushed) in enumerate([
+                    ('READY', 100, 0, False), ('STARTED', 200, 0, False),
+                    ('STOPPED', 240, 2, True)], 1):
+                record = {
+                    'schema': 'rex-gpu-metadata-transition-v1', 'run_id': 'synthetic',
+                    'pid': 42, 'sequence': sequence, 'transition': kind,
+                    'recorder_monotonic_ns': monotonic,
+                    'wall_utc_unix_ns': 1000000000 + sequence,
+                    'correlation_monotonic_ns': monotonic + 1,
+                    'clock_correlation': 'consecutive control-worker samples; scheduler precision only',
+                    'foreground_pid': 42 if kind == 'STARTED' else 0,
+                    'trigger_accepted': kind == 'STARTED', 'terminal_reason': reason,
+                    'terminal_reason_name': 'swaps' if kind == 'STOPPED' else 'none',
+                    'output_flushed': flushed, 'error': ''}
+                (transitions / f'{sequence:016d}-{kind}.json').write_text(
+                    json.dumps(record) + '\n', encoding='utf-8')
+                records.append(record)
+            # The reader starts only after all three short-lived states have occurred.
+            self.assertEqual(gpu.parse_transitions(transitions, 'synthetic', 42), records)
+            bad = copy.deepcopy(records[1]); bad['sequence'] = 9
+            (transitions / '0000000000000002-STARTED.json').write_text(
+                json.dumps(bad), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'sequence'):
+                gpu.parse_transitions(transitions, 'synthetic', 42)
 
 
 if __name__ == '__main__': unittest.main()

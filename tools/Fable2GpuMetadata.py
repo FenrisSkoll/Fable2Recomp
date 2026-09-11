@@ -2,6 +2,7 @@
 import argparse
 from collections import Counter
 import json
+import math
 from pathlib import Path
 import shutil
 import struct
@@ -11,7 +12,9 @@ from datetime import datetime, timezone
 import Fable2GpuConfig as config
 
 RECORD = struct.Struct('<QQQQII27Q')
-HEADER = struct.Struct('<8s64s9Q112s')
+HEADER_V1 = struct.Struct('<8s64s9Q112s')
+HEADER_V2 = struct.Struct('<8s64s16Q56s')
+HEADER = HEADER_V1  # Frozen synthetic-fixture compatibility for REXMETA1.
 MAX_BYTES = 32 * 1024 * 1024
 FIELDS = {
     1: ('terminal', 'reason trigger_ns stop_observed_ns event_records decisions swaps complete_intervals bytes rejected append_ns append_max_ns host_operations storage_bytes'),
@@ -42,13 +45,22 @@ FIELDS = {
     26: ('execute', 'kind offset invoked'),
     27: ('fixed_state', 'blend_r_float_bits blend_g_float_bits blend_b_float_bits blend_a_float_bits alpha_ref_float_bits cull_front cull_back clockwise polygon_mode front_polygon_type back_polygon_type offset_front offset_back index_offset index_min index_max'),
     28: ('vertex_layout', 'binding_index slot stride_bytes attribute_count'),
+    29: ('state_bundle', ''),
+    30: ('state_bundle_ref', 'bundle_id'),
 }
 FIELDS = {key: (name, fields.split()) for key, (name, fields) in FIELDS.items()}
 OUTCOMES = ['packet_failure', 'predicate_rejected', 'query_rejected', 'unsupported_source',
             'preparation_failure', 'no_op', 'copy_succeeded', 'copy_failed',
             'pipeline_unavailable', 'pipeline_not_ready', 'deferred_main_draw_recorded']
 REASONS = ['none', 'deadline', 'swaps', 'decisions', 'records', 'bytes', 'cancelled',
-           'shutdown', 'writer_error', 'device_lost', 'invalid_record']
+           'shutdown', 'writer_error', 'device_lost', 'invalid_record', 'dictionary_capacity']
+TERMINAL_V1 = ('reason trigger_ns stop_observed_ns event_records decisions swaps '
+               'complete_intervals bytes rejected append_ns append_max_ns host_operations '
+               'storage_bytes').split()
+TERMINAL_V2 = TERMINAL_V1 + ('dictionary_definitions dictionary_reuses bundle_definitions '
+                             'bundle_reuses state_references recorder_owned_bytes '
+                             'accepted_foreground_pid').split()
+STATE_TYPES = {4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 18, 22, 23, 24, 25, 27, 28}
 KINDS = ['invalid', 'draw', 'indexed_draw', 'dispatch', 'copy_buffer', 'copy_resource',
          'copy_texture_region', 'copy_texture', 'clear_color', 'clear_depth', 'clear_uav',
          'begin_query', 'end_query', 'resolve_query']
@@ -69,9 +81,24 @@ def parse_capture(path, run_id=None, pid=None):
     if size < 512 or size > MAX_BYTES or size % 256:
         raise ValueError('Invalid metadata size/framing')
     with path.open('rb') as stream:
-        magic, raw_run, process_id, record_bytes, max_records, max_bytes, max_decisions, max_intervals, duration, storage, bookkeeping, reserved = HEADER.unpack(stream.read(256))
+        header_bytes = stream.read(256)
+        magic = header_bytes[:8]
+        if magic == b'REXMETA1':
+            (magic, raw_run, process_id, record_bytes, max_records, max_bytes, max_decisions,
+             max_intervals, duration, storage, bookkeeping, reserved) = HEADER_V1.unpack(header_bytes)
+            version = 1
+            dictionary_slots = bundle_slots = state_reference_capacity = recorder_owned = 0
+            transition_capacity = transition_max_bytes = 0
+        elif magic == b'REXMETA2':
+            (magic, raw_run, process_id, record_bytes, max_records, max_bytes, max_decisions,
+             max_intervals, duration, storage, bookkeeping, format_version, dictionary_slots,
+             bundle_slots, state_reference_capacity, recorder_owned, transition_capacity,
+             transition_max_bytes, reserved) = HEADER_V2.unpack(header_bytes)
+            version = 2
+        else:
+            raise ValueError('Unsupported metadata format magic/version')
         run = raw_run.split(b'\0', 1)[0].decode('ascii')
-        if (magic != b'REXMETA1' or not run or len(run) > 63 or not process_id or any(reserved)
+        if (not run or len(run) > 63 or not process_id or any(reserved)
                 or any(raw_run[len(run):]) or record_bytes != 256
                 or not 3 <= max_records <= 100000 or not 768 <= max_bytes <= MAX_BYTES
                 or not 1 <= max_decisions <= 20000 or not 1 <= max_intervals <= 3
@@ -79,15 +106,31 @@ def parse_capture(path, run_id=None, pid=None):
                 or storage != min(max_records, max_bytes // 256) * 256
                 or (run_id is not None and run != run_id) or (pid is not None and process_id != pid)):
             raise ValueError('Invalid/wrong-session metadata header')
+        if version == 2 and (format_version != 2 or dictionary_slots < 1
+                or dictionary_slots > 131072 or dictionary_slots & (dictionary_slots - 1)
+                or bundle_slots < 1 or bundle_slots > 32768 or bundle_slots & (bundle_slots - 1)
+                or not 1 <= state_reference_capacity <= 512
+                or not 5 <= transition_capacity <= 64 or not 512 <= transition_max_bytes <= 4096
+                or recorder_owned != storage + (dictionary_slots + bundle_slots) * 4
+                                           + state_reference_capacity * 8 + bookkeeping
+                or recorder_owned + transition_capacity * transition_max_bytes > MAX_BYTES):
+            raise ValueError('Invalid REXMETA2 bounded-storage header')
         events = []
         for sequence in range(1, size // 256):
             seq, decision, submission, timestamp, type_id, count, *values = RECORD.unpack(stream.read(256))
             if seq != sequence or type_id not in FIELDS or count > 27 or any(values[count:]):
                 raise ValueError('Invalid sequence, event type, fields or padding')
             name, names = FIELDS[type_id]
+            if name == 'terminal':
+                names = TERMINAL_V2 if version == 2 else TERMINAL_V1
             expected = len(names)
-            if count != expected and not (name == 'texture' and count == 5 and values[4] == 0):
+            dynamic_bundle = version == 2 and name == 'state_bundle' and 5 <= count <= 27
+            if (count != expected and not dynamic_bundle
+                    and not (name == 'texture' and count == 5 and values[4] == 0)):
                 raise ValueError(f'Invalid field count for {name}')
+            if name == 'state_bundle':
+                names = ['bundle_id', 'total_references', 'chunk_index', 'chunk_count'] + [
+                    f'reference_{index}' for index in range(count - 4)]
             event = dict(sequence=seq, decision=decision, submission=submission, time_ns=timestamp,
                          type=name, fields=dict(zip(names[:count], values[:count])))
             events.append(event)
@@ -95,25 +138,81 @@ def parse_capture(path, run_id=None, pid=None):
         raise ValueError('Missing/duplicate terminal')
     terminal = events.pop()
     t = terminal['fields']
-    if (terminal['decision'] or terminal['submission'] or t['reason'] not in range(1, len(REASONS))
+    reason_limit = 11 if version == 1 else len(REASONS)
+    if (terminal['decision'] or terminal['submission'] or t['reason'] not in range(1, reason_limit)
             or t['event_records'] != len(events) or t['bytes'] != size or t['storage_bytes'] != storage
             or t['decisions'] > max_decisions or t['complete_intervals'] > max_intervals
             or terminal['time_ns'] != t['stop_observed_ns'] or t['stop_observed_ns'] < t['trigger_ns']):
         raise ValueError('Invalid terminal accounting')
+    if version == 2 and (t['recorder_owned_bytes'] != recorder_owned
+                         or t['accepted_foreground_pid'] not in (0, process_id)):
+        raise ValueError('Invalid REXMETA2 terminal storage/process accounting')
     cutoff = min(t['stop_observed_ns'], t['trigger_ns'] + duration) if t['trigger_ns'] else t['stop_observed_ns']
     decisions, hosts, executions, submissions = {}, {}, {}, {}
+    definitions, definition_signatures, bundles, bundle_build = {}, {}, {}, {}
+    bundle_reference_records = serialized_bundle_records = 0
     intervals, swaps, external = 0, [], Counter()
     active_decision = 0
     previous_time = t['trigger_ns']
+    def validate_state(name, fields):
+        if name in ('shader', 'texture', 'texture_requested', 'sampler') and fields['stage'] not in (0, 1):
+            raise ValueError('Invalid shader stage')
+        if name in ('texture', 'texture_requested', 'sampler') and fields['slot'] >= 32:
+            raise ValueError('Invalid used texture slot')
+        if name == 'shader' and (fields['present'] not in (0, 1)
+                or (not fields['present'] and (fields['xxh3_64'] or fields['microcode_bytes']))
+                or fields['microcode_bytes'] % 4):
+            raise ValueError('Invalid shader definition')
+        if name == 'pipeline' and fields['result'] not in range(4):
+            raise ValueError('Invalid pipeline result')
     for e in events:
         name, f, d = e['type'], e['fields'], e['decision']
         if not t['trigger_ns'] or not previous_time <= e['time_ns'] <= cutoff:
             raise ValueError('Event outside monotonic observation window')
         previous_time = e['time_ns']
+        type_id = next(key for key, value in FIELDS.items() if value[0] == name)
+        if version == 2 and type_id in STATE_TYPES:
+            if d:
+                raise ValueError('REXMETA2 state definition is decision-local instead of immutable')
+            validate_state(name, f)
+            signature = (name, tuple(f.items()))
+            if signature in definition_signatures:
+                raise ValueError('Duplicate equal state definition did not reuse its ID')
+            definition_signatures[signature] = e['sequence']
+            definitions[e['sequence']] = e
+            continue
+        if version == 2 and name == 'state_bundle':
+            if d:
+                raise ValueError('State bundle definition is decision-local')
+            serialized_bundle_records += 1
+            bundle_id, total = f['bundle_id'], f['total_references']
+            chunk, chunks = f['chunk_index'], f['chunk_count']
+            references = [f[f'reference_{index}'] for index in range(len(f) - 4)]
+            expected_chunks = (total + 22) // 23
+            expected_in_chunk = min(23, total - chunk * 23) if chunk < expected_chunks else 0
+            if (not total or total > state_reference_capacity or chunks != expected_chunks
+                    or chunk >= chunks or len(references) != expected_in_chunk
+                    or any(reference not in definitions or reference >= e['sequence']
+                           for reference in references)):
+                raise ValueError('Invalid or unknown state bundle reference')
+            if chunk == 0:
+                if bundle_id != e['sequence'] or bundle_id in bundles or bundle_id in bundle_build:
+                    raise ValueError('Duplicate/conflicting state bundle definition')
+                bundle_build[bundle_id] = []
+            elif (bundle_id not in bundle_build or e['sequence'] != bundle_id + chunk
+                  or len(bundle_build[bundle_id]) != chunk * 23):
+                raise ValueError('Missing, reordered or conflicting state bundle chunk')
+            bundle_build[bundle_id].extend(references)
+            if chunk + 1 == chunks:
+                if len(bundle_build[bundle_id]) != total:
+                    raise ValueError('Truncated state bundle definition')
+                bundles[bundle_id] = bundle_build.pop(bundle_id)
+            continue
         if name == 'decision':
             if active_decision or d != len(decisions) + 1 or f['opcode'] not in (34, 54) or f['predicate'] not in (0, 1):
                 raise ValueError('Invalid/duplicate decision definition')
-            decisions[d] = {'id': d, 'interval': intervals, 'begin': e['sequence'], 'events': [], 'outcome': None}
+            decisions[d] = {'id': d, 'interval': intervals, 'begin': e['sequence'],
+                            'events': [], 'state_events': [], 'outcome': None}
             active_decision = d
         elif d and (d not in decisions or active_decision != d):
             raise ValueError('Missing/closed decision reference')
@@ -121,19 +220,25 @@ def parse_capture(path, run_id=None, pid=None):
             external[name] += 1  # Explicit carry-in operation lacking a before-window decision.
         if d:
             decisions[d]['events'].append(e)
+        if version == 2 and name == 'state_bundle_ref':
+            bundle_id = f['bundle_id']
+            if not d or bundle_id not in bundles or decisions[d].get('bundle_id') is not None:
+                raise ValueError('Missing, unknown or duplicate decision state bundle reference')
+            decisions[d]['bundle_id'] = bundle_id
+            bundle_reference_records += 1
+            for reference in bundles[bundle_id]:
+                definition = definitions[reference]
+                decisions[d]['state_events'].append({**definition, 'decision': d,
+                    'submission': e['submission'], 'time_ns': e['time_ns'],
+                    'definition_sequence': reference,
+                    'bundle_reference_sequence': e['sequence']})
         if name == 'outcome':
             if not d or f['outcome'] >= len(OUTCOMES) or decisions[d]['outcome'] is not None:
                 raise ValueError('Invalid/duplicate outcome')
             decisions[d]['outcome'] = OUTCOMES[f['outcome']]
             active_decision = 0
-        if name in ('shader', 'texture', 'texture_requested', 'sampler') and f['stage'] not in (0, 1):
-            raise ValueError('Invalid shader stage')
-        if name in ('texture', 'texture_requested', 'sampler') and f['slot'] >= 32:
-            raise ValueError('Invalid used texture slot')
-        if name == 'shader' and (f['present'] not in (0, 1) or (not f['present'] and (f['xxh3_64'] or f['microcode_bytes'])) or f['microcode_bytes'] % 4):
-            raise ValueError('Invalid shader definition')
-        if name == 'pipeline' and f['result'] not in range(4):
-            raise ValueError('Invalid pipeline result')
+        if version == 1 and type_id in STATE_TYPES:
+            validate_state(name, f)
         if name == 'swap':
             if d: raise ValueError('Swap nested inside a decision')
             swaps.append(e)
@@ -151,22 +256,37 @@ def parse_capture(path, run_id=None, pid=None):
             if not e['submission'] or e['submission'] in submissions:
                 raise ValueError('Invalid/duplicate submission issue')
             submissions[e['submission']] = e
+    if bundle_build:
+        raise ValueError('Truncated state bundle at capture end')
     if (t['decisions'] != len(decisions) or t['swaps'] != len(swaps)
             or t['complete_intervals'] != max(0, len(swaps) - 1) or t['host_operations'] != len(hosts)):
         raise ValueError('Terminal count mismatch')
+    if version == 2:
+        referenced_state = sum(len(bundles[e['fields']['bundle_id']])
+                               for e in events if e['type'] == 'state_bundle_ref')
+        if (t['dictionary_definitions'] != len(definitions)
+                or t['bundle_definitions'] != len(bundles)
+                or t['bundle_reuses'] != bundle_reference_records - len(bundles)
+                or t['state_references'] != referenced_state
+                or t['dictionary_reuses'] + t['dictionary_definitions'] < referenced_state):
+            raise ValueError('REXMETA2 dictionary/reference terminal mismatch')
     if t['reason'] == 2 and len(swaps) != max_intervals + 1:
         raise ValueError('Swap stop without complete interval bound')
     if t['reason'] == 3 and len(decisions) != max_decisions:
         raise ValueError('Decision stop without decision bound')
-    if t['reason'] in (4, 5) and size != storage:
+    if t['reason'] in (4, 5) and size != storage and (version == 1 or not t['rejected']):
         raise ValueError('Capacity stop without full bounded storage')
+    if version == 2 and t['reason'] == 11 and not t['rejected']:
+        raise ValueError('Dictionary-capacity stop without reported loss')
+    def semantic_events(decision):
+        return decision['state_events'] + decision['events']
     for decision in decisions.values():
         seen = set()
         selected = None
         pipeline = None
         requested_views, prepared_views = set(), set()
         bindings_ok = False
-        for e in decision['events']:
+        for e in semantic_events(decision):
             name, f = e['type'], e['fields']
             if name in ('shader', 'texture', 'texture_requested', 'sampler', 'vertex_fetch', 'vertex_layout', 'color', 'depth', 'targets', 'viewport', 'bindings', 'geometry', 'index', 'processed', 'shader_selection', 'fixed_state'):
                 key = (name, f.get('stage'), f.get('slot'), f.get('dimension'), f.get('signed'), f.get('binding_index'))
@@ -176,7 +296,7 @@ def parse_capture(path, run_id=None, pid=None):
                 selected = f
                 for stage, field in ((0, 'vertex_selected'), (1, 'pixel_selected')):
                     if f[field] not in (0, 1): raise ValueError('Invalid shader selection')
-                    definition = next((x['fields'] for x in decision['events'] if x['type'] == 'shader' and x['fields']['stage'] == stage), None)
+                    definition = next((x['fields'] for x in semantic_events(decision) if x['type'] == 'shader' and x['fields']['stage'] == stage), None)
                     if f[field] and (not definition or not definition['present']):
                         raise ValueError('Selected shader has no present definition')
             if name == 'pipeline':
@@ -204,7 +324,7 @@ def parse_capture(path, run_id=None, pid=None):
                 for required in ('geometry', 'processed', 'targets', 'depth', 'viewport', 'bindings'):
                     if not any(k[0] == required for k in seen):
                         raise ValueError(f'Main draw lacks carry-in {required}')
-        main = [e for e in decision['events'] if e['type'] == 'host' and e['fields']['main_guest_draw']]
+        main = [e for e in semantic_events(decision) if e['type'] == 'host' and e['fields']['main_guest_draw']]
         if decision['outcome'] == OUTCOMES[10] and not main:
             raise ValueError('Main-draw outcome without recorded operation')
         if main and decision['outcome'] not in (None, OUTCOMES[10]):
@@ -218,7 +338,7 @@ def parse_capture(path, run_id=None, pid=None):
     candidates = []
     for d in decisions.values():
         by_type = {}
-        for e in d['events']: by_type.setdefault(e['type'], []).append(e)
+        for e in semantic_events(d): by_type.setdefault(e['type'], []).append(e)
         shader = {e['fields']['stage']: e['fields'] for e in by_type.get('shader', [])}
         selection = by_type.get('shader_selection', [{}])[0].get('fields', {})
         pair = tuple(f"{shader[s]['xxh3_64']:016X}" if s in shader and selection.get('vertex_selected' if s == 0 else 'pixel_selected') else 'unselected_or_unobserved' for s in (0, 1))
@@ -244,7 +364,7 @@ def parse_capture(path, run_id=None, pid=None):
         candidate = {'run_id': run, 'decision': decision_id, 'interval': decisions[decision_id]['interval'],
                      'qualification': 'further evidence collection only; payload/initial-content/lifetime dependencies unresolved',
                      'records': by_type, 'remaining': GAPS}
-    return {'schema': 'fable2-nr0b2-analysis-v1', 'run_id': run, 'pid': process_id,
+    result = {'schema': 'fable2-nr0b2-analysis-v1', 'run_id': run, 'pid': process_id,
             'capture_identity': config.identity(path), 'structural_validity': 'VALID',
             'terminal': {**t, 'reason_name': REASONS[t['reason']], 'logical_cutoff_ns': cutoff,
                          'deadline_service_lag_ns': max(0, t['stop_observed_ns'] - (t['trigger_ns'] + duration))},
@@ -266,6 +386,158 @@ def parse_capture(path, run_id=None, pid=None):
             'candidate': candidate, 'dependency_completeness': 'UNRESOLVED',
             'gameplay': 'USER REPORT REQUIRED', 'visual_correctness': 'NOT ESTABLISHED',
             'disturbance': 'UNMEASURED IN GAMEPLAY', 'gaps': GAPS}
+    if version == 2:
+        result['schema'] = 'fable2-nr0b2-analysis-v2'
+        result['format'] = {'magic': 'REXMETA2', 'version': 2}
+        result['storage'] = {
+            'serialized_capacity_bytes': storage,
+            'fixed_object_bookkeeping_bytes': bookkeeping,
+            'definition_lookup_bytes': dictionary_slots * 4,
+            'bundle_lookup_bytes': bundle_slots * 4,
+            'decision_reference_workspace_bytes': state_reference_capacity * 8,
+            'recorder_owned_bytes': recorder_owned,
+            'transition_history_max_bytes': transition_capacity * transition_max_bytes,
+            'external_overhead': ('one standard-library thread/OS stack, bounded paths and '
+                                  'FILE buffering; transition history is bounded separately')}
+        serialized_state = len(definitions) + serialized_bundle_records + bundle_reference_records
+        result['dictionary'] = {
+            'immutable_definitions': len(definitions),
+            'definition_reuses': t['dictionary_reuses'],
+            'state_bundles': len(bundles),
+            'bundle_definition_records': serialized_bundle_records,
+            'bundle_reference_records': bundle_reference_records,
+            'bundle_reuses': t['bundle_reuses'],
+            'logical_state_references': t['state_references'],
+            'serialized_state_records': serialized_state,
+            'definition_record_savings': t['state_references'] - serialized_state,
+            'scope': ('exact decoded metadata equality within this run; no resource lifetime or '
+                      'cross-run identity claim')}
+        result['record_accounting'] = {
+            'event_records': t['event_records'], 'total_records': t['event_records'] + 2,
+            'bytes': t['bytes'], 'max_records': max_records, 'max_bytes': max_bytes}
+    return result
+
+
+def parse_transitions(path, run_id, pid, capture=None):
+    """Read the bounded atomically published control history in sequence order."""
+    path = Path(path)
+    if not path.is_dir():
+        raise ValueError('Missing transition history')
+    if any(path.glob('*.tmp')):
+        raise ValueError('Incomplete transition publication')
+    files = sorted(path.glob('*.json'))
+    if not files or len(files) > 64:
+        raise ValueError('Missing or oversized transition history')
+    transitions = []
+    allowed = {'READY', 'STARTED', 'STOPPED', 'ERROR', 'CANCELLED', 'REJECTED'}
+    for sequence, item in enumerate(files, 1):
+        if item.stat().st_size > 4096:
+            raise ValueError('Oversized transition record')
+        try:
+            record = json.loads(item.read_text(encoding='utf-8'))
+        except (OSError, UnicodeError, json.JSONDecodeError) as error:
+            raise ValueError('Malformed transition record') from error
+        transition = record.get('transition')
+        expected_name = f'{sequence:016d}-{transition}.json'
+        if (item.name != expected_name or record.get('schema') != 'rex-gpu-metadata-transition-v1'
+                or record.get('run_id') != run_id or record.get('pid') != pid
+                or record.get('sequence') != sequence or transition not in allowed
+                or not isinstance(record.get('recorder_monotonic_ns'), int)
+                or not isinstance(record.get('wall_utc_unix_ns'), int)
+                or not isinstance(record.get('correlation_monotonic_ns'), int)
+                or record.get('clock_correlation') !=
+                    'consecutive control-worker samples; scheduler precision only'
+                or record.get('wall_utc_unix_ns', 0) <= 0
+                or record.get('correlation_monotonic_ns', 0) <= 0):
+            raise ValueError('Invalid, wrong-session or out-of-sequence transition')
+        transitions.append(record)
+    kinds = [record['transition'] for record in transitions]
+    if any(now['recorder_monotonic_ns'] < before['recorder_monotonic_ns']
+           for before, now in zip(transitions, transitions[1:])):
+        raise ValueError('Transition monotonic order regressed')
+    initialization_error = kinds == ['ERROR']
+    if (not initialization_error and
+            (kinds[0] != 'READY' or kinds.count('READY') != 1 or kinds.count('STARTED') > 1)):
+        raise ValueError('Invalid READY/STARTED transition order')
+    final = kinds[-1]
+    if final not in ('STOPPED', 'CANCELLED', 'ERROR') or any(
+            kind in ('STOPPED', 'CANCELLED', 'ERROR') for kind in kinds[:-1]):
+        raise ValueError('Invalid final control transition')
+    started = next((record for record in transitions if record['transition'] == 'STARTED'), None)
+    if started:
+        if (kinds.index('STARTED') <= kinds.index('READY')
+                or started.get('foreground_pid') != pid
+                or started.get('trigger_accepted') is not True):
+            raise ValueError('Invalid accepted STARTED transition')
+    if final == 'STOPPED' and transitions[-1].get('output_flushed') is not True:
+        raise ValueError('STOPPED was published without successful flush')
+    if final == 'CANCELLED' and (transitions[-1].get('output_flushed') is not True
+                                 or transitions[-1].get('terminal_reason_name') != 'cancelled'):
+        raise ValueError('Invalid CANCELLED transition')
+    if final == 'ERROR' and transitions[-1].get('output_flushed') is not False:
+        raise ValueError('ERROR incorrectly claims successful flush')
+    if capture is not None:
+        terminal = capture['terminal']
+        if not started or started['recorder_monotonic_ns'] != terminal['trigger_ns']:
+            raise ValueError('STARTED does not match accepted capture trigger')
+        if final != ('CANCELLED' if terminal['reason_name'] == 'cancelled' else 'STOPPED'):
+            raise ValueError('Final transition disagrees with capture terminal')
+        if (transitions[-1]['recorder_monotonic_ns'] != terminal['stop_observed_ns']
+                or transitions[-1].get('terminal_reason') != terminal['reason']
+                or transitions[-1].get('terminal_reason_name') != terminal['reason_name']):
+            raise ValueError('Final transition does not match capture stop')
+    return transitions
+
+
+def estimate_v2_density_from_v1(path):
+    """Project exact REXMETA1 event order through the v2 state interning rules."""
+    path = Path(path)
+    parse_capture(path)  # Require a structurally valid frozen input first.
+    data = path.read_bytes()
+    if data[:8] != b'REXMETA1':
+        raise ValueError('Density projection requires REXMETA1 input')
+    records = list(struct.iter_unpack(RECORD.format, data[256:-256]))
+    definitions, bundles, pending = {}, {}, []
+    type_counts, distinct = Counter(), {}
+    non_state = bundle_definition_records = bundle_references = 0
+    for record in records:
+        type_id, count = record[4], record[5]
+        values = tuple(record[6:6 + count])
+        type_counts[FIELDS[type_id][0]] += 1
+        if type_id in STATE_TYPES:
+            key = (type_id, values)
+            distinct.setdefault(FIELDS[type_id][0], set()).add(values)
+            definitions.setdefault(key, len(definitions) + 1)
+            pending.append(definitions[key])
+        else:
+            if type_id == 3 and pending:
+                bundle = tuple(pending)
+                if bundle not in bundles:
+                    bundles[bundle] = len(bundles) + 1
+                    bundle_definition_records += math.ceil(len(bundle) / 23)
+                bundle_references += 1
+                pending = []
+            non_state += 1
+    if pending:
+        bundle = tuple(pending)
+        if bundle not in bundles:
+            bundle_definition_records += math.ceil(len(bundle) / 23)
+        bundle_references += 1
+    projected = len(definitions) + bundle_definition_records + bundle_references + non_state
+    original = len(records)
+    return {
+        'schema': 'fable2-nr0b2-v1-to-v2-density-projection-v1',
+        'source': config.identity(path), 'original_event_records': original,
+        'projected_event_records': projected, 'projected_total_records': projected + 2,
+        'event_record_reduction': original - projected,
+        'event_record_reduction_percent': round((original - projected) * 100 / original, 3),
+        'immutable_definitions': len(definitions), 'distinct_state_bundles': len(bundles),
+        'bundle_definition_records': bundle_definition_records,
+        'bundle_reference_records': bundle_references, 'ordered_non_state_records': non_state,
+        'event_type_counts': dict(type_counts),
+        'distinct_exact_state_tuples': {name: len(values) for name, values in distinct.items()},
+        'scope': ('exact offline projection of retained metadata events; no runtime timing, '
+                  'resource lifetime or payload claim')}
 
 
 def initial(repo):
@@ -381,19 +653,32 @@ def analyse(session):
         if Path(roots.get(field, '')).resolve() != Path(expected).resolve(): errors.append(f'Effective root mismatch: {field}')
     try:
         capture = parse_capture(Path(prep['capture']) / 'metadata.bin', prep['run_id'], process['pid'])
-        recorder_status = (Path(prep['capture']) / 'status.txt').read_text()
-        if not recorder_status.startswith('STOPPED:'):
-            errors.append('Recorder did not report successful output flush: ' + recorder_status[:1024])
+        transition_history = None
+        if capture.get('format', {}).get('version') == 2:
+            transition_history = parse_transitions(
+                Path(prep['capture']) / 'transitions', prep['run_id'], process['pid'], capture)
+            observed = [item.get('record') for item in process.get('recorder_transitions', [])]
+            if observed != transition_history:
+                errors.append('Helper did not durably replay every recorder transition')
+        status_path = Path(prep['capture']) / 'status.txt'
+        if capture.get('format', {}).get('version') != 2:
+            recorder_status = status_path.read_text()
+            if not recorder_status.startswith('STOPPED:'):
+                errors.append('Recorder did not report successful output flush: ' + recorder_status[:1024])
         if not capture['intervals']['complete']: errors.append('No complete consumer interval captured')
         if capture['terminal']['rejected']: errors.append('Recorder reported rejected/lost metadata')
+        if capture['terminal']['reason_name'] in ('records', 'bytes', 'dictionary_capacity'):
+            errors.append('Capture ended on metadata capacity rather than an interval/deadline bound')
         if capture['terminal']['reason_name'] in ('writer_error', 'device_lost', 'shutdown', 'invalid_record'):
             errors.append('Capture stopped on recorder/device/shutdown failure path')
     except (OSError, ValueError, UnicodeError, struct.error) as error:
         capture = {'structural_validity': 'INVALID OR MISSING', 'error': str(error)}
+        transition_history = None
         errors.append(str(error))
     output = {'schema': 'fable2-nr0b2-session-review-v1', 'run_id': prep['run_id'],
               'process': process, 'configuration': records, 'nr0b1_comparison': comparisons,
-              'capture': capture, 'errors': errors, 'user_report': None,
+              'capture': capture, 'transition_history': transition_history,
+              'errors': errors, 'user_report': None,
               'supported_title_log_observations': title_lines,
               'writable_after': config.inventory(prep['writable']),
               'source_preserved_baseline_unchanged': True,
@@ -405,7 +690,7 @@ def analyse(session):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['prepare', 'preflight', 'analyse', 'parse', 'preserve'])
+    parser.add_argument('action', choices=['prepare', 'preflight', 'analyse', 'parse', 'preserve', 'density'])
     parser.add_argument('--repo', type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument('--sdk', type=Path, default=Path('C:/Dev/rexglue-sdk-v0.10'))
     parser.add_argument('--session', type=Path)
@@ -417,6 +702,8 @@ def main():
     elif args.action == 'preflight': preflight(args.session); print('NR0B-2 preflight PASS')
     elif args.action == 'preserve': preserve_check(args.repo, args.sdk); print('Preservation PASS')
     elif args.action == 'analyse': analyse(args.session)
+    elif args.action == 'density':
+        print(json.dumps(estimate_v2_density_from_v1(args.capture), indent=2))
     else:
         result = parse_capture(args.capture, args.run_id)
         if args.output: config.write_new(args.output, result)

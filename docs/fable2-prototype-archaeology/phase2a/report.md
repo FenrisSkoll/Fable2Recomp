@@ -2,8 +2,8 @@
 
 Generated evidence timestamp: `2026-09-11T00:00:00Z`
 
-Generator: `Fable2PrototypeCorrespondence.py` version `1.0.2`, policy
-`precision-first-v1`, commit `f5836c4736b370e8e7b027fb6a602f2dad1d0992`
+Generator: `Fable2PrototypeCorrespondence.py` version `1.0.3`, policy
+`precision-first-v1`, commit `5f96fcf81bf9511dabadc63326468d9de94f87da`
 
 ## Executive result
 
@@ -44,7 +44,7 @@ hashed input causes generation or verification to fail.
 | Target entry/version | `0x82CC21C0`, `0.0.1.26` |
 | Closure SHA-256 | `665CA2AE7ED65632B2E9F368063D3D9EE260E8DEF6F276B455CD62A9F2DCC397` |
 | Generator runtime | `CPython 3.14.3`, cache tag `cpython-314` |
-| Input bundle SHA-256 | `8A3C3C25DFDAA856BA848C408B4677B719217449C7BE111F42D40F08B3F07194` |
+| Input bundle SHA-256 | `DA77AF8D9345C684F81FDD342CDB1E95E48CC826A374D783EEC561F1EDE42B2F` |
 
 The July and build-23 containers have different hashes, but all 15 initialized derived sections,
 their `.pdata`, and the resulting executable-memory fingerprint are byte-identical. The preferred
@@ -158,11 +158,13 @@ similarity is far too permissive for automatic correspondence.
 
 ## Review surfaces and exhaustive evidence
 
-The committed review queue contains 45 deterministic records, five each for accepted exact,
-accepted normalized, ambiguous, structural, quarantine, tiny-leaf, indirect-branch, string, and
-data-anchor strata. It is a bounded audit surface, not a second acceptance source. The complete
-status index retains candidate counts, ambiguity classes, an accepted target where applicable,
-and up to three ranked candidates. It never silently discards the total ambiguity count.
+The committed review queue contains 50 deterministic records, five each for accepted exact,
+accepted normalized, topology-supported, ambiguous, structural, quarantine, tiny-leaf,
+indirect-branch, string, and data-anchor strata. Its selection policy records available, eligible,
+and selected counts for every stratum; `boundary-change` is explicitly `0`/`0`/`0`. It is a
+bounded audit surface, not a second acceptance source. The complete status index retains candidate
+counts, ambiguity classes, an accepted target where applicable, and up to three ranked candidates.
+It never silently discards the total ambiguity count.
 
 Lossless exhaustive material remains ignored because it is reproducible and substantially larger:
 
@@ -219,7 +221,7 @@ All committed JSON documents use the artifact-specific names in the
 | --- | --- |
 | `evidence/prototype-correspondence-index.json` | Complete 46,179-function status/candidate index |
 | `evidence/prototype-correspondence-accepted.json` | Accepted records with explicit evidence and contradiction checks |
-| `evidence/prototype-correspondence-review.json` | Bounded, stratified 45-record manual queue |
+| `evidence/prototype-correspondence-review.json` | Bounded, stratified 50-record manual queue with availability counts |
 | `evidence/prototype-correspondence-validation.json` | Positive control, ten synthetic fixtures, and September robustness |
 | `evidence/prototype-correspondence-summary.json` | Input binding, policy, counts, aggregates, candidate and exhaustive hashes |
 
@@ -231,12 +233,12 @@ is in [phase2b-handoff.md](phase2b-handoff.md).
 The final evidence passed the following checks from the repository root:
 
 - Phase 2A generation with `--check-determinism`: byte-identical committed outputs, 46,179 donor
-  functions, 15,299 accepted mappings, and 45 review records;
+  functions, 15,299 accepted mappings, and 50 review records;
 - `Fable2PrototypeCorrespondence.py verify`: all functions represented once, accepted boundaries
   valid, reciprocal/injective mappings, terminal totals reconciled, no opcode-only acceptance, and
   all bound identities/hashes current;
 - `Verify-Fable2PrototypeCorrespondenceJson.ps1`: five artifacts schema-valid;
-- `test_fable2_prototype_correspondence.py`: 12 tests passed, including all ten synthetic fixtures;
+- `test_fable2_prototype_correspondence.py`: 13 tests passed, including all ten synthetic fixtures;
 - Phase 1 generation with `--check-determinism`: 11 artifacts byte-identical;
 - Phase 1 immutable verification: 1,184 files and ten evidence artifacts verified;
 - Phase 1 cross-artifact consistency: three XEX builds and 15 initialized-section aliases

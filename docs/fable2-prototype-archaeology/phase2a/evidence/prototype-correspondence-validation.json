@@ -2,7 +2,7 @@
   "generated_at_utc": "2026-09-11T00:00:00Z",
   "generator": {
     "name": "Fable2PrototypeCorrespondence.py",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "input_binding": {
     "closure": {
@@ -40,7 +40,7 @@
         "start": "0x82170000"
       }
     },
-    "input_bundle_sha256": "8A3C3C25DFDAA856BA848C408B4677B719217449C7BE111F42D40F08B3F07194",
+    "input_bundle_sha256": "DA77AF8D9345C684F81FDD342CDB1E95E48CC826A374D783EEC561F1EDE42B2F",
     "phase1_evidence": {
       "crossbuild_feasibility_sha256": "FBB0A1067F20952788C83C4D025599DBCB9779C36CD0261F9703564571D2E56D",
       "tu1_relationship_sha256": "FA544543982556ADD1BA1DB93AD512135276E0530AFA6B6F7833754EECDB299A",
@@ -84,11 +84,11 @@
       "version": "0.0.1.26"
     },
     "toolchain": {
-      "fable2_repository_commit": "f5836c4736b370e8e7b027fb6a602f2dad1d0992",
+      "fable2_repository_commit": "5f96fcf81bf9511dabadc63326468d9de94f87da",
       "generator": {
-        "commit": "f5836c4736b370e8e7b027fb6a602f2dad1d0992",
+        "commit": "5f96fcf81bf9511dabadc63326468d9de94f87da",
         "name": "Fable2PrototypeCorrespondence.py",
-        "version": "1.0.2"
+        "version": "1.0.3"
       },
       "ghidra_exporter": {
         "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",

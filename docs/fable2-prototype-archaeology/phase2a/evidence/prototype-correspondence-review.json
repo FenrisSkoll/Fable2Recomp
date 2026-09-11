@@ -2,7 +2,7 @@
   "generated_at_utc": "2026-09-11T00:00:00Z",
   "generator": {
     "name": "Fable2PrototypeCorrespondence.py",
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "input_binding": {
     "closure": {
@@ -40,7 +40,7 @@
         "start": "0x82170000"
       }
     },
-    "input_bundle_sha256": "8A3C3C25DFDAA856BA848C408B4677B719217449C7BE111F42D40F08B3F07194",
+    "input_bundle_sha256": "DA77AF8D9345C684F81FDD342CDB1E95E48CC826A374D783EEC561F1EDE42B2F",
     "phase1_evidence": {
       "crossbuild_feasibility_sha256": "FBB0A1067F20952788C83C4D025599DBCB9779C36CD0261F9703564571D2E56D",
       "tu1_relationship_sha256": "FA544543982556ADD1BA1DB93AD512135276E0530AFA6B6F7833754EECDB299A",
@@ -84,11 +84,11 @@
       "version": "0.0.1.26"
     },
     "toolchain": {
-      "fable2_repository_commit": "f5836c4736b370e8e7b027fb6a602f2dad1d0992",
+      "fable2_repository_commit": "5f96fcf81bf9511dabadc63326468d9de94f87da",
       "generator": {
-        "commit": "f5836c4736b370e8e7b027fb6a602f2dad1d0992",
+        "commit": "5f96fcf81bf9511dabadc63326468d9de94f87da",
         "name": "Fable2PrototypeCorrespondence.py",
-        "version": "1.0.2"
+        "version": "1.0.3"
       },
       "ghidra_exporter": {
         "commit": "2403a5a75b7237dc355f99179916dc29a4b69380",
@@ -243,6 +243,66 @@
       "size": 5112,
       "status": "accepted-normalized-corroborated",
       "stratum": "accepted-normalized",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x83086A90",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83087DE8",
+      "donor_start": "0x83086A18",
+      "review_reason": "deterministic topology-supported stratum sample",
+      "size": 5072,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "topology-supported",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x8318B810",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8318CB78",
+      "donor_start": "0x8318B7F8",
+      "review_reason": "deterministic topology-supported stratum sample",
+      "size": 4992,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "topology-supported",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x82B26460",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x82B26BC8",
+      "donor_start": "0x82B25900",
+      "review_reason": "deterministic topology-supported stratum sample",
+      "size": 4808,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "topology-supported",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x83098870",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x83099A1C",
+      "donor_start": "0x830987F8",
+      "review_reason": "deterministic topology-supported stratum sample",
+      "size": 4644,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "topology-supported",
+      "top_candidates": []
+    },
+    {
+      "accepted_target": "0x8316D190",
+      "ambiguity_class": "accepted-reciprocal-one-to-one",
+      "candidate_count": 1,
+      "donor_end_exclusive": "0x8316E34C",
+      "donor_start": "0x8316D138",
+      "review_reason": "deterministic topology-supported stratum sample",
+      "size": 4628,
+      "status": "accepted-normalized-corroborated",
+      "stratum": "topology-supported",
       "top_candidates": []
     },
     {
@@ -1332,5 +1392,65 @@
     "name": "fable2-prototype-correspondence-review",
     "version": 1
   },
-  "selection_policy": "up to five deterministic, non-overlapping records per documented review stratum"
+  "selection_policy": {
+    "description": "up to five deterministic, non-overlapping records per documented review stratum",
+    "per_stratum_limit": 5,
+    "strata": {
+      "accepted-exact": {
+        "available": 2779,
+        "eligible_after_non_overlap": 2779,
+        "selected": 5
+      },
+      "accepted-normalized": {
+        "available": 12520,
+        "eligible_after_non_overlap": 12520,
+        "selected": 5
+      },
+      "ambiguous": {
+        "available": 15331,
+        "eligible_after_non_overlap": 15331,
+        "selected": 5
+      },
+      "boundary-change": {
+        "available": 0,
+        "eligible_after_non_overlap": 0,
+        "selected": 0
+      },
+      "candidate-structural": {
+        "available": 15337,
+        "eligible_after_non_overlap": 15337,
+        "selected": 5
+      },
+      "data-anchor": {
+        "available": 21285,
+        "eligible_after_non_overlap": 21268,
+        "selected": 5
+      },
+      "indirect-branch": {
+        "available": 634,
+        "eligible_after_non_overlap": 628,
+        "selected": 5
+      },
+      "quarantined": {
+        "available": 210,
+        "eligible_after_non_overlap": 210,
+        "selected": 5
+      },
+      "string-reference": {
+        "available": 9841,
+        "eligible_after_non_overlap": 9832,
+        "selected": 5
+      },
+      "tiny-leaf": {
+        "available": 17,
+        "eligible_after_non_overlap": 17,
+        "selected": 5
+      },
+      "topology-supported": {
+        "available": 8929,
+        "eligible_after_non_overlap": 8922,
+        "selected": 5
+      }
+    }
+  }
 }

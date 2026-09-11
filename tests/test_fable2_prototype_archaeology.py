@@ -76,6 +76,16 @@ class PrototypeArchaeologyTests(unittest.TestCase):
         value = arch.iso_timestamp_ns(-11_644_473_600 * 1_000_000_000)
         self.assertEqual("1601-01-01T00:00:00.000000000Z", value)
 
+    def test_ppc_address_materialization_recovers_lis_pairs(self) -> None:
+        lis_r11 = (15 << 26) | (11 << 21) | 0x820B
+        addi_r3_r11 = (14 << 26) | (3 << 21) | (11 << 16) | 0x7FFC
+        lis_r12 = (15 << 26) | (12 << 21) | 0x8210
+        ori_r3_r12 = (24 << 26) | (12 << 21) | (3 << 16) | 0x1A50
+        self.assertEqual(
+            [0x820B7FFC, 0x82101A50],
+            arch.materialized_addresses([lis_r11, addi_r3_r11, lis_r12, ori_r3_r12]),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

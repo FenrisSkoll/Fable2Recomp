@@ -247,8 +247,13 @@ candidate counts and representative functions; it does not publish a TU1 name ma
 | Build 23 -> canonical TU1 | 46,179 -> 46,180 | 2,900 | 2 | 2,971 | 16,523 | 27,578 |
 
 Representative results include a relocated exact 100-byte function at development `0x82854508`
-and TU1 `0x82853250`, and a normalized 80-byte call-bearing function at development `0x82542BC8`
-and TU1 `0x82541598`. Tiny leaves, large functions, indirect-branch functions, changed functions and
+and TU1 `0x82853250`, a normalized 80-byte call-bearing function at development `0x82542BC8` and
+TU1 `0x82541598`, and the largest unique exact sample (2,540 bytes) at development `0x82CA44C8`
+and TU1 `0x82CA4458`. A useful-string sample associates development `0x83209F98` with TU1
+`0x83209EA0`: both materialize their build's address for
+`e:\xenon\jun08\core\private\xtl\graphics\xgraphics\ucode\compiler\ir\IL2IRTable.hpp` and have
+the same opcode/XO fingerprint. This is a candidate supported by a semantic reference, not an
+accepted identity. Tiny leaves, large functions, indirect-branch functions, changed functions and
 same-address divergences are retained in the JSON.
 
 **Recommendation:** Phase 2 is justified. Use exact `.pdata` boundaries, unique exact or

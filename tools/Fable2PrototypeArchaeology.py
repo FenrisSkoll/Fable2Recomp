@@ -1578,6 +1578,27 @@ def read_function_bytes(
     return None
 
 
+def materialized_addresses(words: list[int]) -> list[int]:
+    """Recover simple lis/addi and lis/ori 32-bit PPC address constructions."""
+    recovered = set()
+    for index, word in enumerate(words):
+        if word >> 26 != 15 or ((word >> 16) & 0x1F) != 0:
+            continue
+        register = (word >> 21) & 0x1F
+        immediate = word & 0xFFFF
+        signed_high = immediate if immediate < 0x8000 else immediate - 0x10000
+        high = (signed_high << 16) & 0xFFFFFFFF
+        for candidate in words[index + 1 : index + 6]:
+            opcode = candidate >> 26
+            if opcode == 14 and ((candidate >> 16) & 0x1F) == register:
+                low = candidate & 0xFFFF
+                signed_low = low if low < 0x8000 else low - 0x10000
+                recovered.add((high + signed_low) & 0xFFFFFFFF)
+            elif opcode == 24 and ((candidate >> 21) & 0x1F) == register:
+                recovered.add(high | (candidate & 0xFFFF))
+    return sorted(recovered)
+
+
 def pdata_functions(derived_root: Path, build_id: str) -> list[dict[str, Any]]:
     blocks = derived_blocks(derived_root, build_id)
     pdata_metadata, pdata = blocks[".pdata"]
@@ -1625,6 +1646,7 @@ def pdata_functions(derived_root: Path, build_id: str) -> list[dict[str, Any]]:
                 "direct_call_count": direct_calls,
                 "conditional_branch_count": conditional_branches,
                 "indirect_branch_count": indirect_branches,
+                "_materialized_addresses": materialized_addresses(words),
                 "pdata_record_address": hex32(int(pdata_metadata["start"], 16) + offset),
             }
         )
@@ -1643,6 +1665,7 @@ def crossbuild_pair(
     left_id: str,
     right_id: str,
     functions_by_build: dict[str, list[dict[str, Any]]],
+    semantic_addresses: dict[str, dict[int, set[str]]],
 ) -> dict[str, Any]:
     left = functions_by_build[left_id]
     right = functions_by_build[right_id]
@@ -1684,15 +1707,37 @@ def crossbuild_pair(
     samples = []
     selected: set[tuple[int, int]] = set()
 
-    def add_sample(category: str, pair: tuple[dict[str, Any], dict[str, Any]] | None) -> None:
-        if pair is None or (pair[0]["start"], pair[1]["start"]) in selected:
+    def public_function(function: dict[str, Any]) -> dict[str, Any]:
+        return {
+            key: value
+            for key, value in function.items()
+            if key != "_materialized_addresses"
+        } | {"materialized_address_count": len(function["_materialized_addresses"])}
+
+    def add_sample(
+        category: str,
+        pair: tuple[dict[str, Any], dict[str, Any]] | None,
+        evidence: dict[str, Any] | None = None,
+        allow_duplicate: bool = False,
+    ) -> None:
+        if pair is None:
             return
-        selected.add((pair[0]["start"], pair[1]["start"]))
-        samples.append({"category": category, "left": pair[0], "right": pair[1]})
+        identity = (pair[0]["start"], pair[1]["start"])
+        if identity in selected and not allow_duplicate:
+            return
+        selected.add(identity)
+        sample = {
+            "category": category,
+            "left": public_function(pair[0]),
+            "right": public_function(pair[1]),
+        }
+        if evidence:
+            sample["evidence"] = evidence
+        samples.append(sample)
 
     raw_pairs = match_pairs_by_kind["raw_sha256"]
     add_sample("tiny-leaf-exact", next((pair for pair in raw_pairs if pair[0]["size"] <= 0x10), None))
-    add_sample("large-exact", next((pair for pair in sorted(raw_pairs, key=lambda pair: -pair[0]["size"]) if pair[0]["size"] >= 0x1000), None))
+    add_sample("largest-unique-exact", max(raw_pairs, key=lambda pair: pair[0]["size"], default=None))
     add_sample("relocated-exact", next((pair for pair in raw_pairs if pair[0]["start"] != pair[1]["start"]), None))
     add_sample(
         "indirect-dispatch-exact",
@@ -1728,6 +1773,43 @@ def crossbuild_pair(
     )
     add_sample("changed-same-address", changed_same_address)
 
+    string_pair = None
+    string_evidence = None
+    candidate_pairs = (
+        raw_pairs
+        + match_pairs_by_kind["branch_normalized_sha256"]
+        + match_pairs_by_kind["opcode_structure_sha256"]
+    )
+    for pair in candidate_pairs:
+        left_strings = {
+            value
+            for address in pair[0]["_materialized_addresses"]
+            for value in semantic_addresses.get(left_id, {}).get(address, set())
+        }
+        right_strings = {
+            value
+            for address in pair[1]["_materialized_addresses"]
+            for value in semantic_addresses.get(right_id, {}).get(address, set())
+        }
+        shared_strings = sorted(left_strings & right_strings, key=lambda value: (-len(value), value))
+        if shared_strings:
+            string_pair = pair
+            string_evidence = {
+                "shared_string": shared_strings[0],
+                "left_string_addresses": [
+                    hex32(address)
+                    for address, values in semantic_addresses[left_id].items()
+                    if shared_strings[0] in values
+                ],
+                "right_string_addresses": [
+                    hex32(address)
+                    for address, values in semantic_addresses[right_id].items()
+                    if shared_strings[0] in values
+                ],
+            }
+            break
+    add_sample("shared-semantic-string-reference", string_pair, string_evidence, allow_duplicate=True)
+
     return {
         "left_build": left_id,
         "right_build": right_id,
@@ -1741,12 +1823,62 @@ def crossbuild_pair(
     }
 
 
-def crossbuild_artifact(derived_root: Path, generated_at: str) -> dict[str, Any]:
+def semantic_string_addresses(
+    derived_root: Path,
+    debug_records: list[dict[str, Any]],
+    script_records: list[dict[str, Any]],
+) -> dict[str, dict[int, set[str]]]:
+    addresses: dict[str, dict[int, set[str]]] = {
+        build_id: collections.defaultdict(set) for build_id in DERIVED_BUILD_IDS
+    }
+    wanted = set()
+    useful_categories = {
+        "pdb-codeview",
+        "source-file",
+        "source-build-path",
+        "assertion-residue",
+        "debug-script-interface",
+        "subsystem-terminology",
+    }
+    for record in debug_records:
+        guest_address = record.get("guest_address")
+        value = record["string"]
+        if (
+            guest_address
+            and record["encoding"] == "ASCII"
+            and useful_categories.intersection(record["categories"])
+            and 8 <= len(value) <= 300
+        ):
+            addresses[record["build_id"]][int(guest_address, 16)].add(value)
+            wanted.add(value)
+    for record in script_records:
+        for match in record["xex_string_matches"]:
+            guest_address = match.get("guest_address")
+            value = match["matched_string"]
+            if guest_address and match["encoding"] == "ASCII" and len(value) >= 8:
+                addresses[record["build_id"]][int(guest_address, 16)].add(value)
+                wanted.add(value)
+
+    for metadata, data in derived_blocks(derived_root, "canonical-tu1").values():
+        block_start = int(metadata["start"], 16)
+        for encoding, offset, value in iter_encoded_strings(data):
+            if encoding == "ASCII" and value in wanted:
+                addresses["canonical-tu1"][block_start + offset].add(value)
+    return addresses
+
+
+def crossbuild_artifact(
+    derived_root: Path,
+    debug_records: list[dict[str, Any]],
+    script_records: list[dict[str, Any]],
+    generated_at: str,
+) -> dict[str, Any]:
     functions = {build_id: pdata_functions(derived_root, build_id) for build_id in DERIVED_BUILD_IDS}
+    semantic_addresses = semantic_string_addresses(derived_root, debug_records, script_records)
     pairs = [
-        crossbuild_pair("sep-2008", "jul-2009", functions),
-        crossbuild_pair("jul-2009", "canonical-tu1", functions),
-        crossbuild_pair("build-23.12.02.0330", "canonical-tu1", functions),
+        crossbuild_pair("sep-2008", "jul-2009", functions, semantic_addresses),
+        crossbuild_pair("jul-2009", "canonical-tu1", functions, semantic_addresses),
+        crossbuild_pair("build-23.12.02.0330", "canonical-tu1", functions, semantic_addresses),
     ]
     return artifact(
         "fable2-prototype-crossbuild-feasibility",
@@ -1756,6 +1888,7 @@ def crossbuild_artifact(derived_root: Path, generated_at: str) -> dict[str, Any]
             "raw_fingerprint": "SHA-256 of exact function bytes",
             "branch_normalized_fingerprint": "SHA-256 after clearing PPC b/bl LI and bc BD displacement fields",
             "opcode_structure_fingerprint": "SHA-256 of primary opcode plus XO for opcodes 19/31/59/63",
+            "semantic_reference_probe": "simple lis/addi and lis/ori address materializations intersected with curated prototype strings present in both images",
             "limitation": "Phase 1 feasibility only; fingerprints are candidates and do not authorize TU1 renames.",
         },
         comparisons=pairs,
@@ -1871,7 +2004,9 @@ def generate(args: argparse.Namespace) -> int:
         args.canonical_closure.resolve(),
         args.generated_at,
     )
-    crossbuild_output = crossbuild_artifact(derived_root, args.generated_at)
+    crossbuild_output = crossbuild_artifact(
+        derived_root, debug_records, script_output["records"], args.generated_at
+    )
 
     outputs = {
         "prototype-inventory.json": inventory_output,

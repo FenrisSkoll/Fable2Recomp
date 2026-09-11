@@ -13,6 +13,7 @@
     "raw_fingerprint": "SHA-256 of exact function bytes",
     "branch_normalized_fingerprint": "SHA-256 after clearing PPC b/bl LI and bc BD displacement fields",
     "opcode_structure_fingerprint": "SHA-256 of primary opcode plus XO for opcodes 19/31/59/63",
+    "semantic_reference_probe": "simple lis/addi and lis/ori address materializations intersected with curated prototype strings present in both images",
     "limitation": "Phase 1 feasibility only; fingerprints are candidates and do not authorize TU1 renames."
   },
   "comparisons": [
@@ -245,7 +246,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8212D7B8"
+            "pdata_record_address": "0x8212D7B8",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2192821968,
@@ -259,7 +261,41 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82135858"
+            "pdata_record_address": "0x82135858",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "largest-unique-exact",
+          "left": {
+            "start": 2194019016,
+            "start_hex": "0x82C612C8",
+            "size": 2540,
+            "end_exclusive": "0x82C61CB4",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x82136CB8",
+            "materialized_address_count": 1
+          },
+          "right": {
+            "start": 2194293960,
+            "start_hex": "0x82CA44C8",
+            "size": 2540,
+            "end_exclusive": "0x82CA4EB4",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x8213EE50",
+            "materialized_address_count": 1
           }
         },
         {
@@ -276,7 +312,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 16,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82134708"
+            "pdata_record_address": "0x82134708",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2193949280,
@@ -290,7 +327,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 16,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8213C650"
+            "pdata_record_address": "0x8213C650",
+            "materialized_address_count": 0
           }
         },
         {
@@ -307,7 +345,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82139840"
+            "pdata_record_address": "0x82139840",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2194870440,
@@ -321,7 +360,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82141C58"
+            "pdata_record_address": "0x82141C58",
+            "materialized_address_count": 0
           }
         },
         {
@@ -338,7 +378,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82114C40"
+            "pdata_record_address": "0x82114C40",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2186554312,
@@ -352,7 +393,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8211BA80"
+            "pdata_record_address": "0x8211BA80",
+            "materialized_address_count": 0
           }
         },
         {
@@ -369,7 +411,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x8213B088"
+            "pdata_record_address": "0x8213B088",
+            "materialized_address_count": 2
           },
           "right": {
             "start": 2195162600,
@@ -383,7 +426,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82143468"
+            "pdata_record_address": "0x82143468",
+            "materialized_address_count": 2
           }
         },
         {
@@ -400,7 +444,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82104E00"
+            "pdata_record_address": "0x82104E00",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2182545424,
@@ -414,7 +459,50 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8210B800"
+            "pdata_record_address": "0x8210B800",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "shared-semantic-string-reference",
+          "left": {
+            "start": 2199649336,
+            "start_hex": "0x831BFC38",
+            "size": 108,
+            "end_exclusive": "0x831BFCA4",
+            "raw_sha256": "46E28D8E98FCF9AC16596CEE8851BB9573D6FE0E8236EDEB1579F929E972D757",
+            "branch_normalized_sha256": "0D57FF8AB8B795F4738E4A21993C09DF9913691DBF072DCDBFD8A80000339BE7",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82151338",
+            "materialized_address_count": 3
+          },
+          "right": {
+            "start": 2199953304,
+            "start_hex": "0x83209F98",
+            "size": 108,
+            "end_exclusive": "0x8320A004",
+            "raw_sha256": "2ADBCF576158B2984D25A0088C5ECBD0CE7AF73847A5290259F307AC0068003D",
+            "branch_normalized_sha256": "0F82B9B71C87D666507A099C38E67EB8CEDA7EF9ECF6E3CB6ED7A76F9B193F33",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82159738",
+            "materialized_address_count": 3
+          },
+          "evidence": {
+            "shared_string": "e:\\xenon\\jun08\\core\\private\\xtl\\graphics\\xgraphics\\ucode\\compiler\\ir\\IL2IRTable.hpp",
+            "left_string_addresses": [
+              "0x8208E578"
+            ],
+            "right_string_addresses": [
+              "0x8208E930"
+            ]
           }
         }
       ]
@@ -648,7 +736,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82135858"
+            "pdata_record_address": "0x82135858",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2192825176,
@@ -662,7 +751,41 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82135850"
+            "pdata_record_address": "0x82135850",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "largest-unique-exact",
+          "left": {
+            "start": 2194293960,
+            "start_hex": "0x82CA44C8",
+            "size": 2540,
+            "end_exclusive": "0x82CA4EB4",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x8213EE50",
+            "materialized_address_count": 1
+          },
+          "right": {
+            "start": 2194293848,
+            "start_hex": "0x82CA4458",
+            "size": 2540,
+            "end_exclusive": "0x82CA4E44",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x8213EE68",
+            "materialized_address_count": 1
           }
         },
         {
@@ -679,7 +802,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x821291E8"
+            "pdata_record_address": "0x821291E8",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2189767248,
@@ -693,7 +817,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82129110"
+            "pdata_record_address": "0x82129110",
+            "materialized_address_count": 0
           }
         },
         {
@@ -710,7 +835,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8211BA80"
+            "pdata_record_address": "0x8211BA80",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2186548632,
@@ -724,7 +850,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8211B9C0"
+            "pdata_record_address": "0x8211B9C0",
+            "materialized_address_count": 0
           }
         },
         {
@@ -741,7 +868,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82143468"
+            "pdata_record_address": "0x82143468",
+            "materialized_address_count": 2
           },
           "right": {
             "start": 2195162720,
@@ -755,7 +883,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82143478"
+            "pdata_record_address": "0x82143478",
+            "materialized_address_count": 2
           }
         },
         {
@@ -772,7 +901,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8210B800"
+            "pdata_record_address": "0x8210B800",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2182545424,
@@ -786,7 +916,50 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8210B800"
+            "pdata_record_address": "0x8210B800",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "shared-semantic-string-reference",
+          "left": {
+            "start": 2199953304,
+            "start_hex": "0x83209F98",
+            "size": 108,
+            "end_exclusive": "0x8320A004",
+            "raw_sha256": "2ADBCF576158B2984D25A0088C5ECBD0CE7AF73847A5290259F307AC0068003D",
+            "branch_normalized_sha256": "0F82B9B71C87D666507A099C38E67EB8CEDA7EF9ECF6E3CB6ED7A76F9B193F33",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82159738",
+            "materialized_address_count": 3
+          },
+          "right": {
+            "start": 2199953056,
+            "start_hex": "0x83209EA0",
+            "size": 108,
+            "end_exclusive": "0x83209F0C",
+            "raw_sha256": "773F5B5C65D2AA8075E1B73E3072DAE14FFB2FA31FBD951F512B35616D10DA7E",
+            "branch_normalized_sha256": "2C7BCA4A30D8DB98A45CDFB50483ABAB56F5350514C5C5972F4BD35C85524368",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82159740",
+            "materialized_address_count": 3
+          },
+          "evidence": {
+            "shared_string": "e:\\xenon\\jun08\\core\\private\\xtl\\graphics\\xgraphics\\ucode\\compiler\\ir\\IL2IRTable.hpp",
+            "left_string_addresses": [
+              "0x8208E930"
+            ],
+            "right_string_addresses": [
+              "0x8208E988"
+            ]
           }
         }
       ]
@@ -1020,7 +1193,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82135858"
+            "pdata_record_address": "0x82135858",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2192825176,
@@ -1034,7 +1208,41 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x82135850"
+            "pdata_record_address": "0x82135850",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "largest-unique-exact",
+          "left": {
+            "start": 2194293960,
+            "start_hex": "0x82CA44C8",
+            "size": 2540,
+            "end_exclusive": "0x82CA4EB4",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x8213EE50",
+            "materialized_address_count": 1
+          },
+          "right": {
+            "start": 2194293848,
+            "start_hex": "0x82CA4458",
+            "size": 2540,
+            "end_exclusive": "0x82CA4E44",
+            "raw_sha256": "CB33395D6C8FD1085AF3E54B0B5CB9D5EF013C6DF1882BB7FAED1E9AEE03F0CE",
+            "branch_normalized_sha256": "CBEDC1E8507EFAE2DDE3F14498EDD00F867FE0D53896FFCB6174F9264F809507",
+            "opcode_structure_sha256": "5E20CDC98C9F5E7C809B06EE653CA22749013660B19D0E7D523C8A0AC12218E1",
+            "instruction_count": 635,
+            "direct_call_count": 17,
+            "conditional_branch_count": 89,
+            "indirect_branch_count": 7,
+            "pdata_record_address": "0x8213EE68",
+            "materialized_address_count": 1
           }
         },
         {
@@ -1051,7 +1259,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x821291E8"
+            "pdata_record_address": "0x821291E8",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2189767248,
@@ -1065,7 +1274,8 @@
             "direct_call_count": 0,
             "conditional_branch_count": 0,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82129110"
+            "pdata_record_address": "0x82129110",
+            "materialized_address_count": 0
           }
         },
         {
@@ -1082,7 +1292,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8211BA80"
+            "pdata_record_address": "0x8211BA80",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2186548632,
@@ -1096,7 +1307,8 @@
             "direct_call_count": 1,
             "conditional_branch_count": 1,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8211B9C0"
+            "pdata_record_address": "0x8211B9C0",
+            "materialized_address_count": 0
           }
         },
         {
@@ -1113,7 +1325,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82143468"
+            "pdata_record_address": "0x82143468",
+            "materialized_address_count": 2
           },
           "right": {
             "start": 2195162720,
@@ -1127,7 +1340,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 4,
             "indirect_branch_count": 2,
-            "pdata_record_address": "0x82143478"
+            "pdata_record_address": "0x82143478",
+            "materialized_address_count": 2
           }
         },
         {
@@ -1144,7 +1358,8 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8210B800"
+            "pdata_record_address": "0x8210B800",
+            "materialized_address_count": 0
           },
           "right": {
             "start": 2182545424,
@@ -1158,7 +1373,50 @@
             "direct_call_count": 2,
             "conditional_branch_count": 0,
             "indirect_branch_count": 0,
-            "pdata_record_address": "0x8210B800"
+            "pdata_record_address": "0x8210B800",
+            "materialized_address_count": 0
+          }
+        },
+        {
+          "category": "shared-semantic-string-reference",
+          "left": {
+            "start": 2199953304,
+            "start_hex": "0x83209F98",
+            "size": 108,
+            "end_exclusive": "0x8320A004",
+            "raw_sha256": "2ADBCF576158B2984D25A0088C5ECBD0CE7AF73847A5290259F307AC0068003D",
+            "branch_normalized_sha256": "0F82B9B71C87D666507A099C38E67EB8CEDA7EF9ECF6E3CB6ED7A76F9B193F33",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82159738",
+            "materialized_address_count": 3
+          },
+          "right": {
+            "start": 2199953056,
+            "start_hex": "0x83209EA0",
+            "size": 108,
+            "end_exclusive": "0x83209F0C",
+            "raw_sha256": "773F5B5C65D2AA8075E1B73E3072DAE14FFB2FA31FBD951F512B35616D10DA7E",
+            "branch_normalized_sha256": "2C7BCA4A30D8DB98A45CDFB50483ABAB56F5350514C5C5972F4BD35C85524368",
+            "opcode_structure_sha256": "000A8CDE58662E32D7CAFADF890AC695F129D479B436D5706BBF8197B933E63D",
+            "instruction_count": 27,
+            "direct_call_count": 1,
+            "conditional_branch_count": 4,
+            "indirect_branch_count": 0,
+            "pdata_record_address": "0x82159740",
+            "materialized_address_count": 3
+          },
+          "evidence": {
+            "shared_string": "e:\\xenon\\jun08\\core\\private\\xtl\\graphics\\xgraphics\\ucode\\compiler\\ir\\IL2IRTable.hpp",
+            "left_string_addresses": [
+              "0x8208E930"
+            ],
+            "right_string_addresses": [
+              "0x8208E988"
+            ]
           }
         }
       ]

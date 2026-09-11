@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fable2recomp.local/schemas/fable2-prototype-correspondence-v1.schema.json",
+  "title": "Fable II prototype correspondence Phase 2A artifact",
+  "type": "object",
+  "required": [
+    "schema",
+    "generator",
+    "generated_at_utc",
+    "input_binding"
+  ],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "enum": [
+            "fable2-prototype-correspondence-index",
+            "fable2-prototype-correspondence-accepted",
+            "fable2-prototype-correspondence-review",
+            "fable2-prototype-correspondence-validation",
+            "fable2-prototype-correspondence-summary"
+          ]
+        },
+        "version": { "const": 1 }
+      },
+      "additionalProperties": false
+    },
+    "generator": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "Fable2PrototypeCorrespondence.py" },
+        "version": { "const": "1.0.0" }
+      },
+      "additionalProperties": false
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "input_binding": {
+      "type": "object",
+      "required": [
+        "donor",
+        "target",
+        "secondary",
+        "closure",
+        "phase1_evidence",
+        "toolchain",
+        "input_bundle_sha256"
+      ],
+      "properties": {
+        "input_bundle_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "schema": { "properties": { "name": { "const": "fable2-prototype-correspondence-index" } } } } },
+      "then": {
+        "required": ["terminal_status_vocabulary", "top_candidate_limit", "functions"],
+        "properties": {
+          "functions": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/functionStatus" }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "schema": { "properties": { "name": { "const": "fable2-prototype-correspondence-accepted" } } } } },
+      "then": {
+        "required": ["semantics_propagated", "records"],
+        "properties": {
+          "semantics_propagated": { "const": false },
+          "records": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/acceptedRecord" }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "schema": { "properties": { "name": { "const": "fable2-prototype-correspondence-review" } } } } },
+      "then": { "required": ["selection_policy", "records"] }
+    },
+    {
+      "if": { "properties": { "schema": { "properties": { "name": { "const": "fable2-prototype-correspondence-validation" } } } } },
+      "then": { "required": ["positive_control", "synthetic_fixtures", "september_robustness_study"] }
+    },
+    {
+      "if": { "properties": { "schema": { "properties": { "name": { "const": "fable2-prototype-correspondence-summary" } } } } },
+      "then": {
+        "required": [
+          "policy",
+          "review_score",
+          "status_counts",
+          "accepted_counts",
+          "fingerprint_candidate_statistics",
+          "aggregate",
+          "exhaustive_candidate_groups",
+          "exhaustive_function_features",
+          "conclusions"
+        ]
+      }
+    }
+  ],
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9A-F]{64}$"
+    },
+    "address": {
+      "type": "string",
+      "pattern": "^0x[0-9A-F]{8}$"
+    },
+    "terminalStatus": {
+      "enum": [
+        "accepted-exact-unique",
+        "accepted-normalized-corroborated",
+        "candidate-structural",
+        "ambiguous",
+        "quarantined",
+        "boundary-change",
+        "unmatched"
+      ]
+    },
+    "functionStatus": {
+      "type": "object",
+      "required": [
+        "donor_start",
+        "donor_end_exclusive",
+        "size",
+        "pdata_record",
+        "boundary_flags",
+        "risk_flags",
+        "status",
+        "candidate_count",
+        "candidate_counts_by_feature",
+        "ambiguity_class",
+        "accepted_target",
+        "top_candidates"
+      ],
+      "properties": {
+        "donor_start": { "$ref": "#/$defs/address" },
+        "donor_end_exclusive": { "$ref": "#/$defs/address" },
+        "pdata_record": { "$ref": "#/$defs/address" },
+        "size": { "type": "integer", "minimum": 4 },
+        "status": { "$ref": "#/$defs/terminalStatus" },
+        "candidate_count": { "type": "integer", "minimum": 0 },
+        "accepted_target": {
+          "oneOf": [
+            { "$ref": "#/$defs/address" },
+            { "type": "null" }
+          ]
+        },
+        "top_candidates": {
+          "type": "array",
+          "maxItems": 6
+        }
+      }
+    },
+    "acceptedRecord": {
+      "type": "object",
+      "required": [
+        "donor_start",
+        "donor_end_exclusive",
+        "target_start",
+        "target_end_exclusive",
+        "size",
+        "status",
+        "evidence_grade",
+        "semantic_name_assigned",
+        "acceptance_policy",
+        "evidence",
+        "contradiction_checks"
+      ],
+      "properties": {
+        "donor_start": { "$ref": "#/$defs/address" },
+        "donor_end_exclusive": { "$ref": "#/$defs/address" },
+        "target_start": { "$ref": "#/$defs/address" },
+        "target_end_exclusive": { "$ref": "#/$defs/address" },
+        "status": {
+          "enum": ["accepted-exact-unique", "accepted-normalized-corroborated"]
+        },
+        "semantic_name_assigned": { "const": false }
+      }
+    }
+  }
+}

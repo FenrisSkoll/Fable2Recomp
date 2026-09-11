@@ -210,6 +210,7 @@ class FunctionEvidence:
     branch_normalized_sha256: str = ""
     opcode_structure_sha256: str = ""
     constant_signature_sha256: str = ""
+    boundary_prefix_sha256: str = ""
     instruction_count: int = 0
     direct_calls: list[tuple[int, int]] = field(default_factory=list)
     conditional_branches: int = 0
@@ -314,15 +315,24 @@ def executable_fingerprint(blocks: list[MemoryBlock]) -> str:
 
 def extract_string_map(blocks: list[MemoryBlock]) -> dict[int, str]:
     result: dict[int, str] = {}
+
+    def useful(value: str) -> bool:
+        if not 8 <= len(value) <= 160 or not any(character.isalpha() for character in value):
+            return False
+        counts = collections.Counter(value)
+        return len(counts) >= 4 and counts.most_common(1)[0][1] * 2 < len(value)
+
     for block in blocks:
         if block.execute:
             continue
         for match in ASCII_RE.finditer(block.data):
-            result[block.start + match.start()] = match.group().decode("ascii")
+            value = match.group().decode("ascii")
+            if useful(value):
+                result[block.start + match.start()] = value
         for match in UTF16_RE.finditer(block.data):
-            result.setdefault(
-                block.start + match.start(), match.group().decode("utf-16le")
-            )
+            value = match.group().decode("utf-16le")
+            if useful(value):
+                result.setdefault(block.start + match.start(), value)
     return result
 
 
@@ -433,11 +443,13 @@ def analyze_function(
         if value is not None:
             string_references.add(value)
         block = block_for_address(blocks, address)
-        if block is not None and not block.execute:
+        if block is not None and block.name in {".data", ".rdata", ".edata"}:
             offset = address - block.start
             sample = block.data[offset : min(offset + 16, len(block.data))]
-            if sample:
-                data_anchors.add(f"{block.name}:{sha256_bytes(sample)}")
+            if len(sample) == 16 and len(set(sample)) >= 4:
+                data_anchors.add(
+                    f"{block.name}:{address_text(address)}:{sha256_bytes(sample)}"
+                )
     padding_words = sum(word in {0, 0x60000000, 0xFFFFFFFF} for word in words)
     risk_flags: list[str] = []
     if len(code) <= 16:
@@ -470,6 +482,7 @@ def analyze_function(
         constant_signature_sha256=sha256_bytes(
             b"".join(struct.pack(">H", constant) for constant in constants)
         ),
+        boundary_prefix_sha256=sha256_bytes(normalized[:16]) if len(normalized) >= 16 else "",
         instruction_count=len(words),
         direct_calls=direct_calls,
         conditional_branches=conditional,
@@ -648,7 +661,7 @@ def pair_evidence(
     if topology_support:
         classes.append("direct-call-topology")
     if shared_strings:
-        classes.append("semantic-string-reference")
+        classes.append("string-content-anchor")
     if shared_data:
         classes.append("data-content-anchor")
     contradictions: list[str] = []
@@ -717,7 +730,7 @@ def has_required_corroboration(evidence: dict[str, Any]) -> bool:
     required = {
         "local-address-delta-neighbourhood",
         "direct-call-topology",
-        "semantic-string-reference",
+        "string-content-anchor",
         "data-content-anchor",
     }
     return len(classes) >= 2 and bool(classes & required)
@@ -810,6 +823,20 @@ def boundary_change_candidate(donor: FunctionEvidence, target: FunctionEvidence 
     )
 
 
+def normalized_prefix_boundary_candidate(
+    donor: FunctionEvidence, target: FunctionEvidence
+) -> bool:
+    if donor.size == target.size or min(donor.size, target.size) < 16:
+        return False
+    length = min(32, donor.size, target.size)
+    donor_words = struct.unpack(f">{length // 4}I", donor.code[:length])
+    target_words = struct.unpack(f">{length // 4}I", target.code[:length])
+    return all(
+        normalize_branch_word(left) == normalize_branch_word(right)
+        for left, right in zip(donor_words, target_words)
+    )
+
+
 def unique_pairs(
     key: str,
     donor_groups: dict[str, dict[str, list[FunctionEvidence]]],
@@ -836,6 +863,14 @@ def match_builds(
     donor_by_start = {function.start: function for function in donor_functions}
     target_by_start = {function.start: function for function in target_functions}
     donor_groups, target_groups = fingerprint_groups(donor_functions, target_functions)
+    donor_boundary_groups = groups(
+        [function for function in donor_functions if function.boundary_prefix_sha256],
+        "boundary_prefix_sha256",
+    )
+    target_boundary_groups = groups(
+        [function for function in target_functions if function.boundary_prefix_sha256],
+        "boundary_prefix_sha256",
+    )
     accepted: dict[int, int] = {}
     accepted_status: dict[int, str] = {}
     rejected_reason: dict[int, str] = {}
@@ -975,6 +1010,40 @@ def match_builds(
             ),
             "candidate_edge_count_within_feature": edge_count,
         }
+    boundary_shared = sorted(set(donor_boundary_groups) & set(target_boundary_groups))
+    boundary_edge_count = sum(
+        len(donor_boundary_groups[digest]) * len(target_boundary_groups[digest])
+        for digest in boundary_shared
+    )
+    group_statistics["boundary_normalized_prefix16_sha256"] = {
+        "donor_unique_fingerprints": sum(len(value) == 1 for value in donor_boundary_groups.values()),
+        "target_unique_fingerprints": sum(len(value) == 1 for value in target_boundary_groups.values()),
+        "shared_fingerprint_groups": len(boundary_shared),
+        "reciprocal_unique_pairs": sum(
+            len(donor_boundary_groups[digest]) == 1
+            and len(target_boundary_groups[digest]) == 1
+            for digest in boundary_shared
+        ),
+        "candidate_edge_count_within_feature": boundary_edge_count,
+        "acceptance_eligible": False,
+        "purpose": "possible split/merge or shifted-boundary review only",
+    }
+    exhaustive_groups["boundary_normalized_prefix16_sha256"] = (
+        [
+            {
+                "fingerprint": digest,
+                "donor_members": [
+                    address_text(item.start) for item in donor_boundary_groups[digest]
+                ],
+                "target_members": [
+                    address_text(item.start) for item in target_boundary_groups[digest]
+                ],
+            }
+            for digest in boundary_shared
+        ]
+        if include_exhaustive
+        else []
+    )
 
     index_records: list[dict[str, Any]] = []
     status_counts: collections.Counter[str] = collections.Counter()
@@ -985,8 +1054,21 @@ def match_builds(
             members = target_groups[key].get(getattr(donor, key), [])
             per_feature_counts[key] = len(members)
             candidates.update(member.start for member in members)
+        donor_boundary_members = donor_boundary_groups.get(donor.boundary_prefix_sha256, [])
+        target_boundary_members = target_boundary_groups.get(donor.boundary_prefix_sha256, [])
+        boundary_members = (
+            target_boundary_members
+            if len(donor_boundary_members) == 1 and len(target_boundary_members) == 1
+            else []
+        )
+        boundary_targets = {
+            member.start
+            for member in boundary_members
+            if normalized_prefix_boundary_candidate(donor, member)
+        }
+        candidates.update(boundary_targets)
         same_start = target_by_start.get(donor.start)
-        boundary_change = boundary_change_candidate(donor, same_start)
+        boundary_change = bool(boundary_targets) or boundary_change_candidate(donor, same_start)
         if boundary_change and same_start is not None:
             candidates.add(same_start.start)
         accepted_target = accepted.get(donor.start)
@@ -1037,6 +1119,10 @@ def match_builds(
                                 ("call-topology", evidence["topology"]["support"] > 0),
                                 ("string", evidence["references"]["shared_string_count"] > 0),
                                 ("data", evidence["references"]["shared_data_anchor_count"] > 0),
+                                (
+                                    "boundary-prefix",
+                                    candidate_start in boundary_targets,
+                                ),
                             )
                             if present
                         ],
@@ -1149,6 +1235,7 @@ def exhaustive_function_features(analysis: BuildAnalysis) -> list[dict[str, Any]
                 "branch_normalized_sha256": function.branch_normalized_sha256,
                 "opcode_structure_sha256": function.opcode_structure_sha256,
                 "constant_signature_sha256": function.constant_signature_sha256,
+                "boundary_normalized_prefix16_sha256": function.boundary_prefix_sha256,
             },
             "shape": shape_values(function) | {"cfg_sha256": function.cfg_sha256},
             "direct_calls": [
@@ -1820,7 +1907,7 @@ def generate(args: argparse.Namespace) -> int:
                 "version": POLICY_VERSION,
                 "precision_first": True,
                 "exact_acceptance": "reciprocal unique raw bytes, exact valid boundaries, injective, shape/CFG consistent, and no final neighbourhood/topology contradiction",
-                "normalized_acceptance": "reciprocal unique branch-normalized bytes plus at least two corroborating classes including neighbourhood/topology or a sound string/data anchor; injective and contradiction-free",
+                "normalized_acceptance": "reciprocal unique branch-normalized bytes plus at least two corroborating classes including exact address-delta neighbourhood, direct-call topology, or a sound string/data anchor; injective and contradiction-free",
                 "risk_policy": "tiny leaves, short thunks, padding-dominated functions, overlaps, and duplicate fingerprints require corroboration or quarantine",
                 "never_automatic": [
                     "opcode/XO structure only",

@@ -9,6 +9,10 @@ all remaining donor functions retain an explicit terminal status and candidate c
 fingerprint candidate groups remain under ignored `out/prototype-archaeology/phase2a`, while a
 bounded top-candidate surface is committed.
 
+Normalized-prefix boundary groups are retained exhaustively, but only reciprocal-unique prefix
+pairs enter the per-function boundary review queue. Common prologues therefore remain measurable
+ambiguity evidence without expanding into misleading millions of split/merge suggestions.
+
 ## Reproduction
 
 Run from the repository root after reproducing and verifying Phase 1:

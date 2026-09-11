@@ -135,7 +135,6 @@
         "size",
         "status",
         "candidate_count",
-        "candidate_counts_by_feature",
         "ambiguity_class",
         "accepted_target",
         "top_candidates"
@@ -148,10 +147,8 @@
         "status": { "$ref": "#/$defs/terminalStatus" },
         "candidate_count": { "type": "integer", "minimum": 0 },
         "accepted_target": {
-          "oneOf": [
-            { "$ref": "#/$defs/address" },
-            { "type": "null" }
-          ]
+          "type": ["string", "null"],
+          "pattern": "^0x[0-9A-F]{8}$"
         },
         "top_candidates": {
           "type": "array",

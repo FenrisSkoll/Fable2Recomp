@@ -4,3 +4,11 @@
 # Deterministic ownership evidence is hashed and compared byte-for-byte.
 /docs/fable2-discovery-pipeline/ownership/*.json text eol=lf
 /docs/fable2-discovery-pipeline/ownership/*.md text eol=lf
+
+# Phase 2B hashes implementation and evidence bytes across Windows checkouts.
+/docs/fable2-prototype-archaeology/phase2b/** text eol=lf
+/tools/Fable2PrototypeSemantics.py text eol=lf
+/tools/Fable2SemanticNative.py text eol=lf
+/tools/Verify-Fable2PrototypeSemantics.ps1 text eol=lf
+/tools/schemas/fable2-prototype-semantics-v1.schema.json text eol=lf
+/tests/test_fable2_prototype_semantics.py text eol=lf

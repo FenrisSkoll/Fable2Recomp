@@ -18,9 +18,10 @@ FOR NR0B-2** following the user-operated Oakfield run. This completes the
 configuration gate only; NR0A's dynamic frame-contract gate and renderer seam
 qualification remain unresolved.
 
-[NR0B-2](../nr0b2/README.md) has prepared the bounded metadata observer and a
-fresh isolated session: **RECORDER PREPARED — USER CAPTURE REQUIRED**. It does
-not implement or qualify a native renderer.
+[NR0B-2](../nr0b2/README.md) has corrected the bounded metadata observer after
+preserving a capacity-limited first capture and has prepared a fresh isolated
+session: **RECORDER CORRECTED — USER CAPTURE REQUIRED**. It does not implement
+or qualify a native renderer.
 
 ## Decision package
 

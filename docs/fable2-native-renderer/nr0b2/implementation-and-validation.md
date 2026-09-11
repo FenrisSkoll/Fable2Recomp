@@ -1,155 +1,203 @@
-# Implementation, validation and prepared identities
+# Correction implementation, validation and prepared identities
 
-**CONFIRMED, source/build/synthetic/preflight evidence only.** No NR0B-2 game
-process or runtime capture has occurred. Configuration/scene/loaded-artifact
-verification for the new run is pending user operation.
+**CONFIRMED, source/build/synthetic/preflight evidence.** Session 002 is the
+preserved failed runtime capture described in
+[its diagnosis](session-002-diagnosis.md). The corrected runtime has not been
+launched. Its actual interval coverage, cue perception and disturbance remain a
+fresh user-run gate.
 
-The SDK implements a default-off preallocated recorder and independent control/
-deadline/writer thread. Narrow consumer sites record decisions and explicit
-returns, bound/selected shader identities, used decoded texture/fetch/sampler
-state, accepted attachment/depth/output state, resolve results, auxiliary/main
-deferred operations, native invocation and submission/completion/swap edges.
-No renderer return value, original branch, GPU wait or guest work is changed.
-In particular, native deferred replay suppression is observed rather than
-mistaken for successful GPU execution.
+## Demonstrated failure and density basis
 
-Fable adds preparation/preflight, exclusive launch/log claims, process/module
-monitoring, strict offline parsing and at-most-one conservative nomination for
-later evidence collection. NR0B-1 helpers and reports remain unchanged. The
-existing source-save, session and log allocation contracts are reused.
+Read-only parsing of the original session 002 `REXMETA1` capture confirms the
+accepted trigger, first record at 5.508 ms, sole swap at 5.5829 ms and records
+stop at 22.7001 ms. It contains exactly 99,998 events plus header and terminal,
+2,375 decisions, one swap, zero complete intervals, no rejected records and an
+open decision 2375. Submissions 5251–5255 are observed, completion reaches
+5254, and submission 5256 remains unresolved. The terminal reason is record
+capacity. The backward-compatible parser still reports the original capture as
+structurally valid and capacity limited; no historical output was rewritten.
 
-## Local source/build relationship
+The highest-volume decoded state families and their exact value repetition were:
 
-SDK implementation: `ab602bd70a6edee877496359e19f7510c19cc83a`, tree
-`cad179a4c273f1172e5994ea90696d520018b0bd`, on
-`fable2-native-renderer-nr0b2-metadata`, directly descended from accepted
-NR0B-1 `06c4b7002a449ad4d173ec90c625e490ed03fe74`.
+| Event type | Session 002 records | Distinct exact tuples |
+|---|---:|---:|
+| texture requested | 15,660 | 686 |
+| texture prepared | 15,646 | 686 |
+| color attachment | 9,036 | 18 |
+| sampler | 7,825 | 101 |
+| shader | 4,700 | 88 |
+| pipeline | 4,518 | 155 |
+| vertex layout | 3,087 | 30 |
+| vertex fetch | 3,087 | 738 |
+| geometry | 2,350 | 425 |
+| submission snapshot | 2,350 | 9 |
+| shader selection | 2,259 | 57 |
+| processed geometry | 2,259 | 617 |
+| targets | 2,259 | 33 |
+| depth | 2,259 | 32 |
+| viewport | 2,258 | 20 |
+| fixed state | 2,258 | 107 |
+| binding result | 2,258 | 1 |
+| index | 1,792 | 602 |
 
-Final SDK source includes the reviewed submission carry-in correction:
-`d90c10b49e95fc4098274d3676ea77c68ed44853`, tree
-`e970f5670a143b1c1a209b765c717ac98398502e`. It keeps the recorder's current
-submission synchronized while armed, including a trigger immediately after
-EndSubmission. Affected Release targets rebuilt successfully, recorded in
-SDK `out/nr0b2-build-carry-in.log`.
+Exact read-only projection through the v2 representation keeps all 14,137
+ordered non-state events and all decisions, while replacing repeated state with
+4,405 immutable definitions, 3,893 bundle-definition records and 2,350 bundle
+references. The projected capture is 24,785 events plus framing, 6,345,472
+bytes, versus 99,998 events and 25,600,000 bytes: 75,213 fewer events, a
+**75.215%** reduction. This equality is bounded decoded-metadata reuse, not
+resource-lifetime or payload compression.
 
-Fable tooling/preparation source:
-`58df26c7a0a39f56b71ecf36f4c0f4fda1517fc2`, tree
-`6cdee8a32b95c4f7bbe4174ca6a7b7c59eaad7e4`, on the same branch name, directly
-descended from accepted `d292ccc36cc4b97d4171431308cedec7e5591a28`.
-The subsequent prepared-state documentation commit does not require recreating
-the session. Exact final HEAD/tree values belong in the final handoff, not in
-their own commit.
+## Corrected recorder and analyzer
 
-SDK Release build used the existing Ninja Multi-Config/Clang configuration,
-D3D12 ON, Vulkan OFF. Targets: `rexruntime rexgpu-xenos unit_tests`. The
-post-commit build confirms no work remains. Artifacts describe exact compiled
-source content and disk bytes; a baked SDK version string alone is not evidence
-of that content. The existing accepted Release Fable EXE is copied unchanged:
-no Fable C++/application ABI/codegen input changed, and GPU-private recorder
-classes remain inside the plugin. No Fable build/codegen, install or baseline
-replacement is needed for these affected SDK targets.
+The SDK now writes `REXMETA2`. Reusable geometry, shader, pipeline, binding,
+attachment and submission state is published once as an immutable exact
+definition. Each decision keeps its ordered definition IDs through a bounded
+state bundle and one compact reference. Individual decisions, outcomes,
+resolves, deferred/native operations, submissions, completions and swaps remain
+ordered records. FNV-1a 64 is only a bounded-table lookup accelerator; exact
+type/count/field equality makes collisions safe. Definitions and bundles are
+never evicted, mutated or silently overwritten. A transaction that cannot
+publish its new definition and valid reference stops cleanly with reported loss.
 
-Private build logs are SDK `out/nr0b2-build-final.log` and
-`out/nr0b2-build-committed.log`; final test output is
-`out/nr0b2-tests-final.log`. The first compile identified an enum conversion
-and unsigned bitfield-expression narrowing in new metadata initializers; those
-were corrected and all affected sources compiled successfully. Existing
-unrelated compiler warnings were retained.
+The hard ceilings remain five seconds, three complete consumer intervals,
+20,000 decisions, 100,000 total records and 32 MiB. Binary storage remains
+25,600,000 bytes. Fixed dictionary/bundle tables, decision workspace,
+bookkeeping and bounded transition history are included in the initialization
+budget check. Terminal reservation and initial-partial semantics are unchanged.
 
-## Prepared session
+The analyzer selects its reader from the magic/version. It retains the frozen
+v1 interpretation for session 002, explicitly rejects unknown versions, and for
+v2 validates definition-before-reference, exact immutable definitions, complete
+ordered bundle chunks, unknown/duplicate references, sizes/padding, terminal
+counters, open decisions and partial submissions. Its report separates wire
+records, dictionary/reference accounting and logical expanded state. Capacity
+never becomes a complete result simply because retained references validate.
 
-Session: `C:\Dev\Fable2Recomp\out\nr0b2\sessions\nr0b2-oakfield-20260910-002`.
-Preparation JSON SHA-256:
-`E716D49723C1851FA6949DA0D473BC2F569257C5BECD50372EE721936943199C`.
-Initial preservation audit SHA-256:
-`E503E7DD80E47096C11E20799AD2843A3035480D19BAAA5211BDC9FA24BF090A`.
+## Durable notification contract
 
-The earlier unused `nr0b2-oakfield-20260910-001` preparation and checkpoint
-remain preserved. They were superseded before user handoff by `002` after the
-final carry-in correction. Neither session was launched; no claim was removed,
-root reused or prior artifact overwritten. Only `002` is the run-card target.
+The control worker publishes READY only after Ctrl+Shift+F10 and
+Ctrl+Shift+F11 both register. An accepted foreground F10 begins capture and
+publishes STARTED exactly once with that same monotonic trigger timestamp.
+STOPPED appears only after recording ends and `metadata.bin` closes. CANCELLED
+and ERROR are distinct final transitions.
 
-| Staged file under session `runtime` | Bytes | SHA-256 |
-|---|---:|---|
-| fable2.exe | 105042944 | `1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9` |
-| rexruntime.dll | 10380288 | `1CEB686A2D9C704491D45C47DA34701E00CA649AE6177C7E1171C980F1EF56D7` |
-| rexgpu-xenos.dll | 2846208 | `584474C1C25D4D68DC49B856F827B3021788F29A29B8D2C4CF46DE25B3EA9B3A` |
-| TracyClient.dll (optional staged file) | 232960 | `FDBE7A329E1B06A86FE61A2C5BE6B335F32F9BBCA7E05F7B183A35C515D2D1A5` |
+Every transition is an immutable, atomically renamed JSON file under
+`capture\transitions`, with run/PID, sequence, recorder monotonic timestamp,
+nearby wall/monotonic correlation, foreground/acceptance data and final
+reason/flush/error fields. The helper drains unseen sequences instead of
+sampling the overwritten compatibility status. The validated cue mapping is:
 
-`llvm-readobj --coff-imports` inspected the exact EXE/runtime/GPU images. None
-imports Tracy, so only those three images are required loaded modules. The
-preparation's “Release import audit required” note is discharged by this
-specific audit, not a general exemption. Audit output:
-`out/nr0b2/release-imports-final.txt`, SHA-256
-`FBC6E936854EF65FE1BC5324A76F3C5C88F20C4387E913D16FFB757948EEE761`.
-Loaded paths/hashes remain unobserved until the actual process.
+| State | Worker-only cue |
+|---|---|
+| READY | two rising tones |
+| STARTED | one high tone |
+| STOPPED | three rising tones |
+| CANCELLED | two falling tones |
+| ERROR | three falling tones |
 
-The source and both new copies match all 14 relative-path/size/hash entries.
-The independent Phase 5A and NR0B-1 preserved checkpoints remain unchanged.
-The writable cache is distinct and copied, not empty: `.rtv.d3d12.xpso` 46956
-bytes / `B84C25906C3E0C5F3560E436BA1954AC0A536651E28CEB10346458A1C0123D22`;
-`.xsh` 246884 bytes /
-`72DB0BC95A784DD65BB1621AFCA6638708D4CDD60900ED05202FA6E7FCC5CD32`.
-Driver-cache state remains unknown. Exe-adjacent `fable2.toml` remains absent.
-No RTV/ROV, scale, async, readback or other rendering setting is overridden.
-The original nine-stage report supplies fresh effective context for comparison.
+Sound failure does not alter the durable state. No cue, file I/O, lock or wait
+runs on the GPU consumer. Console visibility and human cue perception remain
+runtime observations rather than claims from unit tests.
 
-Preflight independently checks the accepted runtime XEX/XEXP identities from
-NR0B-1. The inherited post-patch guest-image SHA remains static evidence,
-not a newly measured process-memory identity. No payload or private build
-artifact is added to Git.
+## Source and build relationship
+
+Both branches are `fable2-native-renderer-nr0b2-metadata`.
+
+- SDK correction: `821aab344f1a3010126f08e9a7d06bf7bd336027`, tree
+  `357b341bed4be953755e36e729fd9b299f1c94b1`, descended from the accepted
+  NR0B-2 tip `d90c10b49e95fc4098274d3676ea77c68ed44853`.
+- Fable durable analyzer/launcher correction:
+  `bb190cde7dcd61e9d0989919982cfd0f8779cad9`, tree
+  `085ba79a65f7095c1b6c4bb040cf95cb0b706f02`, following diagnostic commit
+  `36a64900facf2cb14e0f151c90b39b364c254131`.
+
+Final documentation HEAD/tree values belong in the external handoff, not in
+their own commit. SDK Release targets `rexruntime rexgpu-xenos unit_tests` were
+built with the existing Windows AMD64 Release configuration, D3D12 enabled and
+Vulkan disabled. No Fable executable, ABI or generated source changed, so the
+accepted Release `fable2.exe` is staged unchanged.
 
 ## Focused validation
 
 | Check | Result |
 |---|---|
-| SDK affected Release compilation and post-commit dependency check | PASS |
-| Recorder + existing configuration tests | PASS, 17 cases / 119 assertions; 14 metadata, 3 configuration |
-| Independent Python metadata tests | PASS, 10 synthetic tests |
-| Existing NR0B-1 preparation/parser tests | PASS, 6 |
-| Existing GPU-reference tests | PASS, 10 |
-| Existing NR0A tests | PASS, 7 |
-| G1 verifier | PASS, 11 candidates |
-| NR0A verifier with preserved state | PASS, 10 pins / 44 symbols / 70 local links / 19 immutable links |
+| SDK Release `rexruntime rexgpu-xenos unit_tests` | PASS |
+| SDK `[gpu-metadata],[gpu-config]` tests | PASS, 25 cases / 186 assertions |
+| Independent Fable metadata/config/NR0A/GPU tests | PASS, 37 tests |
+| Durable local replay after delayed polling | PASS, READY -> STARTED -> STOPPED |
+| Preserved session 002 v1 parse and exact v2 projection | PASS |
+| Fresh session 003 preparation and preflight | PASS |
+| NR0A preserved-state verifier and G1 candidate verifier | PASS, 10 pins / 44 symbols / 70 local links / 19 immutable links; 11 candidates |
 | Default GPU-reference verifier | PASS, 0 warnings |
-| Strict historical artifact verifier | 7 known failures, 0 warnings; exact comparison below |
-| Python compilation / PowerShell AST | PASS; actual GUI launch remains user-run validation |
-| Fresh-session preflight, protected inputs, baseline and unrelated edit preservation | PASS |
-| New document links and git diff --check | Checked at final prepared closeout |
+| Strict historical GPU-reference verifier | Expected seven retained failures, 0 warnings; no new failure |
 
-Tests cover default-off allocation, wrong PID and repeated trigger, exact
-deadline/record/byte/decision ceilings, terminal reservation and invalid record
-failure, initial partial/complete swaps, outcomes, carry-in definitions,
-one-to-many operations, missing/duplicate/invalid references, partial execution/
-submission/completion, cancellation, writer failure, shutdown, output/session
-reuse refusal and continued healthy host execution. The real worker expired
-with **no subsequent producer event** and flushed a 512-byte synthetic capture.
-Independent Python accepted it as zero complete intervals. It also accepted
-the C++-written 8192-byte synthetic ordinary-work fixture as one complete
-interval, with joined native invocation/submission/completion. Neither fixture
-is Fable rendering or visual-equivalence evidence.
+The dense C++ fixture preserves 2,350 decisions, one-to-many host/native
+relationships and one complete consumer interval. Its v1-equivalent pattern is
+101,051 events; v2 writes 26,816 events plus framing, 6,865,408 bytes, a
+**73.463%** event reduction. Its v1-equivalent event demand exceeds session
+002's 99,998-event capacity while the v2 result fits the unchanged limits. This
+is a synthetic capacity and semantic test, not evidence of a Fable frame or
+runtime duration.
 
-One final synthetic sample measured disabled `Emit` at 1.1853 ns/call over
-1,000,000 calls and enabled `Emit` at 46.2 ns/call over 10,000 calls (2,560,512
-output bytes). These are recorder-call microbenchmarks, not default-off frame
-cost or gameplay overhead. Source inspection finds pointer guards at consumer
-sites, one recorder-state check when enabled, no allocation/thread/output when
-disabled, and no new hash/analysis/I/O/wait on hot paths. State decoding and
-extra memory traffic are outside the append timing. No negligible-overhead
-claim is made; disturbance remains unmeasured in gameplay.
+Focused tests also cover default-off operation, READY after successful shortcut
+registration, READY-before-STARTED, accepted/rejected/repeated triggers, a
+capture shorter than 250 ms, polling delayed by 300 ms, deadline without later
+GPU events, exact record/byte/decision bounds, terminal reservation,
+definition-before-use, equality reuse, conflicting values under a forced hash
+collision, dictionary exhaustion, no eviction, carry-in, partial/complete
+intervals, open decisions/submissions, one-to-many operations, cancellation,
+writer failure, shutdown, cue dispatch mapping and reused-root refusal.
 
-## Strict historical limitations
+The final synthetic call measurement reported disabled `Emit` at 1.1864
+ns/call and enabled `Emit` at 51.81 ns/call, writing 2,560,512 bytes. It excludes
+state decoding, rendering, serialization and scheduling and does not establish
+gameplay overhead or negligible disturbance.
 
-The actual strict output has exactly the same seven limitations retained by
-NR0B-1: missing `fable2-run-047.1.log`, `fable2-run-047.log`,
-`fable2-run-048.log`; historical baseline EXE comparison; historical GPU artifact
-comparison; repeated G1.6A and G1.6B GPU comparisons. Current baseline hashes
-remain EXE `1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9`
+## Fresh prepared session
+
+Session:
+`C:\Dev\Fable2Recomp\out\nr0b2\sessions\nr0b2-oakfield-20260911-003`.
+Preparation JSON SHA-256:
+`0A3B7FE11E5B0DFB367610A04D54C9A6257CA7FA8034084E52D86D3DE74380CC`.
+The session has no launch claim and no capture directory. Session outputs and
+the new checkpoint are ignored by Git.
+
+The source is the authoritative protected NR0B-1 checkpoint
+`out\nr0b1\checkpoints\nr0b1-oakfield-20260910-001\user-data`. The new protected
+and writable copies match all 14 relative paths, sizes and hashes. Main save:
+415,039 bytes,
+`13FC340F6869DA73CB958BA36CB50905E29B8FBEA073CEFF46490DB4A9812489`.
+The copied shader cache is documented; driver-cache state remains unknown.
+
+| Staged file under session `runtime` | Bytes | SHA-256 |
+|---|---:|---|
+| fable2.exe | 105042944 | `1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9` |
+| rexruntime.dll | 10380288 | `1CEB686A2D9C704491D45C47DA34701E00CA649AE6177C7E1171C980F1EF56D7` |
+| rexgpu-xenos.dll | 2880512 | `C0A38DA1E535669FFC61543A2E6338A8B9D9FC20BBC1CF7D337C8D1A6E477771` |
+| TracyClient.dll (optional staged file) | 232960 | `FDBE7A329E1B06A86FE61A2C5BE6B335F32F9BBCA7E05F7B183A35C515D2D1A5` |
+
+`llvm-readobj --coff-imports` inspected the staged EXE, runtime and corrected
+GPU plugin. None imports Tracy, so the same three modules remain required and
+Tracy stays optional for these binaries. The ignored import report SHA-256 is
+`8AF925A9FA83B6EBDD6BE6A6D9124251502B92956DC0B88142DA5C1E5CD943CD`.
+
+The baseline remains EXE
+`1642ED03BD8B117A8FED6E9FF912AD49CBF0E91A4E1D226B20C266925E3FF2C9`,
+runtime `71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793`
 and GPU `70492C8612DEF79C9E3946817F424111FAB2155A3BE63CEA6E717CA73893ADC5`.
-No new provenance failure is accepted as an exception; no logs/hashes/checks
-were replaced or weakened.
+The staged correction is separate and does not replace those files. No
+exe-adjacent configuration exists. The requested run retains Xenos/D3D12, RTV,
+bindless, tiled shared memory and scale 1x; effective runtime confirmation awaits
+the actual process.
 
-`out/nr0b2/gpu-default.log` SHA-256:
-`F368075FF5E8B8616DC5F5608BBFE013604BCD603B386D129BE667DFCBBB49E0`.
-`out/nr0b2/gpu-strict.log` SHA-256:
-`CB02FB2F5A3B95B660E3A8233A85E60991BCCB631EF0EFA09AB6A0B8A4032750`.
+Session 002, its capture hash
+`9BA5105BBE877B78A7DA47F13D412D6037050595D1D645F08854EC53CCCF5BD9`,
+its launch claim and reports remain unchanged. The unused session 001 also
+remains untouched.
+
+The final strict historical verifier retained exactly the same seven documented
+failures and zero warnings: absent `fable2-run-047.1.log`,
+`fable2-run-047.log`, `fable2-run-048.log`; historical baseline EXE and GPU
+hash comparisons; and the G1.6A and G1.6B active-GPU comparisons. There was no
+new provenance failure. No historical hash or missing log was replaced.

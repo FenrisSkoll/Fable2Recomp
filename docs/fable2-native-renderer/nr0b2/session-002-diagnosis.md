@@ -151,7 +151,7 @@ These are metadata-equality counts, not resource lifetimes or proof that any
 particular dictionary would capture a whole future interval. No candidate is
 selected from the incomplete interval.
 
-## Relationship and smallest proposed correction
+## Relationship and correction disposition
 
 Capacity exhaustion and late **ARMED visibility** are independently assessed;
 no causal connection is established. Capacity exhaustion does make the missing
@@ -159,7 +159,7 @@ no causal connection is established. Capacity exhaustion does make the missing
 helper polling interval. Waiting longer or changing the analyzer cannot recover
 the absent interval.
 
-Proposed work only, requiring a subsequent implementation task:
+The diagnosis proposed the following bounded correction:
 
 1. Give the control worker a distinct documented READY cue after successful
    registration, distinct STARTED and STOPPED cues, and preserve a fixed bounded
@@ -184,14 +184,22 @@ Proposed work only, requiring a subsequent implementation task:
    tests directly call Trigger and do not prove console delivery or real
    notification usability; rerunning them cannot settle the visibility gap.
 
-A **fresh, separately authorized user-operated capture is necessary** after
-correction and focused validation to obtain a complete interval. Neither a
-successful compact synthetic fixture nor these partial records proves it will
-fit. Keep session 002 and the unused session 001 intact; do not reuse either.
+A **fresh user-operated capture is necessary** after correction and focused
+validation to obtain a complete interval. Neither a successful compact synthetic
+fixture nor these partial records proves it will fit. Keep session 002 and the
+unused session 001 intact; do not reuse either.
 
 Only read-only parsing, source review and post-run preservation/configuration
 checks were executed for this diagnosis. No historical results were edited.
 ReXGlue remains the sole renderer. No renderer replacement, payload capture,
 G2A restoration, source-save or baseline change, manifest/generated-source edit,
 merge or push occurred. Unrelated manifest whitespace and libmspack changes
-remain preserved. Stop here; proposed corrections have not been implemented.
+remain preserved.
+
+Correction status, 2026-09-11: the bounded dictionary/bundle representation,
+durable READY/STARTED/final transition history, distinct cues and delayed-poll
+replay described above are implemented and synthetically validated. Fresh
+session 003 is prepared and unlaunched. See
+[implementation and validation](implementation-and-validation.md) and the
+[new run card](user-run-card.md). This forward status does not change any
+session 002 fact, hash, report or incomplete result.

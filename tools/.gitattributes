@@ -1,4 +1,5 @@
 # Phase 2D only; inherited file attributes remain unchanged.
+/.gitattributes text eol=lf
 /Fable2PrototypeReview.py text eol=lf
 /Fable2PrototypeReviewDecision.py text eol=lf
 /VerifyFable2PrototypeReview.py text eol=lf

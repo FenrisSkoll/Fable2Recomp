@@ -102,7 +102,9 @@ def tests(check=False):
         print(stream.getvalue())
     r.require(result.wasSuccessful() and not result.skipped, 'Complete discovery failed or skipped tests')
     r.write(r.OUT / 'test-results.json', r.envelope('tests', records=[{'id': x, 'status': 'pass'} for x in ids],
-        tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped)), check)
+        tests_run=result.testsRun, failures=len(result.failures), errors=len(result.errors), skipped=len(result.skipped),
+        test_implementation=[r.identity(p.relative_to(r.ROOT)) for p in sorted((r.ROOT / 'tests').rglob('*.py'))],
+        runner_implementation=r.identity(Path('tools/VerifyFable2PrototypeReview.py'))), check)
     print('PASS full discovery:', result.testsRun, 'tests; zero failures, errors or skips', flush=True)
 
 
@@ -140,7 +142,7 @@ def relative_evidence_paths(value):
     if isinstance(value, dict):
         for key, child in value.items():
             if key in ('path', 'source') and isinstance(child, str):
-                r.require(not Path(child).is_absolute() and not re.match(r'^[A-Za-z]:[\\/]', child) and '..' not in Path(child).parts,
+                r.require(not Path(child).anchor and not child.startswith(('/', '\\')) and not re.match(r'^[A-Za-z]:', child) and '..' not in Path(child).parts,
                           'Non-relative evidence path: ' + child)
             relative_evidence_paths(child)
     elif isinstance(value, list):
@@ -181,6 +183,9 @@ def verify_consistency():
 
 
 def report_text(summary, artifacts, checks_doc):
+    test_receipt = r.read(r.OUT / 'test-results.json')
+    replay_receipt = r.read(r.OUT / 'replay-results.json')
+    schema_receipt = r.read(r.OUT / 'schema-results.json')
     lines = ['# Phase 2D independent mapping review and adoption readiness', '',
         'All decisions remain pending. This dossier is non-canonical and does not authorize adoption, naming, scripts, assets, manifests or runtime changes.', '',
         '## Starting state and preservation', '',
@@ -214,6 +219,7 @@ def report_text(summary, artifacts, checks_doc):
     lines += [f"| {b['id']} | {b['mapping_count']} | {b['resulting_simulated_count_if_prior_batches_approved']} |" for b in summary['batches']]
     lines += ['', f"All {summary['pending_decisions']} decision rows remain pending. Batch IDs, addresses, exact proposal-set hashes, reservations and intersections are provided in the decision ledger and readable review guide. Empty batches are explicit and cannot authorize mappings.", '',
         '## Verification and inherited blockers', '',
+        f"Complete supported discovery: {test_receipt['tests_run']} tests, zero failures, errors or skips. Read-only domain checks: {len(checks_doc['records'])} passed. Deterministic replay: {len(replay_receipt['records'])} stages passed. Local schemas: {len(schema_receipt['records'][0]['documents'])} Phase 2D documents and {sum(checks_doc['baseline_schema_documents'].values())} earlier-phase documents passed. Injectivity, suppression precedence, dependency consistency, relative/output paths, explicit Git-delta allowlist and SDK preservation pass; all fifteen libmspack files remain bound.", '',
         'The exact executed commands and domain results are in verification-results.json; complete test IDs are in test-results.json. Phase 2C verify-summary passed on the starting branch. At close-out its bytes, original terminal invariants and mapping freeze are checked without weakening branch guards or invoking closed writers. The Phase 2B generator remains branch-restricted. Historical ownership replay remains blocked; existing current ownership/coverage/indirect validations are separate passing checks.', '',
         '```json', json.dumps(summary['inherited_blockers'], indent=2, sort_keys=True), '```', '',
         'Required historical input remains `generated/default/fable2_recomp.136.cpp`, SHA-256 `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59`; current SHA-256 remains `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`. It was not searched for, reconstructed, replaced or regenerated.', '',
@@ -271,6 +277,8 @@ def finalize(check=False):
     review_guide(check)
     checks_doc = r.read(r.OUT / 'verification-results.json')
     tests_doc = r.read(r.OUT / 'test-results.json')
+    for row in tests_doc['test_implementation'] + [tests_doc['runner_implementation']]:
+        r.check_identity(r.ROOT, row)
     replay = r.read(r.OUT / 'replay-results.json')
     r.require(all(x['status'] == 'pass' for x in replay['records']), 'Replay incomplete')
     schema_paths = {p.relative_to(r.ROOT).as_posix() for root in (r.DOC / 'evidence', r.OUT) for p in (r.ROOT / root).rglob('*.json')}

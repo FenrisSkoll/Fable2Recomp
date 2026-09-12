@@ -83,14 +83,19 @@ def audit_paths():
     require(git('rev-parse', BASE + '^{tree}') == TREE, 'closed Phase 2B tree mismatch')
     git('merge-base', '--is-ancestor', BASE, 'HEAD')
     allowed = {'tools/Fable2PrototypeTrust.py', 'tests/test_fable2_prototype_trust.py',
-               'tools/schemas/fable2-prototype-trust-v1.schema.json', 'tools/Verify-Fable2PrototypeTrust.ps1', '.gitattributes'}
+               'tools/schemas/fable2-prototype-trust-v1.schema.json', 'tools/Verify-Fable2PrototypeTrust.ps1', '.gitattributes',
+               'tools/Fable2PrototypeCompletion.py', 'tests/test_fable2_prototype_completion.py',
+               'tools/schemas/fable2-prototype-completion-v1.schema.json'}
     expected_attributes = git('show', BASE + ':.gitattributes').splitlines() + [
         '', '# Phase 2C hashes only its own implementation and evidence bytes.',
         '/docs/fable2-prototype-archaeology/phase2c/** text eol=lf',
         '/tools/Fable2PrototypeTrust.py text eol=lf',
         '/tools/Verify-Fable2PrototypeTrust.ps1 text eol=lf',
         '/tools/schemas/fable2-prototype-trust-v1.schema.json text eol=lf',
-        '/tests/test_fable2_prototype_trust.py text eol=lf']
+        '/tests/test_fable2_prototype_trust.py text eol=lf',
+        '/tools/Fable2PrototypeCompletion.py text eol=lf',
+        '/tests/test_fable2_prototype_completion.py text eol=lf',
+        '/tools/schemas/fable2-prototype-completion-v1.schema.json text eol=lf']
     require((ROOT / '.gitattributes').read_text().splitlines() == expected_attributes,
             'attributes delta extends beyond exact Phase 2C LF rules')
     paths = set(git('diff', '--name-only', BASE).splitlines())
@@ -726,8 +731,8 @@ def freeze_stage(images, pairs, check=False):
     return effective['counts']
 
 
-def verified_freeze():
-    frozen = read(OUT / 'mapping-freeze.json')
+def verified_freeze(mapping_root=None):
+    frozen = read((mapping_root or OUT) / 'mapping-freeze.json')
     for row in frozen['artifacts']:
         p = ROOT / row['path']
         require(p.stat().st_size == row['size'] and old.sha256_file(p) == row['sha256'], f'frozen mapping bytes changed: {row["path"]}')
@@ -751,11 +756,13 @@ def extra_inputs():
     return pins['sources']
 
 
-def semantic_stage(images):
-    verified_freeze()
-    effective = read(OUT / 'effective-map.json')
+def semantic_stage(images, mapping_root=None):
+    mapping_root = mapping_root or OUT
+    frozen = verified_freeze(mapping_root)
+    consumer_paths = frozen.get('consumer_paths', {})
+    effective = read(Path(consumer_paths.get('effective_map', (mapping_root / 'effective-map.json').as_posix())))
     primary = {r['donor_start']: r for r in effective['records']}
-    september_doc = read(OUT / 'september-pairs.json')
+    september_doc = read(Path(consumer_paths.get('september', (mapping_root / 'september-pairs.json').as_posix())))
     september = {r['donor_start']: r for r in september_doc['trust_dispositions'] if r['disposition'].startswith('retained-')}
     prior = read(semantic.OUT / 'semantic-index.json')['records']
     anchors = {r['id']: r for r in read(semantic.OUT / 'semantic-inventory.json')['anchors']}
@@ -810,8 +817,8 @@ def semantic_stage(images):
                         'semantic_role': 'Literal passed in corresponding argument to a trusted corresponding callee.' if support else None,
                         'proposed_name': None, 'canonical_adoption': False})
     require(len(records) == 51657 and len({r['prior_record_id'] for r in records}) == len(records), 'semantic terminal reconciliation failed')
-    verified_freeze()
-    return envelope('semantic-v2', mapping_freeze_sha256=old.sha256_file(ROOT / OUT / 'mapping-freeze.json'), records=records,
+    verified_freeze(mapping_root)
+    return envelope('semantic-v2', mapping_freeze_sha256=old.sha256_file(ROOT / mapping_root / 'mapping-freeze.json'), records=records,
                     counts={'records': len(records), 'statuses': dict(sorted(collections.Counter(r['status'] for r in records).items())),
                             'newly_joined': sum(r['target_start'] is not None and not r['prior_joined'] for r in records),
                             'september_routed': sum(r['build'] == 'sep-2008' and r['target_start'] is not None for r in records),

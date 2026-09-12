@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype-completion:1",
+  "type": "object",
+  "required": ["schema", "checkpoint_commit", "canonical_adoption"],
+  "properties": {
+    "schema": {"type":"object","required":["name","version"],"additionalProperties":false,"properties":{
+      "name":{"enum":["fable2-prototype-completion-matrix","fable2-prototype-completion-profiles","fable2-prototype-completion-ablation","fable2-prototype-completion-boundaries","fable2-prototype-completion-typed","fable2-prototype-completion-ownership","fable2-prototype-completion-freeze","fable2-prototype-completion-recon","fable2-prototype-completion-fixtures","fable2-prototype-completion-tests","fable2-prototype-completion-review","fable2-prototype-completion-validation","fable2-prototype-completion-verification"]},"version":{"const":1}}},
+    "checkpoint_commit":{"const":"e784beeab1a372cc3f71e2cd1af2dfa18b58f321"},
+    "canonical_adoption":{"const":false},
+    "records":{"type":"array","items":{"type":"object"}},
+    "counts":{"type":"object"}
+  },
+  "allOf":[
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-matrix"}}}}},"then":{
+      "required":["records","counts","phase_complete"],"properties":{"records":{"minItems":187,"items":{"required":["id","requirement","mandatory","status","code","evidence","schema","tests","verifiers","report_section","reason"],"properties":{"status":{"enum":["complete","incomplete","blocked-with-evidence","not-applicable-with-proof"]}}}}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-profiles"}}}}},"then":{"required":["builds","source_pins_sha256","algorithm_sha256"]}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-ablation"}}}}},"then":{
+      "required":["proposal_packets","closed_records","counts","profile_sha256","absent_classes","policy"],"properties":{
+        "proposal_packets":{"type":"array","minItems":803,"maxItems":803,"items":{"required":["id","original_grade","donor","target","generation","instruction_differences","baseline","counterfactuals","minimal_independent_support_sets","single_point_dependencies","human_review_state"],"properties":{"counterfactuals":{"type":"array","minItems":11,"maxItems":11},"human_review_state":{"const":"not-human-reviewed"}}}},
+        "closed_records":{"type":"array","minItems":99,"maxItems":99,"items":{"required":["audit_id","original_record_sha256","baseline_disposition","counterfactuals","anchors","contradictions"]}}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-boundaries"}}}}},"then":{
+      "required":["records","counts","populations","exact_window_policy","strong_probable_boundary_disagreements"],"properties":{"records":{"minItems":748,"maxItems":748,"items":{"required":["id","relation","semantic_transport","reason"],"properties":{"relation":{"enum":["ordinary-function-pair","split","merge","outline","inline","thunk","tail","shared-body","internal-code-region","unresolved-boundary"]},"semantic_transport":{"const":false}}}}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-typed"}}}}},"then":{
+      "required":["type_contexts","pointer_runs","globals","counts","recognizers"],"properties":{"type_contexts":{"type":"array","minItems":425,"maxItems":425},"pointer_runs":{"type":"array","minItems":4939,"maxItems":4939},"globals":{"type":"array","minItems":2479,"maxItems":2479}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-ownership"}}}}},"then":{"required":["historical_commit","historical_manifest_sha256","phase2b_manifest_sha256","comparisons","differences","current_generated_input","missing_historical_input","reconstruction"]}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-freeze"}}}}},"then":{"required":["artifacts","semantic_feedback_allowed","consumer_paths","no_semantic_result_used_for_acceptance"],"properties":{"semantic_feedback_allowed":{"const":false},"no_semantic_result_used_for_acceptance":{"const":true}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-recon"}}}}},"then":{"required":["registration_shapes","registration_calls","scripts","script_pairs","preservation","sources","counts","blocked_inputs"],"properties":{"registration_shapes":{"type":"array","minItems":206,"maxItems":206},"registration_calls":{"type":"array","minItems":2662,"maxItems":2662},"scripts":{"type":"array","minItems":160,"maxItems":160},"script_pairs":{"type":"array","minItems":54,"maxItems":54},"preservation":{"type":"array","minItems":200,"maxItems":200}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-fixtures"}}}}},"then":{"required":["records","category_count","sources"],"properties":{"category_count":{"const":39},"records":{"minItems":39,"maxItems":39}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-tests"}}}}},"then":{"required":["tests","run","failures","errors","skipped","fixture_categories","all_required_fixture_methods_executed"],"properties":{"failures":{"const":0},"errors":{"const":0},"fixture_categories":{"const":39},"all_required_fixture_methods_executed":{"const":true}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-review"}}}}},"then":{"required":["records","availability","all_strong_included","human_approval"],"properties":{"all_strong_included":{"const":true},"human_approval":{"const":false}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-validation"}}}}},"then":{"required":["artifacts","implementation","counts","report","phase_complete","remaining_blockers","matrix"]}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-verification"}}}}},"then":{"required":["checks","closed_unchanged","sdk_preserved"]}}
+  ]
+}

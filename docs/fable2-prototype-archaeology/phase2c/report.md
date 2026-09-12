@@ -1,26 +1,103 @@
-# Phase 2C static archaeology checkpoint
+# Phase 2C bounded completion pass
 
-**Phase 2C is not complete.** This is a reproducible provisional evidence layer; no canonical adoption is authorized.
+**Phase 2C remains blocked for an unqualified close-out by a precisely identified historical ownership input.** Independent completion work is implemented, terminally reconciled and replayed. No Phase 2D was started. No mapping or name is canonical.
 
-Build 23 and TU1 remain very closely related, but are not byte-identical semantic layouts. One semantic collision does not invalidate all 15,299 Phase 2A mappings. Phase 2A exact-image precision was a control result, not measured cross-build precision.
+Build 23 and TU1 are extremely close relatives but are not byte-identical semantic layouts. The three discovered semantic collisions do not invalidate the whole map. Phase 2A exact-image precision was a control result, not measured cross-build precision.
 
-The bounded audit retains 15296 closed pairs and suppresses 3. The provisional effective view adds 86 policy-strong proposals, giving 15382 pairs (delta +83).
+## Trust and ablation
 
-A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-human-reviewed` state. It is not an accepted Phase 2A mapping or a source-lineage claim.
+All 15,299 mappings have dispositions: 15,296 retained, three suppressed, zero unresolved audit rows. Of 97 data-anchor-supported pairs, 96 retain independently reproduced support and one loses trust without its partial window. The 113 windows comprise nine full-string matches, 103 bounded non-string windows and one same-address/full-string collision; one pair has an interior pointer. A bounded window cannot prove object identity.
 
-## Exact reconciled counts
+Post-ablation arithmetic: **15,299 - 3 + 86 = 15,382**, a proposed increase of 83 over Phase 2A and no change from the provisional effective count. All 86 strong and 715 probable proposals retain their grades; both same-name physics pairs remain candidates. Every strong entry has an evidence packet and a second machine-policy cross-check, not human approval.
+
+Ablation covers 803 proposal packets and 99 closed records (97 data-anchor records and the other two suppressions), each across 11 removal classes. Each strong proposal loses transport eligibility without canonicalization, boundary/size, CFG/branch or reference-role gates. Callee and import/helper removal each affect the same 85 proposals; these are overlapping obligations, not independent votes. Internal-region support is a single-point dependency for HammerCombat. Caller, neighbourhood, September and same-generation removal alone downgrade zero strong proposals. All actual additions are generation 1 from retained external seeds. No literal is counted both as normalization and corroboration.
+
+## Suppressions
+
+- `0x82631A30 -> 0x82950A98`: Navigator versus Controlled (`T-03503`).
+- `0x828EA448 -> 0x82681198`: TROLL_FOOTSTEP versus DESTROY_ENTITY (`T-05080`).
+- `0x83062950 -> 0x83060C30`: __vspltb versus __vcfsx (`T-13251`).
+
+Suppression bars semantic transport; it does not disprove generic code reuse or rewrite the original accepted record.
+
+## Known-case dispositions
+
+```json
+[
+  {
+    "donor": "0x8229B488",
+    "target": "0x8229B1B8",
+    "grade": "reviewed-strong-proposal",
+    "generation": 1
+  },
+  {
+    "donor": "0x82631A30",
+    "target": "0x82630C30",
+    "grade": "candidate",
+    "generation": 1
+  },
+  {
+    "donor": "0x829506B0",
+    "target": "0x82950A98",
+    "grade": "candidate",
+    "generation": 1
+  }
+]
+```
+
+All four physics wrappers are exact 0x3C .pdata intervals. The donor Navigator wrapper is [0x82631A30,0x82631A6C), TU1 Navigator [0x82630C30,0x82630C6C), donor Controlled [0x829506B0,0x829506EC), TU1 Controlled [0x82950A98,0x82950AD4). Their r4 literal role and r5=-1 agree; this alone is insufficient independent correspondence support.
+
+HammerCombat: exact caller [0x8229B308,0x8229B484) -> [0x8229B038,0x8229B1B4). The 0x7C callee compares string-like content and returns inequality. The caller passes object offset +8, returns zero when equal to HammerCombat, and otherwise evaluates remaining field-dependent logic. This is an exclusion-guard context, not a function named HammerCombat.
+
+The comparator regions [0x8226DB80,0x8226DBD4) and [0x8226D7F8,0x8226D84C) have 21 reachable instructions and identical bytes. Neither has .pdata ownership or an independent .pdata entry. They remain internal code regions.
+
+## Boundary and typed populations
+
+All 713 primary contexts (including the prior 51 shared windows, 662 unresolved contexts and both unmatched donors), 33 September cases and two comparator regions have terminal records. Whole-body aligned-window search with reciprocal uniqueness, maximal owner-bounded extension and external control-flow checks yields 480 shared-body evidence records, 266 unresolved-boundary records and two internal-code-region records. Split, merge, outline, inline, thunk and tail recoveries are zero; synthetic positive and adversarial controls distinguish each class. Shared-body here means a bounded exact fragment, not source-lineage confirmation. No boundary relation independently transports semantics.
+
+Neither unmatched donor `[0x826E3720,0x826E3B34)` nor `[0x82BAD3B8,0x82BAE038)` is explained at function level. No strong/probable proposal has a boundary-size disagreement.
+
+All 425 type contexts remain insufficient to name constructors. All 4,939 executable-pointer runs lack a proven complete typed object boundary; none is promoted to a vtable. Of 2,479 global contexts, 102 have incompatible object/access evidence and 2,377 lack proven boundaries. Zero complete globals are proposed. Rows bind section/alignment, slots or access roles, readers/writers where proven, cross-build targets and alternate jump-table/callback/import/mixed-data interpretations. Descriptor layout, vptr writers and complete object extent are missing evidence, not inferred facts.
+
+## Registration scripts and preservation
+
+CONFIRMED: build-23 callsite 0x82484E58 passes SetUseFreeCamera at 0x820BA1FC in r4 and callback 0x82482298 in r5 to 0x82309378. The helper constructs a four-byte callback payload and adapter closure, then supplies the name to a key consumer. This is an interprocedural runtime layout, which the old adjacent-pointer recognizer did not cover.
+
+The callback [0x82482298,0x824822A4) stores the low byte of r3 at 0x83496BE9 and returns. It has no .pdata owner. The narrow constructor recognizer retains every callee, adapter and state/namespace obligation; it does not establish callable TU1 commands. Full evidence is in registration.json.
+
+## Unfiltered TU1-corroborated contexts
+
+- `S-12BC57D54F752C90D2876FE7`: `Virtual filesystem can not be null` — corresponding literal argument and trusted callee at TU1 `0x82C02CD0`. This is a contextual role, not a function name.
+- `S-2446137A06BE22408008696B`: `Invalid table index` — corresponding literal argument and trusted callee at TU1 `0x82BC3FA8`. This is a contextual role, not a function name.
+- `S-6F63464AA6C04DC23857B40D`: `MaxComboAnimationSpeedMultiplier` — corresponding literal argument and trusted callee at TU1 `0x82763A30`. This is a contextual role, not a function name.
+- `S-FCEF3DCAA6D1D5FB2EF8AB8F`: `HammerCombat` — corresponding literal argument and trusted callee at TU1 `0x8229B038`. This is a contextual role, not a function name.
+
+All 206 constructor shapes retain explicit obligations. Of 2,662 calls, 2,647 have complete names/callback candidates and 15 do not. Zero TU1 command chains are proven: callback payload construction does not prove native state, namespace lifetime or corresponding TU1 consumers.
+
+All 160 script/interface files are inventoried: 108 supported loose Lua chunks parsed statically, 52 banks/interfaces remain inventory-only. The 54 scripts/scripts_r structural pairs compare bytecode structure and debug information, not semantic identity. Game, runtime, GUI and startup path categories remain separate; native Lua-state ownership is unproven. No supported proprietary bank-entry parser or authenticated retail bank inventory is present.
+
+All 200 preservation candidates have presence, dependency, grade and portability records: 18 dependency-linked native-dependent candidates, 182 presence-only candidates of unknown portability. E3/demo lexical markers and current-runtime absence are not proof of recoverable historical content or retail absence. SetUseFreeCamera is first-party native evidence; community-only Debug.ToggleFreeCam remains non-accepting. No runnable recovery is claimed.
+
+## Reconciled evidence
+
+The frozen semantic pass processes all 51,657 terminals: 118 newly joined versus Phase 2B, 112 filtered corroborations, four unfiltered contextual roles, four target-unconfirmed joins and 51,537 mapping-blocked records. Status totals are exclusive; newly-joined is a comparison count. All 9,600 September pairs are materialized and retained, including 1,847 exact and 7,753 normalized; 9,284 have two-hop function routes, but zero September semantic terminals gain a route. July remains only an implementation control.
+
+The four unfiltered roles are filesystem assertion, table-index diagnostic, combo-animation parameter and HammerCombat exclusion guard. The frozen mapping hashes are checked before and after semantics; no semantic outcome feeds a mapping grade. There are no upgrades or downgrades from the provisional semantic result.
+
+Proposal intersections remain 68 closure, 11 coverage and 85 Ghidra; zero ownership, renderer, indirect or historical-crash proposal intersections. Membership prioritizes review only. The complete effective view intersects 4,781 closure, 2,188 coverage, 12,959 Ghidra, 21 ownership and one renderer records. Historical crash membership is not a claim of an open crash. Exact paths and JSON pointers remain in intersections.json.
+
+The review queue includes all 86 strong proposals and three sorted examples per available lower-grade/subsystem stratum, with explicit available and selected totals and no human approval.
 
 ```json
 {
   "boundary_classes": {
-    "inline": 0,
-    "merge": 0,
-    "outline": 0,
-    "shared-body": 51,
-    "split": 0,
-    "tail": 0,
-    "thunk": 0,
-    "unresolved-boundary": 662
+    "internal-code-region": 2,
+    "shared-body": 480,
+    "unresolved-boundary": 266
+  },
+  "completion_gates": {
+    "blocked-with-evidence": 6,
+    "complete": 181
   },
   "effective_map": {
     "additions": 86,
@@ -28,6 +105,24 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
     "delta": 83,
     "effective": 15382,
     "suppressed_or_review_excluded": 3
+  },
+  "feature_ablation": {
+    "closed_records": 99,
+    "grades": {
+      "candidate": 2,
+      "reviewed-probable-proposal": 715,
+      "reviewed-strong-proposal": 86
+    },
+    "proposal_packets": 803,
+    "single_point_dependencies": {
+      "boundary-code-region": 1,
+      "boundary-size": 86,
+      "callee": 85,
+      "cfg-branch": 86,
+      "field-parameter-return-role": 86,
+      "import-helper-call": 85,
+      "string-data-canonicalization": 86
+    }
   },
   "intersections": {
     "closure": 4781,
@@ -84,6 +179,11 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
     },
     "records": 200
   },
+  "proposal_grade_changes": {
+    "candidate -> candidate": 2,
+    "reviewed-probable-proposal -> reviewed-probable-proposal": 715,
+    "reviewed-strong-proposal -> reviewed-strong-proposal": 86
+  },
   "proposal_intersections": {
     "closure": 68,
     "coverage": 11,
@@ -92,6 +192,20 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
     "indirect": 0,
     "ownership": 0,
     "renderer": 0
+  },
+  "recon_completion": {
+    "preservation": {
+      "dependency-linked-preservation-candidate": 18,
+      "presence-only-dependencies-unresolved": 182
+    },
+    "registration": {
+      "incomplete-name-or-callback": 15,
+      "native-name-callback-state-unresolved": 2647
+    },
+    "scripts": {
+      "bank-or-interface-inventory-only": 52,
+      "parsed-loose-chunk-state-unresolved": 108
+    }
   },
   "reference_candidates": {
     "processed_contexts": 21350,
@@ -168,6 +282,7 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
     "trusted-mapped-caller+trusted-two-sided-exact-delta-neighbourhood": 1
   },
   "strong_proposals_with_multiple_reference_identities": 17,
+  "tests": 248,
   "trust_audit": {
     "anchor_classifications": {
       "full-string-match": 9,
@@ -189,6 +304,18 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
       "accepted-normalized-corroborated": 12520
     }
   },
+  "typed_completion": {
+    "globals": {
+      "rejected-incompatible-object-or-access": 102,
+      "unresolved-object-boundary": 2377
+    },
+    "pointer_runs": {
+      "unresolved-object-boundary": 4939
+    },
+    "types": {
+      "type-context-not-constructor": 425
+    }
+  },
   "types_globals": {
     "global_contexts": 2479,
     "new_global_contexts": 10,
@@ -200,94 +327,37 @@ A `reviewed-strong-proposal` is a machine policy disposition with explicit `not-
 }
 ```
 
-Anchor-classification counts count windows; 97 distinct accepted pairs carry 113 shared windows. Full-string comparison requires terminated content; zero-filled storage is not automatically an empty string. Only a proven byte-read context may tokenize an empty terminator.
+## Fixture coverage
 
-## Suppressions
+All 39 required categories bind named executed tests in completion-matrix.json and fixture-coverage.json. Full discovery runs 248 tests with zero failures, errors or skips. Positive synthetic typed/transformation policies do not assert that a real object or transformation was recovered.
 
-```json
-[
-  {
-    "donor": "0x82631A30",
-    "target": "0x82950A98",
-    "audit_id": "T-03503"
-  },
-  {
-    "donor": "0x828EA448",
-    "target": "0x82681198",
-    "audit_id": "T-05080"
-  },
-  {
-    "donor": "0x83062950",
-    "target": "0x83060C30",
-    "audit_id": "T-13251"
-  }
-]
-```
+## Verification and blockers
 
-The conflicts are Navigator versus Controlled, TROLL_FOOTSTEP versus DESTROY_ENTITY, and __vspltb(%s, %d) versus __vcfsx(%s, %d). Suppression bars semantic transport; it does not conclusively disprove generic code/body reuse.
+Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence; two verification gates refer to the same missing historical input.
 
-## Known-case dispositions
+Historical ownership: the Phase 2B and completion-checkpoint manifests are identical. The original current-input invocation fails `FAIL: stale manifest`. The immutable manifest at `c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml` passes the unchanged input validator when supplied as a read-only Git blob. The human ledger reproduces exactly; JSON differs only in three provenance fields for sub_8279E818. Missing `generated/default/fable2_recomp.136.cpp` SHA-256 `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59` is required for exact historical replay. Current bytes hash to `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`; line references shifted 11964→11977 and 12207→12220. Current ledger/plan semantic validation passes. This is explicitly not an all-green result.
 
-```json
-[
-  {
-    "donor": "0x8229B488",
-    "target": "0x8229B1B8",
-    "grade": "reviewed-strong-proposal",
-    "generation": 1
-  },
-  {
-    "donor": "0x82631A30",
-    "target": "0x82630C30",
-    "grade": "candidate",
-    "generation": 1
-  },
-  {
-    "donor": "0x829506B0",
-    "target": "0x82950A98",
-    "grade": "candidate",
-    "generation": 1
-  }
-]
-```
-
-All four physics wrappers are exact 0x3C .pdata intervals. The donor Navigator wrapper is [0x82631A30,0x82631A6C), TU1 Navigator [0x82630C30,0x82630C6C), donor Controlled [0x829506B0,0x829506EC), TU1 Controlled [0x82950A98,0x82950AD4). Their r4 literal role and r5=-1 agree; this alone is insufficient independent correspondence support.
-
-HammerCombat: exact caller [0x8229B308,0x8229B484) -> [0x8229B038,0x8229B1B4). The 0x7C callee compares string-like content and returns inequality. The caller passes object offset +8, returns zero when equal to HammerCombat, and otherwise evaluates remaining field-dependent logic. This is an exclusion-guard context, not a function named HammerCombat.
-
-The comparator regions [0x8226DB80,0x8226DBD4) and [0x8226D7F8,0x8226D84C) have 21 reachable instructions and identical bytes. Neither has .pdata ownership or an independent .pdata entry. They remain internal code regions.
-
-## Limits and unfinished completion gates
-
-- The transport audit uses bounded instruction recovery. It does not prove complete semantic equivalence of every retained function.
-- Physics same-name pairs remain candidates because the strict matcher has no independent trusted caller/callee or two-sided exact-delta support for them. Their immediate helpers also contain a changed global reference and different call destinations.
-- Boundary reconnaissance retains exact shared windows and all 33 September boundary-review rows, but does not resolve split/merge/outline/inline/thunk/tail lineage. The two unmatched primary functions remain unexplained at function level.
-- One native four-byte callback-payload construction chain is demonstrated. Its narrow recognizer returns 206 shape candidates across three builds, each retaining unverified callee/state obligations. No complete frozen TU1 registration chain or callable command is claimed.
-- RTTI/type names and pointer runs do not prove constructors, vtables or stable global objects. This pass supplies candidates and negative gates, not a complete typed reconstruction.
-- No validated script-bank entry parser or distinct native Lua-state ownership chain was recovered. Loose standard Lua 5.1 chunks were parsed without execution; current-runtime file provenance is separate from authenticated retail-disc provenance.
-- The requested full compiler-transformation recovery, exhaustive feature-ablation audit, broader mapping features, and complete required fixture matrix are not complete. This checkpoint must not be represented as completed Phase 2C.
-
-## Native registration reconnaissance
-
-CONFIRMED: build-23 callsite 0x82484E58 passes SetUseFreeCamera at 0x820BA1FC in r4 and callback 0x82482298 in r5 to 0x82309378. The helper constructs a four-byte callback payload and adapter closure, then supplies the name to a key consumer. This is an interprocedural runtime layout, which the old adjacent-pointer recognizer did not cover.
-
-The callback [0x82482298,0x824822A4) stores the low byte of r3 at 0x83496BE9 and returns. It has no .pdata owner. The narrow constructor recognizer retains every callee, adapter and state/namespace obligation; it does not establish callable TU1 commands. Full evidence is in registration.json.
-
-## Unfiltered TU1-corroborated contexts
-
-- `S-12BC57D54F752C90D2876FE7`: `Virtual filesystem can not be null` — corresponding literal argument and trusted callee at TU1 `0x82C02CD0`. This is a contextual role, not a function name.
-- `S-2446137A06BE22408008696B`: `Invalid table index` — corresponding literal argument and trusted callee at TU1 `0x82BC3FA8`. This is a contextual role, not a function name.
-- `S-6F63464AA6C04DC23857B40D`: `MaxComboAnimationSpeedMultiplier` — corresponding literal argument and trusted callee at TU1 `0x82763A30`. This is a contextual role, not a function name.
-- `S-FCEF3DCAA6D1D5FB2EF8AB8F`: `HammerCombat` — corresponding literal argument and trusted callee at TU1 `0x8229B038`. This is a contextual role, not a function name.
-
-The historical ownership reconstruction fails with `FAIL: stale manifest`; the old plan is preserved. Current ledger/plan validation is separate. See verification.md for exact inputs and results.
-
+Neither game was executed. No build, codegen, runtime, renderer, manifest, generated-code, canonical naming, binary, asset, SDK or network operation occurred. Only local Phase 2C analysis/documentation commits were made. The SDK branch, HEAD, tree, remotes, status and fifteen libmspack file hashes remain bound to source-pins.json.
 
 ## Exact artifact bytes
 
-| Path | Bytes | SHA-256 |
+| Repository-relative path | Bytes | SHA-256 |
 | --- | ---: | --- |
 | `out/prototype-archaeology/phase2c/boundaries.json` | 636862 | `4BFF685E8BED00E6412CC1E62A3E634C34BCA4EACE1544112F8239A03358B257` |
+| `out/prototype-archaeology/phase2c/completion/boundary-completion.json` | 10347988 | `2794EC8429DE384C9CEEFFD3384DCAEEACB612A3B49478E771910912C83D080E` |
+| `out/prototype-archaeology/phase2c/completion/candidate-profiles.json` | 93094037 | `3339A4FF7417F9E6945505BA504CFEC51E2C1ECDFA3CDBFE2DDC49DA7438BB94` |
+| `out/prototype-archaeology/phase2c/completion/completion-review.json` | 31600 | `5CCFDF91752F598004E75F3D0943DEE7BDB0CD9D87F20A9B8E7DB42FB0AB5EB7` |
+| `out/prototype-archaeology/phase2c/completion/effective-map.json` | 3689275 | `9D0A494C3555ECFCA1C8B1DCA973C620E0CAAAEC5AE811BFA82BA3BCC3116A51` |
+| `out/prototype-archaeology/phase2c/completion/feature-ablation.json` | 16256090 | `6B1766C142223540DC6CCE8B41D3BD9ABDE244508BF216D3FF6C78373645707E` |
+| `out/prototype-archaeology/phase2c/completion/fixture-coverage.json` | 17565 | `9B3DEEAC1A032552304052EE7CD728C723532410D6AC504C3AD2BE6C6C73D6D2` |
+| `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` | 1736 | `A585287633AACAAEE0C4A7888A1D81C243256D2DDCE7185D4A9C1D5C8236E217` |
+| `out/prototype-archaeology/phase2c/completion/ownership-verification.json` | 2900 | `86FBFC0A7252E04330A4C963152FBF73E9441D5636EFF057CCD8881EAF00B035` |
+| `out/prototype-archaeology/phase2c/completion/recon-completion.json` | 1878710 | `A864F7ED421B138EB7AE393BF411F23515D5E67242868EA13A5449AEF7A99BE2` |
+| `out/prototype-archaeology/phase2c/completion/replay-results.json` | 6783 | `176AAD3B18D310F5646C201204A600BF849C3D57F8C327000AB851B6579A31BA` |
+| `out/prototype-archaeology/phase2c/completion/semantic-final.json` | 23348436 | `A831F0477F0134350D788335AABCD49EF7D3F07F9F98A47503246D182E0705C1` |
+| `out/prototype-archaeology/phase2c/completion/test-results.json` | 24559 | `A72ABEAB15CBD19B6E3BBB1385C08CBD30118C13FDDD7DE9639F1161CEC38FEE` |
+| `out/prototype-archaeology/phase2c/completion/typed-completion.json` | 14193346 | `0E7EA4BE0205A2D5AD7F872300D3DCC48C7152CB6FA7C0E2D0F5B799098137A8` |
+| `out/prototype-archaeology/phase2c/completion/verification-results.json` | 3069 | `35ECAE26425E0F6F83B267418B7D367DE8C832CEDB5A6154A3F22CFC34C37070` |
 | `out/prototype-archaeology/phase2c/effective-map.json` | 3657026 | `0C801C9AC0DB10FDA1FC9A36A9D88488C1200311F1597CCFA749910E3A9BAD00` |
 | `out/prototype-archaeology/phase2c/intersections.json` | 6262669 | `CACB81039B9B7D096E81A64FAEDEC7D245561D24967924F9848D62678C1FAD5C` |
 | `out/prototype-archaeology/phase2c/known-cases.json` | 47797 | `F3A09E42401BCA65A5064526A37D4C5526B31C07032DBF212CAEA17377F43CD0` |
@@ -301,7 +371,6 @@ The historical ownership reconstruction fails with `FAIL: stale manifest`; the o
 | `out/prototype-archaeology/phase2c/september-pairs.json` | 94890858 | `C3ED4ACA5613487F2DC3BF28D19B147801AAA8F4FB9ECEB17613399A48074186` |
 | `out/prototype-archaeology/phase2c/trust-audit.json` | 11230700 | `C21DD1BA0C4D4EB6701657A709D0891D44B761DDAB220143142ACFB1ED3242B0` |
 | `out/prototype-archaeology/phase2c/types-globals.json` | 4376285 | `7D5D346B07A5AE6F679B8C59926CE23E0FE7F1CD6A740D94BEF4485B94CCEB53` |
-
-Closed phases and SDK inputs are rehashed before every analysis command. The mapping freeze is checked before and after semantic analysis. All analytical outputs omit the clock and current HEAD. Exact commands are in README.md.
-
-Neither game was executed. No build, codegen, runtime, renderer, manifest, generated-code, canonical naming, binary modification, push, fetch, pull, merge, tag, PR, upload or release operation was performed.
+| `docs/fable2-prototype-archaeology/phase2c/evidence/source-pins.json` | 319155 | `A6EBB465A081C8D03B7FCE7E0F743738413D0D77BC33A211828B9211BFA3733B` |
+| `docs/fable2-prototype-archaeology/phase2c/evidence/semantic-extra-source-pins.json` | 9116 | `86EC76731EE097BB32B48F2AB8E302E002B514EA24D5761C64589C684141C7D0` |
+| `docs/fable2-prototype-archaeology/phase2c/evidence/completion-matrix.json` | 351925 | `5D9BAAC31131E49C1AF8FB366E94EB2B6BFAC3A6EFEA2F3C51DFA560F760E40F` |

@@ -39,3 +39,21 @@ Registration disassembly is bounded to explicit ends, and absence of proof in
 that slice is not a claim of absence in the binary. Pointer runs are not proven
 vtables. Current-runtime startup scripts are separately pinned and their path
 category does not establish a runtime Lua state or a callable TU1 feature.
+
+For completion, start with `completion/completion-review.json`: every retained
+strong proposal is selected, alongside stratified lower-grade and intersection
+examples. Follow its packet into `completion/feature-ablation.json`. Compare
+exact boundaries and instruction offsets, competing and reciprocal candidates,
+reference tokens, external seed dependencies, behavior summaries, eleven
+counterfactuals and minimal support alternatives. Machine selection is not human
+approval. A mandatory-gate dependency is not an independent corroborating vote.
+
+Use `completion/boundary-completion.json` and `completion/typed-completion.json`
+for per-record negative reasons and alternate explanations. Do not turn exact
+fragments into invented functions, pointer runs into vtables, or type references
+into constructor names. Consult completion-matrix.json for all 187 requirement
+bindings and all 39 fixture categories, including exact evidenced blockers.
+
+`completion/ownership-verification.json` separates unchanged current validators
+from blocked historical byte replay. Resolve the specified missing input before
+an all-green close-out; do not modify the manifest or regenerate code.

@@ -1,56 +1,55 @@
-# Provisional Phase 2C verification
+# Phase 2C completion verification
 
-This is a checkpoint verification record, not a completed Phase 2C gate.
-The generator and report keep `phase_complete=false`.
+`completion/test-results.json` lists 248 executed tests: zero failures, errors or
+skips. `completion/fixture-coverage.json` binds all 39 categories to exact methods.
+Synthetic policy positives do not claim real typed objects or transformations.
 
-The exact supplied Phase 2B branch, HEAD and tree were verified before the
-Phase 2C branch was created. Phase 1 verification and section/report consistency,
-Phase 2A verification with tool commit
-`5f96fcf81bf9511dabadc63326468d9de94f87da`, both exhaustive artifact checks,
-and full Phase 2B semantic replay passed before consuming the evidence. All
-three closed schema verifiers passed. Closed Phase 2B's branch restriction was
-not weakened to run its generator on Phase 2C. Its input/output identities are
-instead rehashed by every Phase 2C command.
+`completion/replay-results.json` records byte-identical full analytical replay:
+15,299 accepted pairs; full candidate populations and 21,350 review contexts;
+45,707 September terminals; original mapping freeze and all downstream passes;
+full profile recomputation; 803 proposal and 99 closed ablation packets; 748
+boundary terminals; 425/4,939/2,479 typed populations; final freeze and 51,657
+semantic terminals; review and historical ownership comparisons.
 
-Completed checkpoint checks:
+An intermediate replay running the earlier boundary implementation correctly
+rejected the newly expanded boundary artifact during the completion refinement.
+It is not the final replay receipt. Final replay uses one unchanged implementation
+and compares the complete regenerated evidence family byte-for-byte.
 
-| Check | Result |
-| --- | --- |
-| `python -m unittest discover -s tests -q` | 227 tests passed, including 39 Phase 2C tests |
-| `verify-audit` | byte-identical full 15,299-pair audit |
-| `verify-candidates` | byte-identical 21,350-context candidate application |
-| `verify-september` | byte-identical 45,707 terminals and 9,600 original-policy accepted pairs |
-| `verify-freeze` | byte-identical six-artifact mapping freeze; effective count 15,382 |
-| `verify-semantics` | byte-identical semantic, registration, script, type/global, preservation and intersection outputs |
-| Phase 2C PowerShell schema verifier | 17 JSON documents passed local schema validation |
-| Phase 1 close-out recheck | 1,184 immutable files, ten artifacts, three builds, fifteen section aliases |
-| Phase 2A exhaustive consistency recheck | both exhaustive artifact identities preserved |
-| Canonical function-map validator | 42,462 functions, exact-image match |
-| Current closure verifier | 35,626 candidates, 54 strong, 180 probable, three fixtures |
-| Both committed ownership ledgers | existing `Fable2OwnershipCorroboration.validate` passed |
-| Manual-001, manual-002 and current merged compact summaries | existing `Fable2IndirectTargets.validate_summary` passed |
-| Current coverage/import plan | existing `Fable2IndirectTargets.validate_plan` passed |
-| Forbidden-path / SDK audit | only Phase 2C paths; SDK branch/HEAD/tree/remotes/status and fifteen libmspack hashes preserved |
+`completion/verification-results.json` records exact Phase 1/2A, function-map and
+closure commands; validation of all nine Phase 2B artifacts, both ownership
+ledgers, three indirect summaries and current coverage/import plan. Closed inputs,
+SDK state and fifteen libmspack hashes are checked by binding and extra_inputs.
+The Phase 2B generator's branch guard is unchanged; its original replay remains
+closed. Schema commands validate the original and completion families recursively.
 
-The full discovery command includes the supported function-map, closure,
-ownership, coverage and indirect-target regression suites. It executes no game.
+Final verifier receipts contain 13 passing consistency/domain checks and four
+passing schema commands: ten Phase 1, five Phase 2A, eleven Phase 2B and 32 Phase
+2C JSON documents (58 total). Historical ownership byte reconstruction is a
+separate blocked comparison and is not counted as a pass.
 
-One historical reproduction command failed, and remains failed:
+`verify-summary` compares report and summary, hashes ignored bytes, checks terminal
+counts and injectivity, checks frozen inputs, and audits environment-specific
+paths and the allowlisted Git delta. No current HEAD is an analytical input.
+
+Historical original invocation (exit 1, `FAIL: stale manifest`):
 
 ```powershell
 python tools/Fable2OwnershipCorroboration.py --phase4-directory out/ownership-corroboration/phase4-run1 --closure out/ownership-corroboration/closure-run1/entrypoint-closure.json --guest-snapshot out/phase3-regression-closure-final-smoke/iteration-01/tu1-text-0x82000000.bin --output-directory docs/fable2-discovery-pipeline/ownership --check
 ```
 
-Exit code 1: `FAIL: stale manifest`. That historical plan binds the old
-80-entry manifest SHA-256
-`E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0`.
-The unchanged Phase 2B starting checkout's current manifest hashes to
+This is inherited. Phase 2B/checkpoint manifest SHA-256:
 `EF1656D77D270F207C4A16D3B92D5B86C4414CE38292D079AEF52B120CE778E1`.
-The old plan was neither rebound nor regenerated, and the invariant was not
-weakened. Passing ledger validation is recorded separately from this failed
-historical reconstruction.
+Historical expected manifest:
+`E3EB39CA153E396D5DC53E6F943ED8FF7AF1D6B0704EB860836BD7D21A3F87B0`.
+The immutable blob at
+`c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml` is supplied by
+Completion `ownership` through a read-only stream. Existing hash validation is
+unchanged; no filesystem manifest is modified. Semantic validation and Markdown
+reconstruction pass. Exact JSON replay lacks the historical generated file named
+in the handoff: one SHA-256 and two line fields differ for sub_8279E818. Every
+other field reconciles. This is an external missing-input blocker, not a pass.
 
-The required fixture matrix is not yet complete. In particular, complete
-compiler-transformation recovery, feature-class ablation, typed-object
-discrimination and native Lua-state ownership remain unfinished. Do not infer
-cross-build accuracy from passing synthetic fixtures or schema validation.
+The source allowlist excludes naming, manifest, overrides, generated, runtime,
+renderer, SDK and binary paths. No game, build, codegen or network action is part
+of these commands. Exact command receipts and artifact hashes are in validation.

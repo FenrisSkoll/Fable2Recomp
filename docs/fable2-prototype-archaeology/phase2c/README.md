@@ -1,66 +1,62 @@
-# Phase 2C static archaeology checkpoint
+# Phase 2C completion pass
 
-This work is **not a completed Phase 2C close-out**. Read the generated
-[report](report.md), [policy](policy.md), [review guide](review-guide.md), and
-[handoff](next-phase-handoff.md) before interpreting its provisional results.
-No proposal is canonical and no production consumer uses the effective view.
+Run from the repository root on `fable2-prototype-archaeology-phase2c`.
+Checkpoint: `e784beeab1a372cc3f71e2cd1af2dfa18b58f321`. Immutable inputs and SDK
+identity remain in `evidence/source-pins.json`. Do not rebind changed inputs.
 
-Run from `C:\Dev\Fable2Recomp` on `fable2-prototype-archaeology-phase2c`.
-ReXGlue remains at `C:\Dev\rexglue-sdk-v0.10`. Do not rebuild, regenerate
-closed phases, launch a game, or rebind changed inputs.
+Read [report.md](report.md), [completion-matrix.md](completion-matrix.md),
+[policy.md](policy.md), [verification.md](verification.md) and the handoff.
+Historical ownership replay remains blocked; no proposal is canonical or
+human-approved. No game, build, code generation or network operation is needed.
 
-The existing pins were created once with these commands. Do not repeat them:
+Generation order on identical validated inputs:
 
 ```powershell
-python tools/Fable2PrototypeTrust.py bind
-python tools/Fable2PrototypeTrust.py bind-semantic-inputs
+python tools/Fable2PrototypeCompletion.py ablation
+python tools/Fable2PrototypeCompletion.py boundaries
+python tools/Fable2PrototypeCompletion.py typed
+python tools/Fable2PrototypeCompletion.py recon
+python tools/Fable2PrototypeCompletion.py ownership
+python tools/Fable2PrototypeCompletion.py mapping
+python tools/Fable2PrototypeCompletion.py semantics
+python tools/Fable2PrototypeCompletion.py review
+python tools/Fable2PrototypeCompletion.py tests
+python tools/Fable2PrototypeCompletion.py checks
+python tools/Fable2PrototypeCompletion.py schemas
+python tools/Fable2PrototypeCompletion.py replay
+python tools/Fable2PrototypeCompletion.py summary
 ```
 
-Generation order, for the same bound inputs:
+Mapping freezes completed ablation, boundaries, effective map and September inputs
+before semantics. Cached profiles bind source and algorithm hashes. `replay`
+recomputes all original Phase 2C mapping/September/downstream populations, full
+profiles and completion stages, comparing bytes. It writes only its replay
+receipt; closed phases are never regenerated.
+
+Final verification:
 
 ```powershell
-python tools/Fable2PrototypeTrust.py audit
-python tools/Fable2PrototypeTrust.py candidates
-python tools/Fable2PrototypeTrust.py september
-.\tools\Verify-Fable2PrototypeTrust.ps1
-python tools/Fable2PrototypeTrust.py freeze
-python tools/Fable2PrototypeTrust.py semantics
-python tools/Fable2PrototypeTrust.py summarize
-```
-
-The mapping freeze must precede semantics. Do not regenerate mapping artifacts
-while treating a previous semantic pass as current. A later mapping revision
-requires a separately reviewed new freeze and replay; semantics cannot validate
-the mapping that produced it.
-
-Complete read-only analytical replay and consistency commands:
-
-```powershell
-python tools/Fable2PrototypeTrust.py verify-audit
-python tools/Fable2PrototypeTrust.py verify-candidates
-python tools/Fable2PrototypeTrust.py verify-september
-python tools/Fable2PrototypeTrust.py verify-freeze
-python tools/Fable2PrototypeTrust.py verify-semantics
-python tools/Fable2PrototypeTrust.py verify-summary
-.\tools\Verify-Fable2PrototypeTrust.ps1
-python -m unittest discover -s tests -q
+python tools/Fable2PrototypeCompletion.py verify-summary
+./tools/Verify-Fable2PrototypeTrust.ps1
+python tools/Fable2PrototypeCompletion.py tests
+python tools/Fable2PrototypeCompletion.py checks
+python tools/Fable2PrototypeCompletion.py schemas
 git diff --check
 ```
 
-Each command hashes the closed input family and SDK preservation state before
-analysis. The `verify-*` commands compare bytes without writing analytical
-outputs. The existing Phase 2B verifier requires the Phase 2B branch; it passed
-before creating Phase 2C. Its source, report and exhaustive output hashes remain
-bound and checked without weakening its branch invariant.
+`checks` invokes existing Phase 1/2A, function-map, closure, ownership, indirect
+and coverage verifiers and validates all bound Phase 2B artifacts. The closed
+Phase 2B generator remains branch-restricted; its pre-Phase-2C replay is preserved.
+Do not weaken its guard or regenerate it under new provenance.
 
-Large machine artifacts remain under ignored
-`out/prototype-archaeology/phase2c/`. Committed
-`evidence/validation.json` binds their exact paths, sizes and hashes, the
-implementation hashes and generated report. The initial repository state and
-all fifteen materialized SDK libmspack identities are in `evidence/source-pins.json`.
-Current-runtime script files have separate `semantic-extra-source-pins.json`:
-they are not silently asserted to have authenticated retail-disc provenance.
+Ignored completion artifacts: `out/prototype-archaeology/phase2c/completion/`.
+Original Phase 2C artifacts remain unchanged in the parent directory. Completion
+effective-map and semantic-final supersede the provisional consumer view only
+within this non-canonical analysis family. `evidence/validation.json` binds every
+artifact, implementation, schema and report. Use Completion `summary` /
+`verify-summary` now; the older Trust summary describes the checkpoint and must
+not overwrite the completion report.
 
-The schema is `tools/schemas/fable2-prototype-trust-v1.schema.json`.
-Schema validity alone does not certify scientific completeness. The report
-explicitly retains the unfinished completion gates.
+Schemas: `tools/schemas/fable2-prototype-trust-v1.schema.json` and
+`tools/schemas/fable2-prototype-completion-v1.schema.json`. The PowerShell checker
+validates both recursively. Paths in evidence are repository/corpus relative.

@@ -1,68 +1,45 @@
-# Unfinished Phase 2C handoff
+# Phase 2C remaining blocker and review handoff
 
-This branch is a provisional checkpoint, not Phase 2C acceptance or canonical
-adoption. Read AGENTS.md, report.md, policy.md and evidence/validation.json.
-Do not regenerate closed Phase 1/2A/2B or rebind a changed source.
+This continues Phase 2C, not Phase 2D. Independent completion work is implemented
+and replayed; exact historical ownership reconstruction remains blocked. Do not
+call the result unconditionally complete or all-green.
 
-The closed starting identity is:
+Required historical input:
 
-```text
-branch: fable2-prototype-archaeology-phase2b
-HEAD: 31d8693ca486758a63221346ce4d376b8865fd20
-tree: 0d5537ffce89d5283d30d8b278909c2122580cdb
-Phase 2A bundle: DA77AF8D9345C684F81FDD342CDB1E95E48CC826A374D783EEC561F1EDE42B2F
-SDK branch: fable2-prototype-archaeology-phase1
-SDK HEAD: fa10315ff88ca56b2d0b380de40bad5b59b542bd
-SDK tree: ec06d4e7e56beb81551c6089e9768b7588606f20
-```
+- Path: `generated/default/fable2_recomp.136.cpp`
+- SHA-256: `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59`
+- Current hash: `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`
+- Historical manifest is available read-only at
+  `c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml`.
 
-The immediate correctness result is semantic suppression of:
+Do not overwrite current generated files, change the manifest, run codegen or
+rebind historical evidence. If the exact file becomes available, supply an
+isolated read-only input with unchanged original hash validation and reproduce
+the three historical provenance fields. `completion/ownership-verification.json`
+binds the differences and passing human-ledger comparison.
 
-```text
-0x82631A30 -> 0x82950A98
-0x828EA448 -> 0x82681198
-0x83062950 -> 0x83060C30
-```
+Review `completion/feature-ablation.json` and `completion/completion-review.json`.
+All 86 strong proposals are selected; none is human-approved. Proposed arithmetic
+is 15,299 - 3 + 86 = 15,382. Suppression has precedence for Navigator/Controlled,
+TROLL_FOOTSTEP/DESTROY_ENTITY and __vspltb/__vcfsx. Both same-name physics pairs
+remain candidates. HammerCombat's callee is a behavioral proposal, not a name.
 
-The crossed physics pair is the sole original accepted pair dependent on partial
-data as its only non-CFG corroboration. No closed row was deleted or changed.
-The proposed same-name physics pairs need independent helper/topology closure.
-For the helpers, inspect `0x8222D118 -> 0x8222CED0`, global references
-`0x83497084 -> 0x83497088`, and calls
-`0x82207A68 -> 0x822078A0`, `0x82215000 -> 0x821C6768`.
+Remaining scientific evidence: supported bank-entry layout and authenticated
+retail inventory; native game/GUI/startup state ownership; TU1 adapter/name/
+callback chain; typed descriptors, vptr writers and complete object boundaries;
+external control flow for shared fragments. Neither unmatched donor is explained
+at function level. The 18 native-dependent and 182 unknown-portability preservation
+candidates do not establish runnable free-camera or E3/demo recovery.
 
-HammerCombat callee `0x8229B488 -> 0x8229B1B8` satisfies the current strong
-proposal gates. Its empty fallback addresses are `0x82000CA4 -> 0x82000CA0`.
-Comparator regions `[0x8226DB80,0x8226DBD4)` and
-`[0x8226D7F8,0x8226D84C)` remain unowned internal code regions.
+Representative E3 presence evidence includes `e3physicsmeshes.txt`,
+`E3Startup.lua`, `E3StartupConsoleScript.lua` and `MyStartup_E32008.lua`,
+including scripts/scripts_r counterparts. These are 21 build/path records across
+September, build 23 and the July alias, graded confirmed file presence with
+candidate purpose and unknown portability. They are not 21 independent semantic
+votes. Lexical `demondoor` paths must not be interpreted as demo-content proof.
 
-Remaining mandatory work includes complete feature-class ablation and weak-
-stratum dependency review, stronger changed-boundary/compiler-transformation
-analysis, and the rest of the requested production/adversarial fixture matrix.
-The current two unmatched donor functions are still not explained at function
-level: `[0x826E3720,0x826E3B34)` and `[0x82BAD3B8,0x82BAE038)`.
-The 33 September boundary rows are preserved, not resolved by copying their
-original classifications. Shared windows cannot independently route semantics.
-
-Native registration has one demonstrated runtime construction chain:
-`0x82484E58` calls `0x82309378`, passing name `0x820BA1FC`
-(`SetUseFreeCamera`) in r4 and callback `0x82482298` in r5. The callback
-`[0x82482298,0x824822A4)` has no `.pdata` owner and stores r3's low byte at
-`0x83496BE9`. The helper requests four bytes through `0x82227B88`, stores the
-callback at payload offset zero, and supplies adapter `0x822CA4F0` and count
-one to `0x8219A600`. Name consumer `0x82A23F08` constructs a string key.
-The exact constructor recognizer finds 69 build-23, 69 TU1 and 68 September
-shape candidates, each retaining callee and state/namespace obligations.
-This establishes native construction, not a callable TU1 command. Do not feed
-this semantic finding back into the already frozen mapping stage.
-
-RTTI/vtable/global objects still lack complete typed boundaries and
-ownership proofs. Script banks need a validated entry parser; loose Lua chunks
-have only static metadata/prototype evidence. Establish native Lua-state lifetime
-and authenticated retail file provenance before claiming retained runnable debug
-or E3/demo behavior. No runtime instrumentation is present.
-
-The next action is to finish these evidence gates and independently review the
-strong proposals. Canonical adoption is a separate later decision. Neither
-symbols, manifests, scripts, free-camera functionality nor historical assets
-should be integrated from this checkpoint.
+Human review must separately approve any mapping delta and semantic-transport
+eligibility. Later adoption planning must preserve suppression precedence,
+injectivity, exact dependencies and independent TU1 corroboration. Names,
+scripts, assets, runtime and renderer changes require separate evidence and
+authorization. No integration follows automatically from this report.

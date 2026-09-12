@@ -70,3 +70,24 @@ change them. Names, type ownership, vtable identity, Lua-state identity and
 content recoverability each require further evidence beyond a mapping. Community
 observations cannot supply an independent support class. No opaque score creates
 a disposition.
+
+Completion policy adds a second deterministic packet check and eleven explicit
+feature-removal counterfactuals. Every strong/probable proposal, all 97 accepted
+data-anchor records, all suppressions and known candidates are covered. The
+packet exposes candidate/reverse populations, injectivity, independent retained
+seeds, instruction differences, minimal sufficient support alternatives and
+single-point dependencies. Callee and import/helper support are overlapping
+obligations, never two votes. Missing mandatory boundary/reference/role gates
+cannot be compensated by a score. Full field-access order, known direct CFG
+dominators/postdominators and stack/return summaries must not contradict.
+
+Boundary completion searches aligned whole-body windows and extends unique exact
+matches only within actual executable and ownership bounds. Shared fragments
+do not independently establish split/merge/outline/inline lineage. Typed policy
+requires complete object extent, descriptor/writer evidence and slot/access
+correspondence; synthetic positive controls do not manufacture real descriptors.
+
+Completion effective-map and mapping-freeze are separate from the checkpoint
+view. Only their hash-bound consumer paths feed semantic-final. All additions
+remain machine proposals awaiting human review. Exact historical ownership
+replay remains blocked until its named generated-file hash is available.

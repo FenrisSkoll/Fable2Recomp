@@ -1,193 +1,202 @@
 # Phase 2C completion matrix
 
-Initial dependency checklist. Every row requires implementation, evidence, schema and validation bindings before closure.
+187 reconciled gates, including 39 explicit fixture categories. No incomplete or silently omitted rows. Blocked rows name exact missing evidence; they are not passes. Machine bindings are in `evidence/completion-matrix.json`.
 
-| Gate | Requirement | Status |
-| --- | --- | --- |
-| A.all-15299-dispositions | all-15299-dispositions | incomplete |
-| A.all-97-data-anchors | all-97-data-anchors | incomplete |
-| A.original-status-provenance | original-status-provenance | incomplete |
-| A.full-object-boundaries-encoding | full-object-boundaries-encoding | incomplete |
-| A.same-address-prefix-interior-padding | same-address-prefix-interior-padding | incomplete |
-| A.role-contradictions | role-contradictions | incomplete |
-| A.feature-ablation-counterfactuals | feature-ablation-counterfactuals | incomplete |
-| A.exact-totals | exact-totals | incomplete |
-| B.versioned-policy | versioned-policy | incomplete |
-| B.no-address-or-prefix-identity | no-address-or-prefix-identity | incomplete |
-| B.nonstring-object-proof | nonstring-object-proof | incomplete |
-| B.wrapper-disambiguation | wrapper-disambiguation | incomplete |
-| B.suppression-not-lineage-disproof | suppression-not-lineage-disproof | incomplete |
-| B.distinct-dispositions | distinct-dispositions | incomplete |
-| C.four-physics-wrapper-bounds | four-physics-wrapper-bounds | incomplete |
-| C.instruction-differences | instruction-differences | incomplete |
-| C.literal-argument-role | literal-argument-role | incomplete |
-| C.immediate-callees | immediate-callees | incomplete |
-| C.reciprocal-competitors | reciprocal-competitors | incomplete |
-| C.global-assignment | global-assignment | incomplete |
-| C.same-name-dispositions | same-name-dispositions | incomplete |
-| D.exact-caller | exact-caller | incomplete |
-| D.callee-0x7C | callee-0x7C | incomplete |
-| D.empty-strings | empty-strings | incomplete |
-| D.reachable-comparators | reachable-comparators | incomplete |
-| D.object-offset8-return-use | object-offset8-return-use | incomplete |
-| D.proposal-gates | proposal-gates | incomplete |
-| D.context-not-name | context-not-name | incomplete |
-| E.full-21350-review-population | full-21350-review-population | incomplete |
-| E.typed-reference-canonicalization | typed-reference-canonicalization | incomplete |
-| E.preserve-unrelated-bits | preserve-unrelated-bits | incomplete |
-| E.independent-evidence | independent-evidence | incomplete |
-| E.no-double-counting | no-double-counting | incomplete |
-| E.generation-dependencies | generation-dependencies | incomplete |
-| E.no-circularity | no-circularity | incomplete |
-| E.reciprocity-injectivity | reciprocity-injectivity | incomplete |
-| E.feature-combinations | feature-combinations | incomplete |
-| E.subsystem-problem-priority | subsystem-problem-priority | incomplete |
-| E.negative-terminal-counts | negative-terminal-counts | incomplete |
-| E.broader-supported-features | broader-supported-features | incomplete |
-| F.closed-minus-suppressions-plus-reviewed-additions | closed-minus-suppressions-plus-reviewed-additions | incomplete |
-| F.original-identities | original-identities | incomplete |
-| F.conflicts-cycles | conflicts-cycles | incomplete |
-| F.noncanonical-consumer | noncanonical-consumer | incomplete |
-| F.exact-delta | exact-delta | incomplete |
-| F.adoption-plan | adoption-plan | incomplete |
-| G.bounded-native-selection | bounded-native-selection | incomplete |
-| G.real-disassembly | real-disassembly | incomplete |
-| G.failure-explanation | failure-explanation | incomplete |
-| G.structure-before-recognizer | structure-before-recognizer | incomplete |
-| G.positive-negative-fixtures | positive-negative-fixtures | incomplete |
-| G.first-party-freecamera | first-party-freecamera | incomplete |
-| H.9600-pair-materialization | 9600-pair-materialization | incomplete |
-| H.complete-original-aggregate | complete-original-aggregate | incomplete |
-| H.45707-terminals | 45707-terminals | incomplete |
-| H.hardened-trust | hardened-trust | incomplete |
-| H.two-hop-dependencies | two-hop-dependencies | incomplete |
-| H.no-oracle-or-July-vote | no-oracle-or-July-vote | incomplete |
-| I.713-primary-population | 713-primary-population | incomplete |
-| I.33-September-boundaries | 33-September-boundaries | incomplete |
-| I.both-unmatched | both-unmatched | incomplete |
-| I.strong-probable-boundary-disagreement | strong-probable-boundary-disagreement | incomplete |
-| I.entry-exit-ownership | entry-exit-ownership | incomplete |
-| I.all-transformation-classes | all-transformation-classes | incomplete |
-| I.no-invented-functions | no-invented-functions | incomplete |
-| J.frozen-mapping-before-semantic | frozen-mapping-before-semantic | incomplete |
-| J.51657-terminal-reconciliation | 51657-terminal-reconciliation | incomplete |
-| J.independent-TU1-check | independent-TU1-check | incomplete |
-| J.changed-status-reasons | changed-status-reasons | incomplete |
-| J.no-feedback | no-feedback | incomplete |
-| J.role-name-separation | role-name-separation | incomplete |
-| K.425-type-contexts | 425-type-contexts | incomplete |
-| K.4939-pointer-runs | 4939-pointer-runs | incomplete |
-| K.2479-global-contexts | 2479-global-contexts | incomplete |
-| K.terminal-object-dispositions | terminal-object-dispositions | incomplete |
-| K.bounds-alignment-slots | bounds-alignment-slots | incomplete |
-| K.writers-readers | writers-readers | incomplete |
-| K.constructor-alternatives | constructor-alternatives | incomplete |
-| K.cross-build-slots | cross-build-slots | incomplete |
-| K.false-positive-controls | false-positive-controls | incomplete |
-| L.160-file-inventory | 160-file-inventory | incomplete |
-| L.108-loose-chunks | 108-loose-chunks | incomplete |
-| L.54-pair-reconciliation | 54-pair-reconciliation | incomplete |
-| L.script-bank-parser-or-blocker | script-bank-parser-or-blocker | incomplete |
-| L.game-GUI-startup-states | game-GUI-startup-states | incomplete |
-| L.debug-info-vs-identity | debug-info-vs-identity | incomplete |
-| L.no-Lua-execution | no-Lua-execution | incomplete |
-| L.retail-provenance | retail-provenance | incomplete |
-| M.206-shapes | 206-shapes | incomplete |
-| M.2662-calls | 2662-calls | incomplete |
-| M.2647-name-callback-candidates | 2647-name-callback-candidates | incomplete |
-| M.per-layout-terminal-obligations | per-layout-terminal-obligations | incomplete |
-| M.complete-chain-or-blocker | complete-chain-or-blocker | incomplete |
-| M.recognizer-fixtures | recognizer-fixtures | incomplete |
-| N.200-preservation-records | 200-preservation-records | incomplete |
-| N.prototype-retail-presence | prototype-retail-presence | incomplete |
-| N.dependency-evidence | dependency-evidence | incomplete |
-| N.portability-grade | portability-grade | incomplete |
-| N.freecamera-E3-demo | freecamera-E3-demo | incomplete |
-| N.no-runnable-claims | no-runnable-claims | incomplete |
-| O.closure | closure | incomplete |
-| O.coverage | coverage | incomplete |
-| O.indirect | indirect | incomplete |
-| O.ownership | ownership | incomplete |
-| O.historical-crashes | historical-crashes | incomplete |
-| O.renderer | renderer | incomplete |
-| O.Ghidra-manifest | Ghidra-manifest | incomplete |
-| O.exact-paths-pointers | exact-paths-pointers | incomplete |
-| O.priority-only | priority-only | incomplete |
-| safety.exact-checkpoint | exact-checkpoint | incomplete |
-| safety.SDK-fifteen-hashes | SDK-fifteen-hashes | incomplete |
-| safety.closed-phases-immutable | closed-phases-immutable | incomplete |
-| safety.no-network | no-network | incomplete |
-| safety.no-runtime-build-codegen | no-runtime-build-codegen | incomplete |
-| safety.local-commits-only | local-commits-only | incomplete |
-| safety.relative-paths | relative-paths | incomplete |
-| safety.output-root-guards | output-root-guards | incomplete |
-| safety.allowlisted-Git-delta | allowlisted-Git-delta | incomplete |
-| safety.clean-ending-tree | clean-ending-tree | incomplete |
-| validation.schema-every-artifact | schema-every-artifact | incomplete |
-| validation.full-test-discovery | full-test-discovery | incomplete |
-| validation.all39-fixture-categories | all39-fixture-categories | incomplete |
-| validation.full-deterministic-replay | full-deterministic-replay | incomplete |
-| validation.three-way-hash-consistency | three-way-hash-consistency | incomplete |
-| validation.baseline-bound-ownership | baseline-bound-ownership | incomplete |
-| validation.all-existing-verifiers | all-existing-verifiers | incomplete |
-| validation.complete-matrix | complete-matrix | incomplete |
-| outputs.source-pins | source-pins | incomplete |
-| outputs.trust-audit | trust-audit | incomplete |
-| outputs.ablation | ablation | incomplete |
-| outputs.proposal-packets | proposal-packets | incomplete |
-| outputs.effective-map | effective-map | incomplete |
-| outputs.candidate-index | candidate-index | incomplete |
-| outputs.known-cases | known-cases | incomplete |
-| outputs.registration | registration | incomplete |
-| outputs.semantic-v2 | semantic-v2 | incomplete |
-| outputs.review-all-strong | review-all-strong | incomplete |
-| outputs.September | September | incomplete |
-| outputs.boundaries | boundaries | incomplete |
-| outputs.types-globals | types-globals | incomplete |
-| outputs.scripts | scripts | incomplete |
-| outputs.preservation | preservation | incomplete |
-| outputs.validation | validation | incomplete |
-| outputs.README | README | incomplete |
-| outputs.report | report | incomplete |
-| outputs.policy | policy | incomplete |
-| outputs.review-guide | review-guide | incomplete |
-| outputs.handoff | handoff | incomplete |
-| fixture.01 | Navigator/Controlled collision | incomplete |
-| fixture.02 | Shared first sixteen bytes | incomplete |
-| fixture.03 | Same address different full strings | incomplete |
-| fixture.04 | Relocated identical full string | incomplete |
-| fixture.05 | Interior and suffix pointers | incomplete |
-| fixture.06 | UTF16LE ASCII boundaries terminators | incomplete |
-| fixture.07 | Zero padding common headers | incomplete |
-| fixture.08 | Unbounded non-string objects | incomplete |
-| fixture.09 | Partial-data-only loss of trust | incomplete |
-| fixture.10 | Independent topology/neighbourhood retention | incomplete |
-| fixture.11 | Signed-low address carry | incomplete |
-| fixture.12 | Proven definition/consumption scope | incomplete |
-| fixture.13 | Unrelated immediate significance | incomplete |
-| fixture.14 | String evidence double counting | incomplete |
-| fixture.15 | Circular same-generation support | incomplete |
-| fixture.16 | Deterministic multigeneration expansion | incomplete |
-| fixture.17 | Reciprocal crossed-wrapper injectivity | incomplete |
-| fixture.18 | Contradictory literal roles | incomplete |
-| fixture.19 | HammerCombat empty relocation and caller use | incomplete |
-| fixture.20 | Unowned identical comparator regions | incomplete |
-| fixture.21 | Overlay suppression precedence | incomplete |
-| fixture.22 | Duplicate conflicting overlays | incomplete |
-| fixture.23 | Community-only nonacceptance | incomplete |
-| fixture.24 | Registration positive and adversarial layouts | incomplete |
-| fixture.25 | Deterministic review availability | incomplete |
-| fixture.26 | Report summary ignored-byte consistency | incomplete |
-| fixture.27 | Forbidden canonical propagation | incomplete |
-| fixture.28 | September aggregate reconciliation | incomplete |
-| fixture.29 | Non-oracular two-hop routing | incomplete |
-| fixture.30 | Split merge outline inline thunk tail internal regions | incomplete |
-| fixture.31 | Shifted boundaries and both unmatched donors | incomplete |
-| fixture.32 | Vtable discrimination | incomplete |
-| fixture.33 | Type strings insufficient for constructor names | incomplete |
-| fixture.34 | Same-address incompatible globals | incomplete |
-| fixture.35 | Scripts/scripts_r structure and debug metadata | incomplete |
-| fixture.36 | Separate game GUI startup provenance | incomplete |
-| fixture.37 | Community-only free camera spelling | incomplete |
-| fixture.38 | Preservation presence and dependencies | incomplete |
-| fixture.39 | Mapping freeze prevents semantic feedback | incomplete |
+| Gate | Status | Implementing functions / fixtures | Evidence |
+| --- | --- | --- | --- |
+| A.all-15299-dispositions | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.all-97-data-anchors | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.original-status-provenance | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.full-object-boundaries-encoding | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.same-address-prefix-interior-padding | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.role-contradictions | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.feature-ablation-counterfactuals | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| A.exact-totals | complete | audit_pairs, ablation_stage | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.versioned-policy | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.no-address-or-prefix-identity | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.nonstring-object-proof | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.wrapper-disambiguation | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.suppression-not-lineage-disproof | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| B.distinct-dispositions | complete | trust_disposition, evaluate_proposal | `out/prototype-archaeology/phase2c/trust-audit.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.four-physics-wrapper-bounds | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.instruction-differences | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.literal-argument-role | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.immediate-callees | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.reciprocal-competitors | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.global-assignment | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| C.same-name-dispositions | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.exact-caller | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.callee-0x7C | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.empty-strings | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.reachable-comparators | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.object-offset8-return-use | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.proposal-gates | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| D.context-not-name | complete | known_cases, ablation_stage | `out/prototype-archaeology/phase2c/known-cases.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.full-21350-review-population | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.typed-reference-canonicalization | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.preserve-unrelated-bits | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.independent-evidence | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.no-double-counting | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.generation-dependencies | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.no-circularity | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.reciprocity-injectivity | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.feature-combinations | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.subsystem-problem-priority | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.negative-terminal-counts | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| E.broader-supported-features | complete | candidate_stage, profile_function, evaluate_proposal, behavior_features, expand_dependencies | `out/prototype-archaeology/phase2c/reference-candidates.json`, `out/prototype-archaeology/phase2c/completion/feature-ablation.json` |
+| F.closed-minus-suppressions-plus-reviewed-additions | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| F.original-identities | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| F.conflicts-cycles | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| F.noncanonical-consumer | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| F.exact-delta | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| F.adoption-plan | complete | effective_view, mapping_final | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| G.bounded-native-selection | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| G.real-disassembly | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| G.failure-explanation | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| G.structure-before-recognizer | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| G.positive-negative-fixtures | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| G.first-party-freecamera | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| H.9600-pair-materialization | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| H.complete-original-aggregate | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| H.45707-terminals | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| H.hardened-trust | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| H.two-hop-dependencies | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| H.no-oracle-or-July-vote | complete | secondary_stage, two_hop | `out/prototype-archaeology/phase2c/september-pairs.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json` |
+| I.713-primary-population | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.33-September-boundaries | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.both-unmatched | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.strong-probable-boundary-disagreement | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.entry-exit-ownership | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.all-transformation-classes | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| I.no-invented-functions | complete | boundary_completion, extend_match, relation_class, transformation_obligations | `out/prototype-archaeology/phase2c/completion/boundary-completion.json` |
+| J.frozen-mapping-before-semantic | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| J.51657-terminal-reconciliation | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| J.independent-TU1-check | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| J.changed-status-reasons | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| J.no-feedback | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| J.role-name-separation | complete | semantic_stage, verified_freeze | `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/mapping-freeze.json` |
+| K.425-type-contexts | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.4939-pointer-runs | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.2479-global-contexts | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.terminal-object-dispositions | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.bounds-alignment-slots | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.writers-readers | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.constructor-alternatives | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.cross-build-slots | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| K.false-positive-controls | complete | typed_completion, typed_disposition | `out/prototype-archaeology/phase2c/completion/typed-completion.json` |
+| L.160-file-inventory | complete | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.108-loose-chunks | complete | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.54-pair-reconciliation | complete | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.script-bank-parser-or-blocker | blocked-with-evidence | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.game-GUI-startup-states | blocked-with-evidence | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.debug-info-vs-identity | complete | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.no-Lua-execution | complete | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| L.retail-provenance | blocked-with-evidence | script_stage, state_provenance, recon_completion | `out/prototype-archaeology/phase2c/scripts.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.206-shapes | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.2662-calls | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.2647-name-callback-candidates | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.per-layout-terminal-obligations | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.complete-chain-or-blocker | blocked-with-evidence | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| M.recognizer-fixtures | complete | registration_stage, recon_completion | `out/prototype-archaeology/phase2c/registration.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.200-preservation-records | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.prototype-retail-presence | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.dependency-evidence | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.portability-grade | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.freecamera-E3-demo | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| N.no-runnable-claims | complete | preservation_stage, preservation_disposition, recon_completion | `out/prototype-archaeology/phase2c/preservation.json`, `out/prototype-archaeology/phase2c/completion/recon-completion.json` |
+| O.closure | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.coverage | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.indirect | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.ownership | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.historical-crashes | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.renderer | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.Ghidra-manifest | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.exact-paths-pointers | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| O.priority-only | complete | intersection_stage | `out/prototype-archaeology/phase2c/intersections.json`, `out/prototype-archaeology/phase2c/completion/completion-review.json` |
+| safety.exact-checkpoint | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.SDK-fifteen-hashes | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.closed-phases-immutable | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.no-network | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.no-runtime-build-codegen | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.local-commits-only | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.relative-paths | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.output-root-guards | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.allowlisted-Git-delta | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| safety.clean-ending-tree | complete | binding, audit_paths, final_summary | `out/prototype-archaeology/phase2c/completion/verification-results.json` |
+| validation.schema-every-artifact | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.full-test-discovery | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.all39-fixture-categories | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.full-deterministic-replay | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.three-way-hash-consistency | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.baseline-bound-ownership | blocked-with-evidence | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.all-existing-verifiers | blocked-with-evidence | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| validation.complete-matrix | complete | closed_checks, verify_terminals, final_summary, ownership_verification, replay_all | `out/prototype-archaeology/phase2c/completion/verification-results.json`, `out/prototype-archaeology/phase2c/completion/ownership-verification.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.source-pins | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.trust-audit | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.ablation | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.proposal-packets | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.effective-map | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.candidate-index | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.known-cases | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.registration | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.semantic-v2 | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.review-all-strong | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.September | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.boundaries | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.types-globals | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.scripts | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.preservation | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.validation | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.README | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.report | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.policy | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.review-guide | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| outputs.handoff | complete | final_summary, verify_terminals | `out/prototype-archaeology/phase2c/completion/effective-map.json`, `out/prototype-archaeology/phase2c/completion/semantic-final.json`, `out/prototype-archaeology/phase2c/completion/replay-results.json` |
+| fixture.01 | complete | test_fable2_prototype_trust.StringIdentityTests.test_production_physics_spellings_share_prefix_but_not_identity | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.02 | complete | test_fable2_prototype_trust.StringIdentityTests.test_synthetic_shared_sixteen_byte_prefix | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.03 | complete | test_fable2_prototype_trust.StringIdentityTests.test_same_virtual_address_different_content | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.04 | complete | test_fable2_prototype_trust.StringIdentityTests.test_relocated_complete_string | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.05 | complete | test_fable2_prototype_trust.StringIdentityTests.test_interior_and_suffix_are_explicit | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.06 | complete | test_fable2_prototype_trust.StringIdentityTests.test_utf16_boundaries_and_terminator, test_fable2_prototype_trust.StringIdentityTests.test_ascii_terminator_required | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.07 | complete | test_fable2_prototype_trust.StringIdentityTests.test_common_zero_is_not_independent_support, test_fable2_prototype_trust.StringIdentityTests.test_empty_byte_string_requires_explicit_use_context | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.08 | complete | test_fable2_prototype_trust.StringIdentityTests.test_binary_header_has_no_invented_boundary | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.09 | complete | test_fable2_prototype_trust.StringIdentityTests.test_partial_data_only_loses_trust | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.10 | complete | test_fable2_prototype_trust.StringIdentityTests.test_independent_evidence_survives_anchor_removal | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.11 | complete | test_fable2_prototype_trust.CanonicalizationTests.test_signed_low_carry_and_only_proven_immediates | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.12 | complete | test_fable2_prototype_trust.CanonicalizationTests.test_signed_low_carry_and_only_proven_immediates | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.13 | complete | test_fable2_prototype_trust.CanonicalizationTests.test_relocation_canonicalizes_but_unrelated_constant_does_not | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.14 | complete | test_fable2_prototype_completion.AblationTests.test_ablation_removes_support_without_double_counting | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.15 | complete | test_fable2_prototype_completion.AblationTests.test_fixed_point_is_seeded_non_circular_and_order_independent | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.16 | complete | test_fable2_prototype_completion.AblationTests.test_fixed_point_is_seeded_non_circular_and_order_independent | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.17 | complete | test_fable2_prototype_completion.AblationTests.test_crossed_targets_and_community_do_not_bootstrap, test_fable2_prototype_trust.OverlayTests.test_duplicate_target_rejected, test_fable2_prototype_completion.AblationTests.test_production_ablation_populations_physics_and_hammer | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.18 | complete | test_fable2_prototype_trust.StringIdentityTests.test_literal_contradiction_overrides_exact_bytes, test_fable2_prototype_completion.AblationTests.test_removed_gate_recomputes_reciprocity_and_grade | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.19 | complete | test_fable2_prototype_trust.ProductionEvidenceTests.test_hammer_callee_diff_is_only_empty_pointer_and_comparator_call, test_fable2_prototype_completion.AblationTests.test_production_ablation_populations_physics_and_hammer | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.20 | complete | test_fable2_prototype_trust.ProductionEvidenceTests.test_comparators_are_equal_reachable_unowned_regions | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.21 | complete | test_fable2_prototype_trust.ProductionEvidenceTests.test_closed_collision_is_suppressed_in_effective_consumer_view | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.22 | complete | test_fable2_prototype_trust.OverlayTests.test_duplicate_donor_rejected, test_fable2_prototype_trust.OverlayTests.test_duplicate_target_rejected | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.23 | complete | test_fable2_prototype_trust.OverlayTests.test_unsupported_community_class_cannot_create_mapping | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.24 | complete | test_fable2_prototype_trust.CallbackConstructionTests.test_payload_shape_exposes_unproven_callees, test_fable2_prototype_trust.CallbackConstructionTests.test_adversarial_payload_width_source_and_name_flow, test_fable2_prototype_trust.CallbackConstructionTests.test_adjacency_and_truncated_layout_do_not_match | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.25 | complete | test_fable2_prototype_completion.ProvenanceTests.test_review_selection_positive_negative_and_deterministic | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.26 | complete | test_fable2_prototype_completion.ProvenanceTests.test_bound_artifacts_detect_mutations, test_fable2_prototype_completion.ProvenanceTests.test_report_summary_and_actual_bytes_three_way | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.27 | complete | test_fable2_prototype_trust.CanonicalizationTests.test_output_roots_fail_closed, test_fable2_prototype_completion.ProvenanceTests.test_forbidden_paths_are_not_allowlisted | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.28 | complete | test_fable2_prototype_trust.ProductionEvidenceTests.test_secondary_pair_level_result_matches_closed_aggregate | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.29 | complete | test_fable2_prototype_completion.ProvenanceTests.test_two_hop_requires_each_trusted_non_oracular_hop | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.30 | complete | test_fable2_prototype_completion.BoundaryPolicyTests.test_all_transformation_classes_positive_and_adversarial, test_fable2_prototype_completion.BoundaryPolicyTests.test_thunk_tail_internal_and_unresolved_have_distinct_bounds | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.31 | complete | test_fable2_prototype_completion.ProvenanceTests.test_unmatched_and_boundary_population_is_exhaustive, test_fable2_prototype_completion.BoundaryPolicyTests.test_all_transformation_classes_positive_and_adversarial, test_fable2_prototype_completion.BoundaryPolicyTests.test_collective_fragment_coverage_preserves_missing_boundaries | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.32 | complete | test_fable2_prototype_completion.TypedPolicyTests.test_vtable_positive_requires_complete_typed_chain | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.33 | complete | test_fable2_prototype_completion.TypedPolicyTests.test_global_identity_needs_boundaries_roles_and_compatible_content | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.34 | complete | test_fable2_prototype_completion.TypedPolicyTests.test_global_identity_needs_boundaries_roles_and_compatible_content | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.35 | complete | test_fable2_prototype_trust.LuaAndFreezeTests.test_stripped_debug_information_preserves_executable_pair, test_fable2_prototype_trust.LuaAndFreezeTests.test_lua_invalid_or_unrelated_container_fails_closed | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.36 | complete | test_fable2_prototype_completion.ProvenanceTests.test_script_state_categories_do_not_prove_runtime_identity | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.37 | complete | test_fable2_prototype_completion.ProvenanceTests.test_preservation_needs_first_party_presence_and_dependencies | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.38 | complete | test_fable2_prototype_completion.ProvenanceTests.test_preservation_needs_first_party_presence_and_dependencies | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+| fixture.39 | complete | test_fable2_prototype_trust.LuaAndFreezeTests.test_frozen_hash_prevents_semantic_feedback, test_fable2_prototype_trust.ProductionEvidenceTests.test_frozen_mapping_files_remain_byte_bound | `out/prototype-archaeology/phase2c/completion/fixture-coverage.json`, `out/prototype-archaeology/phase2c/completion/test-results.json` |
+
+## Evidenced blockers
+
+- `L.script-bank-parser-or-blocker`: Bounded inventory completed; validated proprietary bank-entry layout is unavailable in the existing supported parsers.
+- `L.game-GUI-startup-states`: Path categories are preserved, but a native Lua-state lifetime/namespace ownership chain is absent.
+- `L.retail-provenance`: Current-runtime script inventory is not an authenticated retail-disc bank and dependency inventory.
+- `M.complete-chain-or-blocker`: The native callback payload is proven, but helper/adapter, native state and corresponding TU1 registration obligations remain unresolved.
+- `validation.baseline-bound-ownership`: Exact historical generated/default/fable2_recomp.136.cpp bytes with SHA-256 6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59 are absent; only three baseline-bound provenance fields differ.
+- `validation.all-existing-verifiers`: Current validators pass; exact historical ownership JSON replay remains blocked by the hash-bound generated input. The closed Phase 2B generator retains its branch guard and is not rebound.

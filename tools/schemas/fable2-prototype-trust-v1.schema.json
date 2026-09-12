@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype-trust:1",
+  "title": "Phase 2C provisional trust evidence family",
+  "type": "object",
+  "required": ["schema", "generator", "phase2b_commit", "canonical_adoption"],
+  "properties": {
+    "schema": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": {
+        "version": {"const": 1},
+        "name": {"enum": [
+          "fable2-prototype-trust-source-pins", "fable2-prototype-trust-semantic-extra-source-pins", "fable2-prototype-trust-audit",
+          "fable2-prototype-trust-candidates", "fable2-prototype-trust-september",
+          "fable2-prototype-trust-effective-map", "fable2-prototype-trust-known-cases",
+          "fable2-prototype-trust-boundaries", "fable2-prototype-trust-mapping-freeze",
+          "fable2-prototype-trust-semantic-v2", "fable2-prototype-trust-types-globals",
+          "fable2-prototype-trust-scripts", "fable2-prototype-trust-registration",
+          "fable2-prototype-trust-preservation", "fable2-prototype-trust-intersections",
+          "fable2-prototype-trust-review", "fable2-prototype-trust-validation"
+        ]}
+      }
+    },
+    "generator": {"type": "object", "required": ["name", "version"], "properties": {
+      "name": {"const": "Fable2PrototypeTrust.py"}, "version": {"const": "0.1.0"}
+    }},
+    "phase2b_commit": {"const": "31d8693ca486758a63221346ce4d376b8865fd20"},
+    "canonical_adoption": {"const": false},
+    "records": {"type": "array", "items": {"type": "object"}},
+    "counts": {"type": "object"}
+  },
+  "allOf": [
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-source-pins"}}}}}, "then": {
+      "required": ["sources", "fable_start", "sdk_start", "python_runtime"],
+      "properties": {"sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identity"}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-audit"}}}}}, "then": {
+      "required": ["records", "counts", "source_pins_sha256"],
+      "properties": {"records": {"type": "array", "minItems": 15299, "maxItems": 15299, "items": {
+        "type": "object", "required": ["id", "original_record_index", "original_record_sha256", "donor_start", "target_start", "disposition", "anchors", "reference_comparisons", "conflicts", "code_lineage_disproven"],
+        "properties": {"code_lineage_disproven": {"const": false}, "disposition": {"enum": ["retained-independent-evidence", "retained-full-object-corroborated", "suppressed-semantic-collision", "review-required-partial-anchor", "review-required-independent-evidence"]}}
+      }}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-candidates"}}}}}, "then": {
+      "required": ["records", "proposals", "counts", "audit_sha256"],
+      "properties": {"records": {"type": "array", "minItems": 21350, "maxItems": 21350, "items": {
+        "required": ["original_mapping_review_id", "association_id", "donor_start", "candidates", "candidate_count", "result"]
+      }}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-september"}}}}}, "then": {
+      "required": ["original_pairs", "original_terminals", "original_candidates", "original_aggregate", "trust_dispositions", "trust_counts"],
+      "properties": {"original_pairs": {"type": "array", "minItems": 9600, "maxItems": 9600}, "original_terminals": {"type": "array", "minItems": 45707, "maxItems": 45707}, "trust_dispositions": {"type": "array", "minItems": 9600, "maxItems": 9600}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-effective-map"}}}}}, "then": {
+      "required": ["records", "suppressions", "additions", "counts", "canonical_consumer_enabled"],
+      "properties": {"canonical_consumer_enabled": {"const": false}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-mapping-freeze"}}}}}, "then": {
+      "required": ["artifacts", "semantic_feedback_allowed", "stage_status"],
+      "properties": {"semantic_feedback_allowed": {"const": false}, "artifacts": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"$ref": "#/$defs/identity"}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-semantic-v2"}}}}}, "then": {
+      "required": ["records", "counts", "mapping_freeze_sha256"],
+      "properties": {"records": {"type": "array", "minItems": 51657, "maxItems": 51657, "items": {"required": ["prior_record_id", "mapping_dependencies", "status", "proposed_name", "canonical_adoption"], "properties": {"proposed_name": {"type": "null"}, "canonical_adoption": {"const": false}}}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-known-cases"}}}}}, "then": {
+      "required": ["functions", "comparator_regions", "semantic_role", "comparator_role"],
+      "properties": {"functions": {"type": "array", "minItems": 10}, "comparator_regions": {"type": "array", "minItems": 2, "maxItems": 2}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-boundaries"}}}}}, "then": {
+      "required": ["records", "classes", "internal_code_regions", "september_boundary_review", "limitations"],
+      "properties": {"records": {"items": {"required": ["donor", "relation", "grade", "windows", "semantic_transport_permitted"], "properties": {"semantic_transport_permitted": {"const": false}, "relation": {"enum": ["split", "merge", "outline", "inline", "thunk", "tail", "shared-body", "unresolved-boundary"]}}}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-registration"}}}}}, "then": {
+      "required": ["inspected", "recovered_structures", "new_recognizers", "recognizer_population", "recognizer_candidates", "constructor_uses", "counts", "phase2b_failure"],
+      "properties": {"inspected": {"type": "array", "maxItems": 6}, "constructor_uses": {"type": "array", "items": {"required": ["build", "caller", "call", "helper", "name", "callback", "blockers", "semantic_transport"], "properties": {"semantic_transport": {"const": false}}}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-types-globals"}}}}}, "then": {
+      "required": ["counts", "globals", "pointer_runs", "type_contexts", "limitations"],
+      "properties": {"pointer_runs": {"type": "array", "items": {"required": ["build", "start", "end_exclusive", "slots", "object_boundary_proven", "vtable_proven", "alternatives"], "properties": {"object_boundary_proven": {"const": false}, "vtable_proven": {"const": false}}}}, "globals": {"type": "array", "items": {"required": ["object_boundary_proven", "semantic_acceptance", "status"], "properties": {"object_boundary_proven": {"const": false}, "semantic_acceptance": {"const": false}}}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-scripts"}}}}}, "then": {
+      "required": ["records", "script_pairs", "counts", "extra_source_pins_sha256", "limitations"]
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-preservation"}}}}}, "then": {
+      "required": ["records", "counts", "community_only_free_camera_acceptance", "limitations"],
+      "properties": {"community_only_free_camera_acceptance": {"const": false}, "records": {"items": {"required": ["grade", "portability_class", "dependencies", "retail_presence", "canonical_adoption"], "properties": {"canonical_adoption": {"const": false}}}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-intersections"}}}}}, "then": {
+      "required": ["records", "counts", "limitation"], "properties": {"records": {"items": {"required": ["donor_start", "target_start", "mapping_source", "intersections"]}}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-review"}}}}}, "then": {
+      "required": ["records", "availability", "selection_policy"]
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-validation"}}}}}, "then": {
+      "required": ["phase_complete", "artifacts", "implementation", "report", "counts", "source_pins_sha256", "extra_source_pins_sha256", "limitations"],
+      "properties": {"phase_complete": {"const": false}, "artifacts": {"type": "array", "items": {"$ref": "#/$defs/identity"}}, "implementation": {"type": "array", "items": {"$ref": "#/$defs/identity"}}, "report": {"$ref": "#/$defs/identity"}}
+    }},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-trust-semantic-extra-source-pins"}}}}}, "then": {
+      "required": ["sources", "provenance"], "properties": {"sources": {"type": "array", "items": {"$ref": "#/$defs/identity"}}}
+    }}
+  ],
+  "$defs": {
+    "identity": {"type": "object", "required": ["path", "size", "sha256"], "properties": {
+      "path": {"type": "string", "minLength": 1}, "size": {"type": "integer", "minimum": 0},
+      "sha256": {"type": "string", "pattern": "^[0-9A-F]{64}$"}
+    }}
+  }
+}

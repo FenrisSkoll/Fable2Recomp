@@ -12,3 +12,10 @@
 /tools/Verify-Fable2PrototypeSemantics.ps1 text eol=lf
 /tools/schemas/fable2-prototype-semantics-v1.schema.json text eol=lf
 /tests/test_fable2_prototype_semantics.py text eol=lf
+
+# Phase 2C hashes only its own implementation and evidence bytes.
+/docs/fable2-prototype-archaeology/phase2c/** text eol=lf
+/tools/Fable2PrototypeTrust.py text eol=lf
+/tools/Verify-Fable2PrototypeTrust.ps1 text eol=lf
+/tools/schemas/fable2-prototype-trust-v1.schema.json text eol=lf
+/tests/test_fable2_prototype_trust.py text eol=lf

@@ -67,6 +67,12 @@ class AblationTests(unittest.TestCase):
         self.assertEqual([],c.expand_dependencies({'A':'a'},nodes[:1]))
 
 class BoundaryPolicyTests(unittest.TestCase):
+    def test_collective_fragment_coverage_preserves_missing_boundaries(self):
+        self.assertEqual([],c.coverage_gaps(0,16,[(0,8),(8,16)]))
+        self.assertEqual([[4,8]],c.coverage_gaps(0,16,[(0,4),(8,20)]))
+        self.assertEqual([[0,16]],c.coverage_gaps(0,16,[(20,24)]))
+        self.assertEqual([],c.coverage_gaps(0,16,[(-4,12),(4,16)]))
+
     def test_behavior_features_preserve_fields_and_known_cfg(self):
         a=make_image([(0x1000,[0x80640008,0x4E800020])],b'x\0')
         b=make_image([(0x1000,[0x8064000C,0x4E800020])],b'x\0')
@@ -134,6 +140,17 @@ class TypedPolicyTests(unittest.TestCase):
         self.assertEqual('type-context-not-constructor',c.typed_disposition({'type_string_only':True}))
 
 class ProvenanceTests(unittest.TestCase):
+    def test_report_summary_and_actual_bytes_three_way(self):
+        with tempfile.TemporaryDirectory() as root:
+            root=Path(root); path=root/'evidence.json'; path.write_bytes(b'{}\n')
+            row={'path':'evidence.json','size':3,'sha256':t.digest(b'{}\n')}
+            report=f"| `evidence.json` | 3 | `{row['sha256']}` |"
+            c.report_bindings(root,report,[row])
+            for bad in (report.replace('| 3 |','| 4 |'),report+'\n'+report,''):
+                with self.assertRaises(ValueError): c.report_bindings(root,bad,[row])
+            path.write_bytes(b'[]\n')
+            with self.assertRaises(ValueError): c.report_bindings(root,report,[row])
+
     def test_two_hop_requires_each_trusted_non_oracular_hop(self):
         secondary={'s':{'target':'b','trusted':True}}
         primary={'b':{'target':'t','trusted':True}}

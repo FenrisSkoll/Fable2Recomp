@@ -505,6 +505,64 @@ def extend_match(left,right,df,da,ta,width=32):
             'target_owner':t.native.boundary(owner) if owner else None,
             'donor_flow':flow(left,dl,dh),'target_flow':flow(right,tl,th)}
 
+def coverage_gaps(start,end,intervals):
+    cursor=start; gaps=[]
+    for lo,hi in sorted(intervals):
+        lo=max(start,lo); hi=min(end,hi)
+        if lo>=hi or hi<=cursor:
+            continue
+        if lo>cursor:
+            gaps.append([cursor,lo])
+        cursor=max(cursor,hi)
+    if cursor<end:
+        gaps.append([cursor,end])
+    return gaps
+
+
+def transformation_obligations(records):
+    """Reconcile all exact fragments collectively, including many-to-one owners.
+
+    Missing bytes and unmatched transfer sites remain visible; no union of
+    fragments can itself establish introduced call boundaries or source lineage.
+    """
+    owners=collections.defaultdict(list)
+    for row in records:
+        for region in row.get('regions',[]):
+            if region['target_owner']:
+                owners[region['target_owner']['start']].append((row,region))
+    for row in records:
+        if 'regions' not in row:
+            continue
+        regions=row['regions']; df=row['donor']
+        donor_gaps=coverage_gaps(int(df['start'],16),int(df['end_exclusive'],16),
+                  [(int(r['donor_start'],16),int(r['donor_end_exclusive'],16)) for r in regions])
+        targets=[]
+        for key in sorted({r['target_owner']['start'] for r in regions if r['target_owner']}):
+            contributions=owners[key]; owner=contributions[0][1]['target_owner']
+            gaps=coverage_gaps(int(owner['start'],16),int(owner['end_exclusive'],16),
+                  [(int(r['target_start'],16),int(r['target_end_exclusive'],16)) for _,r in contributions])
+            targets.append({'owner':owner,'donor_contributors':sorted({a['donor']['start'] for a,_ in contributions}),
+                            'uncovered_ranges':[[t.native.hx(a),t.native.hx(b)] for a,b in gaps]})
+        transfer_sites=[]
+        for field in ('calls','external_nonlink_transfers'):
+            for edge in row['flow'][field]:
+                pc=int(edge['instruction'],16)
+                covering=[r for r in regions if int(r['donor_start'],16)<=pc<int(r['donor_end_exclusive'],16)]
+                transfer_sites.append({'kind':field,'donor_instruction':edge['instruction'],
+                    'candidate_target_instructions':sorted({t.native.hx(pc+int(r['target_start'],16)-int(r['donor_start'],16)) for r in covering}),
+                    'blocker':'Introduced/removed call or tail boundaries require independent destination and continuation evidence.'})
+        row['transformation_obligations']={
+          'donor_uncovered_ranges':[[t.native.hx(a),t.native.hx(b)] for a,b in donor_gaps],
+          'target_coverage':targets,'transfer_sites':transfer_sites,
+          'split_owner_candidates':len(targets),
+          'merge_contributor_candidates':max([len(r['donor_contributors']) for r in targets],default=0),
+          'complete_byte_coverage':bool(regions) and not donor_gaps and bool(targets) and all(not r['uncovered_ranges'] for r in targets),
+          'outline_inline_evidence':'No introduced/removed call and continuation relationship is established by exact fragments alone.',
+          'ordinary_pair_gates':row['facts'],
+          'semantic_transport':False}
+    return records
+
+
 def boundary_completion(images, check=False):
     prior=t.read(t.OUT/'boundaries.json')
     seed_pairs={r['donor_start']:r['target_start'] for r in t.read(t.OUT/'trust-audit.json')['records'] if r['disposition'].startswith('retained-')}
@@ -592,6 +650,7 @@ def boundary_completion(images, check=False):
         records.append({'id':f'internal:{i}','region':region,'relation':'internal-code-region','semantic_transport':False,
                         'reason':'Reachable byte-identical comparator region has no independent .pdata entry or owner.'})
     t.require(len(prior['records'])==713 and len(prior['september_boundary_review'])==33,'boundary population drift')
+    transformation_obligations(records)
     doc=env('boundaries',records=records,counts=dict(sorted(collections.Counter(r['relation'] for r in records).items())),
             populations={'primary':713,'september':33,'comparators':2},
             strong_probable_boundary_disagreements=[{'donor':p['donor_start'],'target':p['target_start'],'grade':p['grade']} for p in t.read(t.OUT/'reference-candidates.json')['proposals'] if p['grade'] in ('reviewed-strong-proposal','reviewed-probable-proposal') and not p['boundary_valid']],
@@ -882,12 +941,12 @@ test_duplicate_donor_rejected,test_duplicate_target_rejected
 test_unsupported_community_class_cannot_create_mapping
 test_payload_shape_exposes_unproven_callees,test_adversarial_payload_width_source_and_name_flow,test_adjacency_and_truncated_layout_do_not_match
 test_review_selection_positive_negative_and_deterministic
-test_bound_artifacts_detect_mutations
+test_bound_artifacts_detect_mutations,test_report_summary_and_actual_bytes_three_way
 test_output_roots_fail_closed,test_forbidden_paths_are_not_allowlisted
 test_secondary_pair_level_result_matches_closed_aggregate
 test_two_hop_requires_each_trusted_non_oracular_hop
 test_all_transformation_classes_positive_and_adversarial,test_thunk_tail_internal_and_unresolved_have_distinct_bounds
-test_unmatched_and_boundary_population_is_exhaustive,test_all_transformation_classes_positive_and_adversarial
+test_unmatched_and_boundary_population_is_exhaustive,test_all_transformation_classes_positive_and_adversarial,test_collective_fragment_coverage_preserves_missing_boundaries
 test_vtable_positive_requires_complete_typed_chain
 test_global_identity_needs_boundaries_roles_and_compatible_content
 test_global_identity_needs_boundaries_roles_and_compatible_content
@@ -899,6 +958,13 @@ test_frozen_hash_prevents_semantic_feedback,test_frozen_mapping_files_remain_byt
 
 def check_identity(path,row):
     t.require(path.stat().st_size==row['size'] and t.old.sha256_file(path)==row['sha256'],'bound artifact bytes differ')
+
+
+def report_bindings(root,report,artifacts):
+    for row in artifacts:
+        expected=f"| `{row['path']}` | {row['size']} | `{row['sha256']}` |"
+        t.require(report.count(expected)==1,'report artifact row missing, duplicated or inconsistent')
+        check_identity(root/row['path'],row)
 
 def fixture_coverage(check=False):
     tests={}
@@ -1040,7 +1106,7 @@ GATE_BINDINGS = {
  'F': ('effective_view,mapping_final', 'completion/effective-map.json,completion/mapping-freeze.json', [21,22,39]),
  'G': ('registration_stage,recon_completion', 'registration.json,completion/recon-completion.json', [24,37]),
  'H': ('secondary_stage,two_hop', 'september-pairs.json,completion/semantic-final.json', [28,29]),
- 'I': ('boundary_completion,extend_match,relation_class', 'completion/boundary-completion.json', [20,30,31]),
+ 'I': ('boundary_completion,extend_match,relation_class,transformation_obligations', 'completion/boundary-completion.json', [20,30,31]),
  'J': ('semantic_stage,verified_freeze', 'completion/semantic-final.json,completion/mapping-freeze.json', [29,39]),
  'K': ('typed_completion,typed_disposition', 'completion/typed-completion.json', [32,33,34]),
  'L': ('script_stage,state_provenance,recon_completion', 'scripts.json,completion/recon-completion.json', [35,36]),
@@ -1166,7 +1232,7 @@ def final_summary(check=False):
       'The review queue includes all 86 strong proposals and three sorted examples per available lower-grade/subsystem stratum, with explicit available and selected totals and no human approval.','',
       '```json',json.dumps(counts,indent=2,sort_keys=True),'```','',
       '## Fixture coverage','',
-      'All 39 required categories bind named executed tests in completion-matrix.json and fixture-coverage.json. Full discovery runs 246 tests with zero failures, errors or skips. Positive synthetic typed/transformation policies do not assert that a real object or transformation was recovered.','',
+      'All 39 required categories bind named executed tests in completion-matrix.json and fixture-coverage.json. Full discovery runs 248 tests with zero failures, errors or skips. Positive synthetic typed/transformation policies do not assert that a real object or transformation was recovered.','',
       '## Verification and blockers','',
       'Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence; two verification gates refer to the same missing historical input.','',
       'Historical ownership: the Phase 2B and completion-checkpoint manifests are identical. The original current-input invocation fails `FAIL: stale manifest`. The immutable manifest at `c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml` passes the unchanged input validator when supplied as a read-only Git blob. The human ledger reproduces exactly; JSON differs only in three provenance fields for sub_8279E818. Missing `generated/default/fable2_recomp.136.cpp` SHA-256 `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59` is required for exact historical replay. Current bytes hash to `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`; line references shifted 11964→11977 and 12207→12220. Current ledger/plan semantic validation passes. This is explicitly not an all-green result.','',
@@ -1174,6 +1240,7 @@ def final_summary(check=False):
       '## Exact artifact bytes','', '| Repository-relative path | Bytes | SHA-256 |','| --- | ---: | --- |']
     lines += [f"| `{r['path']}` | {r['size']} | `{r['sha256']}` |" for r in artifacts]
     write(t.DOC/'report.md',('\n'.join(lines)+'\n').encode(),check)
+    report_bindings(t.ROOT,(t.ROOT/t.DOC/'report.md').read_text(),artifacts)
     implementation=[identity(p.relative_to(t.ROOT)) for p in sorted((t.ROOT/'tools').glob('*PrototypeCompletion.py'))]
     implementation += [identity(Path(p)) for p in ('tools/Fable2PrototypeTrust.py','tools/Verify-Fable2PrototypeTrust.ps1',SCHEMA,'tools/schemas/fable2-prototype-trust-v1.schema.json','tests/test_fable2_prototype_completion.py','tests/test_fable2_prototype_trust.py')]
     implementation += [identity(t.DOC/p) for p in ('README.md','policy.md','review-guide.md','verification.md','next-phase-handoff.md','completion-matrix.md')]
@@ -1216,7 +1283,8 @@ def replay_all():
     fixture_coverage(True)
     ownership_verification(True)
     verify_terminals()
-    paths=sorted(p.relative_to(t.ROOT) for p in (t.ROOT/t.OUT).rglob('*.json') if p.name not in ('replay-results.json',))
+    receipts={'replay-results.json','test-results.json','verification-results.json'}
+    paths=sorted(p.relative_to(t.ROOT) for p in (t.ROOT/t.OUT).rglob('*.json') if p.name not in receipts)
     doc=env('verification',checks=[{'path':p.as_posix(),'status':'byte-identical'} for p in paths],
             closed_unchanged=True,sdk_preserved=True,scope='Full original mapping/September/downstream and completion analysis recomputed; tests and closed verifier reports separately validated.',
             artifacts=[identity(p) for p in paths])
@@ -1224,9 +1292,26 @@ def replay_all():
     print('PASS full analytical replay',flush=True)
 
 
+def schema_checks():
+    result=t.read(OUT/'verification-results.json')
+    result['checks']=[r for r in result['checks'] if r.get('kind')!='schema']
+    for script,count in [('Verify-Fable2PrototypeArchaeologyJson.ps1',10),
+                         ('Verify-Fable2PrototypeCorrespondenceJson.ps1',5),
+                         ('Verify-Fable2PrototypeSemantics.ps1',11),
+                         ('Verify-Fable2PrototypeTrust.ps1',None)]:
+        command=['pwsh','-NoProfile','-File','tools/'+script]
+        completed=subprocess.run(command,cwd=t.ROOT,capture_output=True,text=True)
+        t.require(completed.returncode==0,completed.stdout+completed.stderr)
+        if count is None:
+            count=completed.stdout.count('PASS schema:')
+        result['checks'].append({'command':command,'kind':'schema','status':'pass','return_code':0,'artifacts':count})
+        print('PASS schema family',script,count,flush=True)
+    write(OUT/'verification-results.json',result)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command',choices=['matrix-initial','ablation','verify-ablation','boundaries','verify-boundaries','typed','verify-typed','ownership','verify-ownership','mapping','verify-mapping','recon','verify-recon','semantics','verify-semantics','tests','review','checks','summary','verify-summary','replay'])
+    parser.add_argument('command',choices=['matrix-initial','ablation','verify-ablation','boundaries','verify-boundaries','typed','verify-typed','ownership','verify-ownership','mapping','verify-mapping','recon','verify-recon','semantics','verify-semantics','tests','review','checks','schemas','summary','verify-summary','replay'])
     args=parser.parse_args()
     if args.command=='matrix-initial':
         matrix_initial()
@@ -1236,6 +1321,8 @@ def main():
         review_final()
     elif args.command=='checks':
         closed_checks()
+    elif args.command=='schemas':
+        schema_checks()
     elif args.command in ('summary','verify-summary'):
         final_summary(args.command=='verify-summary')
     elif args.command=='replay':

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype-overlay:1",
+  "type": "object",
+  "required": ["schema", "phase2d_commit", "canonical_adoption", "analysis_only"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "enum": [
+            "fable2-prototype-overlay-owner-decision",
+            "fable2-prototype-overlay-approved-delta",
+            "fable2-prototype-overlay-source-pins",
+            "fable2-prototype-overlay-selected-actions",
+            "fable2-prototype-overlay-effective-map",
+            "fable2-prototype-overlay-application-receipt",
+            "fable2-prototype-overlay-suppression-route-audit",
+            "fable2-prototype-overlay-reservation-inventory",
+            "fable2-prototype-overlay-exclusion-audit",
+            "fable2-prototype-overlay-dependency-injectivity",
+            "fable2-prototype-overlay-consumer-compatibility",
+            "fable2-prototype-overlay-rollback-verification",
+            "fable2-prototype-overlay-overlay-summary",
+            "fable2-prototype-overlay-validation",
+            "fable2-prototype-overlay-checks",
+            "fable2-prototype-overlay-tests",
+            "fable2-prototype-overlay-replay",
+            "fable2-prototype-overlay-schemas"
+          ]
+        },
+        "version": {"const": 1}
+      }
+    },
+    "phase2d_commit": {"const": "6db4b4374c6e5cac180b92e23fb0bbeec86c4500"},
+    "canonical_adoption": {"const": false},
+    "analysis_only": {"const": true},
+    "overlay_version": {"const": "phase2e-v1"},
+    "records": {"type": "array", "items": {"type": "object"}}
+  },
+  "allOf": [
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-owner-decision"}}}}},
+      "then": {
+        "required": ["human_approval", "decision_record_schema", "decision", "phase2d_binding", "approved_batches", "selected_actions", "selected_action_count", "selected_action_set_sha256", "approved_population", "reservation_acknowledgement", "explicit_exclusions", "prohibited_surfaces", "noncanonical_adoption"],
+        "properties": {
+          "human_approval": {"const": true},
+          "selected_action_count": {"const": 86},
+          "selected_action_set_sha256": {"const": "8E9CBB93751C0F0B13FF04F1809207D72C0C96587369FEEA0C528F0A9EEE2363"},
+          "approved_batches": {"type": "array", "minItems": 5, "maxItems": 5},
+          "selected_actions": {"type": "array", "minItems": 86, "maxItems": 86},
+          "decision": {
+            "type": "object",
+            "required": ["approver_identity", "decision_timestamp", "external_decision_record_id", "decision", "approved_surface"],
+            "properties": {
+              "approver_identity": {"const": "FenrisSkoll"},
+              "decision_timestamp": {"const": "2026-09-12T22:00:00+01:00"},
+              "external_decision_record_id": {"const": "P2D-OWNER-DECISION-001"},
+              "decision": {"const": "approve"},
+              "approved_surface": {"const": "reversible non-canonical semantic-transport and mapping overlay only"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-approved-delta"}}}}},
+      "then": {
+        "required": ["overlay_version", "owner_decision", "human_decision_record_id", "selected_action_set_sha256", "counts", "application_order", "suppression_precedence_routes", "actions", "noncanonical_adoption"],
+        "properties": {
+          "actions": {"type": "array", "minItems": 86, "maxItems": 86},
+          "selected_action_set_sha256": {"const": "8E9CBB93751C0F0B13FF04F1809207D72C0C96587369FEEA0C528F0A9EEE2363"},
+          "counts": {
+            "type": "object",
+            "required": ["semantic_transport_suppressions", "unreserved_mapping_additions", "reserved_mapping_additions", "mapping_additions", "actions"],
+            "properties": {
+              "semantic_transport_suppressions": {"const": 3},
+              "unreserved_mapping_additions": {"const": 17},
+              "reserved_mapping_additions": {"const": 66},
+              "mapping_additions": {"const": 83},
+              "actions": {"const": 86}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-source-pins"}}}}},
+      "then": {"required": ["overlay_version", "phase2d", "inherited", "decision_inputs", "repository_state", "deterministic_inputs"]}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-selected-actions"}}}}},
+      "then": {"required": ["overlay_version", "owner_decision_record_id", "selected_action_set_sha256", "approved_batches", "records"], "properties": {"records": {"minItems": 86, "maxItems": 86}}}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-effective-map"}}}}},
+      "then": {
+        "required": ["overlay_version", "owner_decision_record_id", "selected_action_set_sha256", "application_order", "counts", "suppressions", "records", "donor_injective", "target_injective", "suppression_precedence", "noncanonical_adoption"],
+        "properties": {
+          "records": {"minItems": 15379, "maxItems": 15379},
+          "suppressions": {"type": "array", "minItems": 3, "maxItems": 3},
+          "donor_injective": {"const": true},
+          "target_injective": {"const": true},
+          "suppression_precedence": {"const": true}
+        }
+      }
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-reservation-inventory"}}}}},
+      "then": {"required": ["overlay_version", "count", "records", "reservations_preserved_exactly"], "properties": {"count": {"const": 66}, "records": {"minItems": 66, "maxItems": 66}, "reservations_preserved_exactly": {"const": true}}}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-exclusion-audit"}}}}},
+      "then": {"required": ["overlay_version", "unapproved_phase2d_ledger_records", "probable_proposals", "counts", "empty_batches"], "properties": {"unapproved_phase2d_ledger_records": {"type": "array", "minItems": 5, "maxItems": 5}, "probable_proposals": {"type": "array", "minItems": 715, "maxItems": 715}}}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"enum": ["fable2-prototype-overlay-application-receipt", "fable2-prototype-overlay-suppression-route-audit", "fable2-prototype-overlay-dependency-injectivity", "fable2-prototype-overlay-consumer-compatibility", "fable2-prototype-overlay-rollback-verification"]}}}}},
+      "then": {"required": ["overlay_version"]}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-overlay-summary"}}}}},
+      "then": {"required": ["overlay_version", "counts", "owner_decision", "approved_delta", "artifacts", "reservations", "exclusions", "consumer_contract", "inherited_blockers"]}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"const": "fable2-prototype-overlay-validation"}}}}},
+      "then": {"required": ["overlay_version", "owner_decision", "approved_delta", "source_pins", "overlay_summary", "report", "artifacts", "implementation", "checks", "inherited_blockers"]}
+    },
+    {
+      "if": {"required": ["schema"], "properties": {"schema": {"required": ["name"], "properties": {"name": {"enum": ["fable2-prototype-overlay-checks", "fable2-prototype-overlay-tests", "fable2-prototype-overlay-replay", "fable2-prototype-overlay-schemas"]}}}}},
+      "then": {"required": ["records"]}
+    }
+  ]
+}

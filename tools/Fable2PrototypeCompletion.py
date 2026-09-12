@@ -20,6 +20,9 @@ from pathlib import Path
 import Fable2PrototypeTrust as t
 
 CHECKPOINT = 'e784beeab1a372cc3f71e2cd1af2dfa18b58f321'
+BOUNDED_FREEZE_START = '393df76edefcfe90ef4e126882b30c69e639c7d6'
+BOUNDED_FREEZE_TREE = 'a052202a1beb35935aff0277fe9cc0128ad503f6'
+BOUNDED_STATE = 'bounded-final-with-evidenced-blockers'
 OUT = t.OUT / 'completion'
 SCHEMA = 'tools/schemas/fable2-prototype-completion-v1.schema.json'
 
@@ -1159,10 +1162,13 @@ def final_matrix(check=False):
                      'schema':SCHEMA,'tests':row['tests'],'verifiers':['Fable2PrototypeCompletion.test_run'],
                      'report_section':'Fixture coverage','reason':row['evidence_contract']})
     t.require(len(rows)==187 and len({r['id'] for r in rows})==187,'gate population drift')
-    doc=env('matrix',stage='final-bounded-blocker-checkpoint',records=rows,
-            counts=dict(sorted(collections.Counter(r['status'] for r in rows).items())),phase_complete=False)
+    counts=dict(sorted(collections.Counter(r['status'] for r in rows).items()))
+    t.require(counts=={'blocked-with-evidence':6,'complete':181},'bounded-final gate disposition drift')
+    t.require({r['id'] for r in rows if r['status']=='blocked-with-evidence'}==set(blockers),'bounded-final blocker identity drift')
+    doc=env('matrix',stage=BOUNDED_STATE,records=rows,counts=counts,phase_complete=False)
     write(t.DOC/'evidence/completion-matrix.json',doc,check)
-    lines=['# Phase 2C completion matrix','','187 reconciled gates, including 39 explicit fixture categories. No incomplete or silently omitted rows. Blocked rows name exact missing evidence; they are not passes. Machine bindings are in `evidence/completion-matrix.json`.','',
+    lines=['# Phase 2C completion matrix','',f'Bounded state: `{BOUNDED_STATE}`.','',
+           'All work possible under the bound inputs and authorized static-analysis scope is terminally reconciled. The 187 gates include 39 explicit fixture categories. No row is incomplete or silently omitted. Six rows retain evidenced blockers, so `phase_complete` remains false; no canonical adoption follows. Machine bindings are in `evidence/completion-matrix.json`.','',
            '| Gate | Status | Implementing functions / fixtures | Evidence |','| --- | --- | --- | --- |']
     for r in rows:
         lines.append('| '+r['id']+' | '+r['status']+' | '+', '.join(x.get('function',x.get('test_id','')) for x in r['code'])+' | '+', '.join('`'+x['path']+'`' for x in r['evidence'])+' |')
@@ -1188,6 +1194,15 @@ def final_summary(check=False):
     t.binding(); t.extra_inputs()
     matrix=final_matrix(check)
     baseline=json.loads(subprocess.check_output(['git','show',CHECKPOINT+':'+(t.DOC/'evidence/validation.json').as_posix()],cwd=t.ROOT))
+    freeze_baseline=json.loads(subprocess.check_output(['git','show',BOUNDED_FREEZE_START+':'+(t.DOC/'evidence/validation.json').as_posix()],cwd=t.ROOT))
+    freeze_matrix=json.loads(subprocess.check_output(['git','show',BOUNDED_FREEZE_START+':'+(t.DOC/'evidence/completion-matrix.json').as_posix()],cwd=t.ROOT))
+    classification=lambda doc:{r['id']:(r['status'],r['reason']) for r in doc['records']}
+    t.require(classification(matrix)==classification(freeze_matrix),'bounded-final gate classification or reason drift')
+    mutable_metadata={(t.DOC/'evidence/completion-matrix.json').as_posix()}
+    protected=[r for r in freeze_baseline['artifacts'] if r['path'] not in mutable_metadata]
+    t.require(len(protected)==30,'bounded-freeze protected artifact population drift')
+    for row in protected:
+        check_identity(t.ROOT/row['path'],row)
     counts=copy.deepcopy(baseline['counts'])
     counts.update(effective_map=t.read(OUT/'effective-map.json')['counts'],semantic_v2=t.read(OUT/'semantic-final.json')['counts'],
                   feature_ablation=t.read(OUT/'feature-ablation.json')['counts'],boundary_classes=t.read(OUT/'boundary-completion.json')['counts'],
@@ -1206,8 +1221,8 @@ def final_summary(check=False):
     checkpoint_report=subprocess.check_output(['git','show',CHECKPOINT+':'+(t.DOC/'report.md').as_posix()],cwd=t.ROOT).decode()
     known=checkpoint_report.split('## Known-case dispositions\n',1)[1].split('## Limits',1)[0]
     native=checkpoint_report.split('## Native registration reconnaissance\n',1)[1].split('The historical ownership reconstruction',1)[0]
-    lines=['# Phase 2C bounded completion pass','',
-      '**Phase 2C remains blocked for an unqualified close-out by a precisely identified historical ownership input.** Independent completion work is implemented, terminally reconciled and replayed. No Phase 2D was started. No mapping or name is canonical.','',
+    lines=['# Phase 2C bounded-final freeze','',
+      f'**Phase 2C is frozen as `{BOUNDED_STATE}`.** All work possible under the bound inputs and authorized static-analysis scope is terminally reconciled. Four scientific questions lack required evidence and two verification gates share one absent historical input. Those six mandatory blockers keep `phase_complete` false. The result is final for downstream review, but is neither all-green nor canonically adopted.','',
       'Build 23 and TU1 are extremely close relatives but are not byte-identical semantic layouts. The three discovered semantic collisions do not invalidate the whole map. Phase 2A exact-image precision was a control result, not measured cross-build precision.','',
       '## Trust and ablation','',
       'All 15,299 mappings have dispositions: 15,296 retained, three suppressed, zero unresolved audit rows. Of 97 data-anchor-supported pairs, 96 retain independently reproduced support and one loses trust without its partial window. The 113 windows comprise nine full-string matches, 103 bounded non-string windows and one same-address/full-string collision; one pair has an interior pointer. A bounded window cannot prove object identity.','',
@@ -1234,8 +1249,9 @@ def final_summary(check=False):
       '## Fixture coverage','',
       'All 39 required categories bind named executed tests in completion-matrix.json and fixture-coverage.json. Full discovery runs 248 tests with zero failures, errors or skips. Positive synthetic typed/transformation policies do not assert that a real object or transformation was recovered.','',
       '## Verification and blockers','',
-      'Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence; two verification gates refer to the same missing historical input.','',
+      'Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence and carry forward as research prerequisites rather than failed implementation work. Two verification gates refer to the same missing historical input.','',
       'Historical ownership: the Phase 2B and completion-checkpoint manifests are identical. The original current-input invocation fails `FAIL: stale manifest`. The immutable manifest at `c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml` passes the unchanged input validator when supplied as a read-only Git blob. The human ledger reproduces exactly; JSON differs only in three provenance fields for sub_8279E818. Missing `generated/default/fable2_recomp.136.cpp` SHA-256 `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59` is required for exact historical replay. Current bytes hash to `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`; line references shifted 11964→11977 and 12207→12220. Current ledger/plan semantic validation passes. This is explicitly not an all-green result.','',
+      'Future resolution of the absent historical file must be an isolated, append-only verification addendum. It must not regenerate, rebind or retroactively change this frozen evidence. A separately authorized Phase 2D may review the 86 proposals; beginning that review would not convert these blocked gates into passes. No runtime, script, asset, free-camera, E3/demo, renderer, manifest or generated-code integration follows from this freeze.','',
       'Neither game was executed. No build, codegen, runtime, renderer, manifest, generated-code, canonical naming, binary, asset, SDK or network operation occurred. Only local Phase 2C analysis/documentation commits were made. The SDK branch, HEAD, tree, remotes, status and fifteen libmspack file hashes remain bound to source-pins.json.','',
       '## Exact artifact bytes','', '| Repository-relative path | Bytes | SHA-256 |','| --- | ---: | --- |']
     lines += [f"| `{r['path']}` | {r['size']} | `{r['sha256']}` |" for r in artifacts]
@@ -1244,10 +1260,11 @@ def final_summary(check=False):
     implementation=[identity(p.relative_to(t.ROOT)) for p in sorted((t.ROOT/'tools').glob('*PrototypeCompletion.py'))]
     implementation += [identity(Path(p)) for p in ('tools/Fable2PrototypeTrust.py','tools/Verify-Fable2PrototypeTrust.ps1',SCHEMA,'tools/schemas/fable2-prototype-trust-v1.schema.json','tests/test_fable2_prototype_completion.py','tests/test_fable2_prototype_trust.py')]
     implementation += [identity(t.DOC/p) for p in ('README.md','policy.md','review-guide.md','verification.md','next-phase-handoff.md','completion-matrix.md')]
-    validation=env('validation',artifacts=artifacts,implementation=implementation,counts=counts,
+    validation=env('validation',stage=BOUNDED_STATE,artifacts=artifacts,implementation=implementation,counts=counts,
                    report=identity(t.DOC/'report.md'),phase_complete=False,
                    remaining_blockers=[{'id':r['id'],'reason':r['reason']} for r in matrix['records'] if r['status']=='blocked-with-evidence'],
-                   matrix=identity(t.DOC/'evidence/completion-matrix.json'))
+                   matrix=identity(t.DOC/'evidence/completion-matrix.json'),
+                   protected_artifacts_unchanged_from={'commit':BOUNDED_FREEZE_START,'tree':BOUNDED_FREEZE_TREE,'artifacts':protected})
     write(t.DOC/'evidence/validation.json',validation,check)
     for r in artifacts+implementation+[validation['report'],validation['matrix']]:
         check_identity(t.ROOT/r['path'],r)

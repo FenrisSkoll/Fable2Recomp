@@ -1,4 +1,4 @@
-# Phase 2C provisional transport policy v1
+# Phase 2C bounded-final transport policy v1
 
 Closed Phase 2A status and Phase 2C transport disposition are distinct. The
 original pair, record index and canonical-JSON record hash remain available.
@@ -25,8 +25,11 @@ wrapper/risk shape, shared anchors, native role comparisons, counterfactual
 dependence on data and contradictions. Contradictory complete literals at the
 same relative native use role suppress transport even when the original code
 pair was exact. Original neighbourhood/topology evidence is not rewritten.
-The current audit does not yet implement every requested class-ablation and
-dependency-removal experiment; see the handoff.
+The original provisional trust-audit artifact did not itself contain every
+requested class-ablation and dependency-removal experiment. The additive
+completion layer now supplies all eleven removal classes in
+`completion/feature-ablation.json`; the closed provisional artifact remains
+unchanged.
 
 Reference canonicalization is restricted to validated two-instruction lis/addi
 or lis/ori definition chains that reach a proven native use. It preserves the
@@ -91,3 +94,9 @@ Completion effective-map and mapping-freeze are separate from the checkpoint
 view. Only their hash-bound consumer paths feed semantic-final. All additions
 remain machine proposals awaiting human review. Exact historical ownership
 replay remains blocked until its named generated-file hash is available.
+
+The scientific outputs are frozen as `bounded-final-with-evidenced-blockers`.
+This means the authorized static populations and fixtures are terminally
+reconciled, while six mandatory gates retain exact evidence blockers. It does
+not mean every gate is green: `phase_complete` and `canonical_adoption` remain
+false. Later proposal review cannot retroactively change these dispositions.

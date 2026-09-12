@@ -1,5 +1,10 @@
 # Phase 2C completion verification
 
+The machine-readable state is `bounded-final-with-evidenced-blockers` in both
+the completion matrix and validation envelope. `phase_complete` remains false
+because six mandatory gates are blocked; `canonical_adoption` remains false.
+This is a frozen bounded result, not an all-green result.
+
 `completion/test-results.json` lists 248 executed tests: zero failures, errors or
 skips. `completion/fixture-coverage.json` binds all 39 categories to exact methods.
 Synthetic policy positives do not claim real typed objects or transformations.
@@ -53,3 +58,9 @@ other field reconciles. This is an external missing-input blocker, not a pass.
 The source allowlist excludes naming, manifest, overrides, generated, runtime,
 renderer, SDK and binary paths. No game, build, codegen or network action is part
 of these commands. Exact command receipts and artifact hashes are in validation.
+
+The bounded-freeze validation compares 30 task-start-bound analytical artifacts
+and receipts against commit `393df76edefcfe90ef4e126882b30c69e639c7d6` and
+tree `a052202a1beb35935aff0277fe9cc0128ad503f6`. Only the derived completion matrix,
+validation/report bindings, schema-backed state metadata and documentation may
+change in this freeze.

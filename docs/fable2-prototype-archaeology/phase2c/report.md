@@ -1,6 +1,6 @@
-# Phase 2C bounded completion pass
+# Phase 2C bounded-final freeze
 
-**Phase 2C remains blocked for an unqualified close-out by a precisely identified historical ownership input.** Independent completion work is implemented, terminally reconciled and replayed. No Phase 2D was started. No mapping or name is canonical.
+**Phase 2C is frozen as `bounded-final-with-evidenced-blockers`.** All work possible under the bound inputs and authorized static-analysis scope is terminally reconciled. Four scientific questions lack required evidence and two verification gates share one absent historical input. Those six mandatory blockers keep `phase_complete` false. The result is final for downstream review, but is neither all-green nor canonically adopted.
 
 Build 23 and TU1 are extremely close relatives but are not byte-identical semantic layouts. The three discovered semantic collisions do not invalidate the whole map. Phase 2A exact-image precision was a control result, not measured cross-build precision.
 
@@ -333,9 +333,11 @@ All 39 required categories bind named executed tests in completion-matrix.json a
 
 ## Verification and blockers
 
-Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence; two verification gates refer to the same missing historical input.
+Full analytical replay is byte-identical across the original and completion evidence populations. Schema validation, terminal counts, injectivity, closed evidence hashes, report/summary/ignored bytes, relative-path and allowlisted Git-delta checks are required by the commands in README.md. The completion matrix has 181 complete and six blocked-with-evidence rows; no incomplete or unclassified row. Four scientific blockers concern parser/state/retail/registration evidence and carry forward as research prerequisites rather than failed implementation work. Two verification gates refer to the same missing historical input.
 
 Historical ownership: the Phase 2B and completion-checkpoint manifests are identical. The original current-input invocation fails `FAIL: stale manifest`. The immutable manifest at `c8a2264500ea32a68d747808d52b7e7820c81b72:fable2_manifest.toml` passes the unchanged input validator when supplied as a read-only Git blob. The human ledger reproduces exactly; JSON differs only in three provenance fields for sub_8279E818. Missing `generated/default/fable2_recomp.136.cpp` SHA-256 `6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59` is required for exact historical replay. Current bytes hash to `D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB`; line references shifted 11964→11977 and 12207→12220. Current ledger/plan semantic validation passes. This is explicitly not an all-green result.
+
+Future resolution of the absent historical file must be an isolated, append-only verification addendum. It must not regenerate, rebind or retroactively change this frozen evidence. A separately authorized Phase 2D may review the 86 proposals; beginning that review would not convert these blocked gates into passes. No runtime, script, asset, free-camera, E3/demo, renderer, manifest or generated-code integration follows from this freeze.
 
 Neither game was executed. No build, codegen, runtime, renderer, manifest, generated-code, canonical naming, binary, asset, SDK or network operation occurred. Only local Phase 2C analysis/documentation commits were made. The SDK branch, HEAD, tree, remotes, status and fifteen libmspack file hashes remain bound to source-pins.json.
 
@@ -373,4 +375,4 @@ Neither game was executed. No build, codegen, runtime, renderer, manifest, gener
 | `out/prototype-archaeology/phase2c/types-globals.json` | 4376285 | `7D5D346B07A5AE6F679B8C59926CE23E0FE7F1CD6A740D94BEF4485B94CCEB53` |
 | `docs/fable2-prototype-archaeology/phase2c/evidence/source-pins.json` | 319155 | `A6EBB465A081C8D03B7FCE7E0F743738413D0D77BC33A211828B9211BFA3733B` |
 | `docs/fable2-prototype-archaeology/phase2c/evidence/semantic-extra-source-pins.json` | 9116 | `86EC76731EE097BB32B48F2AB8E302E002B514EA24D5761C64589C684141C7D0` |
-| `docs/fable2-prototype-archaeology/phase2c/evidence/completion-matrix.json` | 351925 | `5D9BAAC31131E49C1AF8FB366E94EB2B6BFAC3A6EFEA2F3C51DFA560F760E40F` |
+| `docs/fable2-prototype-archaeology/phase2c/evidence/completion-matrix.json` | 351930 | `D80886D9C746D1FDE7E05BA095641D4B6D1B3D8F1D18CB980734829010C21B8C` |

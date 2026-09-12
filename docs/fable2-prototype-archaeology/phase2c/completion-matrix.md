@@ -1,6 +1,8 @@
 # Phase 2C completion matrix
 
-187 reconciled gates, including 39 explicit fixture categories. No incomplete or silently omitted rows. Blocked rows name exact missing evidence; they are not passes. Machine bindings are in `evidence/completion-matrix.json`.
+Bounded state: `bounded-final-with-evidenced-blockers`.
+
+All work possible under the bound inputs and authorized static-analysis scope is terminally reconciled. The 187 gates include 39 explicit fixture categories. No row is incomplete or silently omitted. Six rows retain evidenced blockers, so `phase_complete` remains false; no canonical adoption follows. Machine bindings are in `evidence/completion-matrix.json`.
 
 | Gate | Status | Implementing functions / fixtures | Evidence |
 | --- | --- | --- | --- |

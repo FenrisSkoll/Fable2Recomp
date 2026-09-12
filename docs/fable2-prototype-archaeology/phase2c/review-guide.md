@@ -1,4 +1,4 @@
-# Manual review of the provisional layer
+# Manual review of the bounded-final proposal layer
 
 Run the read-only replay and schema checks from README.md. Verify the validation
 manifest against actual ignored bytes and the report table. Do not use a stale
@@ -57,3 +57,9 @@ bindings and all 39 fixture categories, including exact evidenced blockers.
 `completion/ownership-verification.json` separates unchanged current validators
 from blocked historical byte replay. Resolve the specified missing input before
 an all-green close-out; do not modify the manifest or regenerate code.
+
+The evidence family is frozen as `bounded-final-with-evidenced-blockers`.
+Review may consume it, but must not mutate or rebind it. The 86 strong records
+remain machine proposals with `not-human-reviewed` state. A later Phase 2D may
+review them independently; starting that work neither adopts them nor changes
+the six Phase 2C blocker dispositions.

@@ -1,4 +1,4 @@
-# Phase 2C completion pass
+# Phase 2C bounded-final freeze
 
 Run from the repository root on `fable2-prototype-archaeology-phase2c`.
 Checkpoint: `e784beeab1a372cc3f71e2cd1af2dfa18b58f321`. Immutable inputs and SDK
@@ -8,6 +8,12 @@ Read [report.md](report.md), [completion-matrix.md](completion-matrix.md),
 [policy.md](policy.md), [verification.md](verification.md) and the handoff.
 Historical ownership replay remains blocked; no proposal is canonical or
 human-approved. No game, build, code generation or network operation is needed.
+
+Authoritative state: `bounded-final-with-evidenced-blockers`. All work possible
+under the bound inputs and authorized static scope is terminally reconciled.
+The six blocked gates remain non-passing, so `phase_complete` remains false;
+`canonical_adoption` remains false. The matrix and validation envelope expose
+this state directly.
 
 Generation order on identical validated inputs:
 
@@ -60,3 +66,9 @@ not overwrite the completion report.
 Schemas: `tools/schemas/fable2-prototype-trust-v1.schema.json` and
 `tools/schemas/fable2-prototype-completion-v1.schema.json`. The PowerShell checker
 validates both recursively. Paths in evidence are repository/corpus relative.
+
+Phase 2C scientific outputs are frozen. If the exact historical generated input
+later becomes available, record its verification as an isolated append-only
+addendum. Do not silently regenerate or rebind this evidence family. Proposal
+review belongs to a separately authorized Phase 2D; it does not convert Phase
+2C blockers into passes or authorize integration.

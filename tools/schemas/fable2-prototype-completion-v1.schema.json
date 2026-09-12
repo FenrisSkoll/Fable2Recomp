@@ -8,12 +8,13 @@
       "name":{"enum":["fable2-prototype-completion-matrix","fable2-prototype-completion-profiles","fable2-prototype-completion-ablation","fable2-prototype-completion-boundaries","fable2-prototype-completion-typed","fable2-prototype-completion-ownership","fable2-prototype-completion-freeze","fable2-prototype-completion-recon","fable2-prototype-completion-fixtures","fable2-prototype-completion-tests","fable2-prototype-completion-review","fable2-prototype-completion-validation","fable2-prototype-completion-verification"]},"version":{"const":1}}},
     "checkpoint_commit":{"const":"e784beeab1a372cc3f71e2cd1af2dfa18b58f321"},
     "canonical_adoption":{"const":false},
+    "stage":{"enum":["initial","bounded-final-with-evidenced-blockers"]},
     "records":{"type":"array","items":{"type":"object"}},
     "counts":{"type":"object"}
   },
   "allOf":[
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-matrix"}}}}},"then":{
-      "required":["records","counts","phase_complete"],"properties":{"records":{"minItems":187,"items":{"required":["id","requirement","mandatory","status","code","evidence","schema","tests","verifiers","report_section","reason"],"properties":{"status":{"enum":["complete","incomplete","blocked-with-evidence","not-applicable-with-proof"]}}}}}}},
+      "required":["stage","records","counts","phase_complete"],"properties":{"phase_complete":{"const":false},"records":{"minItems":187,"items":{"required":["id","requirement","mandatory","status","code","evidence","schema","tests","verifiers","report_section","reason"],"properties":{"status":{"enum":["complete","incomplete","blocked-with-evidence","not-applicable-with-proof"]}}}}}}},
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-profiles"}}}}},"then":{"required":["builds","source_pins_sha256","algorithm_sha256"]}},
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-ablation"}}}}},"then":{
       "required":["proposal_packets","closed_records","counts","profile_sha256","absent_classes","policy"],"properties":{
@@ -29,7 +30,7 @@
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-fixtures"}}}}},"then":{"required":["records","category_count","sources"],"properties":{"category_count":{"const":39},"records":{"minItems":39,"maxItems":39}}}},
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-tests"}}}}},"then":{"required":["tests","run","failures","errors","skipped","fixture_categories","all_required_fixture_methods_executed"],"properties":{"failures":{"const":0},"errors":{"const":0},"fixture_categories":{"const":39},"all_required_fixture_methods_executed":{"const":true}}}},
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-review"}}}}},"then":{"required":["records","availability","all_strong_included","human_approval"],"properties":{"all_strong_included":{"const":true},"human_approval":{"const":false}}}},
-    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-validation"}}}}},"then":{"required":["artifacts","implementation","counts","report","phase_complete","remaining_blockers","matrix"]}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-validation"}}}}},"then":{"required":["stage","artifacts","implementation","counts","report","phase_complete","remaining_blockers","matrix","protected_artifacts_unchanged_from"],"properties":{"stage":{"const":"bounded-final-with-evidenced-blockers"},"phase_complete":{"const":false},"protected_artifacts_unchanged_from":{"type":"object","additionalProperties":false,"required":["commit","tree","artifacts"],"properties":{"commit":{"const":"393df76edefcfe90ef4e126882b30c69e639c7d6"},"tree":{"const":"a052202a1beb35935aff0277fe9cc0128ad503f6"},"artifacts":{"type":"array","minItems":30,"maxItems":30,"items":{"type":"object","additionalProperties":false,"required":["path","size","sha256"],"properties":{"path":{"type":"string"},"size":{"type":"integer","minimum":0},"sha256":{"type":"string","pattern":"^[0-9A-F]{64}$"}}}}}}}}},
     {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-completion-verification"}}}}},"then":{"required":["checks","closed_unchanged","sdk_preserved"]}}
   ]
 }

@@ -67,6 +67,17 @@ class AblationTests(unittest.TestCase):
         self.assertEqual([],c.expand_dependencies({'A':'a'},nodes[:1]))
 
 class BoundaryPolicyTests(unittest.TestCase):
+    def test_behavior_features_preserve_fields_and_known_cfg(self):
+        a=make_image([(0x1000,[0x80640008,0x4E800020])],b'x\0')
+        b=make_image([(0x1000,[0x8064000C,0x4E800020])],b'x\0')
+        first=c.behavior_features(a,a.by_start[0x1000])
+        self.assertEqual(8,first['field_accesses'][0]['displacement'])
+        self.assertNotEqual(first,c.behavior_features(b,b.by_start[0x1000]))
+        diamond=make_image([(0x1000,[0x41820008,0x38600000,0x4E800020])],b'x\0')
+        cfg=c.behavior_features(diamond,diamond.by_start[0x1000])
+        self.assertEqual([0,2],dict(cfg['dominators'])[2])
+        self.assertEqual([0,2,3],dict(cfg['postdominators'])[0])
+
     def test_exact_region_extension_never_crosses_pdata_owner(self):
         left=make_image([(0x1000,[0x60000000]*16)],b'x\0')
         right=make_image([(0x1100,[0x60000000]*4),(0x1110,[0x60000000]*12)],b'x\0')

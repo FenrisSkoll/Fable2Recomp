@@ -5,11 +5,13 @@ import json
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import Fable2PrototypeReview as r
 import Fable2PrototypeReviewDecision as d
+import VerifyFable2PrototypeReview as verify
 from test_fable2_prototype_semantics import make_image, instruction, call
 
 
@@ -152,6 +154,33 @@ class DecisionPolicyTests(unittest.TestCase):
 
 
 class BindingTests(unittest.TestCase):
+    def test_relative_evidence_paths_preserve_guest_source_text(self):
+        verify.relative_evidence_paths({'path': 'out/prototype-archaeology/phase2d/packets.json',
+                                        'text': 'E:\\dev\\Fable2\\SourceCode\\example.cpp'})
+        for path in ('C:/Dev/private.json', '../escape.json', '/tmp/private.json'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                verify.relative_evidence_paths({'nested': [{'path': path}]})
+
+    def test_report_validation_and_actual_bytes_three_way(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'data.json').write_bytes(b'{}\n')
+            row = {'path': 'data.json', 'size': 3, 'sha256': r.sha(b'{}\n')}
+            report = f"| `data.json` | 3 | `{row['sha256']}` |"
+            with patch.object(r, 'ROOT', root):
+                verify.three_way(report, [row])
+                for bad in ('', report + '\n' + report, report.replace('| 3 |', '| 4 |')):
+                    with self.assertRaises(ValueError):
+                        verify.three_way(bad, [row])
+
+    def test_forbidden_git_delta_and_canonical_propagation(self):
+        for path in ('fable2_manifest.toml', 'generated/default/fable2_init.cpp', 'src/main.cpp', 'overrides/override.cpp',
+                     'docs/fable2-native-renderer/candidate-hook-inventory.json', 'docs/fable2-prototype-archaeology/phase2c/report.md',
+                     'assets/tu1/default.xex', 'tools/Fable2PrototypeTrust.py'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                verify.audit_paths([path])
+        verify.audit_paths(['tools/Fable2PrototypeReview.py'])
+
     def test_hash_mutation_fails_closed(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -178,6 +207,152 @@ class BindingTests(unittest.TestCase):
         self.assertNotIn('semantic-final', source)
         self.assertNotIn('candidate-profiles.json', source)
         self.assertNotIn('semantic-xrefs.json', source)
+
+
+class HumanAndSimulationTests(unittest.TestCase):
+    def ledger(self):
+        return {'records': [{'id': 'D:T', 'batch_id': 'B01', 'human_decision': 'pending', 'human_decision_evidence': None}],
+                'proposal_set_sha256': r.sha(r.payload(['D:T']))}
+
+    def test_pending_is_default_and_recommendation_is_not_approval(self):
+        ledger = self.ledger()
+        ledger['records'][0]['disposition'] = d.RECOMMEND
+        d.validate_ledger(ledger)
+        self.assertEqual('pending', ledger['records'][0]['human_decision'])
+
+    def test_approval_requires_external_user_decision(self):
+        ledger = self.ledger()
+        ledger['records'][0]['human_decision'] = 'approved'
+        with self.assertRaisesRegex(ValueError, 'pending'):
+            d.validate_ledger(ledger)
+        with self.assertRaisesRegex(ValueError, 'explicit human'):
+            d.validate_ledger(ledger, require_pending=False)
+
+    def test_each_explicit_approval_field_required(self):
+        ledger = self.ledger()
+        evidence = {'external_decision_id': 'synthetic-owner-input', 'approver': 'synthetic-test-owner',
+                    'timestamp': '2000-01-01T00:00:00Z', 'proposal_set_sha256': ledger['proposal_set_sha256'], 'batch_id': 'B01'}
+        ledger['records'][0].update(human_decision='approved', human_decision_evidence=evidence)
+        external = {'synthetic-owner-input': {**evidence, 'decision': 'approved'}}
+        d.validate_ledger(ledger, external, require_pending=False)
+        for key in evidence:
+            bad = copy.deepcopy(ledger)
+            del bad['records'][0]['human_decision_evidence'][key]
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                d.validate_ledger(bad, external, require_pending=False)
+
+    def test_approval_external_set_and_batch_must_match(self):
+        ledger = self.ledger()
+        ledger['proposal_set_sha256'] = '0' * 64
+        with self.assertRaisesRegex(ValueError, 'set hash'):
+            d.validate_ledger(ledger)
+
+    def test_simulation_excludes_hold_reject_and_downgrade(self):
+        closed = [{'donor_start': 'S', 'target_start': 'U'}]
+        p = {'id': 'D:T', 'donor_start': 'D', 'target_start': 'T', 'generation': 1,
+             'dependencies': [{'donor': 'S', 'target': 'U'}], 'disposition': d.HOLD}
+        for status in (d.HOLD, d.REJECT, d.DOWNGRADE):
+            p['disposition'] = status
+            with self.subTest(status=status), self.assertRaises(ValueError):
+                d.simulation(closed, [p], [p['id']])
+
+    def test_all_three_suppressions_precede_every_simulated_view(self):
+        closed = [{'donor_start': a, 'target_start': b} for a, b in r.SUPPRESSIONS.items()]
+        closed.append({'donor_start': 'S', 'target_start': 'U'})
+        view = d.simulation(closed, [], [])
+        self.assertEqual([{'donor_start': 'S', 'target_start': 'U'}], view['records'])
+        self.assertFalse(view['human_approval'])
+        self.assertFalse(view['canonical_consumer_enabled'])
+
+
+@unittest.skipUnless((r.ROOT / r.OUT / 'review-index.json').exists(), 'Phase 2D private review artifacts not yet generated')
+class ProductionReviewTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.index = r.read(r.OUT / 'review-index.json')['records']
+        cls.packets = r.read(r.OUT / 'packets.json')['records']
+        cls.summary = r.read(r.DOC / 'evidence/review-summary.json')
+
+    def test_every_strong_reviewed_and_pending_exactly_once(self):
+        original, _ = r.universe()
+        expected = {(x['donor_start'], x['target_start']) for x in original}
+        actual = [p for p in self.index if p['original_phase2c_grade'] == 'reviewed-strong-proposal']
+        self.assertEqual(86, len(actual))
+        self.assertEqual(expected, {(x['donor_start'], x['target_start']) for x in actual})
+        self.assertTrue(all(x['human_decision'] == 'pending' for x in actual))
+
+    def test_all_probable_have_terminal_blockers(self):
+        rows = r.read(r.OUT / 'probable-blockers.json')['records']
+        self.assertEqual(715, len({p['id'] for p in rows}))
+        self.assertTrue(all(set(p['obligation_states']) == set(d.BLOCKERS) for p in rows))
+
+    def test_callee_import_is_one_obligation(self):
+        self.assertTrue(all(h['callee_import_obligation_count'] == 1 for p in self.packets for h in p['helpers']))
+
+    def test_two_reference_identities_do_not_add_support_classes(self):
+        strong = [p for p in self.packets if p['original_phase2c_grade'] == 'reviewed-strong-proposal']
+        self.assertEqual(17, sum(p['reference_identity_count'] >= 2 for p in strong))
+        self.assertTrue(all(set(p['independent_classes']) <= {'callee', 'caller', 'neighbourhood-order'} for p in strong))
+
+    def test_support_strata_overlap_reconciles(self):
+        strata = self.summary['strata']
+        a, b, c = [set(strata[k]['ids']) for k in ('callee-only', 'richer-support', 'multi-reference')]
+        self.assertEqual((66, 20, 17), (len(a), len(b), len(c)))
+        self.assertFalse(a & b)
+        self.assertEqual(17, len(a & c) + len(b & c))
+
+    def test_hammer_regions_and_context_are_not_names(self):
+        known = r.read(r.OUT / 'known-cases.json')
+        self.assertIn('exclusion guard', known['hammer']['semantic_role'])
+        self.assertIn('no function name assigned', known['hammer']['semantic_role'])
+        self.assertTrue(all(p['kind'] == 'internal-code-region' and not p['independent_pdata_entry'] and p['owner'] is None for p in known['comparator_regions']))
+
+    def test_three_suppressions_reproduced_from_use_proofs(self):
+        rows = r.read(r.OUT / 'known-cases.json')['suppressions']
+        self.assertEqual(dict(r.SUPPRESSIONS), {p['donor_start']: p['target_start'] for p in rows})
+        self.assertTrue(all(p['conflicts'] for p in rows))
+
+    def test_ledger_every_decision_pending(self):
+        ledger = r.read(r.DOC / 'evidence/human-decision-ledger.json')
+        d.validate_ledger(ledger)
+        self.assertEqual(self.summary['pending_decisions'], len(ledger['records']))
+
+    def test_batch_counts_membership_and_injectivity(self):
+        batches = r.read(r.OUT / 'risk-strata-and-batches.json')['records']
+        ids = [i for b in batches for i in b['mapping_ids']]
+        self.assertEqual(len(ids), len(set(ids)))
+        for b in batches:
+            self.assertEqual(len(b['mapping_ids']), b['mapping_count'])
+            self.assertEqual(r.sha(r.payload(sorted(b['mapping_ids']))), b['proposal_set_sha256'])
+
+    def test_exact_simulation_arithmetic(self):
+        for name, view in r.read(r.OUT / 'adoption-simulations.json')['views'].items():
+            self.assertEqual(view['count'] - 15299, view['delta_from_phase2a'])
+            self.assertEqual(view['count'] - 15382, view['delta_from_phase2c'])
+            if 'records' in view:
+                self.assertEqual(view['count'], len({p['donor_start'] for p in view['records']}))
+                self.assertEqual(view['count'], len({p['target_start'] for p in view['records']}))
+
+    def test_inherited_blockers_verbatim(self):
+        original = r.read(r.C / 'evidence/validation.json')['remaining_blockers']
+        self.assertEqual(original, self.summary['inherited_blockers'])
+
+    def test_independent_ablation_matches_frozen_direct_policy(self):
+        self.assertTrue(all(x['frozen_policy_agrees'] for p in self.packets for x in p['counterfactuals']))
+
+    def test_full_same_size_cfg_competitors_include_selected_target(self):
+        self.assertTrue(all(p['target_start'] in p['same_size_cfg_targets'] and p['donor_start'] in p['same_size_cfg_donors'] for p in self.packets))
+
+    def test_reconstruction_is_hash_frozen(self):
+        frozen = d.frozen_reconstruction()
+        self.assertFalse(frozen['semantic_feedback_allowed'])
+
+    def test_high_half_only_references_cannot_create_semantic_conflicts(self):
+        for p in self.packets:
+            for ref in p['donor_profile']['references'] + p['target_profile']['references']:
+                self.assertEqual(2, len(ref['definition_offsets']))
+            for conflict in p['contradictions']:
+                self.assertNotIn(conflict.get('donor', {}).get('address'), ('0x820B0000', '0x820C0000', '0x820D0000'))
 
 
 if __name__ == '__main__':

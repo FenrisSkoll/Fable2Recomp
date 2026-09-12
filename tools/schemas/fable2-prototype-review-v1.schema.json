@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype-review:1",
+  "type": "object",
+  "required": ["schema", "phase2c_commit", "canonical_adoption", "human_approval"],
+  "properties": {
+    "schema": {
+      "type": "object", "additionalProperties": false, "required": ["name", "version"],
+      "properties": {
+        "name": {"enum": ["fable2-prototype-review-source-pins", "fable2-prototype-review-profiles", "fable2-prototype-review-blind-input", "fable2-prototype-review-blind-results", "fable2-prototype-review-reconstruction-freeze", "fable2-prototype-review-packets", "fable2-prototype-review-review-index", "fable2-prototype-review-challenge", "fable2-prototype-review-probable-blockers", "fable2-prototype-review-known-cases", "fable2-prototype-review-dependencies", "fable2-prototype-review-batches", "fable2-prototype-review-simulations", "fable2-prototype-review-consumers", "fable2-prototype-review-review-summary", "fable2-prototype-review-human-decision-ledger", "fable2-prototype-review-validation", "fable2-prototype-review-checks", "fable2-prototype-review-tests", "fable2-prototype-review-replay"]},
+        "version": {"const": 1}
+      }
+    },
+    "phase2c_commit": {"const": "f13ee49c94db48d979de1346b7f67d2d82257ea2"},
+    "canonical_adoption": {"const": false}, "human_approval": {"const": false},
+    "semantic_feedback_allowed": {"const": false},
+    "records": {"type": "array", "items": {"type": "object"}}
+  },
+  "allOf": [
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-review-source-pins"}}}}}, "then": {"required": ["sources", "upstream_sources", "starting_state", "inherited_blockers", "protected_phase2c_artifacts"], "properties": {"inherited_blockers": {"type": "array", "minItems": 6, "maxItems": 6}, "protected_phase2c_artifacts": {"type": "array", "minItems": 30, "maxItems": 30}}}},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-review-profiles"}}}}}, "then": {"required": ["builds", "semantic_feedback_allowed", "parser_dependencies"], "properties": {"builds": {"type": "object", "required": ["build-23.12.02.0330", "canonical-tu1"], "additionalProperties": false, "properties": {"build-23.12.02.0330": {"type": "array", "minItems": 46179, "maxItems": 46179}, "canonical-tu1": {"type": "array", "minItems": 46180, "maxItems": 46180}}}}}},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-review-blind-input"}}}}}, "then": {"required": ["donors", "leakage"], "properties": {"donors": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^0x[0-9A-F]{8}$"}}}}},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-review-blind-results"}}}}}, "then": {"required": ["records", "matching_input", "profiles", "policy"], "properties": {"records": {"items": {"required": ["donor_start", "targets", "reverse_donors", "candidate_count", "reverse_count", "selected_target", "rejection_reasons"]}}}}},
+    {"if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-review-reconstruction-freeze"}}}}}, "then": {"required": ["artifacts", "implementation", "semantic_feedback_allowed"]}}
+  ]
+}

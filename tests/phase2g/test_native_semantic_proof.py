@@ -105,5 +105,44 @@ class FrozenStateTests(unittest.TestCase):
             inputs.ref(path, "/records/6", "0" * 64)
 
 
+class HammerPacketTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.packet = json.loads((ROOT / "out/prototype-archaeology/phase2g/hammercombat/native-proof-packet.json").read_bytes())
+
+    def test_boundaries_and_reservation_are_retained(self):
+        packet = self.packet
+        self.assertEqual("0x8229B308", packet["owner_mapping"]["donor"]["boundary"]["start"])
+        self.assertEqual("0x8229B484", packet["owner_mapping"]["donor"]["boundary"]["end_exclusive"])
+        self.assertEqual("0x8229B1B8", packet["reserved_callee"]["target"]["boundary"]["start"])
+        self.assertEqual("internal-code-region-dependent",
+                         packet["dispositions"]["reservation_reason"])
+        for region in packet["comparator_regions"]:
+            self.assertEqual("internal-code-region", region["kind"])
+            self.assertFalse(region["independent_pdata_entry"])
+            self.assertIsNone(region["containing_owner"])
+
+    def test_hammer_text_never_becomes_function_name(self):
+        packet = self.packet
+        self.assertEqual("not-authorized", packet["dispositions"]["canonical_name"])
+        self.assertTrue(packet["adversarial"]["callee_hammer_name_rejected"])
+        self.assertTrue(packet["adversarial"]["owner_hammer_name_rejected"])
+
+    def test_target_consumer_is_the_only_independent_vote(self):
+        observations = self.packet["independence_observations"]
+        eligible = [row for row in observations if row["proof_eligible"]]
+        self.assertEqual(["A-tu1-byte-consumer-family"], [row["id"] for row in eligible])
+        self.assertEqual(1, eligible[0]["detail"]["family_vote_count"])
+        self.assertEqual("independently-corroborated-role",
+                         self.packet["dispositions"]["primary"])
+
+    def test_comparator_equivalence_does_not_promote_boundary(self):
+        regions = self.packet["comparator_regions"]
+        self.assertEqual(regions[0]["reachable_byte_sha256"],
+                         regions[1]["reachable_byte_sha256"])
+        self.assertEqual(21, regions[0]["instruction_count"])
+        self.assertEqual(21, regions[1]["instruction_count"])
+
+
 if __name__ == "__main__":
     unittest.main()

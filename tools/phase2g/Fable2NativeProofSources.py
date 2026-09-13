@@ -233,11 +233,17 @@ class Inputs:
         self.used.add(name)
         return read(name)
 
+    def bind(self, path):
+        name = Path(path).as_posix()
+        require(name in self.pins, "Unbound analytical input: " + name)
+        check(self.pins[name])
+        self.used.add(name)
+        return {key: self.pins[name][key] for key in ("path", "size", "sha256")}
+
     def ref(self, path, pointer=None, record_sha256=None):
         name = Path(path).as_posix()
-        require(name in self.pins, "Unbound evidence reference: " + name)
-        document = self.read(name)
-        result = {key: self.pins[name][key] for key in ("path", "size", "sha256")}
+        result = self.bind(name)
+        document = read(name)
         if pointer is not None:
             node = document
             require(pointer == "" or pointer.startswith("/"),
@@ -259,6 +265,10 @@ class Inputs:
                     "Evidence record hash changed: " + name + pointer)
             result["record_sha256"] = record_sha256
         return result
+
+    def identities(self):
+        return [{key: self.pins[name][key] for key in ("path", "size", "sha256")}
+                for name in sorted(self.used)]
 
 
 if __name__ == "__main__":

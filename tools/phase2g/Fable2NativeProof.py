@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 import Fable2NativeProofSources as sources
+import Fable2NativeProofAnalysis as native_analysis
 
 CLASSES = (
     "mapping-consumed",
@@ -173,8 +175,12 @@ def analyze(replay=False):
     ledger = sources.envelope("independence-ledger", pins["overlay_selection"],
                               **consumed_ledger(inputs), consumed_sources=sorted(inputs.used))
     artifact = sources.write(sources.OUT / "consumed-evidence/independence-ledger.json", ledger, replay)
+    images = native_analysis.load_images(inputs)
+    hammer = native_analysis.hammer_packet(inputs, images, sys.modules[__name__], pins["overlay_selection"])
+    hammer_artifact = sources.write(sources.OUT / "hammercombat/native-proof-packet.json", hammer, replay)
     print("PASS Phase 2G consumed-evidence ledger:", len(ledger["records"]), flush=True)
-    return {"artifacts": [artifact], "consumed_sources": sorted(inputs.used)}
+    print("PASS Phase 2G HammerCombat native proof:", hammer["dispositions"]["primary"], flush=True)
+    return {"artifacts": [artifact, hammer_artifact], "consumed_sources": sorted(inputs.used)}
 
 
 if __name__ == "__main__":

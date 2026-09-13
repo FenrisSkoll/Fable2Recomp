@@ -42,7 +42,7 @@ read = overlay.read
 
 def relative(path):
     p = Path(path)
-    require(not p.is_absolute() and ".." not in p.parts and ":" not in str(p), "Repository-relative path required")
+    require(not p.anchor and ".." not in p.parts and ":" not in str(p), "Repository-relative path required")
     # Existing hash-bound assets use repository junctions. Input provenance is
     # lexical and relative; only authenticated identities may be read through
     # those junctions. Output confinement additionally checks physical paths.

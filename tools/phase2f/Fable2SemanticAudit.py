@@ -193,7 +193,7 @@ def review_queues(engine, lanes, domain, mapping):
             queue = "sdk-compiler-support"
         elif row["grade"] == "target-corroborated":
             queue = "target-corroborated-game-context" if row["category"] == "fable-game-specific" else "target-corroborated-other"
-        elif any(t in anchor["spelling"].lower() for t in ("camera","debug","console","cheat","command")):
+        elif any(t in anchor["spelling"].lower() for t in ("camera","debug","console","cheat","command","_loadlib","filesystem can not be null")):
             queue = "registration-debug-freecamera"
         elif any(t in anchor["spelling"].lower() for t in ("script","e3","demo","startup","quest","childhood","presentation")):
             queue = "script-e3-preservation"

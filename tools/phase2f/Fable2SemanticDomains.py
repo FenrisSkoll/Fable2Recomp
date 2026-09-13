@@ -117,6 +117,18 @@ def domain_audits(engine, lane_o):
                                  "Debug-namespace/table-ownership","corresponding-TU1-registration-consumer","callable-reachability"],
         "tu1_callable":False,"community_spelling_accepting":False}
     s.require(not obligations_callable(freecamera["facts"]),"Free-camera authorization drift")
+    debug_contexts = []
+    for terminal in lane_o["records"]:
+        if not terminal["used_additions"]:
+            continue
+        text = engine.anchors[terminal["anchor_id"]]["spelling"]
+        kind = "sdk-compiler-diagnostic-context" if terminal["category"] == "sdk-compiler-vector" else \
+               "possible-library-interface-token" if text == "_LOADLIB" else \
+               "assertion-diagnostic-wording" if text == "Virtual filesystem can not be null" else None
+        if kind:
+            debug_contexts.append({"terminal_id":terminal["terminal_id"],"kind":kind,"reference_text":text,
+                "donor_start":terminal["donor_start"],"target_start":terminal["target_start"],"routes":terminal["routes"],
+                "reservations":terminal["reservations"],"grade":terminal["grade"],"callable_command_proven":False})
 
     script_rows,scripts = collection(s.C/"scripts.json","records","script")
     pair_rows,script_pairs = collection(s.C/"scripts.json","script_pairs","script-pair")
@@ -238,9 +250,10 @@ def domain_audits(engine, lane_o):
             "behavior_evidence_consumed_by_mapping":True,"new_independent_semantic_evidence":[],
             "limitation":"Full-reference, field/argument/return and topology observations were already gates in Phase 2D; they are not fresh semantic votes."})
     return {"collection-index":collections_index,
-        "registration-debug-freecamera":{"records":registrations,"shapes":shape_results,"freecamera":freecamera,
+        "registration-debug-freecamera":{"records":registrations,"shapes":shape_results,"freecamera":freecamera,"debug_contexts":debug_contexts,
             "counts":{"calls":len(uses),"shapes":len(shapes),"complete_candidates":sum(x["name"] is not None and r.historical_c.identity_token(x["name"]) is not None and x["callback"] is not None for x in uses),
-                      "changed_calls":sum(bool(x["changed_roles"]) for x in registrations),"changed_shapes":sum(bool(x["changed_roles"]) for x in shape_results),"callable_tu1_chains":0}},
+                      "changed_calls":sum(bool(x["changed_roles"]) for x in registrations),"changed_shapes":sum(bool(x["changed_roles"]) for x in shape_results),"callable_tu1_chains":0,
+                      "debug_context_kinds":r.counts(debug_contexts,"kind")}},
         "script-preservation":{"scripts":scripts,"script_pairs":script_pairs,"preservation":preservation,"e3_presence":e3,
             "counts":{"scripts":len(scripts),"parsed":sum("parsed" in x for x in script_rows),"inventory_only":sum("parsed" not in x for x in script_rows),"pairs":len(script_pairs),"preservation":len(preservation),"e3":len(e3),
                       "new_preservation_links":sum(bool(x["newly_routed_terminal_ids"]) for x in preservation),"new_script_literal_links":sum(bool(x["new_literal_relationship_terminal_ids"]) for x in scripts),"runnable_recoveries":0}},

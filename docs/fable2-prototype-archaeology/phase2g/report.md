@@ -77,14 +77,14 @@ Complete supported discovery passed 408 tests with zero failures, errors or skip
 
 | Ignored artifact | Bytes | SHA-256 |
 |---|---:|---|
-| `out/prototype-archaeology/phase2g/consumed-evidence/independence-ledger.json` | 27016 | `7FB8EAF55189600EE3CEA2134EC58D9B19F1E3CAAAF7AB86967B848859CF9EE8` |
+| `out/prototype-archaeology/phase2g/consumed-evidence/independence-ledger.json` | 22630 | `5825334963E5C3CA483C81EE2A194B7D1A507DBDDE95C5B786DFB27CA65EBA75` |
 | `out/prototype-archaeology/phase2g/expanded-function-scope.json` | 13628 | `41D9AACCC5145271EF60A56B6DBD5AEC1A62C0CBADEDB58279F463523E975885` |
 | `out/prototype-archaeology/phase2g/hammercombat/native-proof-packet.json` | 41276 | `3D0BEF602EE24E045C39B9CE4C4D75B50B40DEA1E4DEA9893659F3F0D921557F` |
 | `out/prototype-archaeology/phase2g/negative-controls/results.json` | 12160 | `1875411154B79AFE651DA215D958D1C4FC52B5EF2724479772C7A5FF9087D52E` |
 | `out/prototype-archaeology/phase2g/oxygen/native-proof-packet.json` | 58393 | `E80632572F17C376ADED14F5AB1218034F4C2FCCE78F077B7F2E69008C42CB56` |
 | `out/prototype-archaeology/phase2g/receipts/checks.json` | 1702 | `E66C05E6A3EAFBE8105DBE2DA664AE6FDD0707A51AB28BFFCDE339D9725C111F` |
 | `out/prototype-archaeology/phase2g/receipts/consistency.json` | 1859 | `286020C8CD39837DFB8F91AF5E9F43BE3D9E9DDE19E651EF4DE318218E874E1B` |
-| `out/prototype-archaeology/phase2g/receipts/replay.json` | 1950 | `BFFA2FC074A8D520A4C6BD8359B42A03C91BF33D773910F7345F41D3FB1F3C9F` |
+| `out/prototype-archaeology/phase2g/receipts/replay.json` | 1950 | `13BEEF5B1E45455BD2AF77165BA76F4F88BAB9D8C82B8DA8973A3836B499DC9F` |
 | `out/prototype-archaeology/phase2g/receipts/schemas.json` | 1532 | `2E33A47C8091E56328BD921B21EC7EA6B9CA7060D90868B08AA03C57334C9643` |
 | `out/prototype-archaeology/phase2g/receipts/tests.json` | 1552 | `BA411A44A3E09BE2A65010AB7E7772C96A37B3E2AC8E2BFC29F093AF21FC3245` |
 | `out/prototype-archaeology/phase2g/review-selection.json` | 11393 | `775A9DF6CC53549446DAA3B46645DEFCCA3E666ACC8C42B249B5BE55AEAAFC06` |

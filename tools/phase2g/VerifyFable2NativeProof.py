@@ -86,7 +86,7 @@ def git_delta():
 def make_receipts(replay=False):
     pins = sources.source_bindings()
     selection = pins["overlay_selection"]
-    proof_output = run([sys.executable, "-B", "tools/phase2g/Fable2NativeProof.py", "--check"])
+    replay_receipt = make_replay_receipt(replay, pins)
     test_output = run([sys.executable, "-B", "-m", "unittest", "discover",
                        "-s", "tests", "-p", "test*.py"])
     match = re.search(r"Ran (\d+) tests", test_output)
@@ -97,13 +97,6 @@ def make_receipts(replay=False):
         complete_supported_tests=int(match.group(1)), failures=0, errors=0, skips=0)
 
     run(["git", "diff", "--check"])
-    replay_receipt = write_receipt(
-        "replay", selection, sources.OUT / "receipts/replay.json", replay=replay,
-        deterministic=True, checked_outputs=8,
-        command="python -B tools/phase2g/Fable2NativeProof.py --check",
-        dispositions={"A": "independently-corroborated-role",
-                      "B": "behaviorally-corresponding-role-reserved",
-                      "C": "independently-corroborated-role"}, output=proof_output.strip().splitlines())
     checks_receipt = write_receipt(
         "checks", selection, sources.OUT / "receipts/checks.json", replay=replay,
         git_diff_check=True, output_root_enforced=True, repository_relative_paths=True,
@@ -134,6 +127,20 @@ def make_receipts(replay=False):
         schema_path="tools/schemas/phase2g/fable2-native-semantic-proof-v1.schema.json")
     print("PASS Phase 2G receipts: tests", int(match.group(1)), flush=True)
     return [replay_receipt, schema_receipt, test_receipt, checks_receipt, consistency_receipt]
+
+
+def make_replay_receipt(replay=False, pins=None):
+    pins = sources.source_bindings() if pins is None else pins
+    proof_output = run([sys.executable, "-B", "tools/phase2g/Fable2NativeProof.py", "--check"])
+    result = write_receipt(
+        "replay", pins["overlay_selection"], sources.OUT / "receipts/replay.json", replay=replay,
+        deterministic=True, checked_outputs=8,
+        command="python -B tools/phase2g/Fable2NativeProof.py --check",
+        dispositions={"A": "independently-corroborated-role",
+                      "B": "behaviorally-corresponding-role-reserved",
+                      "C": "independently-corroborated-role"}, output=proof_output.strip().splitlines())
+    print("PASS Phase 2G evidence replay receipt", flush=True)
+    return result
 
 
 def make_summary(replay=False):
@@ -245,11 +252,13 @@ def git_audit():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("receipts", "schema-receipt", "summary", "validation", "verify", "git-audit", "report-rows"))
+    parser.add_argument("command", choices=("receipts", "replay-receipt", "schema-receipt", "summary", "validation", "verify", "git-audit", "report-rows"))
     parser.add_argument("--check", action="store_true")
     arguments = parser.parse_args()
     if arguments.command == "receipts":
         make_receipts(arguments.check)
+    elif arguments.command == "replay-receipt":
+        make_replay_receipt(arguments.check)
     elif arguments.command == "schema-receipt":
         make_schema_receipt(arguments.check)
     elif arguments.command == "summary":

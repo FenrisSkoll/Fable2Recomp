@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype:native-semantic-proof:v1",
+  "title": "Fable II Phase 2G bounded native semantic proof",
+  "type": "object",
+  "required": ["schema", "phase2f_commit", "overlay_selection", "canonical_adoption", "analysis_only", "semantic_feedback_allowed", "mapping_mutation_allowed", "canonical_names_authorized"],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^fable2-prototype-native-semantic-proof-(source-pins|independence-ledger|hammercombat-packet|oxygen-packet|world-reward-packet|shared-property-pattern|expanded-scope|negative-controls|review-selection|packet-summary|tests|checks|schemas|replay|validation)$"
+        },
+        "version": {"const": 1}
+      }
+    },
+    "phase2f_commit": {"const": "d348952f780d47b47368792a1b6587a2f574ddfe"},
+    "canonical_adoption": {"const": false},
+    "analysis_only": {"const": true},
+    "semantic_feedback_allowed": {"const": false},
+    "mapping_mutation_allowed": {"const": false},
+    "canonical_names_authorized": {"const": false},
+    "overlay_selection": {"$ref": "#/$defs/selection"},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/identity"}},
+    "records": {"type": "array"},
+    "counts": {"type": "object"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-native-semantic-proof-source-pins"}}}}},
+      "then": {
+        "required": ["sources", "starting_state", "sdk", "inherited_blockers", "phase2f_artifact_counts"],
+        "properties": {
+          "sources": {"type": "array", "items": {"$ref": "#/$defs/identity"}},
+          "inherited_blockers": {"type": "array", "minItems": 6, "maxItems": 6}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"schema": {"properties": {"name": {"const": "fable2-prototype-native-semantic-proof-independence-ledger"}}}}},
+      "then": {
+        "required": ["classes", "records", "counts", "independent_proof_count"],
+        "properties": {
+          "classes": {"type": "array", "minItems": 7, "maxItems": 7, "uniqueItems": true},
+          "records": {"type": "array", "items": {"$ref": "#/$defs/observation"}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identity": {
+      "type": "object",
+      "required": ["path", "size", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[^\\\\]+$"},
+        "size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "required": ["selection", "mapping_count", "overlay_enabled", "fallback_permitted"],
+      "properties": {
+        "selection": {"const": "phase2e-v1"},
+        "mapping_count": {"const": 15379},
+        "overlay_enabled": {"const": true},
+        "fallback_permitted": {"const": false},
+        "canonical_adoption": {"const": false}
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": ["id", "packet", "claim", "independence_class", "provenance", "material", "compatible", "owned", "circular", "proof_eligible"],
+      "properties": {
+        "independence_class": {
+          "enum": ["mapping-consumed", "correlated-with-mapping", "independent-target-native", "independent-cross-build-behavior", "context-only", "contradictory", "unresolved"]
+        },
+        "proof_eligible": {"type": "boolean"},
+        "provenance": {"$ref": "#/$defs/identity"}
+      }
+    }
+  }
+}

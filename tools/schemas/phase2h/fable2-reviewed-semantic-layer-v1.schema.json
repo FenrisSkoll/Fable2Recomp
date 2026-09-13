@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype:reviewed-semantic-layer:v1",
+  "title": "Fable II Phase 2H owner-reviewed semantic decision layer",
+  "type": "object",
+  "required": [
+    "schema",
+    "phase2g_commit",
+    "analysis_only",
+    "semantic_annotation_only",
+    "canonical_adoption",
+    "canonical_names_authorized",
+    "mapping_mutation_allowed",
+    "semantic_feedback_allowed"
+  ],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "fable2-prototype-reviewed-semantic-source-pins",
+            "fable2-prototype-reviewed-semantic-owner-decision",
+            "fable2-prototype-reviewed-semantic-correction-delta",
+            "fable2-prototype-reviewed-semantic-materialized-view",
+            "fable2-prototype-reviewed-semantic-default-view",
+            "fable2-prototype-reviewed-semantic-reviewed-summary",
+            "fable2-prototype-reviewed-semantic-validation",
+            "fable2-prototype-reviewed-semantic-decision-receipt",
+            "fable2-prototype-reviewed-semantic-delta-receipt",
+            "fable2-prototype-reviewed-semantic-default-receipt",
+            "fable2-prototype-reviewed-semantic-opt-in-receipt",
+            "fable2-prototype-reviewed-semantic-negative-controls",
+            "fable2-prototype-reviewed-semantic-tamper-controls",
+            "fable2-prototype-reviewed-semantic-schemas-receipt",
+            "fable2-prototype-reviewed-semantic-tests-receipt",
+            "fable2-prototype-reviewed-semantic-replay-receipt",
+            "fable2-prototype-reviewed-semantic-consistency-receipt",
+            "fable2-prototype-reviewed-semantic-path-receipt",
+            "fable2-prototype-reviewed-semantic-git-delta-receipt"
+          ]
+        },
+        "version": {"const": 1}
+      }
+    },
+    "phase2g_commit": {"const": "e89317f75c43bdce8b7108bb291c2b52dddb6182"},
+    "analysis_only": {"const": true},
+    "semantic_annotation_only": {"const": true},
+    "canonical_adoption": {"const": false},
+    "canonical_names_authorized": {"const": false},
+    "mapping_mutation_allowed": {"const": false},
+    "semantic_feedback_allowed": {"const": false},
+    "artifacts": {"type": "array", "items": {"$ref": "#/$defs/identity"}},
+    "input_identities": {"type": "array", "items": {"$ref": "#/$defs/identity"}},
+    "inherited_blockers": {"type": "array", "minItems": 6, "maxItems": 6},
+    "decision_date": {"type": "string", "format": "date"},
+    "decision_record_id": {"type": "string"},
+    "approver": {"type": "string"}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema": {
+            "properties": {
+              "name": {"const": "fable2-prototype-reviewed-semantic-owner-decision"}
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "decision_record_id",
+          "approver",
+          "decision_date",
+          "source",
+          "normalized_statement",
+          "approval_scope",
+          "explicitly_not_approved"
+        ],
+        "properties": {
+          "decision_record_id": {"const": "P2G-OWNER-DECISION-001"},
+          "approver": {"const": "FenrisSkoll"},
+          "decision_date": {"const": "2026-09-13"},
+          "source": {"const": "owner-supplied-chat-statement"}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema": {
+            "properties": {
+              "name": {"const": "fable2-prototype-reviewed-semantic-source-pins"}
+            }
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "sources",
+          "starting_state",
+          "phase2g_trust_roots",
+          "phase2g_commit_sequence",
+          "inherited_blockers",
+          "sdk"
+        ],
+        "properties": {
+          "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identity"}}
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "identity": {
+      "type": "object",
+      "required": ["path", "size", "sha256"],
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[^\\\\]+$"
+        },
+        "size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/hash"}
+      }
+    }
+  }
+}

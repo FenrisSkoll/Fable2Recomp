@@ -144,5 +144,64 @@ class HammerPacketTests(unittest.TestCase):
         self.assertEqual(21, regions[1]["instruction_count"])
 
 
+class PropertyPacketTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.oxygen = json.loads((ROOT / "out/prototype-archaeology/phase2g/oxygen/native-proof-packet.json").read_bytes())
+        cls.world = json.loads((ROOT / "out/prototype-archaeology/phase2g/world-map-reward/native-proof-packet.json").read_bytes())
+        cls.shared = json.loads((ROOT / "out/prototype-archaeology/phase2g/shared-helper/property-pattern.json").read_bytes())
+
+    def test_oxygen_keys_offsets_widths_and_roles(self):
+        rows = self.oxygen["field_role_table"]
+        keyed = {row["key"]: row for row in rows if row["key"] is not None}
+        self.assertEqual({"MaxOxygen", "OxygenConsumptionRate", "OxygenRecoveryRate"}, set(keyed))
+        self.assertEqual([0x38, 0x3C, 0x40], [keyed[name]["offset"] for name in
+                         ("MaxOxygen", "OxygenConsumptionRate", "OxygenRecoveryRate")])
+        self.assertTrue(all(row["width"] == 4 for row in keyed.values()))
+        self.assertEqual("mapping-consumed", keyed["MaxOxygen"]["evidence_class"])
+
+    def test_oxygen_is_loading_not_gameplay(self):
+        role = self.oxygen["role_classification"]
+        self.assertTrue(role["keyed_load_or_deserialization_style"])
+        self.assertFalse(role["property_registration"])
+        self.assertFalse(role["outbound_serialization"])
+        self.assertFalse(role["runtime_depletion_or_recovery"])
+        self.assertEqual("behaviorally-corresponding-role-reserved",
+                         self.oxygen["dispositions"]["primary"])
+
+    def test_world_aliases_reconcile_three_keys_to_four_terminals(self):
+        reconciliation = self.world["terminal_reconciliation"]
+        self.assertEqual(4, reconciliation["population"])
+        self.assertEqual(3, reconciliation["genuine_complete_key_contexts"])
+        self.assertEqual(0, reconciliation["independent_votes_from_aliases"])
+        self.assertEqual("S-26C37A0D8DC5C81610D44E94", reconciliation["spurious_terminal"])
+
+    def test_world_fields_and_boolean_width(self):
+        rows = {row["key"]: row for row in self.world["field_role_table"]}
+        self.assertEqual((0x20, 4), (rows["RewardRenown"]["offset"], rows["RewardRenown"]["width"]))
+        self.assertEqual((0x24, 4), (rows["RewardMoney"]["offset"], rows["RewardMoney"]["width"]))
+        self.assertEqual((0x4D, 1), (rows["AppearOnWorldMap"]["offset"], rows["AppearOnWorldMap"]["width"]))
+        self.assertIn("normalized Boolean", rows["AppearOnWorldMap"]["operation"])
+
+    def test_world_independent_consumer_and_conflict_are_separate(self):
+        eligible = [row["id"] for row in self.world["independence_observations"]
+                    if row["proof_eligible"]]
+        self.assertEqual(["C-second-tu1-field-visitors"], eligible)
+        self.assertEqual("review-triggered", self.world["dispositions"]["mapping"])
+        self.assertFalse(self.world["mapping_mutation_allowed"])
+        self.assertEqual("retained", self.world["dispositions"]["reservation"])
+
+    def test_property_pattern_does_not_transfer_votes_or_claim_gameplay(self):
+        comparison = self.shared["comparison"]
+        self.assertFalse(comparison["cross_packet_similarity_is_independent_vote"])
+        self.assertTrue(comparison["not_identical_support_topology"])
+        self.assertIn("not runtime gameplay", comparison["conclusion"])
+
+    def test_same_strings_can_have_different_roles(self):
+        control = self.oxygen["same_string_different_role_control"]
+        self.assertFalse(control["approved_correspondence"])
+        self.assertIn("field-visitor", control["result"])
+
+
 if __name__ == "__main__":
     unittest.main()

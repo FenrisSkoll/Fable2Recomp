@@ -140,13 +140,6 @@ def consumed_ledger(inputs):
         record(inputs, "C-three-complete-key-terminals", "C",
                "RewardMoney, RewardRenown and AppearOnWorldMap target observations reuse canonicalized proposal evidence.",
                "correlated-with-mapping", inputs.ref(semantic, "/records")),
-        record(inputs, "C-fourth-terminal-r6", "C",
-               "The SetObjectiveTag terminal is an incidental donor r6 high-half intermediate; target 0x820C0000 is an interior pointer into different bytes.",
-               "contradictory", inputs.ref(xrefs, "/references"), material=False, compatible=False,
-               detail={"terminal_id": "S-26C37A0D8DC5C81610D44E94",
-                       "donor_xref": "X-755D156689799A74601CB30A",
-                       "donor_address": "0x820C0000", "target_address": "0x820C0000",
-                       "disposition": "alias-reconciled-not-a-semantic-vote"}),
         record(inputs, "C-duplicate-user-topology", "C",
                "The second donor/target user population for each complete key was consumed as reference distinctiveness.",
                "mapping-consumed", inputs.ref(ledger, "/records/6")),
@@ -168,19 +161,49 @@ def consumed_ledger(inputs):
     }
 
 
+def complete_ledger(base, packets):
+    observations = list(base["records"])
+    for packet in packets:
+        observations.extend(packet["independence_observations"])
+    sources.require(len({row["id"] for row in observations}) == len(observations),
+                    "Evidence observation appears more than once")
+    return {
+        "classes": list(CLASSES),
+        "records": observations,
+        "counts": {name: sum(row["independence_class"] == name for row in observations)
+                   for name in CLASSES},
+        "independent_proof_count": sum(row["proof_eligible"] for row in observations),
+        "rule": "Each observation has exactly one class and appears once in this vote ledger; packet copies are presentational only.",
+    }
+
+
 def analyze(replay=False):
     pins = sources.source_bindings()
     sources.write(sources.DOC / "evidence/source-pins.json", pins, replay)
     inputs = sources.Inputs(pins)
-    ledger = sources.envelope("independence-ledger", pins["overlay_selection"],
-                              **consumed_ledger(inputs), consumed_sources=sorted(inputs.used))
-    artifact = sources.write(sources.OUT / "consumed-evidence/independence-ledger.json", ledger, replay)
+    base_ledger = consumed_ledger(inputs)
     images = native_analysis.load_images(inputs)
     hammer = native_analysis.hammer_packet(inputs, images, sys.modules[__name__], pins["overlay_selection"])
     hammer_artifact = sources.write(sources.OUT / "hammercombat/native-proof-packet.json", hammer, replay)
+    oxygen = native_analysis.oxygen_packet(inputs, images, sys.modules[__name__], pins["overlay_selection"])
+    oxygen_artifact = sources.write(sources.OUT / "oxygen/native-proof-packet.json", oxygen, replay)
+    world_reward = native_analysis.world_reward_packet(
+        inputs, images, sys.modules[__name__], pins["overlay_selection"])
+    world_artifact = sources.write(
+        sources.OUT / "world-map-reward/native-proof-packet.json", world_reward, replay)
+    shared = native_analysis.shared_property_pattern(inputs, images, pins["overlay_selection"])
+    shared_artifact = sources.write(
+        sources.OUT / "shared-helper/property-pattern.json", shared, replay)
+    ledger = sources.envelope("independence-ledger", pins["overlay_selection"],
+                              **complete_ledger(base_ledger, (hammer, oxygen, world_reward)),
+                              input_identities=inputs.identities())
+    artifact = sources.write(sources.OUT / "consumed-evidence/independence-ledger.json", ledger, replay)
     print("PASS Phase 2G consumed-evidence ledger:", len(ledger["records"]), flush=True)
     print("PASS Phase 2G HammerCombat native proof:", hammer["dispositions"]["primary"], flush=True)
-    return {"artifacts": [artifact, hammer_artifact], "consumed_sources": sorted(inputs.used)}
+    print("PASS Phase 2G oxygen native proof:", oxygen["dispositions"]["primary"], flush=True)
+    print("PASS Phase 2G world/reward native proof:", world_reward["dispositions"]["primary"], flush=True)
+    return {"artifacts": [artifact, hammer_artifact, oxygen_artifact, world_artifact, shared_artifact],
+            "consumed_sources": sorted(inputs.used)}
 
 
 if __name__ == "__main__":

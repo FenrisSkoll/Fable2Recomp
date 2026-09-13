@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "tools/phase2g"))
 
 import Fable2NativeProof as proof
 import Fable2NativeProofSources as sources
+import VerifyFable2NativeProof as verifier
 
 
 class IndependenceGateTests(unittest.TestCase):
@@ -79,6 +80,17 @@ class FrozenStateTests(unittest.TestCase):
                      "generated/default/a.cpp", "tools/phase2f/new.json"):
             with self.subTest(path=path), self.assertRaises(ValueError):
                 sources.output(path)
+
+    def test_overlay_tamper_refuses_without_fallback(self):
+        validation = sources.read(sources.PHASE2F_DOC / "evidence/validation.json")
+        selection = copy.deepcopy(validation["overlay_selection"])
+        sources.verify_overlay(selection, validation)
+        for key, value in (("selection", "wrong"), ("mapping_count", 15378),
+                           ("fallback_permitted", True), ("overlay_enabled", False)):
+            bad = copy.deepcopy(selection)
+            bad[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                sources.verify_overlay(bad, validation)
 
     def test_every_ledger_pointer_and_record_hash_resolves(self):
         pins = sources.source_bindings()
@@ -201,6 +213,98 @@ class PropertyPacketTests(unittest.TestCase):
         control = self.oxygen["same_string_different_role_control"]
         self.assertFalse(control["approved_correspondence"])
         self.assertIn("field-visitor", control["result"])
+
+
+class AdversarialPacketTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.controls = json.loads((ROOT / "out/prototype-archaeology/phase2g/negative-controls/results.json").read_bytes())
+        cls.scope = json.loads((ROOT / "out/prototype-archaeology/phase2g/expanded-function-scope.json").read_bytes())
+
+    def test_invalid_string_objects_are_rejected(self):
+        for name in ("prefix", "interior", "empty", "writable", "unterminated"):
+            with self.subTest(name=name):
+                self.assertEqual("rejected", self.controls["synthetic"][name]["disposition"])
+
+    def test_role_and_caller_conflicts_quarantine(self):
+        self.assertEqual("semantic-conflict-quarantined",
+                         self.controls["synthetic"]["same-string-different-role"]["disposition"])
+        self.assertEqual("semantic-conflict-quarantined",
+                         self.controls["synthetic"]["compatible-body-incompatible-caller"]["disposition"])
+        self.assertEqual("semantic-conflict-quarantined",
+                         self.controls["synthetic"]["same-helper-incompatible-field"]["disposition"])
+        self.assertEqual("rejected",
+                         self.controls["synthetic"]["circular-owner-callee"]["disposition"])
+
+    def test_real_collisions_and_exclusions_remain(self):
+        collisions = {row["action_id"] for row in self.controls["real_collision_controls"]}
+        self.assertEqual({"P2E:suppress:0x82631A30:0x82950A98",
+                          "P2E:suppress:0x828EA448:0x82681198",
+                          "P2E:suppress:0x83062950:0x83060C30"}, collisions)
+        self.assertEqual(2, len(self.controls["exclusions"]["physics"]))
+        self.assertEqual(3, len(self.controls["exclusions"]["held_strong"]))
+        self.assertEqual(715, self.controls["exclusions"]["probable_count"])
+        self.assertFalse(self.controls["mapping_mutation_on_conflict"])
+
+    def test_every_expansion_is_bounded_and_reasoned(self):
+        self.assertEqual(self.scope["counts"]["expansions"], len(self.scope["records"]))
+        self.assertTrue(all(row["bounded"] and row["reason"] for row in self.scope["records"]))
+        self.assertEqual({"A", "B", "C"}, {row["packet"] for row in self.scope["records"]})
+
+    def test_field_labels_do_not_claim_complete_types(self):
+        world = json.loads((ROOT / "out/prototype-archaeology/phase2g/world-map-reward/native-proof-packet.json").read_bytes())
+        oxygen = json.loads((ROOT / "out/prototype-archaeology/phase2g/oxygen/native-proof-packet.json").read_bytes())
+        self.assertIn("complete object/type identity", world["unresolved"])
+        self.assertIn("complete object identity", oxygen["unresolved"])
+        self.assertFalse(world["role_classification"]["runtime_reward_granting"])
+        self.assertFalse(world["role_classification"]["runtime_map_marker_behavior"])
+
+
+class FinalEnvelopeTests(unittest.TestCase):
+    def test_summary_validation_report_and_actual_bytes_agree(self):
+        summary = sources.read(sources.DOC / "evidence/packet-summary.json")
+        validation = sources.read(sources.DOC / "evidence/validation.json")
+        actual = verifier.output_json_identities()
+        self.assertEqual(actual, summary["artifacts"])
+        self.assertEqual(actual, validation["artifacts"])
+        self.assertEqual(actual, verifier.parse_report_table())
+
+    def test_every_artifact_path_is_relative_and_confined(self):
+        for row in verifier.output_json_identities():
+            with self.subTest(path=row["path"]):
+                self.assertFalse(Path(row["path"]).is_absolute())
+                self.assertTrue(row["path"].startswith("out/prototype-archaeology/phase2g/"))
+
+    def test_review_selection_is_deterministic(self):
+        selection = sources.read(sources.OUT / "review-selection.json")
+        self.assertEqual(["A", "B", "C"], [row["packet"] for row in selection["records"]])
+        self.assertEqual(1, selection["counts"]["human_review_candidates"])
+        self.assertEqual("packet-id ascending; no randomized or score-based selection",
+                         selection["ordering"])
+
+    def test_prohibited_operations_and_feedback_remain_disabled(self):
+        validation = sources.read(sources.DOC / "evidence/validation.json")
+        self.assertTrue(all(value is False for value in validation["prohibited_operations"].values()))
+        self.assertFalse(validation["canonical_adoption"])
+        self.assertFalse(validation["semantic_feedback_allowed"])
+        self.assertFalse(validation["mapping_mutation_allowed"])
+        self.assertFalse(validation["canonical_names_authorized"])
+
+    def test_git_delta_is_exactly_phase2g(self):
+        names = set(verifier.git_delta())
+        expected = set(verifier.DOCUMENTATION + verifier.IMPLEMENTATION + [
+            "docs/fable2-prototype-archaeology/phase2g/evidence/validation.json"])
+        self.assertEqual(expected, names)
+
+    def test_six_blockers_and_historical_mismatch_remain_verbatim(self):
+        validation = sources.read(sources.DOC / "evidence/validation.json")
+        self.assertEqual(6, len(validation["inherited_blockers"]))
+        serialized = json.dumps(validation["inherited_blockers"])
+        self.assertIn("generated/default/fable2_recomp.136.cpp", serialized)
+        self.assertIn("6053CC0EAC4636AA03AAA26581162B707C37E1B52BEE4C10F205D07C63EBDF59", serialized)
+        frozen_report = (ROOT / sources.PHASE2F_DOC / "report.md").read_text(encoding="utf-8")
+        self.assertIn("D25E664A98833BF9433413336AC92A7376102A67049C0FF35F1270E6BDEB44CB",
+                      frozen_report)
 
 
 if __name__ == "__main__":

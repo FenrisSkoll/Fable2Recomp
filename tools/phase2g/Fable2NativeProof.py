@@ -74,6 +74,38 @@ def proof_eligible(observation):
             not observation.get("circular", True))
 
 
+def semantic_fixture(*, complete=True, interior=False, empty=False, readonly=True,
+                     terminated=True, compatible_role=True, circular=False,
+                     body_compatible=True, caller_compatible=True, field_compatible=True):
+    reasons = []
+    if not complete:
+        reasons.append("prefix")
+    if interior:
+        reasons.append("interior")
+    if empty:
+        reasons.append("empty")
+    if not readonly:
+        reasons.append("writable")
+    if not terminated:
+        reasons.append("unterminated")
+    if circular:
+        reasons.append("circular-support")
+    if not compatible_role:
+        reasons.append("different-consumer-role")
+    if body_compatible and not caller_compatible:
+        reasons.append("incompatible-caller-context")
+    if not field_compatible:
+        reasons.append("incompatible-field-offset-or-width")
+    if any(reason in reasons for reason in ("incompatible-caller-context", "different-consumer-role",
+                                             "incompatible-field-offset-or-width")):
+        disposition = "semantic-conflict-quarantined"
+    elif reasons:
+        disposition = "rejected"
+    else:
+        disposition = "independent-eligible"
+    return {"disposition": disposition, "reasons": reasons}
+
+
 def record(inputs, identifier, packet, claim, independence_class, provenance,
            *, material=False, compatible=True, owned=True, circular=False, detail=None):
     sources.require(independence_class in CLASSES, "Unknown independence class")
@@ -177,6 +209,122 @@ def complete_ledger(base, packets):
     }
 
 
+def expanded_scope(selection, inputs):
+    records = [
+        ("A", "build-23.12.02.0330", "0x8229B488", "reserved direct callee"),
+        ("A", "canonical-tu1", "0x8229B1B8", "reserved direct callee"),
+        ("A", "build-23.12.02.0330", "0x8226DB80", "direct comparator dependency; internal region"),
+        ("A", "canonical-tu1", "0x8226D7F8", "direct comparator dependency; internal region"),
+        ("A", "canonical-tu1", "0x822756E8", "direct owner caller and byte-result comparator"),
+        ("A", "canonical-tu1", "0x8285A850", "direct owner caller; repeated-reference control"),
+        ("A", "canonical-tu1", "0x8285C6A8", "direct owner caller and byte-result store"),
+        ("B", "build-23.12.02.0330", "0x823ADDA8", "direct keyed-load helper"),
+        ("B", "canonical-tu1", "0x823AD468", "direct keyed-load helper"),
+        ("B", "build-23.12.02.0330", "0x821F3F00", "direct key-transform dependency; internal region"),
+        ("B", "canonical-tu1", "0x821F3D58", "direct key-transform dependency; internal region"),
+        ("B", "build-23.12.02.0330", "0x8238D020", "direct attachment helper"),
+        ("B", "canonical-tu1", "0x8238D4B8", "direct attachment helper"),
+        ("B", "build-23.12.02.0330", "0x82407030", "adjacent same-string/different-role control"),
+        ("B", "canonical-tu1", "0x82405900", "adjacent same-string/different-role control"),
+        ("C", "build-23.12.02.0330", "0x821B2528", "direct two-word handle resolver"),
+        ("C", "canonical-tu1", "0x821B24F8", "direct two-word handle resolver"),
+        ("C", "build-23.12.02.0330", "0x823C0588", "direct scalar keyed lookup"),
+        ("C", "canonical-tu1", "0x823BF820", "direct scalar keyed lookup"),
+        ("C", "build-23.12.02.0330", "0x82310448", "direct Boolean keyed lookup"),
+        ("C", "canonical-tu1", "0x82310290", "direct Boolean keyed lookup"),
+        ("C", "build-23.12.02.0330", "0x82524CA0", "direct owner caller and same-field visitor context"),
+        ("C", "canonical-tu1", "0x825237C8", "direct owner caller and independent same-field visitor"),
+        ("C", "build-23.12.02.0330", "0x8251D1C0", "direct owner caller; allocation/population context"),
+        ("C", "canonical-tu1", "0x8251BCE8", "direct owner caller; allocation/population context"),
+        ("C", "canonical-tu1", "0x824807C8", "direct scalar field visitor"),
+        ("C", "canonical-tu1", "0x82A1CE48", "direct Boolean-like field visitor"),
+        ("C", "canonical-tu1", "0x82A006C8", "scalar lookup dependency"),
+        ("C", "canonical-tu1", "0x82A003B0", "Boolean lookup dependency"),
+    ]
+    return sources.envelope("expanded-scope", selection,
+                            records=[{"packet": packet, "build": build, "address": address,
+                                      "reason": reason, "bounded": True}
+                                     for packet, build, address, reason in records],
+                            counts={"expansions": len(records),
+                                    "by_packet": {packet: sum(row[0] == packet for row in records)
+                                                  for packet in PACKETS}},
+                            rule="Every inspected function or internal region outside the three primary owners is listed.",
+                            input_identities=inputs.identities())
+
+
+def negative_controls(selection, inputs):
+    prior_path = "out/prototype-archaeology/phase2f/negative-controls.json"
+    exclusion_path = "out/prototype-archaeology/phase2e/exclusion-audit.json"
+    delta_path = "docs/fable2-prototype-archaeology/phase2e/evidence/approved-overlay-delta.json"
+    prior = inputs.read(prior_path)
+    exclusions = inputs.read(exclusion_path)
+    delta = inputs.read(delta_path)
+    real = [row for row in prior["records"] if row["kind"] == "real-collision"]
+    sources.require(len(real) == 3, "Suppression collision population changed")
+    sources.require(exclusions["counts"] == {
+        "held_original_strong_excluded": 3, "physics_candidates_excluded": 2,
+        "probable_proposals_excluded": 715, "unapproved_ledger_records_excluded": 5},
+        "Excluded population changed")
+    actions = {row["action_id"]: row for row in delta["actions"]}
+    expected_suppressions = [
+        ("P2E:suppress:0x82631A30:0x82950A98", "Navigator", "Controlled"),
+        ("P2E:suppress:0x828EA448:0x82681198", "TROLL_FOOTSTEP", "DESTROY_ENTITY"),
+        ("P2E:suppress:0x83062950:0x83060C30", "__vspltb", "__vcfsx"),
+    ]
+    for identifier, _, _ in expected_suppressions:
+        sources.require(identifier in actions and actions[identifier]["action"] == "suppress-semantic-transport",
+                        "Suppression changed: " + identifier)
+    sources.require("P2E:0x83062950:0x83060CD8" in actions,
+                    "Corrected vector route changed")
+    fixtures = {
+        "valid-independent": semantic_fixture(),
+        "same-string-different-role": semantic_fixture(compatible_role=False),
+        "same-helper-incompatible-field": semantic_fixture(field_compatible=False),
+        "compatible-body-incompatible-caller": semantic_fixture(caller_compatible=False),
+        "prefix": semantic_fixture(complete=False),
+        "interior": semantic_fixture(interior=True),
+        "empty": semantic_fixture(empty=True),
+        "writable": semantic_fixture(readonly=False),
+        "unterminated": semantic_fixture(terminated=False),
+        "circular-owner-callee": semantic_fixture(circular=True),
+    }
+    return sources.envelope(
+        "negative-controls", selection, synthetic=fixtures,
+        real_collision_controls=[{"action_id": identifier, "donor_text": left,
+                                  "target_text": right, "result": "suppression-retained"}
+                                 for identifier, left, right in expected_suppressions],
+        corrected_vector_route={"suppressed_collision": "0x83062950:0x83060C30",
+                                "approved_route": "0x83062950:0x83060CD8",
+                                "unchanged": True},
+        exclusions={"physics": ["0x82631A30:0x82630C30", "0x829506B0:0x82950A98"],
+                    "held_strong": ["0x82BC43E8:0x82BC3FA8", "0x82E510E0:0x82E515D0",
+                                    "0x82FB6620:0x82FB6C50"],
+                    "probable_count": 715, "all_remain_excluded": True,
+                    "address_preserving_semantic_confusion_vote": False},
+        mapping_mutation_on_conflict=False,
+        prior_controls=inputs.ref(prior_path), exclusion_audit=inputs.ref(exclusion_path),
+        input_identities=inputs.identities())
+
+
+def review_selection(selection, inputs, packets):
+    rows = []
+    for packet in sorted(packets, key=lambda row: row["packet"]):
+        label = packet["dispositions"]["role_label"]
+        rows.append({"packet": packet["packet"], "primary_terminal": packet["terminal_ids"][0],
+                     "primary_disposition": packet["dispositions"]["primary"],
+                     "mapping_disposition": packet["dispositions"]["mapping"],
+                     "reservation_disposition": packet["dispositions"]["reservation"],
+                     "role_label": label, "canonical_name": "not-authorized",
+                     "selected_for_human_review": label["kind"] == "human-review candidate"})
+    sources.require([row["packet"] for row in rows] == ["A", "B", "C"],
+                    "Review selection order changed")
+    return sources.envelope("review-selection", selection, records=rows,
+                            counts={"packets": 3, "human_review_candidates":
+                                    sum(row["selected_for_human_review"] for row in rows)},
+                            ordering="packet-id ascending; no randomized or score-based selection",
+                            input_identities=inputs.identities())
+
+
 def analyze(replay=False):
     pins = sources.source_bindings()
     sources.write(sources.DOC / "evidence/source-pins.json", pins, replay)
@@ -194,6 +342,12 @@ def analyze(replay=False):
     shared = native_analysis.shared_property_pattern(inputs, images, pins["overlay_selection"])
     shared_artifact = sources.write(
         sources.OUT / "shared-helper/property-pattern.json", shared, replay)
+    scope = expanded_scope(pins["overlay_selection"], inputs)
+    scope_artifact = sources.write(sources.OUT / "expanded-function-scope.json", scope, replay)
+    controls = negative_controls(pins["overlay_selection"], inputs)
+    controls_artifact = sources.write(sources.OUT / "negative-controls/results.json", controls, replay)
+    selection = review_selection(pins["overlay_selection"], inputs, (hammer, oxygen, world_reward))
+    selection_artifact = sources.write(sources.OUT / "review-selection.json", selection, replay)
     ledger = sources.envelope("independence-ledger", pins["overlay_selection"],
                               **complete_ledger(base_ledger, (hammer, oxygen, world_reward)),
                               input_identities=inputs.identities())
@@ -202,7 +356,8 @@ def analyze(replay=False):
     print("PASS Phase 2G HammerCombat native proof:", hammer["dispositions"]["primary"], flush=True)
     print("PASS Phase 2G oxygen native proof:", oxygen["dispositions"]["primary"], flush=True)
     print("PASS Phase 2G world/reward native proof:", world_reward["dispositions"]["primary"], flush=True)
-    return {"artifacts": [artifact, hammer_artifact, oxygen_artifact, world_artifact, shared_artifact],
+    return {"artifacts": [artifact, hammer_artifact, oxygen_artifact, world_artifact, shared_artifact,
+                          scope_artifact, controls_artifact, selection_artifact],
             "consumed_sources": sorted(inputs.used)}
 
 

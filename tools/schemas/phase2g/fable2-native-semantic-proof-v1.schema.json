@@ -12,7 +12,7 @@
       "properties": {
         "name": {
           "type": "string",
-          "pattern": "^fable2-prototype-native-semantic-proof-(source-pins|independence-ledger|hammercombat-packet|oxygen-packet|world-reward-packet|shared-property-pattern|expanded-scope|negative-controls|review-selection|packet-summary|tests|checks|schemas|replay|validation)$"
+          "pattern": "^fable2-prototype-native-semantic-proof-(source-pins|independence-ledger|hammercombat-packet|oxygen-packet|world-reward-packet|shared-property-pattern|expanded-scope|negative-controls|review-selection|packet-summary|tests|checks|consistency|schemas|replay|validation)$"
         },
         "version": {"const": 1}
       }

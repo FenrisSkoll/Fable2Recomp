@@ -22,8 +22,14 @@ Each packet receives one primary semantic disposition and separate mapping, rese
 
 `internal-code-region-dependent` remains attached to Packet A. The comparator intervals remain internal code regions without exact `.pdata` ownership even when their bytes and behavior correspond. `single-independent-support-class` remains attached to Packets B and C unless a separately published owner release rule is met; Phase 2G itself does not remove it.
 
+The six primary dispositions are mutually exclusive. `independently-corroborated-role` requires at least one material compatible target-native or separately evidenced cross-build observation. `behaviorally-corresponding-role-reserved` permits complete correspondence while an independent role vote or decisive reservation is absent. `contextual-role-only`, `semantic-conflict-quarantined`, `boundary-or-ownership-blocked` and `insufficient-evidence` retain progressively narrower claims. A contradiction creates a review trigger but cannot mutate an approved correspondence.
+
+Field labels prove neither scalar type nor complete object identity. A byte normalized from a word proves only Boolean-like storage. A 32-bit load/store proves an opaque word until arithmetic or another typed consumer establishes more. A property visitor does not establish transfer direction, registration, construction or gameplay execution.
+
 ## Frozen inputs and isolation
 
 Every analytical invocation rehashes the ten Phase 2F trust roots, all 32 ignored artifacts, Phase 2F implementation/documentation bindings, inherited Phase 1–2E inputs, both remote sets, the ReXGlue state and all fifteen libmspack identities. The explicit `phase2e-v1` overlay is mandatory, while the default consumer remains `closed-phase2a-default` at 15,299 mappings. Invalid or changed inputs fail without fallback.
 
 Writes are physically confined to `docs/fable2-prototype-archaeology/phase2g/` and `out/prototype-archaeology/phase2g/`. JSON uses canonical key ordering and contains no time, locale, random or current-HEAD analytical input. Complete negative, contradictory and unresolved observations are retained.
+
+All expansion beyond the three owners must be justified by a direct caller, direct callee, internal call obligation, repeated-key negative control or shared-helper question and appear in `expanded-function-scope.json`. Existing `.pdata` and verified reader/decoder behavior is authoritative; internal comparator/hash regions are never promoted to functions.

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype:semantic-routes:v1",
+  "title": "Fable II Phase 2F noncanonical static semantic routes",
+  "type": "object",
+  "required": ["schema", "phase2e_commit", "overlay_selection", "canonical_adoption", "analysis_only", "semantic_feedback_allowed"],
+  "properties": {
+    "schema": {"type":"object","required":["name","version"],"additionalProperties":false,"properties":{
+      "name":{"type":"string","pattern":"^fable2-prototype-semantic-routes-(source-pins|source-terminal-index|historical-H|lane-(H-2A|S(\\+B01(\\+B02(\\+B04(\\+B05)?)?)?)?|O(-minus-B0[1245])?)|lane-delta|mapping-contribution|batch-attribution|suppression-impact|collection-index|registration-debug-freecamera|script-preservation|type-global-boundary|project-intersections|mapping-context-packets|target-corroboration|semantic-quarantine|review-queues|high-value-review|route-summary|validation|tests|checks|schemas|replay|negative-controls)$"},
+      "version":{"const":1}}},
+    "phase2e_commit":{"const":"1f9c0088bdc6f056ab62c63f7e044d06dcda4e03"},
+    "canonical_adoption":{"const":false}, "analysis_only":{"const":true}, "semantic_feedback_allowed":{"const":false},
+    "overlay_selection":{"$ref":"#/$defs/selection"},
+    "artifacts":{"type":"array","items":{"$ref":"#/$defs/identity"}},
+    "records":{"type":"array"}, "selected":{"type":"array"}, "counts":{"type":"object"}
+  },
+  "allOf":[
+    {"if":{"properties":{"schema":{"properties":{"name":{"pattern":"-lane-(H-2A|S(\\+|$)|O(-|$))"}}}}},
+     "then":{"required":["lane","mapping_count","mapping_set_sha256","records","counts"],"properties":{
+       "lane":{"type":"string"},"mapping_count":{"type":"integer","minimum":15296,"maximum":15379},
+       "mapping_set_sha256":{"$ref":"#/$defs/hash"},"records":{"type":"array","minItems":51657,"maxItems":51657,"items":{"$ref":"#/$defs/terminal"}}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-semantic-routes-mapping-contribution"}}}}},
+     "then":{"required":["records","counts","counting"],"properties":{"records":{"type":"array","minItems":83,"maxItems":83,"items":{
+       "type":"object","required":["mapping_id","donor_start","target_start","batch","reservations","productive","counts","leave_one_mapping_out"],
+       "properties":{"mapping_id":{"type":"string"},"donor_start":{"$ref":"#/$defs/address"},"target_start":{"$ref":"#/$defs/address"},"reservations":{"type":"array","items":{"type":"string"}},"productive":{"type":"boolean"},"counts":{"type":"object"}}}}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-semantic-routes-source-pins"}}}}},
+     "then":{"required":["sources","starting_state","sdk","inherited_blockers"],"properties":{"sources":{"type":"array","items":{"$ref":"#/$defs/identity"}},"inherited_blockers":{"type":"array","minItems":6,"maxItems":6}}}},
+    {"if":{"properties":{"schema":{"properties":{"name":{"const":"fable2-prototype-semantic-routes-high-value-review"}}}}},
+     "then":{"required":["selected","counts","ranking"],"properties":{"selected":{"type":"array","maxItems":8}}}}
+  ],
+  "$defs":{
+    "hash":{"type":"string","pattern":"^[A-F0-9]{64}$"},
+    "address":{"type":"string","pattern":"^0x[A-F0-9]{8}$"},
+    "identity":{"type":"object","required":["path","size","sha256"],"properties":{
+      "path":{"type":"string","pattern":"^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[^\\\\]+$"},
+      "size":{"type":"integer","minimum":0},"sha256":{"$ref":"#/$defs/hash"}}},
+    "selection":{"type":"object","required":["schema","selection","mapping_count","overlay_enabled","fallback_permitted","owner_decision","approved_delta","effective_map","selected_action_set_sha256"],
+      "properties":{"selection":{"const":"phase2e-v1"},"mapping_count":{"const":15379},"overlay_enabled":{"const":true},"fallback_permitted":{"const":false},
+        "canonical_adoption":{"const":false},"analysis_only":{"const":true},
+        "owner_decision":{"allOf":[{"$ref":"#/$defs/identity"},{"properties":{"path":{"const":"docs/fable2-prototype-archaeology/phase2e/evidence/owner-decision.json"},"size":{"const":42203},"sha256":{"const":"7905EDD55A1DDA53C7FDD1D36635FFC7E6315F1BA66F2CB88393A3E5F6F766BD"}}}]},
+        "approved_delta":{"allOf":[{"$ref":"#/$defs/identity"},{"properties":{"path":{"const":"docs/fable2-prototype-archaeology/phase2e/evidence/approved-overlay-delta.json"},"size":{"const":260564},"sha256":{"const":"BD53722F709EB2BB287482DE09E2D6953EAD19DDA675E1B1C34DEBA55D2D52BC"}}}]},
+        "effective_map":{"allOf":[{"$ref":"#/$defs/identity"},{"properties":{"path":{"const":"out/prototype-archaeology/phase2e/effective-map.json"},"size":{"const":8975363},"sha256":{"const":"E3EE02E659ADCBD79823B3343A542505B45B8B902BAADD158A2A75D577E71663"}}}]},
+        "selected_action_set_sha256":{"const":"8E9CBB93751C0F0B13FF04F1809207D72C0C96587369FEEA0C528F0A9EEE2363"}}},
+    "terminal":{"type":"object","required":["terminal_id","anchor_id","build","donor_start","target_start","grade","route_kind","routes","primary_route","reservations","used_additions","conflicts","category","filters","canonical_function_name"],
+      "properties":{"terminal_id":{"type":"string","pattern":"^S-[A-F0-9]{24}$"},"anchor_id":{"type":"string"},
+        "build":{"enum":["build-23.12.02.0330","sep-2008"]},"donor_start":{"anyOf":[{"$ref":"#/$defs/address"},{"type":"null"}]},"target_start":{"anyOf":[{"$ref":"#/$defs/address"},{"type":"null"}]},
+        "grade":{"enum":["target-corroborated","transported-context-reserved","transported-context-unreserved","target-unconfirmed","semantic-conflict-quarantined","suppression-blocked","mapping-blocked","ownership-or-boundary-blocked"]},
+        "routes":{"type":"array","items":{"$ref":"#/$defs/route"}},"primary_route":{"type":["integer","null"],"minimum":0},"reservations":{"type":"array"},"used_additions":{"type":"array","uniqueItems":true,"items":{"type":"string"}},
+        "conflicts":{"type":"array"},"category":{"enum":["fable-game-specific","sdk-compiler-vector","generic-platform","unknown"]},"filters":{"type":"array"},"canonical_function_name":{"const":null}}},
+    "route":{"type":"object","required":["edges","reservations","independent","evidence"],"additionalProperties":false,"properties":{
+      "edges":{"type":"array","minItems":1,"maxItems":4,"items":{"type":"object","required":["id","donor","target","role","source","generation","reservations","provenance","mapping_dependencies"],
+        "properties":{"id":{"type":"string"},"donor":{"$ref":"#/$defs/address"},"target":{"$ref":"#/$defs/address"},"role":{"enum":["owner","literal-consumer-callee"]},"generation":{"type":"integer","minimum":0,"maximum":1},"reservations":{"type":"array","items":{"type":"string"}},"provenance":{"type":"object"},"mapping_dependencies":{"type":"array"}}}},
+      "reservations":{"type":"array"},"independent":{"type":"boolean"},"evidence":{"type":["object","null"]}}}
+  }
+}

@@ -22,6 +22,11 @@ Packet C is the sole owner-reviewed contextual role. The role is
 CONTEXTUAL ROLE — NOT A FUNCTION NAME and retains reservation
 `single-independent-support-class`.
 
+The branch-guarded close-out reran the Phase 2F source/audit/publication/schema
+checks, the complete 408-test supported discovery on frozen Phase 2G, and all
+37 Phase 2H tests. Together with 44 Phase 2I tests, 489 distinct supported
+tests passed with zero failures, errors, or skips.
+
 ## Selection and profile results
 
 No mapping or semantic view is selected by default, and no export is written
@@ -125,13 +130,13 @@ and the summary, avoiding circular self-hashing.
 | `out/prototype-archaeology/phase2i/profiles/semantic-review/rollback-manifest.json` | 77309 | `9148999D3EA38FE38765EC99A83C9D895BEAB1C03DEA51E51AA10F7CD54EA3D2` |
 | `out/prototype-archaeology/phase2i/receipts/collision-controls.json` | 1146 | `8956DB0789E226E776C98A994ED3DDAF0A8344713BABBDFD8D7FA8334CE4C7D5` |
 | `out/prototype-archaeology/phase2i/receipts/consistency.json` | 2910 | `150FB3C31A57CEF1F9344F2C7844EBF3CA880C19847EE820A21EF86A28BC9992` |
-| `out/prototype-archaeology/phase2i/receipts/git-delta.json` | 2814 | `08F0D2E61DCCF6BD2E5B37460591EDD82AEEFC712A151FA5FFF835595BDC8F70` |
+| `out/prototype-archaeology/phase2i/receipts/git-delta.json` | 3016 | `FFAE0C32F4297D2938421B320BB39F718B9C1FBE3C785886131E4DFCA21BEA42` |
 | `out/prototype-archaeology/phase2i/receipts/negative-controls.json` | 875 | `DFA47E9A25D5C83CA04F4B347F9EEFBE7054C5D69E567E35113FAD469B948262` |
 | `out/prototype-archaeology/phase2i/receipts/path-audit.json` | 712 | `288EFC829844ED2B35A84D7C919BC61EE155ABE027D73B7B4DAAC01BE8E5202B` |
 | `out/prototype-archaeology/phase2i/receipts/replay.json` | 5937 | `C44CC2E3911BCBE9984E3420F6DDE56D2970A5DCD8667BCAD0B409D584100E20` |
 | `out/prototype-archaeology/phase2i/receipts/schemas.json` | 838 | `886B98BCDAA8AC959AEF5DCB37982AB485CF965A4E60F329F38BE946D55AEC80` |
 | `out/prototype-archaeology/phase2i/receipts/sdk-preservation.json` | 3242 | `8569128FEE00FDBC46C8648D5AF9AA63FF4BBC1BECA61703DA89695E65C4B1C7` |
-| `out/prototype-archaeology/phase2i/receipts/source-inspection.json` | 927 | `10A8CDDBD9E3E8AE68807736BE38C1113A70A68BCBBFE555CBD7A7E94F14D319` |
+| `out/prototype-archaeology/phase2i/receipts/source-inspection.json` | 958 | `40F3EDE1C8362167BA4BEFD2416BA004647B65311E3B77F35FDFB5A4CBBEF72B` |
 | `out/prototype-archaeology/phase2i/receipts/tamper-controls.json` | 674 | `91DEE5189D5FBA069FC14442F814DFDAB5EC77591D35E31DFE45B8DC8F4EABDE` |
 | `out/prototype-archaeology/phase2i/receipts/tests.json` | 666 | `AC162A2EEE027E64990838F1425334FD97B7CA27D0BD86E39405D4C8C5DE6C46` |
 <!-- PHASE2I_ARTIFACTS_END -->

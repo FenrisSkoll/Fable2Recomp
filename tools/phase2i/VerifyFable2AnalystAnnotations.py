@@ -57,14 +57,17 @@ ALLOWED_GIT_PATHS = {
     "docs/fable2-prototype-archaeology/phase2i/report.md",
     "docs/fable2-prototype-archaeology/phase2i/rollback.md",
     "tests/phase2i/__init__.py",
+    "tests/phase2i/.gitattributes",
     "tests/phase2i/test_analyst_annotations.py",
     "tests/phase2i/test_analyst_export.py",
+    "tools/phase2i/.gitattributes",
     "tools/phase2i/Fable2AnalystAnnotations.py",
     "tools/phase2i/Fable2AnalystExport.py",
     "tools/phase2i/Fable2AnalystSources.py",
     "tools/phase2i/Invoke-Fable2AnalystExports.ps1",
     "tools/phase2i/Verify-Fable2AnalystAnnotationSchemas.ps1",
     "tools/phase2i/VerifyFable2AnalystAnnotations.py",
+    "tools/schemas/phase2i/.gitattributes",
     "tools/schemas/phase2i/fable2-analyst-annotation-layer-v1.schema.json",
 }
 
@@ -575,6 +578,11 @@ def build_report() -> str:
         "CONTEXTUAL ROLE — NOT A FUNCTION NAME and retains reservation",
         "`single-independent-support-class`.",
         "",
+        "The branch-guarded close-out reran the Phase 2F source/audit/publication/schema",
+        "checks, the complete 408-test supported discovery on frozen Phase 2G, and all",
+        "37 Phase 2H tests. Together with 44 Phase 2I tests, 489 distinct supported",
+        "tests passed with zero failures, errors, or skips.",
+        "",
         "## Selection and profile results",
         "",
         "No mapping or semantic view is selected by default, and no export is written",
@@ -683,6 +691,7 @@ def publication_identities() -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         SUMMARY,
     ]
     implementation_paths = [
+        Path("tools/phase2i/.gitattributes"),
         Path("tools/phase2i/Fable2AnalystSources.py"),
         Path("tools/phase2i/Fable2AnalystAnnotations.py"),
         Path("tools/phase2i/Fable2AnalystExport.py"),
@@ -691,9 +700,11 @@ def publication_identities() -> tuple[list[dict[str, Any]], list[dict[str, Any]]
         Path("tools/phase2i/Verify-Fable2AnalystAnnotationSchemas.ps1"),
     ]
     test_schema_paths = [
+        Path("tests/phase2i/.gitattributes"),
         Path("tests/phase2i/__init__.py"),
         Path("tests/phase2i/test_analyst_annotations.py"),
         Path("tests/phase2i/test_analyst_export.py"),
+        Path("tools/schemas/phase2i/.gitattributes"),
         Path("tools/schemas/phase2i/fable2-analyst-annotation-layer-v1.schema.json"),
     ]
     return (
@@ -722,6 +733,26 @@ def build_validation() -> dict[str, Any]:
         tests_and_schemas=tests_and_schemas,
         counts=summary["counts"],
         profiles=summary["profiles"],
+        supported_tests={
+            "frozen_phase2g_complete_discovery": 408,
+            "frozen_phase2h": 37,
+            "phase2i": 44,
+            "combined_distinct": 489,
+            "failures": 0,
+            "errors": 0,
+            "skips": 0,
+        },
+        frozen_verifier_replay={
+            "phase2f_source_bindings": 413,
+            "phase2f_schema_documents": 36,
+            "phase2f_semantic_universe": 51657,
+            "phase2g_source_bindings": 468,
+            "phase2g_schema_documents": 16,
+            "phase2h_source_bindings": 501,
+            "phase2h_ignored_artifacts": 13,
+            "phase2h_schema_documents": 18,
+            "result": "pass",
+        },
         receipts={name: row["result"] for name, row in sorted(receipts.items())},
         report_summary_actual_bytes="pass",
         deterministic_replay="pass",

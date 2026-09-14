@@ -86,6 +86,10 @@ try {
         -Output "out/prototype-archaeology/phase2i/profiles/overlay-review"
 
     Invoke-Phase2IExport `
+        -Profile "excluded-review" `
+        -Output "out/prototype-archaeology/phase2i/profiles/excluded-review"
+
+    Invoke-Phase2IExport `
         -Profile "project-relevant" `
         -Output "out/prototype-archaeology/phase2i/profiles/project-relevant"
 

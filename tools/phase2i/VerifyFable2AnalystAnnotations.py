@@ -31,6 +31,7 @@ PROFILE_ROOTS = {
     "address": sources.OUT / "profiles/address",
     "phase2h-approved": sources.OUT / "profiles/phase2h-approved",
     "overlay-review": sources.OUT / "profiles/overlay-review",
+    "excluded-review": sources.OUT / "profiles/excluded-review",
     "project-relevant": sources.OUT / "profiles/project-relevant",
     "semantic-review": sources.OUT / "profiles/semantic-review",
     "all-correspondences": sources.OUT / "profiles/all-correspondences",
@@ -40,6 +41,7 @@ EXPECTED_PROFILE_COUNTS = {
     "address": 3,
     "phase2h-approved": 6,
     "overlay-review": 86,
+    "excluded-review": 720,
     "project-relevant": 82,
     "semantic-review": 116,
     "all-correspondences": 15379,
@@ -517,9 +519,9 @@ def write_all_receipts(check: bool = False) -> list[dict[str, Any]]:
         "source-inspection.json": source_inspection_receipt(),
         "tamper-controls.json": tamper_receipt(),
         "tests.json": test_receipt(),
-        # 25 profile/index JSON + 10 other receipts + this receipt + two
+        # 29 profile/index JSON + 10 other receipts + this receipt + two
         # committed Phase 2I evidence documents at final publication.
-        "schemas.json": schema_receipt(39),
+        "schemas.json": schema_receipt(43),
     }
     rows = [write_receipt(name, documents[name], check) for name in sorted(documents)]
     rows.append(write_receipt("path-audit.json", path_receipt(), check))

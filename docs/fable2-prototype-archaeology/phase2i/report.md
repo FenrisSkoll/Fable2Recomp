@@ -38,6 +38,7 @@ additionally requires the deliberate bulk flag.
 | address | 3 | 16104 | 0 | 0 | 0 | 2 | 1 | 1 | 0 | 1 |
 | phase2h-approved | 6 | 16101 | 0 | 0 | 0 | 2 | 4 | 1 | 0 | 1 |
 | overlay-review | 86 | 16016 | 0 | 3 | 0 | 69 | 17 | 0 | 0 | 0 |
+| excluded-review | 720 | 15382 | 0 | 0 | 720 | 720 | 0 | 0 | 0 | 0 |
 | project-relevant | 82 | 16020 | 0 | 0 | 0 | 65 | 17 | 0 | 0 | 0 |
 | semantic-review | 116 | 16102 | 0 | 0 | 0 | 75 | 41 | 0 | 116 | 0 |
 | all-correspondences | 15379 | 723 | 0 | 0 | 0 | 66 | 15313 | 0 | 0 | 0 |
@@ -104,6 +105,12 @@ and the summary, avoiding circular self-hashing.
 | `out/prototype-archaeology/phase2i/profiles/all-correspondences/ghidra-plan.json` | 14961558 | `7236DCB4BA67071D2037B9FCBEE62CF746CFF4802C011A0E9FF5842562F239C9` |
 | `out/prototype-archaeology/phase2i/profiles/all-correspondences/preview.txt` | 36828 | `1BAC75F0245DDA71871DE345C6A880E3BE216933442CF3BD5506755A6FB52C52` |
 | `out/prototype-archaeology/phase2i/profiles/all-correspondences/rollback-manifest.json` | 9890270 | `AB3D962F816D87F26051FCF53E3D961A4CC8A6D3554A20EFA54C4DDC697EF637` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/annotations.json` | 1218974 | `825FACBB3883F7738A6FEA966CBA1235377C767507C8EFB272A0AAFFFFE313FB` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/annotations.tsv` | 441533 | `FC4877E615EED370D49B08561F7BC2DD6A94A5A51B295F60FA2663DCB705E8A1` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/export-receipt.json` | 3172 | `46304965F4C4D06EDACDB554304A024AF32513A80E33217D2F1D799F260C5418` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/ghidra-plan.json` | 675126 | `3EFCFD091DFD519DED12263D7A7FCC275A3E2FB1A3501D655D953349E8F04E0C` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/preview.txt` | 32857 | `F091638CD4383971E6D7317B846FB33F64AE34076480A7AFE67F0A983C5335A6` |
+| `out/prototype-archaeology/phase2i/profiles/excluded-review/rollback-manifest.json` | 465266 | `96B4969989A43925316C93176D8EABAD7C995E092F0F548B5BD41275729F10D0` |
 | `out/prototype-archaeology/phase2i/profiles/overlay-review/annotations.json` | 189223 | `30BF2A69E1C75FB57A0AB4E9474CF05EAE36270CF35A9CA4C34F780BB317784D` |
 | `out/prototype-archaeology/phase2i/profiles/overlay-review/annotations.tsv` | 72180 | `F0736C21F95EF7CBF986714239400FEC3FCF795B6EFE758DBA766FB0E5ED3042` |
 | `out/prototype-archaeology/phase2i/profiles/overlay-review/export-receipt.json` | 3158 | `7B4624A9558F3098BF64052CD6FE909CE9C81E7790D44B0BC08D3E66D41F66CC` |
@@ -129,12 +136,12 @@ and the summary, avoiding circular self-hashing.
 | `out/prototype-archaeology/phase2i/profiles/semantic-review/preview.txt` | 39413 | `8EF2AD7E6A74E071249FA5C835102A0A3E2871584D262CD4F2FEE1CF3AFE5E33` |
 | `out/prototype-archaeology/phase2i/profiles/semantic-review/rollback-manifest.json` | 77309 | `9148999D3EA38FE38765EC99A83C9D895BEAB1C03DEA51E51AA10F7CD54EA3D2` |
 | `out/prototype-archaeology/phase2i/receipts/collision-controls.json` | 1146 | `8956DB0789E226E776C98A994ED3DDAF0A8344713BABBDFD8D7FA8334CE4C7D5` |
-| `out/prototype-archaeology/phase2i/receipts/consistency.json` | 2910 | `150FB3C31A57CEF1F9344F2C7844EBF3CA880C19847EE820A21EF86A28BC9992` |
+| `out/prototype-archaeology/phase2i/receipts/consistency.json` | 3171 | `D4022658EF00BBB6BA14A3A6DF217E277B3C8BF8E22CDAF7272124908983BB1B` |
 | `out/prototype-archaeology/phase2i/receipts/git-delta.json` | 3016 | `FFAE0C32F4297D2938421B320BB39F718B9C1FBE3C785886131E4DFCA21BEA42` |
 | `out/prototype-archaeology/phase2i/receipts/negative-controls.json` | 875 | `DFA47E9A25D5C83CA04F4B347F9EEFBE7054C5D69E567E35113FAD469B948262` |
-| `out/prototype-archaeology/phase2i/receipts/path-audit.json` | 712 | `288EFC829844ED2B35A84D7C919BC61EE155ABE027D73B7B4DAAC01BE8E5202B` |
-| `out/prototype-archaeology/phase2i/receipts/replay.json` | 5937 | `C44CC2E3911BCBE9984E3420F6DDE56D2970A5DCD8667BCAD0B409D584100E20` |
-| `out/prototype-archaeology/phase2i/receipts/schemas.json` | 838 | `886B98BCDAA8AC959AEF5DCB37982AB485CF965A4E60F329F38BE946D55AEC80` |
+| `out/prototype-archaeology/phase2i/receipts/path-audit.json` | 712 | `672ABBBF9BBD08661E92B6DF535A9D1E7E347A977D9D4FE0F1DDBEC4D5FF1F1C` |
+| `out/prototype-archaeology/phase2i/receipts/replay.json` | 6810 | `D137F3230B8DAED5F25610F407260DA6B5FECCEE4CBCC95ABD8D10273C1E875F` |
+| `out/prototype-archaeology/phase2i/receipts/schemas.json` | 838 | `723094BB1913351093209439782688D331C1F015824A4AF768A4E1F331603AC2` |
 | `out/prototype-archaeology/phase2i/receipts/sdk-preservation.json` | 3242 | `8569128FEE00FDBC46C8648D5AF9AA63FF4BBC1BECA61703DA89695E65C4B1C7` |
 | `out/prototype-archaeology/phase2i/receipts/source-inspection.json` | 958 | `40F3EDE1C8362167BA4BEFD2416BA004647B65311E3B77F35FDFB5A4CBBEF72B` |
 | `out/prototype-archaeology/phase2i/receipts/tamper-controls.json` | 674 | `91DEE5189D5FBA069FC14442F814DFDAB5EC77591D35E31DFE45B8DC8F4EABDE` |

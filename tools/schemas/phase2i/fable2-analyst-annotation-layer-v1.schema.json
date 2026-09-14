@@ -51,8 +51,16 @@
       "items": {"$ref": "#/$defs/identity"}
     },
     "artifacts": {
-      "type": "array",
-      "items": {"$ref": "#/$defs/identity"}
+      "oneOf": [
+        {
+          "type": "array",
+          "items": {"$ref": "#/$defs/identity"}
+        },
+        {
+          "type": "object",
+          "additionalProperties": {"$ref": "#/$defs/hash"}
+        }
+      ]
     },
     "inherited_blockers": {"type": "array", "minItems": 6, "maxItems": 6}
   },

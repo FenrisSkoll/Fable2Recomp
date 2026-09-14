@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import copy
 import importlib.util
+import io
 import json
 import sys
 import unittest
@@ -281,6 +283,53 @@ class ProfileAndSelectionTests(unittest.TestCase):
             annotations.validate_selections(arguments("none", "phase2f-evidence"))
         with self.assertRaises(annotations.SelectionError):
             annotations.validate_selections(arguments("closed-phase2a-default", "phase2h-v1"))
+
+
+class MainExitCodeTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.document = json.loads((ROOT / annotations.INDEX_PATH).read_bytes())
+        cls.record = next(row for row in cls.document["records"] if row["display_kind"] == "owner-reviewed-contextual-role")
+
+    def call(self, argv, *, selected=None, failure=None) -> int:
+        original_load = annotations._load_index
+        original_selected = annotations.selected_records
+        try:
+            if failure is not None:
+                def fail_load():
+                    raise failure
+                annotations._load_index = fail_load
+            else:
+                annotations._load_index = lambda: self.document
+            if selected is not None:
+                annotations.selected_records = lambda document, choice: selected
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                return annotations.main(argv)
+        finally:
+            annotations._load_index = original_load
+            annotations.selected_records = original_selected
+
+    def test_success_with_records_exit_zero(self) -> None:
+        code = self.call(["query", "--address", "0x82522C10"], selected=[self.record])
+        self.assertEqual(code, 0)
+
+    def test_success_with_no_records_exit_one(self) -> None:
+        code = self.call(["query", "--address", "0x80000000"], selected=[])
+        self.assertEqual(code, 1)
+
+    def test_invalid_selection_exit_two(self) -> None:
+        code = self.call([
+            "query", "--address", "0x82522C10",
+            "--phase2e-decision", annotations.PHASE2E_DECISION.as_posix(),
+        ])
+        self.assertEqual(code, 2)
+
+    def test_internal_validation_failure_exit_three(self) -> None:
+        code = self.call(
+            ["query", "--address", "0x82522C10"],
+            failure=annotations.sources.EvidenceError("fixture validation failure"),
+        )
+        self.assertEqual(code, 3)
 
 
 if __name__ == "__main__":

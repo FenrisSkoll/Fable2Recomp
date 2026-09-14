@@ -897,8 +897,10 @@ def _load_index() -> dict[str, Any]:
     validate_index(document)
     if (ROOT / SUMMARY_PATH).is_file():
         summary = sources.read_json(SUMMARY_PATH)
-        expected = next(row for row in summary.get("artifacts", []) if row["path"] == INDEX_PATH.as_posix())
-        sources.check_identity(expected)
+        if summary.get("result") == "pass":
+            matches = [row for row in summary.get("artifacts", []) if row["path"] == INDEX_PATH.as_posix()]
+            sources.require(len(matches) == 1, "Published summary does not bind exactly one normalized index")
+            sources.check_identity(matches[0])
     return document
 
 

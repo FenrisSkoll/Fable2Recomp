@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fable2:prototype:analyst-annotation-layer:v1",
+  "title": "Fable II Phase 2I analyst annotation and export layer",
+  "type": "object",
+  "required": [
+    "schema",
+    "phase2h_commit",
+    "analysis_only",
+    "annotation_generation_only",
+    "canonical_name_authority",
+    "production_mapping_authority",
+    "runtime_authority",
+    "ghidra_mutation_authority"
+  ],
+  "properties": {
+    "schema": {
+      "type": "object",
+      "required": ["name", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "fable2-prototype-analyst-annotation-source-pins",
+            "fable2-prototype-analyst-annotation-normalized-index",
+            "fable2-prototype-analyst-annotation-bundle",
+            "fable2-prototype-analyst-annotation-ghidra-plan",
+            "fable2-prototype-analyst-annotation-rollback-manifest",
+            "fable2-prototype-analyst-annotation-summary",
+            "fable2-prototype-analyst-annotation-validation",
+            "fable2-prototype-analyst-annotation-receipt"
+          ]
+        },
+        "version": {"const": 1}
+      }
+    },
+    "phase2h_commit": {"const": "d9721cd72a98420eaa06548ee54a01c5a076fa62"},
+    "analysis_only": {"const": true},
+    "annotation_generation_only": {"const": true},
+    "canonical_name_authority": {"const": false},
+    "production_mapping_authority": {"const": false},
+    "runtime_authority": {"const": false},
+    "ghidra_mutation_authority": {"const": false},
+    "records": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/annotation"}
+    },
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/identity"}
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/identity"}
+    },
+    "inherited_blockers": {"type": "array", "minItems": 6, "maxItems": 6}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema": {"properties": {"name": {"const": "fable2-prototype-analyst-annotation-source-pins"}}}
+        }
+      },
+      "then": {
+        "required": ["sources", "starting_state", "phase2h_commit_sequence", "phase2h_trust_roots", "phase2h_ignored_artifacts", "inherited_blockers", "sdk"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema": {"properties": {"name": {"const": "fable2-prototype-analyst-annotation-normalized-index"}}}
+        }
+      },
+      "then": {"required": ["records", "counts", "source_pins"]}
+    },
+    {
+      "if": {
+        "properties": {
+          "schema": {"properties": {"name": {"const": "fable2-prototype-analyst-annotation-bundle"}}}
+        }
+      },
+      "then": {"required": ["records", "selection", "profile", "counts", "source_pins"]}
+    }
+  ],
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[A-F0-9]{64}$"},
+    "address": {"type": "string", "pattern": "^0x[0-9A-F]{8}$"},
+    "identity": {
+      "type": "object",
+      "required": ["path", "size", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*:)[^\\\\]+$"},
+        "size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "range": {
+      "type": "object",
+      "required": ["start", "end_exclusive"],
+      "additionalProperties": false,
+      "properties": {
+        "start": {"$ref": "#/$defs/address"},
+        "end_exclusive": {"$ref": "#/$defs/address"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["path", "json_pointer", "size", "sha256", "record_identity"],
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string"},
+        "json_pointer": {"type": "string", "pattern": "^/"},
+        "size": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/hash"},
+        "record_identity": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "required": [
+        "annotation_id",
+        "namespace_marker",
+        "target",
+        "display_kind",
+        "display_title",
+        "comment_body",
+        "suggestion",
+        "mapping",
+        "semantic",
+        "sources",
+        "limitations",
+        "safe_for_analyst_comment_display",
+        "canonical_name_authority",
+        "production_mapping_authority",
+        "runtime_authority",
+        "mapping_views",
+        "project_memberships"
+      ],
+      "propertyNames": {
+        "not": {
+          "enum": ["function_name", "symbol_name", "rename_to", "canonical_label", "canonical_function_name", "semantic_function_name", "proposed_name"]
+        }
+      },
+      "properties": {
+        "annotation_id": {"type": "string", "pattern": "^A-[A-F0-9]{24}$"},
+        "namespace_marker": {"type": "string", "pattern": "^\\[F2PA:phase2i:A-[A-F0-9]{24}\\]$"},
+        "target": {
+          "type": "object",
+          "required": ["build", "range"],
+          "properties": {"build": {"const": "fable2-goty-tu1"}, "range": {"$ref": "#/$defs/range"}}
+        },
+        "donor": {
+          "type": ["object", "null"],
+          "properties": {"build": {"const": "build-23.12.02.0330"}, "range": {"$ref": "#/$defs/range"}}
+        },
+        "display_kind": {
+          "enum": [
+            "correspondence-provenance",
+            "overlay-addition",
+            "suppression-warning",
+            "unreviewed-semantic-evidence",
+            "corroborated-review-evidence",
+            "owner-reviewed-contextual-role",
+            "semantic-edge-correction",
+            "rejected-alias-warning",
+            "excluded-proposal-warning"
+          ]
+        },
+        "display_title": {"type": "string", "maxLength": 240},
+        "comment_body": {"type": "string", "pattern": "^[^\\r\\n\\t]*$"},
+        "suggestion": {
+          "type": "object",
+          "required": ["comment_type", "bookmark_category"],
+          "additionalProperties": false,
+          "properties": {
+            "comment_type": {"const": "PRE_COMMENT"},
+            "bookmark_category": {"type": "string", "pattern": "^F2PA/Phase2I/"}
+          }
+        },
+        "mapping": {"type": ["object", "null"]},
+        "semantic": {"type": ["object", "null"]},
+        "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+        "limitations": {"type": "array", "items": {"type": "string"}},
+        "safe_for_analyst_comment_display": {"type": "boolean"},
+        "canonical_name_authority": {"const": false},
+        "production_mapping_authority": {"const": false},
+        "runtime_authority": {"const": false},
+        "mapping_views": {"type": "array", "items": {"enum": ["closed-phase2a-default", "phase2e-v1"]}},
+        "project_memberships": {"type": "array", "items": {"type": "string"}},
+        "relationships": {"type": "array"}
+      }
+    }
+  }
+}

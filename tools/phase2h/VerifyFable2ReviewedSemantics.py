@@ -403,7 +403,7 @@ def changed_paths() -> list[str]:
 def verify_git_delta() -> None:
     actual = changed_paths()
     layer.require(actual == TRACKED_ALLOWLIST, "Phase 2H Git delta escaped exact allowlist")
-    result = subprocess.run(["git", "diff", "--check"], cwd=layer.ROOT, text=True,
+    result = subprocess.run(["git", "diff", "--check", layer.PHASE2G_COMMIT], cwd=layer.ROOT, text=True,
                             capture_output=True, check=False)
     layer.require(result.returncode == 0, "git diff --check failed: " + result.stdout + result.stderr)
 

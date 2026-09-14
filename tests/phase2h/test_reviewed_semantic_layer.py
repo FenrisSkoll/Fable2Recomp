@@ -7,6 +7,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "tools/phase2h")]
@@ -244,6 +245,12 @@ class ReviewedSemanticLayerTests(unittest.TestCase):
         self.assertEqual(len(self.delta["claims_not_made"]), 7)
         self.assertFalse(self.delta["preservation"]["production_propagation"])
         self.assertFalse(self.delta["preservation"]["mapping_records_mutated"])
+
+    def test_37_missing_bound_file_refuses(self) -> None:
+        arguments = self.exact_opt_in_args()
+        with mock.patch.object(layer, "identity", side_effect=FileNotFoundError("missing")):
+            with self.assertRaises(FileNotFoundError):
+                consumer.select(arguments)
 
 
 if __name__ == "__main__":

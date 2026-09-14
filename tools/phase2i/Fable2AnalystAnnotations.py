@@ -989,6 +989,8 @@ def annotation_counts(records: list[dict[str, Any]]) -> dict[str, int]:
             return row["semantic"].get("reservations", [])
         return []
 
+    active_mappings = [row for row in records if row["selection_layer"] == "mapping-active"]
+    semantic_contexts = [row for row in records if row["selection_layer"] == "semantic-phase2f"]
     return {
         "selected": len(records),
         "excluded": sum(row["display_kind"] == "excluded-proposal-warning" for row in records),
@@ -998,6 +1000,11 @@ def annotation_counts(records: list[dict[str, Any]]) -> dict[str, int]:
         "approved_role": sum(row["display_kind"] == "owner-reviewed-contextual-role" for row in records),
         "unreviewed_context": sum(row["selection_layer"] == "semantic-phase2f" for row in records),
         "rejected_alias": sum(row["display_kind"] == "rejected-alias-warning" for row in records),
+        "active_correspondence": len(active_mappings),
+        "reserved_active_correspondence": sum(bool(row["mapping"]["reservations"]) for row in active_mappings),
+        "unreserved_active_correspondence": sum(not row["mapping"]["reservations"] for row in active_mappings),
+        "reserved_unreviewed_context": sum(bool(row["semantic"]["reservations"]) for row in semantic_contexts),
+        "unreserved_unreviewed_context": sum(not row["semantic"]["reservations"] for row in semantic_contexts),
     }
 
 

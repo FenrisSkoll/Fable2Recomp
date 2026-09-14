@@ -11,6 +11,11 @@ and Packet B/oxygen remain static review evidence without owner approval or
 function names. Suppressed, held, probable and physics pairs remain inactive.
 All six inherited blockers remain unchanged.
 
+When an analyst needs to inspect those inactive proposals, use the explicit
+`excluded-review` export: it contains exactly 720 warning-only records (two
+physics candidates, three held strong mappings and 715 probable mappings) and
+does not add a correspondence route.
+
 The generated Ghidra plan is intentionally data-only. The smallest justified
 next integration, if desired, is a separately authorized importer trial on a
 disposable copy of a Ghidra project. It must verify exact TU1 image identity,

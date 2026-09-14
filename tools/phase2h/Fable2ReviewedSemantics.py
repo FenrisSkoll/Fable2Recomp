@@ -39,6 +39,7 @@ DELTA_PATH = DOC / "evidence/semantic-correction-delta.json"
 SUMMARY_PATH = DOC / "evidence/reviewed-semantic-summary.json"
 VALIDATION_PATH = DOC / "evidence/validation.json"
 VIEW_PATH = OUT / "materialized-reviewed-semantic-view.json"
+DEFAULT_VIEW_PATH = OUT / "receipts/default.json"
 
 STATEMENT = (
     "Approved as FenrisSkoll: adopt the non-canonical contextual role “conditional keyed "
@@ -441,6 +442,233 @@ def validate_owner_decision(document: dict[str, Any], pins: dict[str, Any]) -> N
             "Missing, stale, altered, incorrectly hashed or over-broad owner decision")
 
 
+def build_semantic_delta(pins: dict[str, Any], decision: dict[str, Any]) -> dict[str, Any]:
+    validate_owner_decision(decision, pins)
+    inputs = Inputs(pins)
+    provenance = {
+        "packet_c": inputs.ref(
+            "out/prototype-archaeology/phase2g/world-map-reward/native-proof-packet.json"
+        ),
+        "independent_visitor": inputs.ref(
+            "out/prototype-archaeology/phase2g/consumed-evidence/independence-ledger.json",
+            "/records/18",
+        ),
+        "phase2g_review_selection": inputs.ref(
+            "out/prototype-archaeology/phase2g/review-selection.json", "/records/2"
+        ),
+        "erroneous_phase2f_route": inputs.ref(
+            "docs/fable2-prototype-archaeology/phase2f/evidence/high-value-review.json",
+            "/selected/2",
+        ),
+        "phase2f_mapping_context": inputs.ref(
+            "out/prototype-archaeology/phase2f/mapping-context-packets.json", "/records/6"
+        ),
+        "phase2f_target_corroboration": inputs.ref(
+            "out/prototype-archaeology/phase2f/target-corroboration.json", "/records/12"
+        ),
+        "phase2f_route_summary": inputs.ref(
+            "docs/fable2-prototype-archaeology/phase2f/evidence/route-summary.json"
+        ),
+    }
+    scalar_fields = [
+        {
+            "key": "RewardRenown",
+            "key_register": "r4",
+            "store": {"base": "object", "offset": "0x20", "bytes": 4},
+            "signedness": "unresolved",
+            "numeric_representation": "unresolved",
+        },
+        {
+            "key": "RewardMoney",
+            "key_register": "r4",
+            "store": {"base": "object", "offset": "0x24", "bytes": 4},
+            "signedness": "unresolved",
+            "numeric_representation": "unresolved",
+        },
+    ]
+    return envelope(
+        "correction-delta",
+        layer_version=LAYER_VERSION,
+        decision_record_id=DECISION_RECORD_ID,
+        decision=identity(DECISION_PATH),
+        source_pins=identity(SOURCE_PINS_PATH),
+        approved_packets=[PACKET],
+        contextual_role_adoption={
+            "packet": PACKET,
+            "terminal": TERMINAL,
+            "owner_mapping": {
+                "donor": DONOR_OWNER,
+                "target": TARGET_OWNER,
+                "disposition": "unchanged",
+                "canonical": False,
+            },
+            "contextual_role": CONTEXTUAL_ROLE,
+            "role_status": ROLE_STATUS,
+            "canonical_function_name": None,
+            "reservation": RESERVATION,
+            "visitor": {
+                "target_start": "0x825237C8",
+                "target_end_exclusive": "0x82524454",
+                "corroborates_offsets": ["0x20", "0x24", "0x4D"],
+                "direction": "unresolved",
+            },
+        },
+        corrected_semantic_edges=[
+            {
+                "kind": "handle-resolver",
+                "donor": HANDLE_DONOR,
+                "target": HANDLE_TARGET,
+                "action": "resolves-two-word-handle",
+                "parked_registers_read": [],
+                "parked_registers_not_read": ["r5", "r6", "r7"],
+                "reward_keys_consumed": [],
+            },
+            {
+                "kind": "scalar-key-consumer",
+                "donor": SCALAR_DONOR,
+                "target": SCALAR_TARGET,
+                "action": "performs-scalar-key-lookup-and-returns-stored-32-bit-word",
+                "fields": scalar_fields,
+            },
+            {
+                "kind": "boolean-like-key-consumer",
+                "donor": BOOLEAN_DONOR,
+                "target": BOOLEAN_TARGET,
+                "action": "performs-boolean-like-key-lookup",
+                "field": {
+                    "key": "AppearOnWorldMap",
+                    "store": {"base": "object", "offset": "0x4D", "bytes": 1},
+                    "representation": "normalized-0-or-1",
+                },
+            },
+        ],
+        rejected_alias={
+            "terminal": FALSE_ALIAS_TERMINAL,
+            "text": "SetObjectiveTag",
+            "disposition": "rejected-false-high-half-alias",
+            "semantic_vote": False,
+            "genuine_packet_c_key": False,
+            "evidence": [
+                "handle resolver reads none of parked r5/r6/r7 values",
+                "TU1 address 0x820C0000 is an interior pointer to different text",
+            ],
+        },
+        genuine_packet_c_keys=["AppearOnWorldMap", "RewardMoney", "RewardRenown"],
+        unresolved=[
+            "scalar signedness",
+            "scalar numeric representation",
+            "visitor direction",
+        ],
+        claims_not_made=[
+            "reward granting",
+            "reward arithmetic",
+            "map-marker creation",
+            "visibility updates",
+            "constructor identity",
+            "serialization direction",
+            "complete quest-object ownership",
+        ],
+        preservation={
+            "owner_mapping": "unchanged-non-canonical",
+            "reservation": RESERVATION,
+            "visitor_direction": "unresolved",
+            "canonical_naming": "prohibited",
+            "mapping_records_duplicated": False,
+            "mapping_records_mutated": False,
+            "production_propagation": False,
+        },
+        unapproved_packets=["A", "B"],
+        all_other_semantic_rows_approved=False,
+        provenance=provenance,
+        input_identities=inputs.identities(),
+    )
+
+
+def validate_semantic_delta(
+    document: dict[str, Any], pins: dict[str, Any], decision: dict[str, Any]
+) -> None:
+    require(document == build_semantic_delta(pins, decision),
+            "Missing, stale, altered, wrong-version, incorrectly hashed or over-broad semantic delta")
+
+
+def build_materialized_view(
+    pins: dict[str, Any], decision: dict[str, Any], delta: dict[str, Any]
+) -> dict[str, Any]:
+    validate_semantic_delta(delta, pins, decision)
+    return envelope(
+        "materialized-view",
+        layer_version=LAYER_VERSION,
+        selection="phase2h-owner-reviewed-semantic-opt-in",
+        opt_in_applied=True,
+        decision_record_id=DECISION_RECORD_ID,
+        approver=APPROVER,
+        decision_date=DECISION_DATE,
+        source_pins=identity(SOURCE_PINS_PATH),
+        decision=identity(DECISION_PATH),
+        delta=identity(DELTA_PATH),
+        approved_packets=[PACKET],
+        reviewed_roles=[copy.deepcopy(delta["contextual_role_adoption"])],
+        semantic_corrections=copy.deepcopy(delta["corrected_semantic_edges"]),
+        rejected_aliases=[copy.deepcopy(delta["rejected_alias"])],
+        reservation=RESERVATION,
+        visitor_direction="unresolved",
+        canonical_function_names=[],
+        mapping_changes=[],
+        unapproved_packets=["A", "B"],
+        all_other_semantic_rows_approved=False,
+        limitations=copy.deepcopy(delta["claims_not_made"]),
+    )
+
+
+def validate_materialized_view(
+    document: dict[str, Any], pins: dict[str, Any], decision: dict[str, Any], delta: dict[str, Any]
+) -> None:
+    require(document == build_materialized_view(pins, decision, delta),
+            "Missing, stale, altered or over-broad materialized reviewed view")
+
+
+def build_default_view() -> dict[str, Any]:
+    return envelope(
+        "default-view",
+        layer_version=LAYER_VERSION,
+        selection="closed-phase2g-semantic-default",
+        opt_in_applied=False,
+        reviewed_roles=[],
+        semantic_corrections=[],
+        rejected_aliases=[],
+        approved_packets=[],
+        canonical_function_names=[],
+        mapping_changes=[],
+        message="No Phase 2H reviewed semantic label is exposed without exact explicit opt-in.",
+    )
+
+
+def load_layer() -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    pins = read_json(SOURCE_PINS_PATH)
+    validate_source_pins(pins)
+    decision = read_json(DECISION_PATH)
+    validate_owner_decision(decision, pins)
+    delta = read_json(DELTA_PATH)
+    validate_semantic_delta(delta, pins, decision)
+    view = read_json(VIEW_PATH)
+    validate_materialized_view(view, pins, decision, delta)
+    return pins, decision, delta, view
+
+
+def write_layer(check: bool = False) -> tuple[dict[str, Any], dict[str, Any]]:
+    pins = read_json(SOURCE_PINS_PATH)
+    validate_source_pins(pins)
+    decision = read_json(DECISION_PATH)
+    validate_owner_decision(decision, pins)
+    delta = build_semantic_delta(pins, decision)
+    write_json(DELTA_PATH, delta, check)
+    view = build_materialized_view(pins, decision, delta)
+    write_json(VIEW_PATH, view, check)
+    print("PASS Phase 2H semantic correction delta: Packet C only", flush=True)
+    print("PASS materialized reviewed semantic view:", CONTEXTUAL_ROLE, flush=True)
+    return delta, view
+
+
 def write_bindings(check: bool = False) -> tuple[dict[str, Any], dict[str, Any]]:
     pins = build_source_pins()
     write_json(SOURCE_PINS_PATH, pins, check)
@@ -453,8 +681,10 @@ def write_bindings(check: bool = False) -> tuple[dict[str, Any], dict[str, Any]]
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("bindings",))
+    parser.add_argument("command", choices=("bindings", "layer"))
     parser.add_argument("--check", action="store_true")
     arguments = parser.parse_args()
     if arguments.command == "bindings":
         write_bindings(arguments.check)
+    elif arguments.command == "layer":
+        write_layer(arguments.check)

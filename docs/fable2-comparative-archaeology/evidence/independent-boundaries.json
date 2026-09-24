@@ -1,0 +1,354 @@
+{
+  "source_base_image": "B8F294DDAE3DA4A01DE455F5003CD1452D7C838EDC3DE1C166F3CAB9008B77A8",
+  "source_tu1_image": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+  "functions": [
+    {
+      "base_start": "0x82806168",
+      "base_end_exclusive": "0x828061E4",
+      "tu1_start": "0x8254B670",
+      "tu1_end_exclusive": "0x8254B6EC",
+      "base_sha256": "3B4119E1A2E1ABF8EF8652461FC7176798BAB21A34095FEEBC349A0621E626BF",
+      "tu1_sha256": "3FAAB6DBE1D1DC7ADBD55EB262BDDD060050A933394077B7D67070072ED8E51A",
+      "raw_equal": false,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x8256E368",
+      "base_end_exclusive": "0x8256E4F4",
+      "tu1_start": "0x8253B058",
+      "tu1_end_exclusive": "0x8253B1E4",
+      "base_sha256": "144902CF3DA1B6EA1591F2B529AE3AE54CA22FE94271CBE624B3AB3DD746252A",
+      "tu1_sha256": "144902CF3DA1B6EA1591F2B529AE3AE54CA22FE94271CBE624B3AB3DD746252A",
+      "raw_equal": true,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x824B3528",
+      "base_end_exclusive": "0x824B36A0",
+      "tu1_start": "0x824EDBB0",
+      "tu1_end_exclusive": "0x824EDD28",
+      "base_sha256": "270655479C53639FBEFC42EB5E12CDC45B9D33EB939428DF7430E4F65A4E8A3A",
+      "tu1_sha256": "270655479C53639FBEFC42EB5E12CDC45B9D33EB939428DF7430E4F65A4E8A3A",
+      "raw_equal": true,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82B9C7F8",
+      "base_end_exclusive": "0x82B9C9D4",
+      "tu1_start": "0x82BA2F68",
+      "tu1_end_exclusive": "0x82BA3144",
+      "base_sha256": "C61CC050F3588107382F84AD25ED9B0776B05C9ED84E02898719B4B9C82F31DB",
+      "tu1_sha256": "524A469A3189A3100DC3A56F1FADA99AE6A0AB5512314289CD893CCE8096F2F4",
+      "raw_equal": false,
+      "branch_mask_equal": false,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82B9CD68",
+      "base_end_exclusive": "0x82B9D48C",
+      "tu1_start": "0x82BA34D8",
+      "tu1_end_exclusive": "0x82BA3BFC",
+      "base_sha256": "B0FB8149500664CE63F02B3AE29431957F848331D40F3E693ECA3C250B77651B",
+      "tu1_sha256": "86F43B571FAC5458A0387538798CB0D365B14D203BE43BDFB60F2D7218A88758",
+      "raw_equal": false,
+      "branch_mask_equal": false,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82242628",
+      "base_end_exclusive": "0x8224271C",
+      "tu1_start": "0x82242668",
+      "tu1_end_exclusive": "0x8224275C",
+      "base_sha256": "34EC64DC59AC5EB5DF78A3BCC4FAF468D3D88EFEB1E744437BA443C77A0C149D",
+      "tu1_sha256": "4FF73A34D1132C4F89431169D5D8545D7D7CA11E680F2321052481A818F07AEE",
+      "raw_equal": false,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82B9B8D8",
+      "base_end_exclusive": "0x82B9B96C",
+      "tu1_start": "0x82BA26B0",
+      "tu1_end_exclusive": "0x82BA2744",
+      "base_sha256": "579E98DA68C7344575362DEE8709214BF57931E5AF577908BFC245C4A26986C3",
+      "tu1_sha256": "199C66493CC05AC28ABCA2971517C5C7343073E6E3E7EACA099CD024ED0CD2EC",
+      "raw_equal": false,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82B9BA58",
+      "base_end_exclusive": "0x82B9BEC8",
+      "tu1_start": "0x82BA2830",
+      "tu1_end_exclusive": "0x82BA2CA0",
+      "base_sha256": "469359BE44795CC774D0E982B5D385B5A510A2A610E3D53BC87E17880D8C9C61",
+      "tu1_sha256": "B8EF6B42EDE39BD31FF4CB3AF791461764FF136403394BE5CE670B6289277AF5",
+      "raw_equal": false,
+      "branch_mask_equal": false,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x82190760",
+      "base_end_exclusive": "0x82190830",
+      "tu1_start": "0x82190728",
+      "tu1_end_exclusive": "0x821907F8",
+      "base_sha256": "449941DC5AE6E799E0CBECDF3426DBD66D9B3FF11B4CEB6BA0A4F063EABF53D3",
+      "tu1_sha256": "D3F34D10742A916053AE293EC3B3F45CB662C49F061DE416B5154786944E1B3C",
+      "raw_equal": false,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x832304E8",
+      "base_end_exclusive": "0x83230568",
+      "tu1_start": "0x83236D60",
+      "tu1_end_exclusive": "0x83236DE0",
+      "base_sha256": "9E2F4B254A0EC30652945435F945E3CF01654837F30933A58D62B834F7E4BF40",
+      "tu1_sha256": "9E2F4B254A0EC30652945435F945E3CF01654837F30933A58D62B834F7E4BF40",
+      "raw_equal": true,
+      "branch_mask_equal": true,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x825ADB40",
+      "base_end_exclusive": "0x825ADCB0",
+      "tu1_start": "0x82459928",
+      "tu1_end_exclusive": "0x82459A98",
+      "base_sha256": "E2A02BF330F737B9BB6E408A9AA206A04C3440BDB551E40ADCA49762ACD50FF5",
+      "tu1_sha256": "770EA417D4A1B96E4F5E7EDE3A947F20B2B1CD6DFC9E6A094AD5C8CCF33D80CA",
+      "raw_equal": false,
+      "branch_mask_equal": false,
+      "note": "Hashes/ranges only. Candidate similarity alone does not prove semantics; see curated findings."
+    },
+    {
+      "base_start": "0x8274B738",
+      "tu1_start": "0x82967540",
+      "size": 16,
+      "sha256": "F34C6F1F77631DC7A6943F70FBAA060F2B29EE0E385500993BA985A98D0E084E",
+      "raw_equal": true,
+      "role_limit": "Virtual slot thunk; story-specific meaning unproved."
+    },
+    {
+      "base_start": "0x8297EB28",
+      "tu1_start": "0x82964800",
+      "size": 16,
+      "sha256": "FED6ACBDA5B5D5F66844D3D9C576F84A393B5BA4E633D1BD3185F264A762ECD3",
+      "raw_equal": true,
+      "role_limit": "Virtual slot thunk; story-specific meaning unproved."
+    },
+    {
+      "base_start": "0x8297EB48",
+      "tu1_start": "0x82964820",
+      "size": 16,
+      "sha256": "8018A855AAF23AA448EA5ACAC2FBDC00107CDD658BBC497035361FCE6F49556C",
+      "raw_equal": true,
+      "role_limit": "Virtual slot thunk; story-specific meaning unproved."
+    },
+    {
+      "base_start": "0x82988EE8",
+      "tu1_start": "0x82967570",
+      "size": 16,
+      "sha256": "4189E854469B93D29F1AEAB9AA5EF30D685E039261019020434431408F6DA698",
+      "raw_equal": true,
+      "role_limit": "Virtual slot thunk; story-specific meaning unproved."
+    }
+  ],
+  "independent_section_comparison": [
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\00-.rdata-82000600.bin",
+      "start": "0x82000600",
+      "size": 1093744,
+      "export_sha256": "BD72FC76624A193588C3F9B7D81A2029B6BF0802FA1040277E3EA01CD06B34BF",
+      "loaded_sha256": "5A531575516B39CA2836EAB3679AD65271C1B35948D9E54B56A089172EF7F578",
+      "equal": false,
+      "different_byte_count": 50,
+      "different_word_addresses": [
+        "0x82000788",
+        "0x82000820",
+        "0x820008A4",
+        "0x820008F4",
+        "0x8200090C",
+        "0x82000910",
+        "0x82000920",
+        "0x8200096C",
+        "0x820009AC",
+        "0x820009B0",
+        "0x820009BC",
+        "0x82000A08",
+        "0x82000A1C"
+      ],
+      "different_word_symbols": {
+        "0x82000788": "__imp__ExEventObjectType",
+        "0x82000820": "__imp__XboxHardwareInfo",
+        "0x820008A4": "__imp__XboxKrnlVersion",
+        "0x820008F4": "__imp__XexExecutableModuleHandle",
+        "0x8200090C": "__imp__KeTimeStampBundle",
+        "0x82000910": "__imp__KeDebugMonitorData",
+        "0x82000920": "__imp__ExThreadObjectType",
+        "0x8200096C": "__imp__ExLoadedCommandLine",
+        "0x820009AC": "__imp__VdGlobalXamDevice",
+        "0x820009B0": "__imp__VdGlobalDevice",
+        "0x820009BC": "__imp__KeCertMonitorData",
+        "0x82000A08": "__imp__VdGpuClockInMHz",
+        "0x82000A1C": "__imp__VdHSIOCalibrationLock"
+      }
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\01-.pdata-8210B800.bin",
+      "start": "0x8210B800",
+      "size": 369440,
+      "export_sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+      "loaded_sha256": "FE6A61E508AD67FC39BEA85372A06DA1CAF40C5F1E7BB2B52FF37471FE44AB3C",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\02-BINKBSS-82165C00.bin",
+      "start": "0x82165C00",
+      "size": 10504,
+      "export_sha256": "B0034FF6536F80ED36CC09DC0D638583FC8DDB5FA9D465F3800E373F72F12505",
+      "loaded_sha256": "B0034FF6536F80ED36CC09DC0D638583FC8DDB5FA9D465F3800E373F72F12505",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\03-.text-82170000.bin",
+      "start": "0x82170000",
+      "size": 18131900,
+      "export_sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+      "loaded_sha256": "1B9F2E80280637FE2287286ED3FE18B367F378E24A695A2B8AB50B9ACD8FC724",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\04-BINK-832BAC00.bin",
+      "start": "0x832BAC00",
+      "size": 62524,
+      "export_sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146",
+      "loaded_sha256": "D715B7B4F3E7912489DBBBA3FF2642B1907479CBEDBDF974CD043827DB707146",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\05-.data-832D0000.bin",
+      "start": "0x832D0000",
+      "size": 2275724,
+      "export_sha256": "CAEC714A61B5DC878EB198F084FDBAA55FD79CC08E1A3878F4B53D1248DDCEFA",
+      "loaded_sha256": "CAEC714A61B5DC878EB198F084FDBAA55FD79CC08E1A3878F4B53D1248DDCEFA",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\06-.lhmem-834FBA00.bin",
+      "start": "0x834FBA00",
+      "size": 12,
+      "export_sha256": "346796263367A47D9E567460D3AB34583B7D5803ED8BAB8AF42C7C6556600EDD",
+      "loaded_sha256": "346796263367A47D9E567460D3AB34583B7D5803ED8BAB8AF42C7C6556600EDD",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\07-.XBMOVIE-834FBC00.bin",
+      "start": "0x834FBC00",
+      "size": 12,
+      "export_sha256": "2A44B8F1C527AE2C83D9721888DE9CECE3D43B83BD8341E6E5EDA6B773BFC219",
+      "loaded_sha256": "2A44B8F1C527AE2C83D9721888DE9CECE3D43B83BD8341E6E5EDA6B773BFC219",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\08-.tls-834FBE00.bin",
+      "start": "0x834FBE00",
+      "size": 25,
+      "export_sha256": "61126DE1B795B976F3AC878F48E88FA77A87D7308BA57C7642B9E1068403A496",
+      "loaded_sha256": "61126DE1B795B976F3AC878F48E88FA77A87D7308BA57C7642B9E1068403A496",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\09-.lhtrc-834FC000.bin",
+      "start": "0x834FC000",
+      "size": 8,
+      "export_sha256": "577FCAD6FCD8592BF8B3B70C5ED4981EB1B2F7B7AC7AE355B930AA302FF85A55",
+      "loaded_sha256": "577FCAD6FCD8592BF8B3B70C5ED4981EB1B2F7B7AC7AE355B930AA302FF85A55",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\10-BINKDATA-834FC200.bin",
+      "start": "0x834FC200",
+      "size": 15688,
+      "export_sha256": "E198F018782D720C8CBBFED1D0810058DDA5B2E36A7659D3A9677C6F8B920618",
+      "loaded_sha256": "E198F018782D720C8CBBFED1D0810058DDA5B2E36A7659D3A9677C6F8B920618",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\11-.edata-83500000.bin",
+      "start": "0x83500000",
+      "size": 7453,
+      "export_sha256": "1A0CDEA2CE5328213E90ABB51305CA4E153B85F9383ABEC990C30B8026B8E5AC",
+      "loaded_sha256": "1A0CDEA2CE5328213E90ABB51305CA4E153B85F9383ABEC990C30B8026B8E5AC",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\12-.idata-83510000.bin",
+      "start": "0x83510000",
+      "size": 1190,
+      "export_sha256": "1CAE755C20645AD927EB9167ECB2FAA1C7823B653943294D8EFDC1C6D62317DD",
+      "loaded_sha256": "1CAE755C20645AD927EB9167ECB2FAA1C7823B653943294D8EFDC1C6D62317DD",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\13-.XBLD-83520000.bin",
+      "start": "0x83520000",
+      "size": 192,
+      "export_sha256": "963390CF074BD3555E374FB03B691989996E6F2B0D805154EE506A3FBC6D1A84",
+      "loaded_sha256": "963390CF074BD3555E374FB03B691989996E6F2B0D805154EE506A3FBC6D1A84",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    },
+    {
+      "path": "out\\prototype-archaeology\\derived\\canonical-tu1\\sections\\14-.reloc-83520200.bin",
+      "start": "0x83520200",
+      "size": 1034088,
+      "export_sha256": "96BD18A70E809A24FF9EBEF354FA6815620E77EBA1F5F1AD210BC858C7A11E51",
+      "loaded_sha256": "96BD18A70E809A24FF9EBEF354FA6815620E77EBA1F5F1AD210BC858C7A11E51",
+      "equal": true,
+      "different_byte_count": 0,
+      "different_word_addresses": [],
+      "different_word_symbols": {}
+    }
+  ]
+}

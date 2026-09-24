@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "status": "VERIFIED CONSISTENT",
+  "scope": "fresh load-only snapshots and generated source; no guest execution or translation-correctness proof",
+  "source_inputs": [
+    {
+      "path": "C:\\Dev\\Fable2Recomp\\assets\\tu1\\default.xex",
+      "sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "size": 21217280
+    },
+    {
+      "path": "C:\\Dev\\Fable2Recomp\\assets\\tu1\\default.xexp",
+      "sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "size": 2992128
+    },
+    {
+      "path": "C:\\Dev\\Fable2Recomp\\assets\\runtime\\default.xex",
+      "sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "size": 21217280
+    },
+    {
+      "path": "C:\\Dev\\Fable2Recomp\\assets\\runtime\\default.xexp",
+      "sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "size": 2992128
+    }
+  ],
+  "tool": {
+    "directory": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\tool-final",
+    "mode": "tool",
+    "image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "identity": {
+      "mode": "tool",
+      "base": "2181038080",
+      "size": "23199744",
+      "entry": "2194416064"
+    },
+    "sections": [
+      {
+        "name": ".rdata",
+        "address": "2181039616",
+        "size": "1093744",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".pdata",
+        "address": "2182133760",
+        "size": "369440",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": "BINKBSS",
+        "address": "2182503424",
+        "size": "10504",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".text",
+        "address": "2182545408",
+        "size": "18131900",
+        "executable": "1",
+        "writable": "0"
+      },
+      {
+        "name": "BINK",
+        "address": "2200677376",
+        "size": "62524",
+        "executable": "1",
+        "writable": "0"
+      },
+      {
+        "name": ".data",
+        "address": "2200764416",
+        "size": "2275724",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".lhmem",
+        "address": "2203040256",
+        "size": "12",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".XBMOVIE",
+        "address": "2203040768",
+        "size": "12",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".tls",
+        "address": "2203041280",
+        "size": "25",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".lhtrc",
+        "address": "2203041792",
+        "size": "8",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": "BINKDATA",
+        "address": "2203042304",
+        "size": "15688",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".edata",
+        "address": "2203058176",
+        "size": "7453",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".idata",
+        "address": "2203123712",
+        "size": "1190",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".XBLD",
+        "address": "2203189248",
+        "size": "192",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".reloc",
+        "address": "2203189760",
+        "size": "1034088",
+        "executable": "0",
+        "writable": "0"
+      }
+    ],
+    "loaded_runtime_path": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\rexruntime.dll",
+    "runtime_sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+    "layout": [
+      "encryption_bytes\tcompression_bytes\tcompression_info_offset",
+      "2\t2\t8"
+    ]
+  },
+  "runtime": {
+    "directory": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\runtime-final",
+    "mode": "runtime",
+    "image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "identity": {
+      "mode": "runtime",
+      "base": "2181038080",
+      "size": "23199744",
+      "entry": "2194416064"
+    },
+    "sections": [
+      {
+        "name": ".rdata",
+        "address": "2181039616",
+        "size": "1093744",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".pdata",
+        "address": "2182133760",
+        "size": "369440",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": "BINKBSS",
+        "address": "2182503424",
+        "size": "10504",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".text",
+        "address": "2182545408",
+        "size": "18131900",
+        "executable": "1",
+        "writable": "0"
+      },
+      {
+        "name": "BINK",
+        "address": "2200677376",
+        "size": "62524",
+        "executable": "1",
+        "writable": "0"
+      },
+      {
+        "name": ".data",
+        "address": "2200764416",
+        "size": "2275724",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".lhmem",
+        "address": "2203040256",
+        "size": "12",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".XBMOVIE",
+        "address": "2203040768",
+        "size": "12",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".tls",
+        "address": "2203041280",
+        "size": "25",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".lhtrc",
+        "address": "2203041792",
+        "size": "8",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": "BINKDATA",
+        "address": "2203042304",
+        "size": "15688",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".edata",
+        "address": "2203058176",
+        "size": "7453",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".idata",
+        "address": "2203123712",
+        "size": "1190",
+        "executable": "0",
+        "writable": "1"
+      },
+      {
+        "name": ".XBLD",
+        "address": "2203189248",
+        "size": "192",
+        "executable": "0",
+        "writable": "0"
+      },
+      {
+        "name": ".reloc",
+        "address": "2203189760",
+        "size": "1034088",
+        "executable": "0",
+        "writable": "0"
+      }
+    ],
+    "loaded_runtime_path": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\rexruntime.dll",
+    "runtime_sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+    "layout": [
+      "encryption_bytes\tcompression_bytes\tcompression_info_offset",
+      "2\t2\t8"
+    ]
+  },
+  "generated": {
+    "status": "PASS",
+    "identical_files": 591,
+    "inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+    "current": "C:\\Dev\\Fable2Recomp\\generated\\default",
+    "regenerated": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\regenerated"
+  },
+  "installed_cli": {
+    "path": "C:\\Dev\\rexglue-sdk-v0.10\\out\\install\\win-amd64\\bin\\rexglue.exe",
+    "sha256": "D123A6AB2DC3C15EF0B2398E0ED6F4583C71948F3043A582B777BDBD9BDBBD52"
+  },
+  "evidence_sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E"
+}

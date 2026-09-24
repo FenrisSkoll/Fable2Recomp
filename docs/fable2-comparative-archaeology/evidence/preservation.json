@@ -1,0 +1,12 @@
+{
+  "sdk_head": "18130a95c7790b4a9d3a2b30f601f247b1a7a864",
+  "sdk_tree": "c659bfaf3ff8fb32f5a17774ecabc6a9aa508544",
+  "sdk_status": "M thirdparty/libmspack",
+  "preexisting_dirty_file_hashes_identical": true,
+  "canonical_remotes_unchanged": true,
+  "manifest_bytes_unchanged": true,
+  "manifest_sha256": "EF1656D77D270F207C4A16D3B92D5B86C4414CE38292D079AEF52B120CE778E1",
+  "external_head": "2bdf8f93a0edcec599023ce9382ca284a7e92c06",
+  "external_status": "",
+  "generated_source_comparison": "provenance.json: 591 identical C++/headers"
+}

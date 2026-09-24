@@ -1,0 +1,36 @@
+[
+  {
+    "path": "C:\\Dev\\Fable2Recomp",
+    "branch": "main",
+    "head": "a87f6e549f157e1eacfcc7fa1d41049c6c23e88a",
+    "tree": "f22f8610b7560fe6a23cea39ebfdceed2c827935",
+    "status": "",
+    "remotes": "fork\thttps://github.com/FenrisSkoll/Fable2Recomp-old-fork.git (fetch)\nfork\thttps://github.com/FenrisSkoll/Fable2Recomp-old-fork.git (push)\norigin\thttps://github.com/FenrisSkoll/Fable2Recomp.git (fetch)\norigin\thttps://github.com/FenrisSkoll/Fable2Recomp.git (push)\nupstream\thttps://github.com/Fable2Recomp/Fable2Recomp.git (fetch)\nupstream\thttps://github.com/Fable2Recomp/Fable2Recomp.git (push)"
+  },
+  {
+    "path": "C:\\Dev\\rexglue-sdk-v0.10",
+    "branch": "fable2-native-renderer-nr0c2b1gv-validation-closeout",
+    "head": "18130a95c7790b4a9d3a2b30f601f247b1a7a864",
+    "tree": "c659bfaf3ff8fb32f5a17774ecabc6a9aa508544",
+    "status": "M thirdparty/libmspack",
+    "remotes": "origin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (fetch)\norigin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (push)\nupstream\thttps://github.com/rexglue/rexglue-sdk.git (fetch)\nupstream\thttps://github.com/rexglue/rexglue-sdk.git (push)",
+    "submodule_head": "305907723a4e7ab2018e58040059ffb5e77db837",
+    "dirty_file_hashes": {
+      "cabextract/mspack/ChangeLog": "B9E35458ABEDDE7086457E3D10284CF9204F353C9D2C9961A4D1FB96E89BC01D",
+      "cabextract/mspack/cab.h": "CFA1FB317B4F6418FF848C1630D45BEED4A165780D40B51C45448B8D9382B4D1",
+      "cabextract/mspack/cabd.c": "863FD5339BE807F7BEF396A7FF565A26F1A9D0E6E534BCDCDAF2CC52027735EB",
+      "cabextract/mspack/lzx.h": "3FAB60D43D09AEC570558125E4F6C391A69FC906738EF5FE56E15F22027BDDF5",
+      "cabextract/mspack/lzxd.c": "2ADA35D1FA8855BBCC645234D5745EBA90F8C37D7C8A694A22DF3B1159C6E21F",
+      "cabextract/mspack/macros.h": "31E34DF474E5B2E5781AE2ED52C329C9F4E6EB8FE935139200F566253E6A8436",
+      "cabextract/mspack/mspack.h": "E651545F9619F74E2AE3416895E243072B400E47E494426007BA1503A0DC2921",
+      "cabextract/mspack/mszip.h": "2C2965DBFF4F363D905E4103782094A6E9753979DD9A45AE7B935254240F581F",
+      "cabextract/mspack/mszipd.c": "F64E1A4FB7304BA485AD78E1705C22485DF28B54FD987604F325AE1082BE2ECF",
+      "cabextract/mspack/qtm.h": "E5E0A27721AB3D26C6322CFCC01BD19750852476FB157E6738115BB2C488466A",
+      "cabextract/mspack/qtmd.c": "49E006AE055249A6000A523AAFFFC634ABAD7698135E9A2FDC3AB4010A2EA837",
+      "cabextract/mspack/readbits.h": "FE0FF476FD8AD602A1EB1A6D3131AFA43210FC2FB7DD230A806A0FE2C7F51618",
+      "cabextract/mspack/readhuff.h": "E2217871A1446E8881F9013280F6532B0D65DA7FDAEB08762CFDEA9B42A10546",
+      "cabextract/mspack/system.c": "27B6921B4859346A7992148DABDF9A9480735552F790054D7E2DA3AF31B77389",
+      "cabextract/mspack/system.h": "62E06060EE7F1CF0D254A0D0C8751C23BADAA28FC339FC10E74BBF560A1B5D9D"
+    }
+  }
+]

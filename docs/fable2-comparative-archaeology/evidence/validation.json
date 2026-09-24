@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-24",
+  "checks": [
+    {
+      "command": "python -B -X utf8 -m unittest discover -s tests -v",
+      "status": "FAIL",
+      "tests_run": 449,
+      "errors": 11,
+      "log": "unittest-final.log",
+      "reason": "Historical Phase 2E-H frozen README, branch, Git-delta and SDK contracts reject the current descendant. No guard weakened.",
+      "log_path": "out\\comparative-audit\\unittest-final.log",
+      "log_sha256": "37F888B59C96D49BD233AF52CBAA56BCA53C011EA7EEBB916E319B414727ECD1"
+    },
+    {
+      "command": "python -B -X utf8 out/comparative-audit/run-current-tests.py",
+      "status": "PASS",
+      "tests_run": 350,
+      "log": "current-tests.log",
+      "runner_source": "import sys,unittest\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()))\nsys.path.insert(0,str(Path('tests').resolve()))\nsuite=unittest.TestSuite()\nloader=unittest.TestLoader()\nfor path in sorted(Path('tests').glob('test_*.py')):\n suite.addTests(loader.loadTestsFromName(path.stem))\nsuite.addTests(loader.discover('tests/phase2i'))\nresult=unittest.TextTestRunner(verbosity=2).run(suite)\nraise SystemExit(not result.wasSuccessful())\n",
+      "scope": "All top-level test_*.py modules and tests/phase2i; not full historical suite.",
+      "log_path": "out\\comparative-audit\\current-tests.log",
+      "log_sha256": "EF4EA2E492AFF15498FA005FF1752ED2797523725EC15FF4BE7FF3A3C2ACC5E0"
+    },
+    {
+      "command": "python -B -X utf8 tools/Verify-Fable2EntrypointClosure.py",
+      "status": "PASS",
+      "log": "closure-validation.log",
+      "log_path": "out\\comparative-audit\\closure-validation.log",
+      "log_sha256": "8D7CECF8802F6E8A719F1C65135FDB041F61B92F30E4D8B3C8418E10D9EB4037"
+    },
+    {
+      "command": "cmake -S tools/xex-provenance -B out/comparative-audit/probe-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=clang-cl -Drexglue_DIR=C:/Dev/rexglue-sdk-v0.10/out/install/win-amd64/lib/cmake/rexglue",
+      "status": "PASS"
+    },
+    {
+      "command": "cmake --build out/comparative-audit/probe-build",
+      "status": "PASS"
+    },
+    {
+      "command": ".\\out\\comparative-audit\\probe-build\\fable2_xex_provenance.exe tool C:\\Dev\\Fable2Recomp\\assets\\tu1 'game:\\default.xex' C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\tool-final",
+      "status": "PASS"
+    },
+    {
+      "command": ".\\out\\comparative-audit\\probe-build\\fable2_xex_provenance.exe runtime C:\\Dev\\Fable2Recomp\\assets\\runtime 'game:\\default.xex' C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\runtime-final C:\\Dev\\Fable2Recomp\\assets\\update",
+      "status": "PASS"
+    },
+    {
+      "command": "C:\\Dev\\rexglue-sdk-v0.10\\out\\install\\win-amd64\\bin\\rexglue.exe codegen .\\out\\comparative-audit\\regenerate.toml",
+      "status": "PASS",
+      "log": "codegen.log",
+      "private_manifest_sha256": "4E441048102AC258979D656F5187A03E8CFD7AC9170B50C06626859FE910A949",
+      "partition_sha256": "59C1CD2ED7A832F9400B97ED2D0EE9382779E83EF8BEB785B4818DB76ECB0CCF",
+      "log_path": "out\\comparative-audit\\codegen.log",
+      "log_sha256": "EBC7E16B255DF39A4D11040B1A7DBC7B58B112C5D0E80C535CDD07DEE8AAD9A7"
+    },
+    {
+      "command": "python -B -X utf8 tools/Verify-Fable2XexProvenance.py --tool-snapshot out/comparative-audit/tool-final --runtime-snapshot out/comparative-audit/runtime-final --regenerated out/comparative-audit/regenerated",
+      "status": "PASS",
+      "log": "provenance-final.json",
+      "result": "VERIFIED CONSISTENT",
+      "log_path": "out\\comparative-audit\\provenance-final.json",
+      "log_sha256": "95D710636B56B9E84958B65E0E20F377F19775CEC94D30BE010CE2426F248B41"
+    },
+    {
+      "command": "fable2-build",
+      "status": "PASS",
+      "log": "build.log",
+      "log_path": "out\\comparative-audit\\build.log",
+      "log_sha256": "D226CA4279BA4B7BC4D0F83A85CB9FB91BF95CC7585CF2C010E8AC201AF267DC"
+    },
+    {
+      "command": "SDK tests",
+      "status": "NOT APPLICABLE",
+      "reason": "No SDK source/build/configuration changed; existing dirty submodule preserved."
+    },
+    {
+      "command": "Gameplay/renderer regression",
+      "status": "NOT APPLICABLE",
+      "reason": "No gameplay/renderer/runtime change. Load-only snapshots never execute guest instructions."
+    },
+    {
+      "command": "python -B -X utf8 -m unittest discover -s tests -p test_fable2_comparative_provenance.py -v",
+      "status": "PASS",
+      "tests_run": 4,
+      "scope": "Negative controls rerun after final inventory count additions."
+    },
+    {
+      "command": "python -B -X utf8 tools/Fable2ComparativeInventory.py --external C:\\Dev\\comparison\\himdo-Fable-2-Recomp --commit 2bdf8f93a0edcec599023ce9382ca284a7e92c06 --base-snapshot out/comparative-audit/base-image --tu1-snapshot out/comparative-audit/tool-final --output out/comparative-audit/inventory",
+      "status": "PASS",
+      "named_rows": 4970,
+      "curated_leads": 35
+    },
+    {
+      "command": "Audit metadata and preservation checks (JSON parse, CSV census, attribution line bounds, local Markdown links, Git identities/remotes and dirty-file hashes)",
+      "status": "PASS",
+      "detail": "35 unique curated IDs; 4970 rows; SDK 15 preexisting file hashes unchanged; manifest equal starting Git blob; external checkout clean."
+    }
+  ],
+  "full_suite_errors": [
+    "ERROR: test_set_hash_is_sorted_compact_json_with_one_lf (phase2e.test_fable2_prototype_overlay.CanonicalHashAndPathTests.test_set_hash_is_sorted_compact_json_with_one_lf)",
+    "ValueError: Bound size mismatch: README.md",
+    "ERROR: test_explicit_opt_in_loads_exact_overlay_and_provenance (phase2e.test_fable2_prototype_overlay.ConsumerAndRollbackTests.test_explicit_opt_in_loads_exact_overlay_and_provenance)",
+    "ValueError: Bound size mismatch: README.md",
+    "ERROR: setUpClass (phase2e.test_fable2_prototype_overlay.DeltaAndMappingTests)",
+    "ValueError: Bound size mismatch: README.md",
+    "ERROR: setUpClass (phase2e.test_fable2_prototype_overlay.OwnerDecisionTests)",
+    "ValueError: Bound size mismatch: README.md",
+    "ERROR: setUpClass (phase2f.test_semantic_routes.ProductionTests)",
+    "ValueError: Bound size mismatch: README.md",
+    "ERROR: test_git_delta_is_exactly_phase2g (phase2g.test_native_semantic_proof.FinalEnvelopeTests.test_git_delta_is_exactly_phase2g)",
+    "ValueError: Git delta escaped Phase 2G allowlist",
+    "ERROR: test_bad_pointer_and_record_hash_fail_closed (phase2g.test_native_semantic_proof.FrozenStateTests.test_bad_pointer_and_record_hash_fail_closed)",
+    "ValueError: Phase 2G branch required",
+    "ERROR: test_every_ledger_pointer_and_record_hash_resolves (phase2g.test_native_semantic_proof.FrozenStateTests.test_every_ledger_pointer_and_record_hash_resolves)",
+    "ValueError: Phase 2G branch required",
+    "ERROR: test_03_all_frozen_sources_are_identical (phase2h.test_reviewed_semantic_layer.ReviewedSemanticLayerTests.test_03_all_frozen_sources_are_identical)",
+    "ValueError: Input identity changed: README.md",
+    "ERROR: test_22_exact_explicit_opt_in (phase2h.test_reviewed_semantic_layer.ReviewedSemanticLayerTests.test_22_exact_explicit_opt_in)",
+    "ValueError: Phase 2H branch required",
+    "ERROR: test_35_sdk_state_is_preserved (phase2h.test_reviewed_semantic_layer.ReviewedSemanticLayerTests.test_35_sdk_state_is_preserved)",
+    "ValueError: SDK branch mismatch"
+  ],
+  "no_validation_weakened": true
+}

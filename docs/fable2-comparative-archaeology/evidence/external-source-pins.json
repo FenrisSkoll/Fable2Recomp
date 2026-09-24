@@ -1,0 +1,157 @@
+{
+  "repository": "https://github.com/himdo/Fable-2-Recomp",
+  "commit": "2bdf8f93a0edcec599023ce9382ca284a7e92c06",
+  "tree": "d6fc3b0dc98033c706fbc857f7b50936adb3880c",
+  "sources": [
+    {
+      "path": "README.md",
+      "sha256": "72DA118FFF13DDDEDFD2276B87B44F7DEA2BC91AC654870C68B8CB84F8CD55F0",
+      "size": 29634
+    },
+    {
+      "path": "FUNCTION_NAMES.md",
+      "sha256": "1395BC5F8F36CDAE1430D52F189DBAB99A0A8ABA8B9E60FAF934FC8B25E6B54F",
+      "size": 295801
+    },
+    {
+      "path": "TEXT_RENDERING_NOTES.md",
+      "sha256": "52F01B6F0DB40EDAFAAB963318BA3D930B01945B523558E35DA93BAB43AE73EF",
+      "size": 36011
+    },
+    {
+      "path": "docs/patches.md",
+      "sha256": "70E116D0A0444407739A2568EC55AD4EB381DBAB48E35AEB0BF93EAE73434CCA",
+      "size": 11999
+    },
+    {
+      "path": "docs/FPS_CAP_INVESTIGATION.md",
+      "sha256": "F3334D2977015AAC18FB392A14EF129404454649D6F7C0B8787BC186A6D77DE9",
+      "size": 9084
+    },
+    {
+      "path": "docs/main_menu_crash_fix.md",
+      "sha256": "836B5B8039F506DC069695681AFB018E81E767334C7017D6F8A95303D636F23E",
+      "size": 4648
+    },
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "7CA004147A9D316A9B1355B1535A3FB1BC087A3775129AB01A1D4C26417E641D",
+      "size": 18523
+    },
+    {
+      "path": "fable_2_manifest.toml",
+      "sha256": "98E60267121FE4C00D883FA865EBA929682A03898E827C31681B6F003E23483B",
+      "size": 3905611
+    },
+    {
+      "path": "fable2_switch_tables.toml",
+      "sha256": "9015A6DC2B1F3BF42D50BB62A5ED7E255F9C50B4FBF50CDA136052CC7754D889",
+      "size": 331822
+    },
+    {
+      "path": "src/core/xex_verify.h",
+      "sha256": "0E945A19FC35E55A772DA381656606F124F1080CE01DACB71DF9A2566644B4C1",
+      "size": 8241
+    },
+    {
+      "path": "src/core/fable2_hooks.cpp",
+      "sha256": "B76AC54CF61A40FBFD832C501872CA7334F44798D280CB469A2D8C21141804B9",
+      "size": 4822
+    },
+    {
+      "path": "src/core/fable2_patches.cpp",
+      "sha256": "71A70DAE7AED872A883A4DBC460911D0F1551A8AAC5DE2FDF2A49B0F62A4349E",
+      "size": 17165
+    },
+    {
+      "path": "src/core/fable2_f5_lua.h",
+      "sha256": "3DE4BDABFB800614BFFF5FAAD0B4E0BDF0B3ADB69C20D56E693952D47C8C363F",
+      "size": 10341
+    },
+    {
+      "path": "src/core/fable2_func_trace.h",
+      "sha256": "B20760ADCADDC46E3450BA6C7991CCC0A8B8DA8E2B99AEE561094DAFF6602940",
+      "size": 17725
+    },
+    {
+      "path": "src/core/fable_2_app.h",
+      "sha256": "D34F1A167F8D7393BB623FF2DB71F27866EB141D0EEC9B6BFE605E4492008396",
+      "size": 22158
+    },
+    {
+      "path": "src/core/fable2_config.h",
+      "sha256": "95C2B73A7F9BFDA9447F1A5BB6E46F458C6912D3A34CA5E1EEA15A5706E6974F",
+      "size": 3986
+    },
+    {
+      "path": "src/input/keyboard_gamepad.h",
+      "sha256": "D68FB5E64EBB03000FF01EF475A757B4F8C89C35393CB8044182F2FCCC49BC08",
+      "size": 15830
+    },
+    {
+      "path": "src/input/remote_control_server.h",
+      "sha256": "3447C0A170CA5CD9FA07EC52868ED95C50AC455D5913357AFD0C3CF608B08610",
+      "size": 43399
+    },
+    {
+      "path": "src/diagnostics/fable2_state_probe.h",
+      "sha256": "6502B037D10BD9E41BB57873414D656531D81BDADF7A6D6354771DE3451349CC",
+      "size": 29061
+    },
+    {
+      "path": "src/diagnostics/fps_probe.h",
+      "sha256": "2C7D47977E6055C8C12DE5E254AC0E7D2EBAFA086E7718C0901A9E939178ADDD",
+      "size": 14873
+    },
+    {
+      "path": "tools/apply_recomp_patches.py",
+      "sha256": "7C69A1C660C051C478D7FDC408D302F6AA55B6660977C81C850BA408B3E940D2",
+      "size": 3157
+    },
+    {
+      "path": "tools/fable2.cmd",
+      "sha256": "514C808D825DB6F85B12018EDF96104B238A4A716F1A9D63DE9094E595B21051",
+      "size": 3669
+    },
+    {
+      "path": "tools/setup_sdk_src.cmd",
+      "sha256": "5540989878E4B367FC7E1394D3ADEA4F700F8448CBEC85193D3DA5D8E5C31355",
+      "size": 2995
+    },
+    {
+      "path": "tools/build_sdk_vulkan.cmd",
+      "sha256": "CBD9A3A8779E2A67BFD34A861D108599D0D2486172D8EB9BB75EDF8F97C77C0A",
+      "size": 3463
+    },
+    {
+      "path": "tools/repro/clean_pe.py",
+      "sha256": "4072E0867C8A8E5EF00D74D4E7593F9F0B5A95A8EA3373C4A6D741ABCBF6D568",
+      "size": 8754
+    },
+    {
+      "path": "config/fable2_config.toml",
+      "sha256": "901A6A39A2416C15AFD7605053642100FB531CE538D717506D32A0343A9A102B",
+      "size": 4393
+    },
+    {
+      "path": "config/fable2_patches.toml",
+      "sha256": "643EAFC220DEF3467551C74B44C32B1E6D1CCA32A02FB52F5C29997804DD24D3",
+      "size": 2822
+    },
+    {
+      "path": "thirdparty/rexglue-sdk-local.patch",
+      "sha256": "69DDE7931C8E957D2DE7E5072460D687B5987C1A16D1AFB07D52D343FBDEF3FB",
+      "size": 65171
+    },
+    {
+      "path": "thirdparty/sdk_allocfixed_patch.patch",
+      "sha256": "86F067455BC31A571E2201F113E1118FBDC24ECEF360C9C995AED2120F99C764",
+      "size": 3217
+    },
+    {
+      "path": "thirdparty/sdk_mainmenu_crash_fix.patch",
+      "sha256": "88C953BF51C0E149029EA6FADD37F3FA0644696D92BA15C4F33A568AEB08C307",
+      "size": 13946
+    }
+  ]
+}

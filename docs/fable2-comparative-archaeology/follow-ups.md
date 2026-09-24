@@ -6,14 +6,12 @@ No follow-up requires replaying the entire audit.
 
 ## Correctness prerequisites
 
-**CP-1 — Title-delta and tool invalidation.** `PROV-03`; canonical
-`generated/default/codegen.d` omits `default.xexp`. In an isolated fixture,
-change only the title delta and test both build scheduling and the codegen
-module stamp. Separately replace the SDK/tool build identity. Determine the
-smallest generic dependency/stamp correction if either leaves stale output.
-Acceptance: changed intended loaded image cannot reuse old generated source;
-unchanged inputs remain deterministic. Current full regeneration passes, so
-there is no demonstrated stale canonical artifact to repair immediately.
+**CP-1 — CLOSED: title-delta and tool invalidation.** `PROV-03`; the isolated
+valid-XEXP mutation reproduced stale reuse. The generic SDK dependency/cache fix
+now tracks patches, optional-file existence and actual tool/runtime identity.
+Changed-input and unchanged-input controls pass, and all 591 canonical generated
+files remain byte-identical. See the [closeout](xexp-invalidation-closeout.md)
+for evidence, local commits, the CLI-only installed update and coverage limits.
 
 **CP-2 — Recover external mismatch witnesses, only if investigating its cause.**
 `PROV-01`; request exact generated file at base `0x8233AE50`, producing CLI and
@@ -111,13 +109,14 @@ verified archaeology in this audit.
 
 Canonical path: original TU1 manifest/owners → installed `.51` loader → identical
 load-time image and deterministic regenerated source → existing native gameplay
-baseline. Earliest new discrepancy: none in codegen/runtime bytes; incremental
-XEXP dependency omission is a future-staleness risk. External mismatch cause,
+baseline. No canonical codegen/runtime byte discrepancy was found. The original
+incremental XEXP dependency omission is corrected by CP-1's generic SDK fix;
+the `.51` runtime is retained with the documented `.65` codegen CLI. External mismatch cause,
 content labels and timing safety remain unresolved. No temporary instrumentation
 is present in the game or SDK. The isolated probe exists only under
 `tools/xex-provenance`; private runs are in `out/comparative-audit`.
 
-Next smallest prerequisite is CP-1's isolated delta-only invalidation test.
+CP-1's isolated delta-only invalidation test and generic correction are complete.
 Existing renderer capture and human progression plans remain the appropriate
 runtime next steps. Historical reports, prototype gates and SDK dirty files
 remain untouched.

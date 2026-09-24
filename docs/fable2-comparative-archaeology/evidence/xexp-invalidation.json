@@ -1,0 +1,1070 @@
+{
+  "schema_version": 1,
+  "status": "PASS \u2014 generic fix implemented",
+  "starting_state": {
+    "repositories": [
+      {
+        "path": "C:/Dev/Fable2Recomp",
+        "branch": "main",
+        "head": "eb222bd5fe94c00a6d77826b654ae96d09610475",
+        "tree": "e33f86d709f2793bf4e78c15028bd5c8427369f9",
+        "status": [],
+        "remotes": [
+          "fork\thttps://github.com/FenrisSkoll/Fable2Recomp-old-fork.git (fetch)",
+          "fork\thttps://github.com/FenrisSkoll/Fable2Recomp-old-fork.git (push)",
+          "origin\thttps://github.com/FenrisSkoll/Fable2Recomp.git (fetch)",
+          "origin\thttps://github.com/FenrisSkoll/Fable2Recomp.git (push)",
+          "upstream\thttps://github.com/Fable2Recomp/Fable2Recomp.git (fetch)",
+          "upstream\thttps://github.com/Fable2Recomp/Fable2Recomp.git (push)"
+        ]
+      },
+      {
+        "path": "C:/Dev/rexglue-sdk-v0.10",
+        "branch": "fable2-native-renderer-nr0c2b1gv-validation-closeout",
+        "head": "18130a95c7790b4a9d3a2b30f601f247b1a7a864",
+        "tree": "c659bfaf3ff8fb32f5a17774ecabc6a9aa508544",
+        "status": [
+          " M thirdparty/libmspack"
+        ],
+        "remotes": [
+          "origin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (fetch)",
+          "origin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (push)",
+          "upstream\thttps://github.com/rexglue/rexglue-sdk.git (fetch)",
+          "upstream\thttps://github.com/rexglue/rexglue-sdk.git (push)"
+        ]
+      }
+    ],
+    "libmspack_head": "305907723a4e7ab2018e58040059ffb5e77db837",
+    "libmspack_status": [
+      " M cabextract/mspack/ChangeLog",
+      " M cabextract/mspack/cab.h",
+      " M cabextract/mspack/cabd.c",
+      " M cabextract/mspack/lzx.h",
+      " M cabextract/mspack/lzxd.c",
+      " M cabextract/mspack/macros.h",
+      " M cabextract/mspack/mspack.h",
+      " M cabextract/mspack/mszip.h",
+      " M cabextract/mspack/mszipd.c",
+      " M cabextract/mspack/qtm.h",
+      " M cabextract/mspack/qtmd.c",
+      " M cabextract/mspack/readbits.h",
+      " M cabextract/mspack/readhuff.h",
+      " M cabextract/mspack/system.c",
+      " M cabextract/mspack/system.h"
+    ],
+    "libmspack_files": [
+      {
+        "path": "cabextract/mspack/ChangeLog",
+        "sha256": "B9E35458ABEDDE7086457E3D10284CF9204F353C9D2C9961A4D1FB96E89BC01D"
+      },
+      {
+        "path": "cabextract/mspack/cab.h",
+        "sha256": "CFA1FB317B4F6418FF848C1630D45BEED4A165780D40B51C45448B8D9382B4D1"
+      },
+      {
+        "path": "cabextract/mspack/cabd.c",
+        "sha256": "863FD5339BE807F7BEF396A7FF565A26F1A9D0E6E534BCDCDAF2CC52027735EB"
+      },
+      {
+        "path": "cabextract/mspack/lzx.h",
+        "sha256": "3FAB60D43D09AEC570558125E4F6C391A69FC906738EF5FE56E15F22027BDDF5"
+      },
+      {
+        "path": "cabextract/mspack/lzxd.c",
+        "sha256": "2ADA35D1FA8855BBCC645234D5745EBA90F8C37D7C8A694A22DF3B1159C6E21F"
+      },
+      {
+        "path": "cabextract/mspack/macros.h",
+        "sha256": "31E34DF474E5B2E5781AE2ED52C329C9F4E6EB8FE935139200F566253E6A8436"
+      },
+      {
+        "path": "cabextract/mspack/mspack.h",
+        "sha256": "E651545F9619F74E2AE3416895E243072B400E47E494426007BA1503A0DC2921"
+      },
+      {
+        "path": "cabextract/mspack/mszip.h",
+        "sha256": "2C2965DBFF4F363D905E4103782094A6E9753979DD9A45AE7B935254240F581F"
+      },
+      {
+        "path": "cabextract/mspack/mszipd.c",
+        "sha256": "F64E1A4FB7304BA485AD78E1705C22485DF28B54FD987604F325AE1082BE2ECF"
+      },
+      {
+        "path": "cabextract/mspack/qtm.h",
+        "sha256": "E5E0A27721AB3D26C6322CFCC01BD19750852476FB157E6738115BB2C488466A"
+      },
+      {
+        "path": "cabextract/mspack/qtmd.c",
+        "sha256": "49E006AE055249A6000A523AAFFFC634ABAD7698135E9A2FDC3AB4010A2EA837"
+      },
+      {
+        "path": "cabextract/mspack/readbits.h",
+        "sha256": "FE0FF476FD8AD602A1EB1A6D3131AFA43210FC2FB7DD230A806A0FE2C7F51618"
+      },
+      {
+        "path": "cabextract/mspack/readhuff.h",
+        "sha256": "E2217871A1446E8881F9013280F6532B0D65DA7FDAEB08762CFDEA9B42A10546"
+      },
+      {
+        "path": "cabextract/mspack/system.c",
+        "sha256": "27B6921B4859346A7992148DABDF9A9480735552F790054D7E2DA3AF31B77389"
+      },
+      {
+        "path": "cabextract/mspack/system.h",
+        "sha256": "62E06060EE7F1CF0D254A0D0C8751C23BADAA28FC339FC10E74BBF560A1B5D9D"
+      }
+    ]
+  },
+  "ending_sdk": {
+    "path": "C:/Dev/rexglue-sdk-v0.10",
+    "branch": "fable2-native-renderer-nr0c2b1gv-validation-closeout",
+    "head": "d30122381144fb341e447ee7b0862e330d1af252",
+    "tree": "85ecee5c3ecb2212153c9ea7eb1ff0ef49abeccb",
+    "status": [
+      " M thirdparty/libmspack"
+    ],
+    "remotes": [
+      "origin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (fetch)",
+      "origin\thttps://github.com/FenrisSkoll/rexglue-sdk.git (push)",
+      "upstream\thttps://github.com/rexglue/rexglue-sdk.git (fetch)",
+      "upstream\thttps://github.com/rexglue/rexglue-sdk.git (push)"
+    ]
+  },
+  "sdk_changed_files": [
+    "docs/codegen-invalidation.md",
+    "include/rex/codegen/output_stamp.h",
+    "include/rex/codegen/project_recompiler.h",
+    "resources/templates/init/rexglue_cmake.inja",
+    "src/codegen/CMakeLists.txt",
+    "src/codegen/manifest.cpp",
+    "src/codegen/output_stamp.cpp",
+    "src/codegen/project_recompiler.cpp",
+    "tests/unit/CMakeLists.txt",
+    "tests/unit/codegen/dependency_fixture.cpp",
+    "tests/unit/codegen/dependency_scheduler_test.py",
+    "tests/unit/codegen/output_stamp_test.cpp"
+  ],
+  "sdk_commits": [
+    "15cb43b6c0b3014598cdb0a343b76b5344041778 Fix codegen invalidation for optional title deltas and tool identity",
+    "3e1a37aa50a84a5f841305ec65a25b217805153d Fail closed when codegen dependency metadata is missing",
+    "d30122381144fb341e447ee7b0862e330d1af252 Bind codegen identity to the loaded runtime DLL rather than a static thunk"
+  ],
+  "libmspack_preservation": {
+    "status": "PASS",
+    "count": 15,
+    "after": [
+      {
+        "path": "cabextract/mspack/ChangeLog",
+        "sha256": "B9E35458ABEDDE7086457E3D10284CF9204F353C9D2C9961A4D1FB96E89BC01D"
+      },
+      {
+        "path": "cabextract/mspack/cab.h",
+        "sha256": "CFA1FB317B4F6418FF848C1630D45BEED4A165780D40B51C45448B8D9382B4D1"
+      },
+      {
+        "path": "cabextract/mspack/cabd.c",
+        "sha256": "863FD5339BE807F7BEF396A7FF565A26F1A9D0E6E534BCDCDAF2CC52027735EB"
+      },
+      {
+        "path": "cabextract/mspack/lzx.h",
+        "sha256": "3FAB60D43D09AEC570558125E4F6C391A69FC906738EF5FE56E15F22027BDDF5"
+      },
+      {
+        "path": "cabextract/mspack/lzxd.c",
+        "sha256": "2ADA35D1FA8855BBCC645234D5745EBA90F8C37D7C8A694A22DF3B1159C6E21F"
+      },
+      {
+        "path": "cabextract/mspack/macros.h",
+        "sha256": "31E34DF474E5B2E5781AE2ED52C329C9F4E6EB8FE935139200F566253E6A8436"
+      },
+      {
+        "path": "cabextract/mspack/mspack.h",
+        "sha256": "E651545F9619F74E2AE3416895E243072B400E47E494426007BA1503A0DC2921"
+      },
+      {
+        "path": "cabextract/mspack/mszip.h",
+        "sha256": "2C2965DBFF4F363D905E4103782094A6E9753979DD9A45AE7B935254240F581F"
+      },
+      {
+        "path": "cabextract/mspack/mszipd.c",
+        "sha256": "F64E1A4FB7304BA485AD78E1705C22485DF28B54FD987604F325AE1082BE2ECF"
+      },
+      {
+        "path": "cabextract/mspack/qtm.h",
+        "sha256": "E5E0A27721AB3D26C6322CFCC01BD19750852476FB157E6738115BB2C488466A"
+      },
+      {
+        "path": "cabextract/mspack/qtmd.c",
+        "sha256": "49E006AE055249A6000A523AAFFFC634ABAD7698135E9A2FDC3AB4010A2EA837"
+      },
+      {
+        "path": "cabextract/mspack/readbits.h",
+        "sha256": "FE0FF476FD8AD602A1EB1A6D3131AFA43210FC2FB7DD230A806A0FE2C7F51618"
+      },
+      {
+        "path": "cabextract/mspack/readhuff.h",
+        "sha256": "E2217871A1446E8881F9013280F6532B0D65DA7FDAEB08762CFDEA9B42A10546"
+      },
+      {
+        "path": "cabextract/mspack/system.c",
+        "sha256": "27B6921B4859346A7992148DABDF9A9480735552F790054D7E2DA3AF31B77389"
+      },
+      {
+        "path": "cabextract/mspack/system.h",
+        "sha256": "62E06060EE7F1CF0D254A0D0C8751C23BADAA28FC339FC10E74BBF560A1B5D9D"
+      }
+    ]
+  },
+  "unchanged_branches_and_remotes": true,
+  "canonical_manifest_gameplay_and_historical_evidence_unchanged": true,
+  "canonical_partition_sha256": "59C1CD2ED7A832F9400B97ED2D0EE9382779E83EF8BEB785B4818DB76ECB0CCF",
+  "original": {
+    "initial": {
+      "base": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "delta": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+      "build_stamp": "d974e9c1fddb8df4db0393d966a01ba2\n",
+      "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/before/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/before/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/before/game/default.xex\n",
+      "fingerprint": "d974e9c1fddb8df4db0393d966a01ba2",
+      "generated_count": 591,
+      "generated_inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+      "fable2_recomp.291.cpp_sha256": "50CCFF49CB09C488E23352C2D5570E1F46C8C89D7A0B7B9E2203537B1A3CE783"
+    },
+    "mutated": {
+      "base": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+      "delta": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+      "build_stamp": "d974e9c1fddb8df4db0393d966a01ba2\n",
+      "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/before/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/before/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/before/game/default.xex\n",
+      "fingerprint": "d974e9c1fddb8df4db0393d966a01ba2",
+      "generated_count": 591,
+      "generated_inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+      "fable2_recomp.291.cpp_sha256": "50CCFF49CB09C488E23352C2D5570E1F46C8C89D7A0B7B9E2203537B1A3CE783"
+    },
+    "result": "Stale source reused; invocation due to manifest rewrite, module cache skipped"
+  },
+  "fixture": {
+    "loaded_original_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+    "loaded_mutated_sha256": "351FFD0C1BE5319B1F3D1595AE95530477ACAD95FFCC89DB07554EDBFDF46190",
+    "base_only_loaded_sha256": "B8F294DDAE3DA4A01DE455F5003CD1452D7C838EDC3DE1C166F3CAB9008B77A8",
+    "changed_guest_instruction": "0x82967544",
+    "changed_image_byte_offsets": [
+      "0x967547"
+    ],
+    "original_instruction": "816c0098",
+    "mutated_instruction": "816c005c"
+  },
+  "corrected": {
+    "commands": [
+      {
+        "label": "configure",
+        "command": [
+          "cmake",
+          "-S",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final",
+          "-B",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "-G",
+          "Ninja",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_CXX_COMPILER=clang-cl",
+          "-Drexglue_DIR=C:\\Dev\\rexglue-sdk-v0.10\\out\\install\\win-amd64/lib/cmake/rexglue"
+        ],
+        "returncode": 0,
+        "log_sha256": "C8DC820F8D76A3FA2665D61310B28746A159FA8D5465A9A49E796F1869220232"
+      },
+      {
+        "label": "initial",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "C527C958434DBCB62403A9DFD090DDE017F0DBCC33E215FF523DF0B6937C8460"
+      },
+      {
+        "label": "initial-noop",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "3C0BDA9858D8B1149E987DF0C7346299F194C5424133F4ADBC51BF441741555A"
+      },
+      {
+        "label": "delta-changed",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "0EB0396B098B51FD2614C4C614EFC3AB4FE074D82B5B0A41B9EA451D4E459890"
+      },
+      {
+        "label": "changed-noop",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+      },
+      {
+        "label": "tool-changed",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "AB55FF198F454482C717E3F6BCF06E6C182F8A32207732837A989F754C8D94E6"
+      },
+      {
+        "label": "tool-noop",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+      },
+      {
+        "label": "runtime-changed",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "151DE7C7F0C7FB328F07236F7C7E4DC331829DDC321DB3290529F196CA51E591"
+      },
+      {
+        "label": "runtime-noop",
+        "command": [
+          "cmake",
+          "--build",
+          "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-contract-final\\build",
+          "--target",
+          "fable2_codegen",
+          "--",
+          "-d",
+          "explain"
+        ],
+        "returncode": 0,
+        "log_sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+      }
+    ],
+    "original_installed_tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+    "tested_tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+    "status": "PASS",
+    "changed_generated_files": [
+      "fable2_recomp.291.cpp"
+    ],
+    "real_removal": {
+      "status": "PASS",
+      "removed_build": "EXPECTED VALIDATION FAILURE",
+      "restored_build": "PASS",
+      "restored_noop": "PASS"
+    },
+    "states": {
+      "initial": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "a56af97e43a1097f833c89f9edd77726\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "a56af97e43a1097f833c89f9edd77726",
+        "generated_count": 591,
+        "generated_inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+        "fable2_recomp.291.cpp_sha256": "50CCFF49CB09C488E23352C2D5570E1F46C8C89D7A0B7B9E2203537B1A3CE783"
+      },
+      "initial-noop": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "a56af97e43a1097f833c89f9edd77726\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "a56af97e43a1097f833c89f9edd77726",
+        "generated_count": 591,
+        "generated_inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+        "fable2_recomp.291.cpp_sha256": "50CCFF49CB09C488E23352C2D5570E1F46C8C89D7A0B7B9E2203537B1A3CE783"
+      },
+      "delta-changed": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "8fb6aecc5185fd9b47154cf14d8e2e1f\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "8fb6aecc5185fd9b47154cf14d8e2e1f",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      },
+      "changed-noop": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "8fb6aecc5185fd9b47154cf14d8e2e1f\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "8fb6aecc5185fd9b47154cf14d8e2e1f",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      },
+      "tool-changed": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F4A02AC530D6F1D57F171C73E218ED2B1C9A6D7479AB5E277982D58AC652A90E",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "0401f1aeca0377ef70ddaa69d0628d52\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "0401f1aeca0377ef70ddaa69d0628d52",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      },
+      "tool-noop": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F4A02AC530D6F1D57F171C73E218ED2B1C9A6D7479AB5E277982D58AC652A90E",
+        "runtime": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+        "build_stamp": "0401f1aeca0377ef70ddaa69d0628d52\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "0401f1aeca0377ef70ddaa69d0628d52",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      },
+      "runtime-changed": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F4A02AC530D6F1D57F171C73E218ED2B1C9A6D7479AB5E277982D58AC652A90E",
+        "runtime": "0B6D20807AB5FDC3C883D7A17DDC45C4F139A0122D014FB7B03A3A9346E1A8DD",
+        "build_stamp": "2aa1b8d2380b082468230f47c45b5971\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "2aa1b8d2380b082468230f47c45b5971",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      },
+      "runtime-noop": {
+        "xex": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "xexp": "CF5A17147BC5C2ABBD17A7254E6B2022D3224E0052F3EF3E08CD60005EA15F74",
+        "manifest": "4CF49695F4A8EF67ADB655AFF42C4174E0E1ECE5196C6F59416059057566FA45",
+        "tool": "F4A02AC530D6F1D57F171C73E218ED2B1C9A6D7479AB5E277982D58AC652A90E",
+        "runtime": "0B6D20807AB5FDC3C883D7A17DDC45C4F139A0122D014FB7B03A3A9346E1A8DD",
+        "build_stamp": "2aa1b8d2380b082468230f47c45b5971\n",
+        "depfile": "C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/generated/default/codegen.build.stamp: \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/fable2_manifest.toml \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xex \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/game/default.xexp \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexglue.exe \\\n  C:/Dev/Fable2Recomp/out/xexp-invalidation/verified-contract-final/tool/rexruntime.dll\n",
+        "fingerprint": "2aa1b8d2380b082468230f47c45b5971",
+        "generated_count": 591,
+        "generated_inventory_sha256": "D68D6968687AAA17345BDE5DB396CA7B0D821B9884DBDE4EBDACB9A92B8B20A2",
+        "fable2_recomp.291.cpp_sha256": "27DD50BEF5321DE4E83203E473F3BBC52F47E284183E8D878EA42BB3CA6EC2F1"
+      }
+    }
+  },
+  "canonical_provenance": {
+    "schema_version": 1,
+    "status": "VERIFIED CONSISTENT",
+    "scope": "fresh load-only snapshots and generated source; no guest execution or translation-correctness proof",
+    "source_inputs": [
+      {
+        "path": "C:\\Dev\\Fable2Recomp\\assets\\tu1\\default.xex",
+        "sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "size": 21217280
+      },
+      {
+        "path": "C:\\Dev\\Fable2Recomp\\assets\\tu1\\default.xexp",
+        "sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+        "size": 2992128
+      },
+      {
+        "path": "C:\\Dev\\Fable2Recomp\\assets\\runtime\\default.xex",
+        "sha256": "88C4EF2E18E65409444D1B068EFF921D1F7E180A5AE64EDC64BA6B0872372662",
+        "size": 21217280
+      },
+      {
+        "path": "C:\\Dev\\Fable2Recomp\\assets\\runtime\\default.xexp",
+        "sha256": "046A05693B4DA4437083C784000A850858B3BF992955C7DB30D518FB3E53E41C",
+        "size": 2992128
+      }
+    ],
+    "tool": {
+      "directory": "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\tool-final",
+      "mode": "tool",
+      "image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "identity": {
+        "mode": "tool",
+        "base": "2181038080",
+        "size": "23199744",
+        "entry": "2194416064"
+      },
+      "sections": [
+        {
+          "name": ".rdata",
+          "address": "2181039616",
+          "size": "1093744",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".pdata",
+          "address": "2182133760",
+          "size": "369440",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": "BINKBSS",
+          "address": "2182503424",
+          "size": "10504",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".text",
+          "address": "2182545408",
+          "size": "18131900",
+          "executable": "1",
+          "writable": "0"
+        },
+        {
+          "name": "BINK",
+          "address": "2200677376",
+          "size": "62524",
+          "executable": "1",
+          "writable": "0"
+        },
+        {
+          "name": ".data",
+          "address": "2200764416",
+          "size": "2275724",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".lhmem",
+          "address": "2203040256",
+          "size": "12",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".XBMOVIE",
+          "address": "2203040768",
+          "size": "12",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".tls",
+          "address": "2203041280",
+          "size": "25",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".lhtrc",
+          "address": "2203041792",
+          "size": "8",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": "BINKDATA",
+          "address": "2203042304",
+          "size": "15688",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".edata",
+          "address": "2203058176",
+          "size": "7453",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".idata",
+          "address": "2203123712",
+          "size": "1190",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".XBLD",
+          "address": "2203189248",
+          "size": "192",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".reloc",
+          "address": "2203189760",
+          "size": "1034088",
+          "executable": "0",
+          "writable": "0"
+        }
+      ],
+      "loaded_runtime_path": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\rexruntime.dll",
+      "runtime_sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+      "layout": [
+        "encryption_bytes\tcompression_bytes\tcompression_info_offset",
+        "2\t2\t8"
+      ]
+    },
+    "runtime": {
+      "directory": "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\runtime-final",
+      "mode": "runtime",
+      "image_sha256": "BF7300F7E0DEEE91444ACD50FBE69752F5CFD3CF51358186F1B849DF25A8CB00",
+      "identity": {
+        "mode": "runtime",
+        "base": "2181038080",
+        "size": "23199744",
+        "entry": "2194416064"
+      },
+      "sections": [
+        {
+          "name": ".rdata",
+          "address": "2181039616",
+          "size": "1093744",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".pdata",
+          "address": "2182133760",
+          "size": "369440",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": "BINKBSS",
+          "address": "2182503424",
+          "size": "10504",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".text",
+          "address": "2182545408",
+          "size": "18131900",
+          "executable": "1",
+          "writable": "0"
+        },
+        {
+          "name": "BINK",
+          "address": "2200677376",
+          "size": "62524",
+          "executable": "1",
+          "writable": "0"
+        },
+        {
+          "name": ".data",
+          "address": "2200764416",
+          "size": "2275724",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".lhmem",
+          "address": "2203040256",
+          "size": "12",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".XBMOVIE",
+          "address": "2203040768",
+          "size": "12",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".tls",
+          "address": "2203041280",
+          "size": "25",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".lhtrc",
+          "address": "2203041792",
+          "size": "8",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": "BINKDATA",
+          "address": "2203042304",
+          "size": "15688",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".edata",
+          "address": "2203058176",
+          "size": "7453",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".idata",
+          "address": "2203123712",
+          "size": "1190",
+          "executable": "0",
+          "writable": "1"
+        },
+        {
+          "name": ".XBLD",
+          "address": "2203189248",
+          "size": "192",
+          "executable": "0",
+          "writable": "0"
+        },
+        {
+          "name": ".reloc",
+          "address": "2203189760",
+          "size": "1034088",
+          "executable": "0",
+          "writable": "0"
+        }
+      ],
+      "loaded_runtime_path": "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\rexruntime.dll",
+      "runtime_sha256": "71BB1BA29413773226245B1D05F40379561C974F8E2EA4E5BB994D6DC3591793",
+      "layout": [
+        "encryption_bytes\tcompression_bytes\tcompression_info_offset",
+        "2\t2\t8"
+      ]
+    },
+    "generated": {
+      "status": "PASS",
+      "identical_files": 591,
+      "inventory_sha256": "8506ED30A4021E7D735C344B237334315B551E6E7DA5CF3AA9ADB260093572FF",
+      "current": "C:\\Dev\\Fable2Recomp\\generated\\default",
+      "regenerated": "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\fresh-generated"
+    },
+    "installed_cli": {
+      "path": "C:\\Dev\\rexglue-sdk-v0.10\\out\\install\\win-amd64\\bin\\rexglue.exe",
+      "sha256": "F13E6E5AA6EFDC9AF6CC387E15977DFEDF81E15BFBEE123C76932E8DEA939AFF"
+    },
+    "evidence_sha256": "54C6A14EA06EA217B09E784026B2C9A11A5AC325EE838B003A1DDFC8E6BAB02E"
+  },
+  "validation": [
+    {
+      "name": "SDK configure",
+      "command": "cmake --preset win-amd64",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/sdk-configure-final.log"
+    },
+    {
+      "name": "SDK build",
+      "command": "cmake --build --preset win-amd64-release --target rexglue unit_tests codegen_dependency_fixture",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/sdk-build-final.log"
+    },
+    {
+      "name": "SDK focused",
+      "command": "./out/win-amd64/Release/unit_tests.exe \"[output_stamp]\"",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/sdk-focused-final.log"
+    },
+    {
+      "name": "SDK scheduler",
+      "command": "ctest --preset win-amd64-release -R codegen_dependency_scheduler --output-on-failure",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/sdk-scheduler-final.log"
+    },
+    {
+      "name": "SDK full units",
+      "command": "./out/win-amd64/Release/unit_tests.exe",
+      "status": "PASS (361 passed, four pre-existing skips)",
+      "log": "out/xexp-invalidation/sdk-unit-tests-final.log"
+    },
+    {
+      "name": "current descendant",
+      "command": "python -B -X utf8 out/comparative-audit/run-current-tests.py",
+      "status": "PASS (350 tests)",
+      "log": "out/xexp-invalidation/current-tests-final.log"
+    },
+    {
+      "name": "provenance tests",
+      "command": "python -B -X utf8 -m unittest discover -s tests -p test_fable2_comparative_provenance.py -v",
+      "status": "PASS (4 tests)",
+      "log": "out/xexp-invalidation/provenance-tests-final.log"
+    },
+    {
+      "name": "closure",
+      "command": "python -B -X utf8 tools/Verify-Fable2EntrypointClosure.py",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/closure-final.log"
+    },
+    {
+      "name": "canonical codegen",
+      "command": "fable2-codegen",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/canonical-codegen-final.log"
+    },
+    {
+      "name": "normal build",
+      "command": "fable2-build",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/normal-build-final.log"
+    },
+    {
+      "name": "canonical no-op",
+      "command": "fable2-codegen",
+      "status": "PASS",
+      "log": "out/xexp-invalidation/canonical-noop-final.log"
+    },
+    {
+      "name": "full historical discovery",
+      "command": "python -B -X utf8 -m unittest discover -s tests -v",
+      "status": "FAIL (449 tests, 11 unchanged frozen Phase 2E-H errors)",
+      "log": "out/xexp-invalidation/full-historical-tests.log"
+    }
+  ],
+  "revalidation_commands": [
+    {
+      "label": "tool-snapshot",
+      "command": [
+        "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\fable2_xex_provenance.exe",
+        "tool",
+        "C:\\Dev\\Fable2Recomp\\assets\\tu1",
+        "game:\\default.xex",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\tool-final"
+      ],
+      "returncode": 0
+    },
+    {
+      "label": "runtime-snapshot",
+      "command": [
+        "C:\\Dev\\Fable2Recomp\\out\\comparative-audit\\probe-build\\fable2_xex_provenance.exe",
+        "runtime",
+        "C:\\Dev\\Fable2Recomp\\assets\\runtime",
+        "game:\\default.xex",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\runtime-final",
+        "C:\\Dev\\Fable2Recomp\\assets\\update"
+      ],
+      "returncode": 0
+    },
+    {
+      "label": "fresh-codegen",
+      "command": [
+        "C:\\Dev\\rexglue-sdk-v0.10\\out\\install\\win-amd64\\bin\\rexglue.exe",
+        "codegen",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\regenerate.toml"
+      ],
+      "returncode": 0
+    },
+    {
+      "label": "provenance-final",
+      "command": [
+        "python",
+        "-B",
+        "-X",
+        "utf8",
+        "tools/Verify-Fable2XexProvenance.py",
+        "--tool-snapshot",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\tool-final",
+        "--runtime-snapshot",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\runtime-final",
+        "--regenerated",
+        "C:\\Dev\\Fable2Recomp\\out\\xexp-invalidation\\verified-provenance\\fresh-generated"
+      ],
+      "returncode": 0
+    }
+  ],
+  "logs": [
+    {
+      "path": "out/xexp-invalidation/sdk-configure-final.log",
+      "sha256": "298314B6F53228C1497B4F072FC12B7BB0B05EC9FA886E602FD250E67E1DBE07"
+    },
+    {
+      "path": "out/xexp-invalidation/sdk-build-final.log",
+      "sha256": "FF6C13EDF5809383407871682CCB8FEBECE92E57FE9E0914D2FE907351644F4A"
+    },
+    {
+      "path": "out/xexp-invalidation/sdk-focused-final.log",
+      "sha256": "1CFD755D04D9FF62CCC49A333AEE4A835BB0B890B99F862621FDD3C66D31CD20"
+    },
+    {
+      "path": "out/xexp-invalidation/sdk-scheduler-final.log",
+      "sha256": "24F19FF1FE2F463035DFCB1DF0AE61ABC0C89BDF4F13AE1E64AD9815E764506C"
+    },
+    {
+      "path": "out/xexp-invalidation/sdk-unit-tests-final.log",
+      "sha256": "C29145931569E140DD6A06A38562D03804A00215936167A258AE1876F4A9AFAD"
+    },
+    {
+      "path": "out/xexp-invalidation/current-tests-final.log",
+      "sha256": "254FB5053695A16501384903C5789FBF81A62AC6A78F32EFE66C85E8C2381901"
+    },
+    {
+      "path": "out/xexp-invalidation/provenance-tests-final.log",
+      "sha256": "D4CDFA32138D445D7A39F7A3B2A1BB15E569B675FFA0398F44E48C5A5794D62B"
+    },
+    {
+      "path": "out/xexp-invalidation/closure-final.log",
+      "sha256": "8D7CECF8802F6E8A719F1C65135FDB041F61B92F30E4D8B3C8418E10D9EB4037"
+    },
+    {
+      "path": "out/xexp-invalidation/canonical-codegen-final.log",
+      "sha256": "078529B5837716778D856F9C861C0594E419468BE5652C90B7E400DF2D19A540"
+    },
+    {
+      "path": "out/xexp-invalidation/normal-build-final.log",
+      "sha256": "7600B2416BC0473A2296A9346D939D364C3F2E4C2536F596C07450337FF90F8C"
+    },
+    {
+      "path": "out/xexp-invalidation/canonical-noop-final.log",
+      "sha256": "7716162F3CD3B99CF3B8A8DD6DECF324E08C7E941AAE7E730BABA5E4FC8C075B"
+    },
+    {
+      "path": "out/xexp-invalidation/full-historical-tests.log",
+      "sha256": "156AEF215CC18A44D0581FD4119CDD4308A470E135335A154B953C976C5191B0"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/changed-noop.log",
+      "sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/configure.log",
+      "sha256": "C8DC820F8D76A3FA2665D61310B28746A159FA8D5465A9A49E796F1869220232"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/delta-changed.log",
+      "sha256": "0EB0396B098B51FD2614C4C614EFC3AB4FE074D82B5B0A41B9EA451D4E459890"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/initial-noop.log",
+      "sha256": "3C0BDA9858D8B1149E987DF0C7346299F194C5424133F4ADBC51BF441741555A"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/initial.log",
+      "sha256": "C527C958434DBCB62403A9DFD090DDE017F0DBCC33E215FF523DF0B6937C8460"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/real-delta-removed.log",
+      "sha256": "AFD38E1B0677A95099E01F1CCCF5B896BD738CA3AB96D6AE9B002219B08C69A2"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/real-delta-restored.log",
+      "sha256": "C6C3BB11B3C2B99B76574C09586F2A438B6322C24811157A4DB7E6B354C54FD2"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/real-restored-noop.log",
+      "sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/runtime-changed.log",
+      "sha256": "151DE7C7F0C7FB328F07236F7C7E4DC331829DDC321DB3290529F196CA51E591"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/runtime-noop.log",
+      "sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/tool-changed.log",
+      "sha256": "AB55FF198F454482C717E3F6BCF06E6C182F8A32207732837A989F754C8D94E6"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-contract-final/tool-noop.log",
+      "sha256": "DBA6BD8299DEF39CE4CA18C09E22D46EEE73F88A861852F19A1E16307DB66D61"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-provenance/fresh-codegen.log",
+      "sha256": "9BCFF7E8872E4396F26C46C6C30321EFE5B16930C988A6214B53ACB1E8B2B2E0"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-provenance/provenance-final.log",
+      "sha256": "733E1E3E3B9A7FBF8D2EFC2D19233A996659536528D14195A72A2B2DD1E14C3C"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-provenance/runtime-snapshot.log",
+      "sha256": "884F78C73DB193AB17C085D535824BD5A0790282F4294D7D12B3A006806FC2D9"
+    },
+    {
+      "path": "out/xexp-invalidation/verified-provenance/tool-snapshot.log",
+      "sha256": "884F78C73DB193AB17C085D535824BD5A0790282F4294D7D12B3A006806FC2D9"
+    },
+    {
+      "path": "out/xexp-invalidation/before-configure.log",
+      "sha256": "1EA7EF3D71C5077874E42DFA29CA2C8CE50FECAA0F17C6B3991FBBF233F5C738"
+    },
+    {
+      "path": "out/xexp-invalidation/before-direct.log",
+      "sha256": "106535E5079F1DFC3C567CBF2103366009BDF6C9EA77D395958304690B0E2820"
+    },
+    {
+      "path": "out/xexp-invalidation/before-first.log",
+      "sha256": "B3229D0DDE85504DF9D6AC1011A1A02941A9257A7F4E16F93E1FE4D7AF6B404F"
+    },
+    {
+      "path": "out/xexp-invalidation/before-noop.log",
+      "sha256": "7B1221406AD2B235A763759E3F120C20A70B7680C5FE5969FBAD74F4546007C0"
+    },
+    {
+      "path": "out/xexp-invalidation/before-settle.log",
+      "sha256": "E75E7C2ABD0E79BAA797782B176684152FCF7D200B9D573CF9B6B4EA0E313146"
+    },
+    {
+      "path": "out/xexp-invalidation/before-xexp.log",
+      "sha256": "24354DA531FC78444BD454FE30208455B9AB7613537F27DB1D3F82F8C43E1115"
+    }
+  ],
+  "limits": [
+    "Windows/Ninja execution coverage; POSIX path discovery unexecuted",
+    "Standard filesystem scheduling assumes changed file timestamps are not adversarially restored",
+    "Real TU1-manifest patch removal fails closed; successful base-only scheduler emission uses synthetic inputs",
+    "No guest execution or renderer/gameplay parity claim"
+  ]
+}

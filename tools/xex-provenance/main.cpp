@@ -68,6 +68,13 @@ int main(int argc, char** argv) {
                     runtime.memory()->TranslateVirtual(module->base_address())),
                 module->image_size());
     image.close();
+    // Private loaded headers support controlled delta fixtures without exposing keys
+    // or changing loader behavior. Keep this alongside the private image snapshot.
+    std::ofstream headers(output / "headers.bin", std::ios::binary);
+    headers.exceptions(std::ios::badbit | std::ios::failbit);
+    headers.write(reinterpret_cast<const char*>(module->xex_header()),
+                  module->xex_header()->header_size);
+    headers.close();
     std::ofstream identity(output / "identity.tsv");
     identity.exceptions(std::ios::badbit | std::ios::failbit);
     identity << "mode\tbase\tsize\tentry\n" << mode << '\t'

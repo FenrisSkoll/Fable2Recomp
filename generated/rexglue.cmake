@@ -114,10 +114,18 @@ endmacro()
 # codegen, including one a project assembles itself rather than taking the
 # library rexglue_setup_target() builds. The stamp comes first: the DEPFILE
 # names it.
+file(GLOB _REXGLUE_INPUT_MANIFEST CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.inputs.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.inputs.cmake" OPTIONAL)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.build.stamp"
+   AND NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.inputs.cmake")
+    message(FATAL_ERROR "Missing codegen dependency metadata; run rexglue codegen on the project manifest to restore it")
+endif()
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.build.stamp"
            ${REXGLUE_ENTRYPOINT_GENERATED_SOURCES}
     COMMAND $<TARGET_FILE:rex::rexglue> codegen ${CMAKE_CURRENT_SOURCE_DIR}/fable2_manifest.toml
+    DEPENDS rex::rexglue ${REXGLUE_CODEGEN_INPUTS}
     DEPFILE "${CMAKE_CURRENT_SOURCE_DIR}/generated/default/codegen.d"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMENT "Generating recompiled code for fable2"

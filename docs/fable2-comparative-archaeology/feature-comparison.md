@@ -44,11 +44,11 @@ claims even where the relevant feature is not itself implemented by a hook.
 | Physics/animation/audio parity | UNKNOWN across enabled timing changes | PARTIAL original-runtime bring-up; no complete subsystem parity proof |
 
 Canonical evidence: [current README](../../README.md),
-[save parity](../fable2-native-save-write-parity.md),
+[save parity](../fable2-native-save/fable2-native-save-write-parity.md),
 [Phase 5A](../fable2-discovery-pipeline/09-phase5a-tranche-001.md),
 [GPU runtime closeout](../fable2-native-renderer/nr0b1/runtime-closeout.md),
 [renderer handoff](../fable2-native-renderer/nr0b2/completion-and-handoff.md),
-[fault-walk performance](../fault-walk-performance.md).
+[fault-walk performance](../fable2-fault-walker/fault-walk-performance.md).
 External source attribution for individual claims is in
 [external-leads.json](external-leads.json) and the pinned source inventory.
 

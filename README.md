@@ -18,7 +18,7 @@ The Windows AMD64 build currently:
 
 This is meaningful bring-up progress, not a claim that the full game is playable or release-ready. The whole campaign, every quest and every gameplay system have not been validated.
 
-The save investigation and its exact evidence are recorded in [Native-save write parity](docs/fable2-native-save-write-parity.md). A historical native attempt that produced only three files was not reproduced during the validated workflow, so its original cause remains unproved.
+The save investigation and its exact evidence are recorded in [Native-save write parity](docs/fable2-native-save/fable2-native-save-write-parity.md). A historical native attempt that produced only three files was not reproduced during the validated workflow, so its original cause remains unproved.
 
 ## Required ReXGlue fork
 
@@ -120,13 +120,13 @@ New-Item -ItemType Directory -Force .\out\user-data | Out-Null
     --gpu_plugin=xenos
 ```
 
-Back up important saves before testing development builds. Save-path tracing is disabled by default; the controlled diagnostic procedure is documented in [Native-save write parity](docs/fable2-native-save-write-parity.md).
+Back up important saves before testing development builds. Save-path tracing is disabled by default; the controlled diagnostic procedure is documented in [Native-save write parity](docs/fable2-native-save/fable2-native-save-write-parity.md).
 
 ## Technical status and contributor tooling
 
 - **TU1 recompilation:** the base XEX and sibling XEXP are loaded together, and code generation operates on the patched image.
 - **Discovery:** the project includes static entrypoint closure, function-map, jump-table and indirect-target analysis. See the [discovery pipeline](docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md), [Phase 4 closeout](docs/fable2-discovery-pipeline/06-phase4-closeout.md) and [focused ownership corroboration](docs/fable2-discovery-pipeline/07-focused-ownership-corroboration.md). All 42 reviewed internal entries and 114 switch destinations retain their existing owners; none was promoted to a new function.
-- **Runtime diagnosis:** dispatch-only and full fault-walker configurations are experimental, opt-in tools for contributors. See [Fault walking](docs/fault-walk.md).
+- **Runtime diagnosis:** dispatch-only and full fault-walker configurations are experimental, opt-in tools for contributors. See the [fault-walker documentation](docs/fable2-fault-walker/README.md).
 - **Extended coverage:** [Phase 5A tranche 001](docs/fable2-discovery-pipeline/09-phase5a-tranche-001.md) is complete: Bowerstone Market-to-Oakfield reference coverage, one reviewed thunk import and a successful native Oakfield endpoint smoke test. Full-tranche native replay parity and gameplay tracing overhead remain unmeasured; the [session contract](docs/fable2-discovery-pipeline/coverage/README.md) preserves those limits.
 - **Rendering:** the normal build uses ReXGlue's Xenos plugin with the validated D3D12 path. The [NR0A architecture gate](docs/fable2-native-renderer/nr0a/README.md) conditionally recommends a Fable-specific renderer developed through isolated workloads; bounded frame-contract evidence remains required after NR0B-1 configuration verification. The accepted [G1 research](docs/fable2-native-renderer/g1-completion.md) and [GPU reference](docs/fable2-gpu-reference/README.md) remain its foundation. No replacement renderer is enabled.
 - **Saves:** the tested `Hero000` workflow supports native creation, restart loading, updating and Xenia interoperability. Payload-free, opt-in traces and synthetic filesystem/flush tests support further diagnosis.

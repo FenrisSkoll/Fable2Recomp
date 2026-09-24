@@ -25,7 +25,7 @@ Neither unrelated change is part of an NR0B-2 commit.
 - [Project index](../../../README.md), [GPU index](../../fable2-gpu-reference/README.md), SDK README and existing GPU reporting documentation.
 - [NR0A index](../nr0a/README.md), [architecture](../nr0a/architecture-decision.md), [ownership](../nr0a/ownership-and-transition-contract.md), [evidence plan](../nr0a/nr0b-evidence-plan.md), [gates](../nr0a/implementation-gates.md).
 - [NR0B-1 index](../nr0b1/README.md), [preparation](../nr0b1/preparation-and-provenance.md), [configuration](../nr0b1/effective-configuration.md), [runtime closeout](../nr0b1/runtime-closeout.md), [handoff](../nr0b1/nr0b2-handoff.md), [run card](../nr0b1/user-run-card.md), [completion](../nr0b1/nr0b1-completion.md), reviewed runtime ledger.
-- [Save contract](../../fable2-native-save-write-parity.md), [session/log contract](../../fable2-discovery-pipeline/coverage/README.md), [accepted Oakfield endpoint](../../fable2-discovery-pipeline/09-phase5a-tranche-001.md), [G2A retirement](../../fable2-gpu-reference/g2a-retirement.md).
+- [Save contract](../../fable2-native-save/fable2-native-save-write-parity.md), [session/log contract](../../fable2-discovery-pipeline/coverage/README.md), [accepted Oakfield endpoint](../../fable2-discovery-pipeline/09-phase5a-tranche-001.md), [G2A retirement](../../fable2-gpu-reference/g2a-retirement.md).
 - Existing `Fable2GpuConfig.py`, `Invoke-Fable2GpuConfig.ps1`, their tests, SDK configuration reporter source/call sites, live numbered-log allocator, Release caches/build wiring and actual consumer GPU paths.
 
 Accepted starting runtime evidence is PID 27668, `fable2-run-004.log`, actual

@@ -104,14 +104,14 @@ The context reconstruction read every repository `AGENTS.md`, inventoried all
 Markdown under `docs`, and read the relevant complete handoffs:
 
 ```text
-docs/rexglue-0.10-migration.md
-docs/fable2-fault-walker-baseline.md
-docs/fault-walk.md
-docs/fault-walk-performance.md
-docs/fault-walk-harvest-001.md
-docs/fault-walk-harvest-002.md
-docs/fault-walk-harvest-003.md
-docs/indirect-function-discovery.md
+docs/fable2-rexglue-migration/rexglue-0.10-migration.md
+docs/fable2-fault-walker/fable2-fault-walker-baseline.md
+docs/fable2-fault-walker/fault-walk.md
+docs/fable2-fault-walker/fault-walk-performance.md
+docs/fable2-fault-walker/fault-walk-harvest-001.md
+docs/fable2-fault-walker/fault-walk-harvest-002.md
+docs/fable2-fault-walker/fault-walk-harvest-003.md
+docs/fable2-indirect-function-discovery/indirect-function-discovery.md
 docs/fable2-discovery-pipeline/01-static-entrypoint-closure.md
 docs/fable2-discovery-pipeline/02-ghidra-function-map.md
 docs/fable2-discovery-pipeline/03-jump-table-recovery.md

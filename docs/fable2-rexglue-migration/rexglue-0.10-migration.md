@@ -44,7 +44,7 @@ Evidence labels in this document have their normal project meanings:
   (`Pin audited ReXGlue 0.10 fork build`)
 - The final documentation commit is the commit containing this file. Resolve
   it without ambiguity with
-  `git log -1 --format=%H -- docs/rexglue-0.10-migration.md`.
+  `git log -1 --format=%H -- docs/fable2-rexglue-migration/rexglue-0.10-migration.md`.
 
 The baseline worktree was clean. The completed Harvest 001-003 closeout was
 already committed as `c11c60e7`; no extra baseline commit was needed. The
@@ -247,7 +247,7 @@ Frozen normal evidence:
 - Invalid/unregistered dispatch: none
 
 The authoritative prior ledger and its forensic classifications remain in
-[`docs/fable2-fault-walker-baseline.md`](fable2-fault-walker-baseline.md).
+[`docs/fable2-fault-walker/fable2-fault-walker-baseline.md`](../fable2-fault-walker/fable2-fault-walker-baseline.md).
 
 ## Fork-patch ledger
 

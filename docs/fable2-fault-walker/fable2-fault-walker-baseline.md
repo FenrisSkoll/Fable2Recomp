@@ -4,8 +4,10 @@ Closeout date: `2026-08-28`
 
 This document is the durable handoff for the experimental Fable II fault-walker
 work through Harvest 003. Exact per-run evidence remains in
-`docs/fault-walk-harvest-001.md`, `docs/fault-walk-harvest-002.md`,
-`docs/fault-walk-harvest-003.md`, and the referenced numbered logs/reports.
+`docs/fable2-fault-walker/fault-walk-harvest-001.md`,
+`docs/fable2-fault-walker/fault-walk-harvest-002.md`,
+`docs/fable2-fault-walker/fault-walk-harvest-003.md`, and the referenced
+numbered logs/reports.
 
 ## Evidence labels
 
